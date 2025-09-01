@@ -1,29 +1,56 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { db, sqlite } from "@/shared/db/client";
+import migrations from "@/shared/db/drizzle/migrations";
+import { loadExercisesSeed } from "@/shared/db/seed/seed";
+import { useMainStoreActions } from "@/shared/hooks/use-main-store";
+import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
-import { useColorScheme } from '@/hooks/useColorScheme';
+import "react-native-reanimated";
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
+  const { loadFromStorage } = useMainStoreActions();
+  const { success, error } = useMigrations(db, migrations);
+
+  useDrizzleStudio(sqlite);
+
   const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+
+  useEffect(() => {
+    if (loaded) {
+      // Load data from storage when app starts
+      loadFromStorage();
+    }
+  }, [loaded, loadFromStorage]);
+
+  useEffect(() => {
+    if (success) {
+      loadExercisesSeed();
+    }
+  }, [success]);
 
   if (!loaded) {
     // Async font loading only occurs in development.
     return null;
   }
 
+  if (error || !success) {
+    return null;
+  }
+
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

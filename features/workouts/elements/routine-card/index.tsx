@@ -1,0 +1,127 @@
+import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { Button } from "@/shared/ui/button";
+import { Card } from "@/shared/ui/card";
+import { Typography } from "@/shared/ui/typography";
+import { Dumbbell, Hash, Play } from "lucide-react-native";
+import React from "react";
+import { TouchableOpacity, View } from "react-native";
+
+interface RoutineCardProps {
+  routine: RoutineWithMetrics;
+  onStart: (routine: RoutineWithMetrics | null) => void;
+  onLongPress?: (routine: RoutineWithMetrics | null) => void;
+  onPress: (routine: RoutineWithMetrics | null) => void;
+}
+
+export const RoutineCard: React.FC<RoutineCardProps> = ({
+  routine,
+  onStart,
+  onLongPress,
+  onPress,
+}) => {
+  const { colors } = useColorScheme();
+
+  // Verificar si es una rutina reciente (modificada en los últimos 7 días)
+  const isRecent = () => {
+    const updatedDate = routine.updated_at;
+
+    if (!updatedDate) return false;
+
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+
+    return updatedDate > weekAgo;
+  };
+
+  const handleSelectRoutine = () => {
+    onPress(routine);
+  };
+
+  return (
+    <TouchableOpacity
+      onLongPress={onLongPress ? () => onLongPress(routine) : undefined}
+      delayLongPress={500}
+      activeOpacity={onLongPress ? 0.7 : 1}
+      onPress={handleSelectRoutine}
+    >
+      <Card
+        variant="outlined"
+        padding="md"
+        style={{
+          marginBottom: 12,
+        }}
+      >
+        {/* Header con título y indicador de reciente */}
+        <View style={{ marginBottom: 16 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <Typography variant="h6" weight="semibold" style={{ flex: 1 }}>
+              {routine.name}
+            </Typography>
+
+            {isRecent() && (
+              <View
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: 4,
+                  backgroundColor: colors.primary[500],
+                }}
+              />
+            )}
+          </View>
+        </View>
+
+        {/* Estadísticas en fila */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 20,
+            marginBottom: 16,
+          }}
+        >
+          {/* Bloques */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Hash size={14} color={colors.textMuted} />
+            <Typography variant="caption" color="textMuted">
+              {routine.blocksCount} bloque
+              {routine.blocksCount !== 1 ? "s" : ""}
+            </Typography>
+          </View>
+
+          {/* Ejercicios */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+            <Dumbbell size={14} color={colors.textMuted} />
+            <Typography variant="caption" color="textMuted">
+              {routine.exercisesCount} ejercicio
+              {routine.exercisesCount !== 1 ? "s" : ""}
+            </Typography>
+          </View>
+
+          {/* Tiempo estimado */}
+          {/* <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <Clock size={14} color={colors.textMuted} />
+            <Typography variant="caption" color="textMuted">
+              ~{estimatedMinutes} min
+            </Typography>
+          </View> */}
+        </View>
+
+        <Button
+          variant="primary"
+          size="md"
+          onPress={() => onStart(routine)}
+          icon={<Play size={18} color="#ffffff" />}
+          iconPosition="left"
+          style={{
+            paddingHorizontal: 24,
+            paddingVertical: 12,
+          }}
+        >
+          Iniciar Entrenamiento
+        </Button>
+      </Card>
+    </TouchableOpacity>
+  );
+};

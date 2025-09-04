@@ -1,0 +1,91 @@
+import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { BaseFolder } from "@/shared/db/schema";
+import { Typography } from "@/shared/ui/typography";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import React, { useRef, useState } from "react";
+import { View } from "react-native";
+import { FoldersBody } from "../folders-view";
+import { MainView } from "../main-view";
+import { MoveRoutineModal } from "../move-routine-modal";
+import { RoutineList } from "../routine-list";
+import { RoutineOptionsBottomSheet } from "../routine-options-sheet";
+
+type Props = {
+  routines: RoutineWithMetrics[];
+  folders: BaseFolder[];
+  selectedFolder: BaseFolder | null;
+  setSelectedFolder: (folder: BaseFolder | null) => void;
+};
+
+export const Body: React.FC<Props> = ({
+  routines,
+  folders,
+  selectedFolder,
+  setSelectedFolder,
+}) => {
+  const routineOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
+  const [routineToMove, setRoutineToMove] = useState<RoutineWithMetrics | null>(
+    null
+  );
+  const [selectedRoutine, setSelectedRoutine] =
+    useState<RoutineWithMetrics | null>(null);
+
+  const handleRoutineOptions = (routine: RoutineWithMetrics | null) => {
+    setSelectedRoutine(routine);
+    routineOptionsBottomSheetRef.current?.present();
+  };
+
+  return (
+    <>
+      {selectedFolder ? (
+        <FoldersBody setSelectedFolder={setSelectedFolder}>
+          <RoutineList
+            routines={routines}
+            setRoutineToMove={setRoutineToMove}
+            onPressRoutine={handleRoutineOptions}
+          />
+        </FoldersBody>
+      ) : (
+        <MainView
+          folders={folders}
+          onReorder={() => {}}
+          setSelectedFolder={setSelectedFolder}
+        >
+          {routines.length > 0 && (
+            <View style={{ marginBottom: 24 }}>
+              <Typography
+                variant="h5"
+                weight="semibold"
+                style={{ marginBottom: 16 }}
+              >
+                Rutinas
+              </Typography>
+            </View>
+          )}
+          <RoutineList
+            routines={routines}
+            setRoutineToMove={setRoutineToMove}
+            onPressRoutine={handleRoutineOptions}
+          />
+        </MainView>
+      )}
+
+      <MoveRoutineModal
+        visible={!!routineToMove}
+        onClose={() => {
+          setRoutineToMove(null);
+        }}
+        routine={routineToMove}
+        folders={folders}
+        onMoveToFolder={() => {}}
+        currentFolderId={routineToMove?.folder_id}
+      />
+
+      <RoutineOptionsBottomSheet
+        ref={routineOptionsBottomSheetRef}
+        onDelete={() => {}}
+        onEdit={() => {}}
+      />
+    </>
+  );
+};

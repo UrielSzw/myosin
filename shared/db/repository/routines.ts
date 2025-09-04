@@ -1,10 +1,18 @@
 import { eq, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import { exercise_in_block, routine_blocks, routines } from "../schema";
+import type { BaseRoutine } from "../schema/routine";
+
+export type RoutineWithMetrics = BaseRoutine & {
+  blocksCount: number;
+  exercisesCount: number;
+};
 
 export const routinesRepository = {
-  findAllWithMetrics: async (folderId?: string) => {
-    const result = await db
+  findAllWithMetrics: async (
+    folderId: string | null
+  ): Promise<RoutineWithMetrics[]> => {
+    const rows = await db
       .select({
         id: routines.id,
         name: routines.name,
@@ -24,6 +32,19 @@ export const routinesRepository = {
       )
       .groupBy(routines.id);
 
-    return result;
+    // Normalizar/asegurar tipos: algunos drivers pueden devolver counts como string
+    const normalized: RoutineWithMetrics[] = rows.map((r: any) => ({
+      ...r,
+      blocksCount:
+        typeof r.blocksCount === "number"
+          ? r.blocksCount
+          : Number(r.blocksCount || 0),
+      exercisesCount:
+        typeof r.exercisesCount === "number"
+          ? r.exercisesCount
+          : Number(r.exercisesCount || 0),
+    }));
+
+    return normalized;
   },
 };

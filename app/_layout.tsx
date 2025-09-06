@@ -49,6 +49,40 @@ export default function RootLayout() {
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="+not-found" />
+        <Stack.Screen
+          name="routines/create"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/edit/[id]"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/reorder-blocks"
+          options={{
+            presentation: "fullScreenModal",
+            headerShown: false,
+            title: "Reordenar Bloques",
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/reorder-exercises"
+          options={{
+            presentation: "fullScreenModal",
+            headerShown: false,
+            title: "Reordenar Ejercicios",
+            gestureEnabled: false,
+            gestureDirection: "horizontal",
+            fullScreenGestureEnabled: false,
+          }}
+        />
       </Stack>
       <StatusBar style="auto" />
     </GestureHandlerRootView>

@@ -1,6 +1,7 @@
 import { BaseFolder } from "@/shared/db/schema";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
-import React, { useState } from "react";
+import { useFocusEffect } from "expo-router";
+import React, { useCallback, useState } from "react";
 import { Text } from "react-native";
 import { Body } from "./elements/body";
 import { EmptyState } from "./elements/empty-state";
@@ -11,7 +12,7 @@ import { useRoutinesByFolder } from "./hooks/use-routines-by-folder";
 export const WorkoutsFeature = () => {
   const [selectedFolder, setSelectedFolder] = useState<BaseFolder | null>(null);
 
-  const { routines, loading, error } = useRoutinesByFolder(
+  const { routines, loading, error, refetch } = useRoutinesByFolder(
     selectedFolder?.id || null
   );
 
@@ -20,6 +21,13 @@ export const WorkoutsFeature = () => {
     loading: foldersLoading,
     error: foldersError,
   } = useFolders();
+
+  useFocusEffect(
+    useCallback(() => {
+      // Refetch cuando la screen gana focus
+      refetch();
+    }, [refetch])
+  );
 
   if (loading || foldersLoading) return <Text>Loading...</Text>;
   if (error || foldersError)
@@ -37,6 +45,7 @@ export const WorkoutsFeature = () => {
         folders={folders}
         selectedFolder={selectedFolder}
         setSelectedFolder={setSelectedFolder}
+        refetch={refetch}
       />
 
       {routines.length === 0 && folders.length === 0 && <EmptyState />}

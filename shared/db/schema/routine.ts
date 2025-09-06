@@ -116,9 +116,7 @@ export const routine_blocks = sqliteTable("routine_blocks", {
     .references(() => routines.id)
     .notNull(),
 
-  type: text("type")
-    .$type<"warmup" | "strength" | "superset" | "circuit">()
-    .notNull(),
+  type: text("type").$type<"individual" | "superset" | "circuit">().notNull(),
   order_index: integer("order_index").notNull(),
   rest_time_seconds: integer("rest_time_seconds").notNull(),
   rest_between_exercises_seconds: integer(
@@ -165,8 +163,8 @@ export const routine_sets = sqliteTable("routine_sets", {
   reps_type: text("reps_type").$type<IRepsType>().notNull(),
 
   reps_range: blob("reps_range", { mode: "json" }).$type<{
-    min: number;
-    max: number;
+    min: number | null;
+    max: number | null;
   }>(),
 
   ...timestamps,

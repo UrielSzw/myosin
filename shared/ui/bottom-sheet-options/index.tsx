@@ -7,12 +7,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
   title: string;
+  subtitle?: string;
   options: { type: string; label: string; method: () => void }[];
   warningOption?: { label: string; method: () => void };
+  addBottomInset?: boolean;
 };
 
 export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
-  ({ title, options, warningOption }, ref) => {
+  ({ title, subtitle, options, warningOption, addBottomInset }, ref) => {
     const { colors } = useColorScheme();
     const insets = useSafeAreaInsets();
 
@@ -30,7 +32,7 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
         ref={ref}
         snapPoints={["50%"]}
         enablePanDownToClose
-        bottomInset={bottomInset}
+        bottomInset={addBottomInset ? bottomInset : 0}
         backgroundStyle={{
           backgroundColor: colors.surface,
           shadowColor: "#000",
@@ -52,6 +54,16 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
           >
             {title}
           </Typography>
+
+          {subtitle && (
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={{ marginBottom: 16 }}
+            >
+              {subtitle}
+            </Typography>
+          )}
 
           {options.map((option) => (
             <TouchableOpacity

@@ -9,6 +9,8 @@ export type ISetType =
 
 export type IRepsType = "reps" | "range" | "time" | "distance";
 
+export type IBlockType = "individual" | "superset" | "circuit";
+
 export type IExerciseMuscle =
   | "chest"
   | "back"

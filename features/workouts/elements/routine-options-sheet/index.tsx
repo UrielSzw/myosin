@@ -13,10 +13,12 @@ export const RoutineOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
       <BottomSheetOptions
         ref={ref}
         title="Opciones de Rutina"
-        options={[
-          { type: "edit", label: "Editar rutina", method: onEdit },
-          { type: "delete", label: "Eliminar rutina", method: onDelete },
-        ]}
+        options={[{ type: "edit", label: "Editar rutina", method: onEdit }]}
+        warningOption={{
+          label: "Eliminar rutina",
+          method: onDelete,
+        }}
+        addBottomInset
       />
     );
   }

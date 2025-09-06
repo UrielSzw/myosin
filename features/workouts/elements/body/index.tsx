@@ -4,6 +4,7 @@ import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import React, { useRef, useState } from "react";
 import { View } from "react-native";
+import { useRoutineOptions } from "../../hooks/use-routine-options";
 import { FoldersBody } from "../folders-view";
 import { MainView } from "../main-view";
 import { MoveRoutineModal } from "../move-routine-modal";
@@ -15,6 +16,7 @@ type Props = {
   folders: BaseFolder[];
   selectedFolder: BaseFolder | null;
   setSelectedFolder: (folder: BaseFolder | null) => void;
+  refetch: () => Promise<void>;
 };
 
 export const Body: React.FC<Props> = ({
@@ -22,7 +24,10 @@ export const Body: React.FC<Props> = ({
   folders,
   selectedFolder,
   setSelectedFolder,
+  refetch,
 }) => {
+  const { handleDeleteRoutine, handleEditRoutine } = useRoutineOptions();
+
   const routineOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
   const [routineToMove, setRoutineToMove] = useState<RoutineWithMetrics | null>(
     null
@@ -33,6 +38,24 @@ export const Body: React.FC<Props> = ({
   const handleRoutineOptions = (routine: RoutineWithMetrics | null) => {
     setSelectedRoutine(routine);
     routineOptionsBottomSheetRef.current?.present();
+  };
+
+  const handleDelete = async () => {
+    // Lógica para eliminar la rutina
+    if (!selectedRoutine) return;
+
+    await handleDeleteRoutine(selectedRoutine, refetch);
+
+    routineOptionsBottomSheetRef.current?.dismiss();
+    setSelectedRoutine(null);
+  };
+
+  const handleEdit = async () => {
+    if (!selectedRoutine) return;
+
+    handleEditRoutine(selectedRoutine);
+    routineOptionsBottomSheetRef.current?.dismiss();
+    setSelectedRoutine(null);
   };
 
   return (
@@ -83,8 +106,8 @@ export const Body: React.FC<Props> = ({
 
       <RoutineOptionsBottomSheet
         ref={routineOptionsBottomSheetRef}
-        onDelete={() => {}}
-        onEdit={() => {}}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
       />
     </>
   );

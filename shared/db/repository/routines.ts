@@ -39,6 +39,7 @@ export const routinesRepository = {
         updated_at: routines.updated_at,
         blocksCount: sql<number>`COUNT(DISTINCT ${routine_blocks.id})`,
         exercisesCount: sql<number>`COUNT(${exercise_in_block.id})`,
+        folder_id: routines.folder_id,
       })
       .from(routines)
       .leftJoin(routine_blocks, eq(routine_blocks.routine_id, routines.id))
@@ -288,5 +289,14 @@ export const routinesRepository = {
       .update(routines)
       .set({ folder_id: folderId })
       .where(eq(routines.id, routineId));
+  },
+
+  getAllRoutinesCount: async (): Promise<number> => {
+    const result = await db
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(routines)
+      .limit(1);
+
+    return result[0].count;
   },
 };

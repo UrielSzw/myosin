@@ -1,15 +1,14 @@
-import { BaseFolder } from "@/shared/db/schema";
+import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { TouchableOpacity, Vibration, View } from "react-native";
 
 type Props = {
-  folder: BaseFolder;
+  folder: FolderWithMetrics;
   drag: () => void;
   isActive: boolean;
   onSelect: () => void;
-  routinesCount: number;
 };
 
 export const FolderItem: React.FC<Props> = ({
@@ -17,7 +16,6 @@ export const FolderItem: React.FC<Props> = ({
   drag,
   isActive,
   onSelect,
-  routinesCount,
 }) => {
   const { colors } = useColorScheme();
 
@@ -65,7 +63,9 @@ export const FolderItem: React.FC<Props> = ({
               {folder.name}
             </Typography>
             <Typography variant="body2" color="textMuted">
-              {routinesCount === 1 ? "1 rutina" : `${routinesCount} rutinas`}
+              {folder.routineCount === 1
+                ? "1 rutina"
+                : `${folder.routineCount} rutinas`}
             </Typography>
           </View>
         </View>

@@ -1,53 +1,47 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import type { RoutineWithMetrics } from "@/shared/db/repository/routines";
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { routinesService } from "../service/routines";
 
 export const useMainWorkoutsData = () => {
-  const [routines, setRoutines] = useState<RoutineWithMetrics[]>([]);
-  const [folders, setFolders] = useState<FolderWithMetrics[]>([]);
+  const {
+    data: routines = [],
+    isLoading: routinesLoading,
+    error: routinesError,
+  } = useQuery({
+    queryKey: ["workouts", "routines"],
+    queryFn: () => routinesService.findAllWithMetrics(null),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    gcTime: 1000 * 60 * 10, // 10 minutos
+  });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const { data: routinesCount = 0 } = useQuery({
+    queryKey: ["workouts", "routines", "count"],
+    queryFn: () => routinesService.getAllRoutinesCount(),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    gcTime: 1000 * 60 * 10, // 10 minutos
+  });
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const routinesDb = await routinesService.findAllWithMetrics(null);
-      const foldersDb = await routinesService.getAllFoldersWithMetrics();
+  const {
+    data: folders = [],
+    isLoading: foldersLoading,
+    error: foldersError,
+  } = useQuery({
+    queryKey: ["workouts", "folders"],
+    queryFn: () => routinesService.getAllFoldersWithMetrics(),
+    staleTime: 1000 * 60 * 5, // 5 minutos
+    gcTime: 1000 * 60 * 10, // 10 minutos
+  });
 
-      setRoutines(routinesDb);
-      setFolders(foldersDb);
-    } catch (err: any) {
-      setError(err instanceof Error ? err : new Error(String(err)));
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    const runFetch = async () => {
-      if (mounted) {
-        await fetchData();
-      }
-    };
-
-    runFetch();
-
-    return () => {
-      mounted = false;
-    };
-  }, [fetchData]);
+  // Estados derivados
+  const loading = routinesLoading || foldersLoading;
+  const error = routinesError || foldersError;
 
   return {
-    routines,
-    folders,
+    routines: routines as RoutineWithMetrics[],
+    folders: folders as FolderWithMetrics[],
     loading,
-    error,
-    refetch: fetchData,
-    count: routines.length,
+    error: error as Error | null,
+    count: routinesCount,
   };
 };

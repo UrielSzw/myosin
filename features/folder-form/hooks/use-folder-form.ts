@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Alert } from "react-native";
 
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useQueryClient } from "@tanstack/react-query";
 import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 import { useSaveFolder } from "./use-save-folder";
@@ -15,6 +16,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
+  const queryClient = useQueryClient();
 
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -34,7 +36,12 @@ export const useFolderForm = ({ isEditMode }: Props) => {
 
   const handleSaveFolder = async () => {
     const result = await saveFolder();
-    if (!result.success) {
+
+    if (result.success) {
+      queryClient.invalidateQueries({ queryKey: ["workouts", "folders"] });
+      resetForm();
+      router.back();
+    } else {
       Alert.alert("Error", result.error);
     }
   };
@@ -54,6 +61,9 @@ export const useFolderForm = ({ isEditMode }: Props) => {
             setIsDeleting(true);
             try {
               await folderService.deleteFolder(editingId);
+              queryClient.invalidateQueries({
+                queryKey: ["workouts", "folders"],
+              });
               setSelectedFolder(null);
               resetForm();
               router.back();

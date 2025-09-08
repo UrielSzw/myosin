@@ -3,6 +3,7 @@ import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { Folder, FolderMinus, X } from "lucide-react-native";
 import React from "react";
@@ -13,9 +14,8 @@ type Props = {
   visible: boolean;
   onClose: () => void;
   routine: RoutineWithMetrics | null;
-  folders: BaseFolder[];
   currentFolderId?: string | null;
-  refetch: () => Promise<void>;
+  folders?: BaseFolder[];
 };
 
 export const MoveRoutineModal: React.FC<Props> = ({
@@ -24,20 +24,23 @@ export const MoveRoutineModal: React.FC<Props> = ({
   routine,
   folders,
   currentFolderId,
-  refetch,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const queryClient = useQueryClient();
 
   if (!routine) return null;
 
   const handleMoveToFolder = async (folderId: string | null) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     await routinesService.updateRoutineFolderId(routine.id, folderId);
-    refetch();
+    queryClient.invalidateQueries({
+      queryKey: ["workouts"],
+    });
+
     onClose();
   };
 
-  const availableFolders = folders.filter(
+  const availableFolders = folders?.filter(
     (folder) => folder.id !== currentFolderId
   );
 
@@ -96,7 +99,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
                 style={{ marginTop: 4 }}
               >
                 Actualmente en:{" "}
-                {folders.find((f) => f.id === currentFolderId)?.name}
+                {folders?.find((f) => f.id === currentFolderId)?.name}
               </Typography>
             )}
           </View>
@@ -145,8 +148,8 @@ export const MoveRoutineModal: React.FC<Props> = ({
             {currentFolderId ? "Mover a otra carpeta:" : "Mover a carpeta:"}
           </Typography>
 
-          {availableFolders.length > 0 ? (
-            availableFolders.map((folder) => (
+          {availableFolders && availableFolders?.length > 0 ? (
+            availableFolders?.map((folder) => (
               <TouchableOpacity
                 key={folder.id}
                 style={{

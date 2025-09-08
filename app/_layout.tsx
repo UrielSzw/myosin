@@ -2,6 +2,7 @@ import { db, sqlite } from "@/shared/db/client";
 import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useMainStoreActions } from "@/shared/hooks/use-main-store";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useFonts } from "expo-font";
@@ -9,8 +10,9 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
 import "react-native-reanimated";
+
+const queryClient = new QueryClient();
 
 export default function RootLayout() {
   const { loadFromStorage } = useMainStoreActions();
@@ -45,60 +47,62 @@ export default function RootLayout() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-        <Stack.Screen
-          name="routines/create"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="routines/edit/[id]"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="folders/create"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="folders/edit/[id]"
-          options={{
-            presentation: "modal",
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="routines/reorder-blocks"
-          options={{
-            presentation: "fullScreenModal",
-            headerShown: false,
-            title: "Reordenar Bloques",
-            gestureEnabled: false,
-          }}
-        />
-        <Stack.Screen
-          name="routines/reorder-exercises"
-          options={{
-            presentation: "fullScreenModal",
-            headerShown: false,
-            title: "Reordenar Ejercicios",
-            gestureEnabled: false,
-            gestureDirection: "horizontal",
-            fullScreenGestureEnabled: false,
-          }}
-        />
-      </Stack>
-      <StatusBar style="auto" />
-    </GestureHandlerRootView>
+    <QueryClientProvider client={queryClient}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" />
+          <Stack.Screen
+            name="routines/create"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="routines/edit/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="folders/create"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="folders/edit/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="routines/reorder-blocks"
+            options={{
+              presentation: "fullScreenModal",
+              headerShown: false,
+              title: "Reordenar Bloques",
+              gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
+            name="routines/reorder-exercises"
+            options={{
+              presentation: "fullScreenModal",
+              headerShown: false,
+              title: "Reordenar Ejercicios",
+              gestureEnabled: false,
+              gestureDirection: "horizontal",
+              fullScreenGestureEnabled: false,
+            }}
+          />
+        </Stack>
+        <StatusBar style="auto" />
+      </GestureHandlerRootView>
+    </QueryClientProvider>
   );
 }

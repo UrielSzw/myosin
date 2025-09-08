@@ -24,7 +24,7 @@ type FolderFormState = {
 
 const initialState = {
   name: "",
-  color: "#3B82F6", // Default blue color
+  color: "#3b82f6", // Default blue color
   icon: "📁", // Default folder icon
   isLoading: false,
   mode: "create" as const,
@@ -32,7 +32,7 @@ const initialState = {
 };
 
 export const useFolderFormStore = create<FolderFormState>()(
-  immer((set, get) => ({
+  immer((set) => ({
     ...initialState,
 
     setName: (name: string) =>

@@ -1,4 +1,4 @@
-import { BaseFolder } from "@/shared/db/schema";
+import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { Button } from "@/shared/ui/button";
@@ -10,15 +10,15 @@ import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import { routinesService } from "../../service/routines";
 import { FolderItem } from "./folder-item";
 
 type Props = {
   children: React.ReactNode;
-  folders?: BaseFolder[];
-  onReorder: (folders: BaseFolder[]) => void;
+  folders?: FolderWithMetrics[];
 };
 
-export const MainView: React.FC<Props> = ({ folders, children, onReorder }) => {
+export const MainView: React.FC<Props> = ({ folders, children }) => {
   const { colors } = useColorScheme();
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
@@ -28,7 +28,7 @@ export const MainView: React.FC<Props> = ({ folders, children, onReorder }) => {
     item,
     drag,
     isActive,
-  }: RenderItemParams<BaseFolder>) => {
+  }: RenderItemParams<FolderWithMetrics>) => {
     const handleSelect = () => {
       setSelectedFolder(item);
     };
@@ -40,14 +40,13 @@ export const MainView: React.FC<Props> = ({ folders, children, onReorder }) => {
           drag={drag}
           isActive={isActive}
           onSelect={handleSelect}
-          routinesCount={0}
         />
       </ScaleDecorator>
     );
   };
 
-  const handleReorder = ({ data }: { data: BaseFolder[] }) => {
-    onReorder(data);
+  const handleReorder = ({ data }: { data: FolderWithMetrics[] }) => {
+    routinesService.reorderFolders(data.map((folder) => folder.id));
   };
 
   const handleCreateFolder = () => {

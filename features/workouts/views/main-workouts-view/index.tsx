@@ -23,7 +23,7 @@ export const MainWorkoutsView = ({
   const setTotalRoutines = useWorkoutsMetricsStore(
     (state) => state.setTotalRoutines
   );
-  const { routines, folders, refetch, count } = useMainWorkoutsData();
+  const { routines, folders, count } = useMainWorkoutsData();
 
   useEffect(() => {
     setTotalRoutines(count);
@@ -31,7 +31,7 @@ export const MainWorkoutsView = ({
 
   return (
     <>
-      <MainView folders={folders} onReorder={() => {}}>
+      <MainView folders={folders}>
         {routines.length > 0 && (
           <View style={{ marginBottom: 24 }}>
             <Typography
@@ -60,7 +60,6 @@ export const MainWorkoutsView = ({
         routine={routineToMove}
         folders={folders}
         currentFolderId={routineToMove?.folder_id}
-        refetch={refetch}
       />
     </>
   );

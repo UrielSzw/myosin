@@ -1,13 +1,13 @@
-import { useRouter } from "expo-router";
+import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useCallback } from "react";
-
 import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 
 export const useSaveFolder = () => {
-  const router = useRouter();
-  const { name, color, icon, mode, editingId, resetForm } =
-    useFolderFormStore();
+  const { name, color, icon, mode, editingId } = useFolderFormStore();
+  const { selectedFolder, setSelectedFolder } = useSelectedFolderStore(
+    (state) => state
+  );
 
   const saveFolder = useCallback(async () => {
     if (!name.trim()) {
@@ -22,6 +22,15 @@ export const useSaveFolder = () => {
           color,
           icon,
         });
+
+        if (selectedFolder) {
+          setSelectedFolder({
+            ...selectedFolder,
+            name: name.trim(),
+            color,
+            icon,
+          });
+        }
       } else {
         // Create new folder
         const orderIndex = await folderService.getNextOrderIndex();
@@ -34,8 +43,6 @@ export const useSaveFolder = () => {
         });
       }
 
-      resetForm();
-      router.back();
       return { success: true };
     } catch (error) {
       console.error("Error saving folder:", error);
@@ -46,7 +53,7 @@ export const useSaveFolder = () => {
         } la carpeta`,
       };
     }
-  }, [name, color, icon, mode, editingId, resetForm, router]);
+  }, [name, color, icon, mode, editingId]);
 
   return { saveFolder };
 };

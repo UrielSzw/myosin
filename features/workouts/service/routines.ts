@@ -10,4 +10,6 @@ export const routinesService = {
   getRoutineForEdit: (routineId: string) =>
     routinesRepository.findRoutineById(routineId),
   updateRoutineFolderId: routinesRepository.updateRoutineFolderId,
+  reorderFolders: foldersRepository.reorderFolders,
+  getAllRoutinesCount: routinesRepository.getAllRoutinesCount,
 };

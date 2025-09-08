@@ -35,8 +35,12 @@ export const Header: React.FC<Props> = ({ selectedFolder }) => {
         </Typography>
         <Typography variant="body2" color="textMuted">
           {selectedFolder
-            ? `${totalRoutines} rutinas en esta carpeta`
-            : `${totalRoutines} rutinas totales`}
+            ? `${totalRoutines} rutina${
+                totalRoutines !== 1 ? "s" : ""
+              } en esta carpeta`
+            : `${totalRoutines} rutina${totalRoutines !== 1 ? "s" : ""} total${
+                totalRoutines !== 1 ? "es" : ""
+              }`}
         </Typography>
       </View>
 

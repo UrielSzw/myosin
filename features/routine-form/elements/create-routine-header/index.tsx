@@ -1,6 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { Alert, View } from "react-native";
 import {
@@ -14,6 +15,7 @@ export const CreateRoutineHeader = () => {
   const { saveRoutine, isLoading, error } = useSaveRoutine();
   const { clearForm } = useMainActions();
   const { mode } = useRoutineFormState();
+  const queryClient = useQueryClient();
 
   const isEditMode = mode === "edit";
 
@@ -25,21 +27,13 @@ export const CreateRoutineHeader = () => {
     const savedRoutineId = await saveRoutine();
 
     if (savedRoutineId) {
-      Alert.alert(
-        isEditMode ? "¡Rutina actualizada!" : "¡Rutina guardada!",
-        isEditMode
-          ? "Tu rutina se ha actualizado exitosamente."
-          : "Tu rutina se ha guardado exitosamente.",
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              clearForm();
-              router.back();
-            },
-          },
-        ]
-      );
+      queryClient.invalidateQueries({
+        queryKey: ["workouts", "routines"],
+      });
+
+      clearForm();
+
+      router.back();
     } else if (error) {
       Alert.alert("Error", error);
     }

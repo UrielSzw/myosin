@@ -1,16 +1,16 @@
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import { routinesService } from "../service/routines";
 
 export const useRoutineOptions = () => {
+  const queryClient = useQueryClient();
+
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleDeleteRoutine = async (
-    routine: RoutineWithMetrics,
-    onSuccess?: () => void
-  ) => {
+  const handleDeleteRoutine = async (routine: RoutineWithMetrics) => {
     Alert.alert(
       "Eliminar Rutina",
       `¿Estás seguro que deseas eliminar "${routine.name}"?\n\nEsta acción eliminará todos los bloques, ejercicios y sets asociados y no se puede deshacer.`,
@@ -26,17 +26,7 @@ export const useRoutineOptions = () => {
             setIsDeleting(true);
             try {
               await routinesService.deleteRoutine(routine.id);
-
-              Alert.alert(
-                "Rutina eliminada",
-                "La rutina se ha eliminado exitosamente.",
-                [
-                  {
-                    text: "OK",
-                    onPress: () => onSuccess?.(),
-                  },
-                ]
-              );
+              queryClient.invalidateQueries({ queryKey: ["workouts"] });
             } catch (error) {
               console.error("Error deleting routine:", error);
               Alert.alert(

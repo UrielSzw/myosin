@@ -85,4 +85,16 @@ export const foldersRepository = {
 
     return result.length > 0 ? (result[0].maxOrder || 0) + 1 : 0;
   },
+
+  reorderFolders: async (orderedFolderIds: string[]): Promise<void> => {
+    await db.transaction(async (tx) => {
+      for (let index = 0; index < orderedFolderIds.length; index++) {
+        const folderId = orderedFolderIds[index];
+        await tx
+          .update(folders)
+          .set({ order_index: index })
+          .where(eq(folders.id, folderId));
+      }
+    });
+  },
 };

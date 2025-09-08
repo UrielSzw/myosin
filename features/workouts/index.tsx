@@ -64,6 +64,7 @@ export const WorkoutsFeature = () => {
             handleRoutineOptions={handleRoutineOptions}
             selectedFolder={selectedFolder}
             setRoutineToMove={setRoutineToMove}
+            routineToMove={routineToMove}
           />
         </Animated.View>
       ) : (

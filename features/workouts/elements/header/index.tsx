@@ -5,13 +5,15 @@ import { router } from "expo-router";
 import { Plus } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
+import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store";
 
 type Props = {
-  routinesLength: number;
   selectedFolder: BaseFolder | null;
 };
 
-export const Header: React.FC<Props> = ({ selectedFolder, routinesLength }) => {
+export const Header: React.FC<Props> = ({ selectedFolder }) => {
+  const totalRoutines = useWorkoutsMetricsStore((state) => state.totalRoutines);
+
   const handleCreateRoutine = () => {
     router.push("/routines/create");
   };
@@ -33,8 +35,8 @@ export const Header: React.FC<Props> = ({ selectedFolder, routinesLength }) => {
         </Typography>
         <Typography variant="body2" color="textMuted">
           {selectedFolder
-            ? `${routinesLength} rutinas en esta carpeta`
-            : `${routinesLength} rutinas totales`}
+            ? `${totalRoutines} rutinas en esta carpeta`
+            : `${totalRoutines} rutinas totales`}
         </Typography>
       </View>
 

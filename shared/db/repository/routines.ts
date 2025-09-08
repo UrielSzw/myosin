@@ -279,4 +279,14 @@ export const routinesRepository = {
       await tx.delete(routines).where(eq(routines.id, routineId));
     });
   },
+
+  updateRoutineFolderId: async (
+    routineId: string,
+    folderId: string | null
+  ): Promise<void> => {
+    await db
+      .update(routines)
+      .set({ folder_id: folderId })
+      .where(eq(routines.id, routineId));
+  },
 };

@@ -64,6 +64,20 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="folders/create"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="folders/edit/[id]"
+          options={{
+            presentation: "modal",
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="routines/reorder-blocks"
           options={{
             presentation: "fullScreenModal",

@@ -1,7 +1,9 @@
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
+import { router } from "expo-router";
 import { FolderPlus } from "lucide-react-native";
 import { View } from "react-native";
 import DraggableFlatList, {
@@ -14,16 +16,13 @@ type Props = {
   children: React.ReactNode;
   folders?: BaseFolder[];
   onReorder: (folders: BaseFolder[]) => void;
-  setSelectedFolder: (folder: BaseFolder | null) => void;
 };
 
-export const MainView: React.FC<Props> = ({
-  folders,
-  children,
-  onReorder,
-  setSelectedFolder,
-}) => {
+export const MainView: React.FC<Props> = ({ folders, children, onReorder }) => {
   const { colors } = useColorScheme();
+  const setSelectedFolder = useSelectedFolderStore(
+    (state) => state.setSelectedFolder
+  );
 
   const renderFolderItem = ({
     item,
@@ -52,7 +51,7 @@ export const MainView: React.FC<Props> = ({
   };
 
   const handleCreateFolder = () => {
-    // router.push("/folders/create");
+    router.push("/folders/create");
   };
 
   return (

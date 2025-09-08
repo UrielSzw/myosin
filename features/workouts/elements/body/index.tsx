@@ -61,7 +61,10 @@ export const Body: React.FC<Props> = ({
   return (
     <>
       {selectedFolder ? (
-        <FoldersBody setSelectedFolder={setSelectedFolder}>
+        <FoldersBody
+          selectedFolderId={selectedFolder.id}
+          setSelectedFolder={setSelectedFolder}
+        >
           <RoutineList
             routines={routines}
             setRoutineToMove={setRoutineToMove}
@@ -100,8 +103,8 @@ export const Body: React.FC<Props> = ({
         }}
         routine={routineToMove}
         folders={folders}
-        onMoveToFolder={() => {}}
         currentFolderId={routineToMove?.folder_id}
+        refetch={refetch}
       />
 
       <RoutineOptionsBottomSheet

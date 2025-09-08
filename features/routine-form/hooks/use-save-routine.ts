@@ -6,7 +6,7 @@ import type {
 } from "@/shared/db/schema";
 import * as Crypto from "expo-crypto";
 import { useState } from "react";
-import { createRoutineService } from "../service/create";
+import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
 
 type SaveState = "idle" | "saving" | "success" | "error";

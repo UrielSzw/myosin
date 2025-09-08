@@ -7,14 +7,15 @@ import * as Haptics from "expo-haptics";
 import { Folder, FolderMinus, X } from "lucide-react-native";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import { routinesService } from "../../service/routines";
 
 type Props = {
   visible: boolean;
   onClose: () => void;
   routine: RoutineWithMetrics | null;
   folders: BaseFolder[];
-  onMoveToFolder: (routineId: string, folderId?: string) => void;
   currentFolderId?: string | null;
+  refetch: () => Promise<void>;
 };
 
 export const MoveRoutineModal: React.FC<Props> = ({
@@ -22,16 +23,17 @@ export const MoveRoutineModal: React.FC<Props> = ({
   onClose,
   routine,
   folders,
-  onMoveToFolder,
   currentFolderId,
+  refetch,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
 
   if (!routine) return null;
 
-  const handleMoveToFolder = (folderId?: string) => {
+  const handleMoveToFolder = async (folderId: string | null) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    onMoveToFolder(routine.id, folderId);
+    await routinesService.updateRoutineFolderId(routine.id, folderId);
+    refetch();
     onClose();
   };
 
@@ -112,7 +114,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
                 padding: 16,
                 marginBottom: 16,
               }}
-              onPress={() => handleMoveToFolder(undefined)}
+              onPress={() => handleMoveToFolder(null)}
             >
               <View
                 style={{

@@ -1,23 +1,27 @@
-import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { Button } from "@/shared/ui/button";
+import { router } from "expo-router";
 import { FolderEdit } from "lucide-react-native";
 import React from "react";
 import { ScrollView, View } from "react-native";
 
 type Props = {
   children: React.ReactNode;
-  setSelectedFolder: (folder: BaseFolder | null) => void;
+  selectedFolderId: string;
 };
 
 export const FoldersBody: React.FC<Props> = ({
   children,
-  setSelectedFolder,
+  selectedFolderId,
 }) => {
   const { colors } = useColorScheme();
+  const setSelectedFolder = useSelectedFolderStore(
+    (state) => state.setSelectedFolder
+  );
 
   const handleEditFolder = () => {
-    // router.push("/folders/edit");
+    router.push(`/folders/edit/${selectedFolderId}` as any);
   };
 
   const handleGoBack = () => {

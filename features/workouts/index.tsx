@@ -1,54 +1,91 @@
-import { BaseFolder } from "@/shared/db/schema";
+import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
-import { useFocusEffect } from "expo-router";
-import React, { useCallback, useState } from "react";
-import { Text } from "react-native";
-import { Body } from "./elements/body";
-import { EmptyState } from "./elements/empty-state";
+import React, { useEffect, useState } from "react";
+import Animated, {
+  Easing,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  SlideOutRight,
+} from "react-native-reanimated";
 import { Header } from "./elements/header";
-import { useFolders } from "./hooks/use-folders";
-import { useRoutinesByFolder } from "./hooks/use-routines-by-folder";
+import { RoutineOptionsBottomSheet } from "./elements/routine-options-sheet";
+import { useWorkouts } from "./hooks/use-workouts";
+import { FolderDetailView } from "./views/folder-detail-view";
+import { MainWorkoutsView } from "./views/main-workouts-view";
 
 export const WorkoutsFeature = () => {
-  const [selectedFolder, setSelectedFolder] = useState<BaseFolder | null>(null);
-
-  const { routines, loading, error, refetch } = useRoutinesByFolder(
-    selectedFolder?.id || null
+  const selectedFolder = useSelectedFolderStore(
+    (state) => state.selectedFolder
   );
-
   const {
-    folders,
-    loading: foldersLoading,
-    error: foldersError,
-  } = useFolders();
+    routineOptionsBottomSheetRef,
+    routineToMove,
+    setRoutineToMove,
+    handleRoutineOptions,
+    handleDelete,
+    handleEdit,
+  } = useWorkouts();
 
-  useFocusEffect(
-    useCallback(() => {
-      // Refetch cuando la screen gana focus
-      refetch();
-    }, [refetch])
+  // Fix para el bug de layout inicial
+  const [isInitialMount, setIsInitialMount] = useState(true);
+
+  useEffect(() => {
+    // Marcar como no-inicial después del primer render
+    setIsInitialMount(false);
+  }, []);
+
+  // Animation configurations
+  const slideInFromRight = SlideInRight.duration(300).easing(
+    Easing.bezier(0.25, 0.1, 0.25, 1)
   );
-
-  if (loading || foldersLoading) return <Text>Loading...</Text>;
-  if (error || foldersError)
-    return <Text>Error: {error?.message || foldersError?.message}</Text>;
+  const slideInFromLeft = !isInitialMount
+    ? SlideInLeft.duration(300).easing(Easing.bezier(0.25, 0.1, 0.25, 1))
+    : undefined;
+  const slideOutToLeft = SlideOutLeft.duration(300).easing(
+    Easing.bezier(0.25, 0.1, 0.25, 1)
+  );
+  const slideOutToRight = SlideOutRight.duration(300).easing(
+    Easing.bezier(0.25, 0.1, 0.25, 1)
+  );
 
   return (
     <ScreenWrapper withSheets>
-      <Header
-        selectedFolder={selectedFolder}
-        routinesLength={routines.length}
-      />
+      <Header selectedFolder={selectedFolder} />
 
-      <Body
-        routines={routines}
-        folders={folders}
-        selectedFolder={selectedFolder}
-        setSelectedFolder={setSelectedFolder}
-        refetch={refetch}
-      />
+      {selectedFolder ? (
+        <Animated.View
+          key="folder-detail"
+          entering={slideInFromRight}
+          exiting={slideOutToRight}
+          style={{ flex: 1 }}
+        >
+          <FolderDetailView
+            handleRoutineOptions={handleRoutineOptions}
+            selectedFolder={selectedFolder}
+            setRoutineToMove={setRoutineToMove}
+          />
+        </Animated.View>
+      ) : (
+        <Animated.View
+          key="main-workouts"
+          entering={slideInFromLeft}
+          exiting={slideOutToLeft}
+          style={{ flex: 1 }}
+        >
+          <MainWorkoutsView
+            handleRoutineOptions={handleRoutineOptions}
+            routineToMove={routineToMove}
+            setRoutineToMove={setRoutineToMove}
+          />
+        </Animated.View>
+      )}
 
-      {routines.length === 0 && folders.length === 0 && <EmptyState />}
+      <RoutineOptionsBottomSheet
+        ref={routineOptionsBottomSheetRef}
+        onDelete={handleDelete}
+        onEdit={handleEdit}
+      />
     </ScreenWrapper>
   );
 };

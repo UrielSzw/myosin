@@ -1,0 +1,56 @@
+import { IExerciseEquipment, IExerciseMuscle } from "../types/workout";
+
+export const EXERCISE_CATEGORIES: IExerciseMuscle[] = [
+  "arms",
+  "back",
+  "chest",
+  "legs",
+  "shoulders",
+  "core",
+  "lats",
+  "biceps",
+  "triceps",
+  "forearms",
+  "glutes",
+  "hamstrings",
+  "quads",
+  "calves",
+  "lower_back",
+  "traps",
+  "rear_delts",
+  "obliques",
+];
+
+export const EXERCISE_CATEGORY_LABELS: Record<IExerciseMuscle, string> = {
+  arms: "Brazos",
+  back: "Espalda",
+  chest: "Pecho",
+  legs: "Piernas",
+  shoulders: "Hombros",
+  core: "Core",
+  lats: "Dorsales",
+  biceps: "Bíceps",
+  triceps: "Tríceps",
+  forearms: "Antebrazos",
+  glutes: "Glúteos",
+  hamstrings: "Isquiotibiales",
+  quads: "Cuádriceps",
+  calves: "Pantorrillas",
+  lower_back: "Zona lumbar",
+  traps: "Trapecios",
+  rear_delts: "Deltoides posteriores",
+  obliques: "Oblicuos",
+  full_body: "Cuerpo completo",
+  hip_flexors: "Flexores de cadera",
+};
+
+export const EXERCISE_EQUIPMENT_LABELS: Record<IExerciseEquipment, string> = {
+  dumbbell: "Mancuernas",
+  barbell: "Barra",
+  machine: "Máquina",
+  cable: "Polea",
+  bodyweight: "Peso corporal",
+  kettlebell: "Kettlebell",
+  band: "Banda elástica",
+  other: "Otro",
+};

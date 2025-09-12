@@ -53,12 +53,17 @@ export const ActiveSetRow: React.FC<Props> = ({
       const userRepsInput = setData.reps ? Number(setData.reps) : null;
       const userRpeInput = setData.rpe ? Number(setData.rpe) : null;
 
-      const shouldStartTimer = completeSet(exerciseInBlock.id, setId, blockId, {
-        actualWeight: userWeightInput || set.planned_weight || 0,
-        actualReps:
-          userRepsInput || set?.reps_range?.min || set.planned_reps || 0,
-        actualRpe: userRpeInput || set.planned_rpe || 0,
-      });
+      const shouldStartTimer = completeSet(
+        exerciseInBlock.tempId,
+        setId,
+        blockId,
+        {
+          actualWeight: userWeightInput || set.planned_weight || 0,
+          actualReps:
+            userRepsInput || set?.reps_range?.min || set.planned_reps || 0,
+          actualRpe: userRpeInput || set.planned_rpe || 0,
+        }
+      );
 
       if (shouldStartTimer) {
         onToggleSheet("restTimer");
@@ -77,14 +82,14 @@ export const ActiveSetRow: React.FC<Props> = ({
   const handleSetType = useCallback(() => {
     onToggleSheet("setType");
     setCurrentState({
-      currentSetId: set.id,
-      currentExerciseInBlockId: exerciseInBlock.id,
+      currentSetId: set.tempId,
+      currentExerciseInBlockId: exerciseInBlock.tempId,
       currentSetType: set.set_type,
     });
   }, [
-    exerciseInBlock.id,
+    exerciseInBlock.tempId,
     onToggleSheet,
-    set.id,
+    set.tempId,
     set.set_type,
     setCurrentState,
   ]);
@@ -96,7 +101,7 @@ export const ActiveSetRow: React.FC<Props> = ({
 
   return (
     <View
-      key={set.id}
+      key={set.tempId}
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -194,7 +199,7 @@ export const ActiveSetRow: React.FC<Props> = ({
       {/* Complete Button */}
       <View style={{ width: 40, alignItems: "center" }}>
         <TouchableOpacity
-          onPress={() => handleSetPress(isSetCompleted, set.id)}
+          onPress={() => handleSetPress(isSetCompleted, set.tempId)}
           style={{
             width: 32,
             height: 32,

@@ -28,8 +28,8 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
 
   const handlePress = () => {
     setCurrentState({
-      currentBlockId: block.id,
-      currentExerciseInBlockId: exerciseInBlock.id,
+      currentBlockId: block.tempId,
+      currentExerciseInBlockId: exerciseInBlock.tempId,
       isCurrentBlockMulti: block.type !== "individual",
       currentExerciseName: exerciseInBlock.exercise.name,
     });
@@ -45,7 +45,7 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
       />
 
       <ActiveSetsTable
-        exerciseInBlockId={exerciseInBlock.id}
+        exerciseInBlockId={exerciseInBlock.tempId}
         blockType={block.type}
       >
         {sets.map((setId) => (
@@ -54,7 +54,7 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
             setId={setId}
             exerciseInBlock={exerciseInBlock}
             blockType={block.type}
-            blockId={block.id}
+            blockId={block.tempId}
             onToggleSheet={onToggleSheet}
           />
         ))}

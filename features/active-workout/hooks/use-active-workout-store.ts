@@ -561,6 +561,8 @@ const useActiveWorkoutStore = create<Store>()(
               currentExercisesCount
             );
 
+          console.log("newExercisesInBlock", newExercisesInBlock);
+
           // Agregar nuevos ejercicios
           newExercisesInBlock.forEach((exercise) => {
             state.activeWorkout.exercises[exercise.tempId] = exercise;
@@ -910,6 +912,14 @@ const useActiveWorkoutStore = create<Store>()(
               state.activeWorkout.blocksBySession.filter(
                 (bId) => bId !== currentBlockId
               );
+          } else if (
+            currentBlock.type !== "individual" &&
+            state.activeWorkout.exercisesByBlock[currentBlockId].length === 1
+          ) {
+            // Si el bloque no es individual y queda 1 solo ejercicio, convertir a individual
+            currentBlock.type = "individual";
+            currentBlock.name = "Individual";
+            currentBlock.rest_between_exercises_seconds = 0;
           }
 
           // 7. Limpiar currentState
@@ -1058,6 +1068,17 @@ const useActiveWorkoutStore = create<Store>()(
             );
 
           state.stats.totalSetsPlanned -= 1;
+
+          // Actualizar order index de los sets restantes
+          state.activeWorkout.setsByExercise[currentExerciseInBlockId].forEach(
+            (setId, index) => {
+              const set = state.activeWorkout.sets[setId];
+
+              if (set) {
+                set.order_index = index;
+              }
+            }
+          );
         });
       },
 

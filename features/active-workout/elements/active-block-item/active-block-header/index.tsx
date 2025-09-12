@@ -32,7 +32,7 @@ export const BlockHeader: React.FC<Props> = ({
 
   const handlePress = () => {
     setCurrentState({
-      currentBlockId: block.id,
+      currentBlockId: block.tempId,
       isCurrentBlockMulti: block.type !== "individual",
     });
     onToggleSheet("blockOptions");
@@ -40,7 +40,7 @@ export const BlockHeader: React.FC<Props> = ({
 
   const handleUpdateRestBetweenExercises = () => {
     setCurrentState({
-      currentBlockId: block.id,
+      currentBlockId: block.tempId,
       currentRestTime: block.rest_between_exercises_seconds,
       currentRestTimeType: "between-exercises",
     });
@@ -49,7 +49,7 @@ export const BlockHeader: React.FC<Props> = ({
 
   const handleUpdateRestBetweenRounds = () => {
     setCurrentState({
-      currentBlockId: block.id,
+      currentBlockId: block.tempId,
       currentRestTime: block.rest_time_seconds,
       currentRestTimeType: "between-rounds",
     });

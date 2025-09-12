@@ -100,6 +100,13 @@ export default function RootLayout() {
               fullScreenGestureEnabled: false,
             }}
           />
+          <Stack.Screen
+            name="workout/active"
+            options={{
+              presentation: "fullScreenModal",
+              headerShown: false,
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>

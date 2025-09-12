@@ -1,26 +1,27 @@
+import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { router } from "expo-router";
 import { Dumbbell, Hash, Play } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
 interface RoutineCardProps {
   routine: RoutineWithMetrics;
-  onStart: (routine: RoutineWithMetrics | null) => void;
   onLongPress?: (routine: RoutineWithMetrics | null) => void;
   onPress: (routine: RoutineWithMetrics | null) => void;
 }
 
 export const RoutineCard: React.FC<RoutineCardProps> = ({
   routine,
-  onStart,
   onLongPress,
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const { initializeWorkout } = useActiveMainActions();
 
   // Verificar si es una rutina reciente (modificada en los últimos 7 días)
   const isRecent = () => {
@@ -36,6 +37,16 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
 
   const handleSelectRoutine = () => {
     onPress(routine);
+  };
+
+  const handleStartRoutine = async (routine: RoutineWithMetrics) => {
+    try {
+      await initializeWorkout(routine.id);
+
+      router.push("/workout/active");
+    } catch (error) {
+      console.error("Error iniciando workout:", error);
+    }
   };
 
   return (
@@ -111,7 +122,7 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
         <Button
           variant="primary"
           size="md"
-          onPress={() => onStart(routine)}
+          onPress={() => handleStartRoutine(routine)}
           icon={<Play size={18} color="#ffffff" />}
           iconPosition="left"
           style={{

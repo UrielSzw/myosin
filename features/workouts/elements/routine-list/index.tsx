@@ -19,7 +19,6 @@ export const RoutineList: React.FC<Props> = ({
         <RoutineCard
           key={routine.id}
           routine={routine}
-          onStart={() => {}}
           onLongPress={setRoutineToMove}
           onPress={onPressRoutine}
         />

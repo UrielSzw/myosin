@@ -1,0 +1,117 @@
+import { useBlockStyles } from "@/shared/hooks/use-block-styles";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { IBlockType } from "@/shared/types/workout";
+import { Typography } from "@/shared/ui/typography";
+import { Check, ChevronDown, Plus } from "lucide-react-native";
+import { TouchableOpacity, View } from "react-native";
+import {
+  useActiveSetActions,
+  useActiveWorkout,
+} from "../../hooks/use-active-workout-store";
+
+type Props = {
+  exerciseInBlockId: string;
+  blockType: IBlockType;
+  children: React.ReactNode;
+};
+
+export const ActiveSetsTable: React.FC<Props> = ({
+  exerciseInBlockId,
+  blockType,
+  children,
+}) => {
+  const { sets, setsByExercise } = useActiveWorkout();
+  const { colors } = useColorScheme();
+  const { getRepsColumnTitle, getBlockColors } = useBlockStyles();
+  const { addSet } = useActiveSetActions();
+
+  const handleAddSet = () => {
+    addSet(exerciseInBlockId);
+  };
+
+  const blockColors = getBlockColors(blockType);
+  const setId = setsByExercise[exerciseInBlockId]?.[0];
+  const repsType = sets[setId]?.reps_type || "reps";
+
+  return (
+    <View style={{ marginTop: 12 }}>
+      {/* Table Headers */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: 8,
+          marginBottom: 8,
+          paddingHorizontal: 8,
+        }}
+      >
+        <View style={{ width: 40, alignItems: "center" }}>
+          <Typography variant="caption" weight="medium" color="textMuted">
+            SET
+          </Typography>
+        </View>
+        <View style={{ width: 80, alignItems: "center" }}>
+          <Typography variant="caption" weight="medium" color="textMuted">
+            PREV
+          </Typography>
+        </View>
+        <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
+          <Typography variant="caption" weight="medium" color="textMuted">
+            KG
+          </Typography>
+        </View>
+        <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 4,
+            }}
+          >
+            <Typography variant="caption" weight="medium" color="textMuted">
+              {getRepsColumnTitle(repsType)}
+            </Typography>
+            <ChevronDown size={12} color={colors.textMuted} />
+          </TouchableOpacity>
+        </View>
+        <View style={{ width: 40, alignItems: "center" }}>
+          <Check size={16} color={colors.textMuted} />
+        </View>
+      </View>
+
+      {/* Set Rows */}
+      {children}
+
+      {/* Add Set Button */}
+      <TouchableOpacity
+        onPress={handleAddSet}
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          paddingVertical: 8,
+          marginTop: 6,
+          borderWidth: 1,
+          borderColor: blockColors.primary,
+          borderStyle: "dashed",
+          borderRadius: 4,
+          backgroundColor: blockColors.light,
+          marginHorizontal: 8,
+          opacity: 0.6,
+        }}
+      >
+        <Plus size={14} color={blockColors.primary} />
+        <Typography
+          variant="caption"
+          weight="medium"
+          style={{
+            color: blockColors.primary,
+            marginLeft: 4,
+          }}
+        >
+          Agregar Serie
+        </Typography>
+      </TouchableOpacity>
+    </View>
+  );
+};

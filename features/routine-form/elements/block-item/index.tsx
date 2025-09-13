@@ -44,12 +44,30 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
 
   if (!block || !exercisesInBlockIds.length) return null;
 
+  const exerciseCount = exercisesInBlockIds.length;
+  const blockTypeText =
+    block.type === "individual"
+      ? "individual"
+      : block.type === "superset"
+      ? "superserie"
+      : "circuito";
+
   return (
     <TouchableOpacity
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={1}
       onPress={handlePress}
+      accessible={true}
+      accessibilityRole="button"
+      accessibilityLabel={`Bloque ${blockTypeText}: ${block.name}`}
+      accessibilityHint={`Toca para configurar el bloque. Mantén presionado para reordenar. Contiene ${exerciseCount} ${
+        exerciseCount === 1 ? "ejercicio" : "ejercicios"
+      }`}
+      accessibilityActions={[
+        { name: "longpress", label: "Reordenar bloques" },
+        { name: "activate", label: "Configurar bloque" },
+      ]}
     >
       <Card variant="outlined" padding="none">
         {/* Block Header with Continuous Line */}

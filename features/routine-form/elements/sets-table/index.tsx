@@ -78,7 +78,21 @@ export const SetsTable: React.FC<Props> = ({
               flexDirection: "row",
               alignItems: "center",
               gap: 4,
+              // Área clickeable mínima para accesibilidad
+              minHeight: 44,
+              paddingVertical: 12,
+              paddingHorizontal: 8,
+              // Margin negativo para mantener alineación visual
+              marginHorizontal: -8,
+              marginVertical: -12,
             }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Cambiar tipo de repeticiones`}
+            accessibilityHint={`Actualmente configurado para ${getRepsColumnTitle(
+              repsType
+            )}. Toca para cambiar`}
+            accessibilityValue={{ text: getRepsColumnTitle(repsType) }}
           >
             <Typography variant="caption" weight="medium" color="textMuted">
               {getRepsColumnTitle(repsType)}
@@ -98,7 +112,10 @@ export const SetsTable: React.FC<Props> = ({
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          paddingVertical: 8,
+          // Altura mínima mejorada para accesibilidad
+          minHeight: 44,
+          paddingVertical: 12,
+          paddingHorizontal: 16,
           marginTop: 4,
           borderWidth: 1,
           borderColor: blockColors.primary,
@@ -106,6 +123,10 @@ export const SetsTable: React.FC<Props> = ({
           borderRadius: 4,
           backgroundColor: blockColors.light,
         }}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel="Agregar nueva serie"
+        accessibilityHint="Toca para añadir una serie adicional a este ejercicio"
       >
         <Plus size={14} color={blockColors.primary} />
         <Typography

@@ -120,27 +120,48 @@ export const ActiveSetRow: React.FC<Props> = ({
         <TouchableOpacity
           onPress={handleSetType}
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 14,
-            backgroundColor:
-              set.set_type !== "normal"
-                ? getSetTypeColor(set.set_type)
-                : colors.border,
+            // Hit area mínima de 44x44px para accesibilidad
+            minWidth: 44,
+            minHeight: 44,
             alignItems: "center",
             justifyContent: "center",
+            // Padding invisible para expandir área clickeable
+            paddingHorizontal: 8,
+            paddingVertical: 8,
           }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={`Cambiar tipo de set ${set.order_index + 1}`}
+          accessibilityHint={`Actualmente es ${
+            getSetTypeLabel(set.set_type) || "normal"
+          }. Toca para cambiar el tipo de set`}
         >
-          <Typography
-            variant="caption"
-            weight="medium"
+          {/* Visual element mantiene el mismo tamaño */}
+          <View
             style={{
-              color: set.set_type !== "normal" ? "white" : colors.text,
-              fontSize: 10,
+              width: 28,
+              height: 28,
+              borderRadius: 14,
+              backgroundColor:
+                set.set_type !== "normal"
+                  ? getSetTypeColor(set.set_type)
+                  : colors.border,
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            {getSetTypeLabel(set.set_type) || (set.order_index + 1).toString()}
-          </Typography>
+            <Typography
+              variant="caption"
+              weight="medium"
+              style={{
+                color: set.set_type !== "normal" ? "white" : colors.text,
+                fontSize: 10,
+              }}
+            >
+              {getSetTypeLabel(set.set_type) ||
+                (set.order_index + 1).toString()}
+            </Typography>
+          </View>
         </TouchableOpacity>
       </View>
 
@@ -206,28 +227,53 @@ export const ActiveSetRow: React.FC<Props> = ({
         <TouchableOpacity
           onPress={() => handleSetPress(isSetCompleted, set.tempId)}
           style={{
-            width: 32,
-            height: 32,
+            // Área clickeable mínima para WCAG
+            minWidth: 44,
+            minHeight: 44,
             alignItems: "center",
             justifyContent: "center",
-            borderRadius: 8,
-            backgroundColor: isSetCompleted
-              ? blockColors.primary
-              : colors.background,
-            borderWidth: isSetCompleted ? 0 : 2,
-            borderColor: isSetCompleted ? "transparent" : colors.border,
-            shadowColor: isSetCompleted ? blockColors.primary : "transparent",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: isSetCompleted ? 3 : 0,
+            // Padding invisible para expandir área clickeable
+            paddingHorizontal: 6,
+            paddingVertical: 6,
           }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={
+            isSetCompleted ? "Marcar serie como incompleta" : "Completar serie"
+          }
+          accessibilityHint={
+            isSetCompleted
+              ? "Toca para desmarcar esta serie"
+              : "Toca para marcar esta serie como completada"
+          }
+          accessibilityState={{ checked: isSetCompleted }}
         >
-          <Check
-            size={16}
-            color={isSetCompleted ? "#ffffff" : colors.textMuted}
-            strokeWidth={isSetCompleted ? 2.5 : 2}
-          />
+          {/* Visual element mantiene el mismo tamaño */}
+          <View
+            style={{
+              width: 32,
+              height: 32,
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 8,
+              backgroundColor: isSetCompleted
+                ? blockColors.primary
+                : colors.background,
+              borderWidth: isSetCompleted ? 0 : 2,
+              borderColor: isSetCompleted ? "transparent" : colors.border,
+              shadowColor: isSetCompleted ? blockColors.primary : "transparent",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: isSetCompleted ? 3 : 0,
+            }}
+          >
+            <Check
+              size={16}
+              color={isSetCompleted ? "#ffffff" : colors.textMuted}
+              strokeWidth={isSetCompleted ? 2.5 : 2}
+            />
+          </View>
         </TouchableOpacity>
       </View>
     </View>

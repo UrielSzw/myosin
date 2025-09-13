@@ -122,12 +122,22 @@ export const BlockHeader: React.FC<Props> = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingVertical: 3,
-                  paddingHorizontal: 6,
+                  // Área clickeable mínima para accesibilidad
+                  minHeight: 36,
+                  minWidth: 36,
+                  paddingVertical: 6,
+                  paddingHorizontal: 8,
                   backgroundColor: blockColors.primary + "10",
                   borderRadius: 4,
                   borderWidth: 1,
                   borderColor: blockColors.border,
+                }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Configurar tiempo de descanso entre ejercicios"
+                accessibilityHint="Toca para ajustar el tiempo de descanso entre ejercicios"
+                accessibilityValue={{
+                  text: formatRestTime(block.rest_between_exercises_seconds),
                 }}
               >
                 <Timer size={12} color={blockColors.primary} />
@@ -150,12 +160,22 @@ export const BlockHeader: React.FC<Props> = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  paddingVertical: 4,
-                  paddingHorizontal: 6,
+                  // Área clickeable mínima para accesibilidad
+                  minHeight: 36,
+                  minWidth: 36,
+                  paddingVertical: 6,
+                  paddingHorizontal: 8,
                   backgroundColor: blockColors.primary + "15",
                   borderRadius: 4,
                   borderWidth: 1,
                   borderColor: blockColors.border,
+                }}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel="Configurar tiempo de descanso entre vueltas"
+                accessibilityHint="Toca para ajustar el tiempo de descanso entre vueltas del bloque"
+                accessibilityValue={{
+                  text: formatRestTime(block.rest_time_seconds),
                 }}
               >
                 <Timer size={12} color={blockColors.primary} />
@@ -179,12 +199,22 @@ export const BlockHeader: React.FC<Props> = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                paddingVertical: 4,
-                paddingHorizontal: 6,
+                // Área clickeable mínima para accesibilidad
+                minHeight: 36,
+                minWidth: 36,
+                paddingVertical: 6,
+                paddingHorizontal: 8,
                 backgroundColor: blockColors.primary + "15",
                 borderRadius: 4,
                 borderWidth: 1,
                 borderColor: blockColors.border,
+              }}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Configurar tiempo de descanso entre series"
+              accessibilityHint="Toca para ajustar el tiempo de descanso entre series"
+              accessibilityValue={{
+                text: formatRestTime(block.rest_time_seconds),
               }}
             >
               <Timer size={12} color={blockColors.primary} />

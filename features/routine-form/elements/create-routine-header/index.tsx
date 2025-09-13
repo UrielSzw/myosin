@@ -8,6 +8,7 @@ import {
   useMainActions,
   useRoutineFormState,
 } from "../../hooks/use-routine-form-store";
+import { useRoutineValidation } from "../../hooks/use-routine-validation";
 import { useSaveRoutine } from "../../hooks/use-save-routine";
 
 export const CreateRoutineHeader = () => {
@@ -15,15 +16,24 @@ export const CreateRoutineHeader = () => {
   const { saveRoutine, isLoading, error } = useSaveRoutine();
   const { clearForm } = useMainActions();
   const { mode } = useRoutineFormState();
+  const routineValidation = useRoutineValidation();
   const queryClient = useQueryClient();
 
   const isEditMode = mode === "edit";
+  const canSave = routineValidation.isValid && !isLoading;
 
   const handleGoBack = () => {
     router.back();
   };
 
   const handleSave = async () => {
+    if (!routineValidation.isValid) {
+      // Mostrar primer error encontrado
+      const firstError = Object.values(routineValidation.errors)[0];
+      Alert.alert("Error de validación", firstError);
+      return;
+    }
+
     const savedRoutineId = await saveRoutine();
 
     if (savedRoutineId) {
@@ -32,11 +42,17 @@ export const CreateRoutineHeader = () => {
       });
 
       clearForm();
-
       router.back();
     } else if (error) {
       Alert.alert("Error", error);
     }
+  };
+
+  const getButtonText = () => {
+    if (isLoading) {
+      return isEditMode ? "Actualizando..." : "Guardando...";
+    }
+    return isEditMode ? "Actualizar" : "Guardar";
   };
 
   return (
@@ -52,12 +68,27 @@ export const CreateRoutineHeader = () => {
         borderBottomColor: colors.border,
         zIndex: 1,
       }}
+      accessible={true}
+      accessibilityRole="toolbar"
+      accessibilityLabel="Barra de navegación de rutina"
     >
-      <Button variant="ghost" size="sm" onPress={handleGoBack}>
+      <Button
+        variant="ghost"
+        size="sm"
+        onPress={handleGoBack}
+        accessible={true}
+        accessibilityLabel="Volver atrás"
+        accessibilityHint="Regresa a la pantalla anterior"
+      >
         ← Atrás
       </Button>
 
-      <Typography variant="h6" weight="semibold">
+      <Typography
+        variant="h6"
+        weight="semibold"
+        accessible={true}
+        accessibilityRole="header"
+      >
         {isEditMode ? "Editar Rutina" : "Crear Rutina"}
       </Typography>
 
@@ -65,15 +96,19 @@ export const CreateRoutineHeader = () => {
         variant="primary"
         size="sm"
         onPress={handleSave}
-        disabled={isLoading}
+        disabled={!canSave}
+        accessible={true}
+        accessibilityLabel={getButtonText()}
+        accessibilityHint={
+          canSave
+            ? `${
+                isEditMode ? "Actualizar" : "Guardar"
+              } la rutina con los datos ingresados`
+            : "Botón deshabilitado. Completa todos los campos requeridos para guardar"
+        }
+        accessibilityState={{ disabled: !canSave }}
       >
-        {isLoading
-          ? isEditMode
-            ? "Actualizando..."
-            : "Guardando..."
-          : isEditMode
-          ? "Actualizar"
-          : "Guardar"}
+        {getButtonText()}
       </Button>
     </View>
   );

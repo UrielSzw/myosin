@@ -8,6 +8,7 @@ import { generateUUID } from "@/shared/db/utils/uuid";
 import { useState } from "react";
 import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
+import { useRoutineValidation } from "./use-routine-validation";
 
 type SaveState = "idle" | "saving" | "success" | "error";
 
@@ -15,15 +16,14 @@ export const useSaveRoutine = () => {
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState<string | null>(null);
   const formState = useRoutineFormState();
+  const validation = useRoutineValidation();
 
   const saveRoutine = async (): Promise<string | null> => {
-    if (!formState.routine.name.trim()) {
-      setError("El nombre de la rutina es requerido");
-      return null;
-    }
-
-    if (formState.blocksByRoutine.length === 0) {
-      setError("La rutina debe tener al menos un bloque");
+    // Usar la validación centralizada
+    if (!validation.isValid) {
+      const firstError = Object.values(validation.errors)[0];
+      setError(firstError || "La rutina tiene errores de validación");
+      setSaveState("error");
       return null;
     }
 

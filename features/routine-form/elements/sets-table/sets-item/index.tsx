@@ -88,6 +88,10 @@ export const SetsItem = React.memo<Props>(
 
     if (!set) return null;
 
+    const setNumber = set.order_index + 1;
+    const setTypeLabel = getSetTypeLabel(set.set_type);
+    const isSpecialSet = set.set_type !== "normal";
+
     return (
       <View
         style={{
@@ -98,128 +102,256 @@ export const SetsItem = React.memo<Props>(
           borderRadius: 4,
           marginBottom: 4,
         }}
+        accessible={true}
+        accessibilityLabel={`Set ${setNumber}${
+          isSpecialSet ? ` (${setTypeLabel})` : ""
+        }`}
       >
         {/* Set Number */}
         <View style={{ width: 40, alignItems: "center" }}>
           <TouchableOpacity
             onPress={handleSetType}
             style={{
-              width: 28,
-              height: 28,
-              borderRadius: 14,
-              backgroundColor:
-                set.set_type !== "normal"
-                  ? getSetTypeColor(set.set_type)
-                  : colors.border,
+              // Hit area mínima de 44x44px para accesibilidad
+              minWidth: 44,
+              minHeight: 44,
               alignItems: "center",
               justifyContent: "center",
+              // Padding invisible para expandir área clickeable
+              paddingHorizontal: 8,
+              paddingVertical: 8,
             }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Cambiar tipo de set ${setNumber}`}
+            accessibilityHint={`Actualmente es ${
+              setTypeLabel || "normal"
+            }. Toca para cambiar el tipo de set`}
+            accessibilityValue={{ text: setTypeLabel || "normal" }}
           >
-            <Typography
-              variant="caption"
-              weight="medium"
+            {/* Visual element mantiene el mismo tamaño */}
+            <View
               style={{
-                color: set.set_type !== "normal" ? "white" : colors.text,
-                fontSize: 10,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
+                backgroundColor:
+                  set.set_type !== "normal"
+                    ? getSetTypeColor(set.set_type)
+                    : colors.border,
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              {getSetTypeLabel(set.set_type) ||
-                (set.order_index + 1).toString()}
-            </Typography>
+              <Typography
+                variant="caption"
+                weight="medium"
+                style={{
+                  color: set.set_type !== "normal" ? "white" : colors.text,
+                  fontSize: 10,
+                }}
+              >
+                {getSetTypeLabel(set.set_type) ||
+                  (set.order_index + 1).toString()}
+              </Typography>
+            </View>
           </TouchableOpacity>
         </View>
 
         {/* Weight Input */}
         <View style={{ flex: 1, paddingHorizontal: 8 }}>
-          <TextInput
-            value={`${set.weight || ""}`}
-            onChangeText={handleWeightChange}
-            placeholder="0"
-            keyboardType="numeric"
+          {/* Contenedor clickeable para accesibilidad */}
+          <TouchableOpacity
+            activeOpacity={1}
             style={{
-              backgroundColor: colors.background,
-              borderWidth: 1,
-              borderColor: colors.border,
-              borderRadius: 4,
-              paddingHorizontal: 8,
-              paddingVertical: 6,
-              textAlign: "center",
-              color: colors.text,
-              fontSize: 14,
+              // Área clickeable mínima para WCAG
+              minHeight: 44,
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          />
+          >
+            <TextInput
+              value={`${set.weight || ""}`}
+              onChangeText={handleWeightChange}
+              placeholder="0"
+              keyboardType="numeric"
+              style={{
+                // Input visual más compacto
+                backgroundColor: "transparent",
+                borderWidth: 0,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.border,
+                paddingHorizontal: 8,
+                paddingVertical: 6,
+                textAlign: "center",
+                color: colors.text,
+                fontSize: 16,
+                fontWeight: "500",
+                // Ancho completo del contenedor
+                width: "100%",
+                minHeight: 32,
+              }}
+              accessible={true}
+              accessibilityLabel={`Peso para set ${setNumber}`}
+              accessibilityHint="Ingresa el peso en kilogramos"
+              accessibilityValue={{
+                text: set.weight
+                  ? `${set.weight} kilogramos`
+                  : "Sin peso asignado",
+              }}
+            />
+          </TouchableOpacity>
         </View>
 
         {/* Reps Input */}
         <View style={{ flex: 1, paddingHorizontal: 8 }}>
           {repsType === "range" ? (
-            // Rango: Dos inputs lado a lado
+            // Rango: Dos inputs lado a lado con wrapper clickeable
             <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 4,
+                minHeight: 44,
+                justifyContent: "center",
+              }}
             >
-              <TextInput
-                value={`${set.reps_range?.min || ""}`}
-                onChangeText={handleRepsMinChange}
-                placeholder="0"
-                keyboardType="numeric"
+              <TouchableOpacity
+                activeOpacity={1}
                 style={{
                   flex: 1,
-                  backgroundColor: colors.background,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  borderRadius: 4,
-                  paddingHorizontal: 6,
-                  paddingVertical: 6,
-                  textAlign: "center",
-                  color: colors.text,
-                  fontSize: 12,
+                  minHeight: 44,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-              />
+              >
+                <TextInput
+                  value={`${set.reps_range?.min || ""}`}
+                  onChangeText={handleRepsMinChange}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  style={{
+                    backgroundColor: "transparent",
+                    borderWidth: 0,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    paddingHorizontal: 4,
+                    paddingVertical: 4,
+                    textAlign: "center",
+                    color: colors.text,
+                    fontSize: 14,
+                    fontWeight: "500",
+                    width: "100%",
+                    minHeight: 28,
+                  }}
+                  accessible={true}
+                  accessibilityLabel={`Repeticiones mínimas para set ${setNumber}`}
+                  accessibilityHint="Ingresa el número mínimo de repeticiones"
+                />
+              </TouchableOpacity>
+
               <Typography
                 variant="caption"
                 color="textMuted"
-                style={{ fontSize: 10 }}
+                style={{ fontSize: 12, paddingHorizontal: 2 }}
               >
                 -
               </Typography>
-              <TextInput
-                value={`${set.reps_range?.max || ""}`}
-                onChangeText={handleRepsMaxChange}
-                placeholder="0"
-                keyboardType="numeric"
+
+              <TouchableOpacity
+                activeOpacity={1}
                 style={{
                   flex: 1,
-                  backgroundColor: colors.background,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                  borderRadius: 4,
-                  paddingHorizontal: 6,
-                  paddingVertical: 6,
-                  textAlign: "center",
-                  color: colors.text,
-                  fontSize: 12,
+                  minHeight: 44,
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
-              />
+              >
+                <TextInput
+                  value={`${set.reps_range?.max || ""}`}
+                  onChangeText={handleRepsMaxChange}
+                  placeholder="0"
+                  keyboardType="numeric"
+                  style={{
+                    backgroundColor: "transparent",
+                    borderWidth: 0,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    paddingHorizontal: 4,
+                    paddingVertical: 4,
+                    textAlign: "center",
+                    color: colors.text,
+                    fontSize: 14,
+                    fontWeight: "500",
+                    width: "100%",
+                    minHeight: 28,
+                  }}
+                  accessible={true}
+                  accessibilityLabel={`Repeticiones máximas para set ${setNumber}`}
+                  accessibilityHint="Ingresa el número máximo de repeticiones"
+                />
+              </TouchableOpacity>
             </View>
           ) : (
             // Input normal para reps, time, distance
-            <TextInput
-              value={`${set.reps || ""}`}
-              onChangeText={handleRepsChange}
-              placeholder="0"
-              keyboardType="numeric"
+            <TouchableOpacity
+              activeOpacity={1}
               style={{
-                backgroundColor: colors.background,
-                borderWidth: 1,
-                borderColor: colors.border,
-                borderRadius: 4,
-                paddingHorizontal: 8,
-                paddingVertical: 6,
-                textAlign: "center",
-                color: colors.text,
-                fontSize: 14,
+                // Área clickeable mínima para WCAG
+                minHeight: 44,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-            />
+            >
+              <TextInput
+                value={`${set.reps || ""}`}
+                onChangeText={handleRepsChange}
+                placeholder="0"
+                keyboardType="numeric"
+                style={{
+                  // Input visual más compacto
+                  backgroundColor: "transparent",
+                  borderWidth: 0,
+                  borderBottomWidth: 1,
+                  borderBottomColor: colors.border,
+                  paddingHorizontal: 8,
+                  paddingVertical: 6,
+                  textAlign: "center",
+                  color: colors.text,
+                  fontSize: 16,
+                  fontWeight: "500",
+                  // Ancho completo del contenedor
+                  width: "100%",
+                  minHeight: 32,
+                }}
+                accessible={true}
+                accessibilityLabel={`${
+                  repsType === "reps"
+                    ? "Repeticiones"
+                    : repsType === "time"
+                    ? "Tiempo"
+                    : "Distancia"
+                } para set ${setNumber}`}
+                accessibilityHint={`Ingresa ${
+                  repsType === "reps"
+                    ? "el número de repeticiones"
+                    : repsType === "time"
+                    ? "el tiempo en segundos"
+                    : "la distancia"
+                }`}
+                accessibilityValue={{
+                  text: set.reps
+                    ? `${set.reps} ${
+                        repsType === "reps"
+                          ? "repeticiones"
+                          : repsType === "time"
+                          ? "segundos"
+                          : "metros"
+                      }`
+                    : "Sin valor asignado",
+                }}
+              />
+            </TouchableOpacity>
           )}
         </View>
       </View>

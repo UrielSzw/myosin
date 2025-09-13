@@ -22,16 +22,29 @@ export const RoutineFormFeature = () => {
     exerciseOptionsBottomSheetRef,
   } = useFormRoutineSheets();
 
+  const blockCount = blocksByRoutine.length;
+
   return (
     <ScreenWrapper withSheets fullscreen>
       <CreateRoutineHeader />
 
-      <ScrollView style={{ flex: 1 }}>
-        <View style={{ flex: 1, padding: 20 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        accessible={true}
+        accessibilityLabel="Contenido de la rutina"
+        contentInsetAdjustmentBehavior="automatic"
+      >
+        <View
+          style={{ flex: 1, padding: 20 }}
+          accessible={true}
+          accessibilityLabel={`Rutina con ${blockCount} ${
+            blockCount === 1 ? "bloque" : "bloques"
+          }`}
+        >
           <RoutineInfo />
 
           <BlocksList>
-            {blocksByRoutine.map((blockId) => (
+            {blocksByRoutine.map((blockId, index) => (
               <BlockItem
                 key={blockId}
                 blockId={blockId}

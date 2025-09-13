@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { InferSelectModel, relations } from "drizzle-orm";
 import {
   blob,
@@ -7,7 +8,6 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import * as Crypto from "expo-crypto";
 import { IRepsType, ISetType } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
 import {
@@ -24,7 +24,7 @@ export const workout_sessions = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => Crypto.randomUUID()),
+      .$defaultFn(() => randomUUID()),
     routine_id: text("routine_id")
       .references(() => routines.id)
       .notNull(),
@@ -53,7 +53,7 @@ export const workout_blocks = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => Crypto.randomUUID()),
+      .$defaultFn(() => randomUUID()),
     workout_session_id: text("workout_session_id")
       .references(() => workout_sessions.id, { onDelete: "cascade" })
       .notNull(),
@@ -93,7 +93,7 @@ export const workout_exercises = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => Crypto.randomUUID()),
+      .$defaultFn(() => randomUUID()),
     workout_block_id: text("workout_block_id")
       .references(() => workout_blocks.id, { onDelete: "cascade" })
       .notNull(),
@@ -132,7 +132,7 @@ export const workout_sets = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => Crypto.randomUUID()),
+      .$defaultFn(() => randomUUID()),
     workout_exercise_id: text("workout_exercise_id")
       .references(() => workout_exercises.id, { onDelete: "cascade" })
       .notNull(),

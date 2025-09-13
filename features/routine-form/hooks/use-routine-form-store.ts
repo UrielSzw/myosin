@@ -6,7 +6,7 @@ import {
   SetInsert,
 } from "@/shared/db/schema";
 import { IRepsType, ISetType } from "@/shared/types/workout";
-import * as Crypto from "expo-crypto";
+import { randomUUID } from "crypto";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { routinesService } from "../../workouts/service/routines";
@@ -195,7 +195,7 @@ const useRoutineFormStore = create<Store>()(
               const blocksByRoutine: string[] = [];
 
               routineData.blocks.forEach((block) => {
-                const tempId = `temp-block-${Crypto.randomUUID()}`;
+                const tempId = `temp-block-${randomUUID()}`;
                 blockIdMapping[block.id] = tempId;
 
                 blocksWithTempId[tempId] = {
@@ -219,7 +219,7 @@ const useRoutineFormStore = create<Store>()(
 
               routineData.exercisesInBlock.forEach(
                 ({ exerciseInBlock, exercise }) => {
-                  const tempId = `temp-exercise-${Crypto.randomUUID()}`;
+                  const tempId = `temp-exercise-${randomUUID()}`;
                   const blockTempId = blockIdMapping[exerciseInBlock.block_id];
 
                   exerciseIdMapping[exerciseInBlock.id] = tempId;
@@ -247,7 +247,7 @@ const useRoutineFormStore = create<Store>()(
               const setsByExercise: Record<string, string[]> = {};
 
               routineData.sets.forEach((set) => {
-                const tempId = `temp-set-${Crypto.randomUUID()}`;
+                const tempId = `temp-set-${randomUUID()}`;
                 const exerciseTempId =
                   exerciseIdMapping[set.exercise_in_block_id];
 

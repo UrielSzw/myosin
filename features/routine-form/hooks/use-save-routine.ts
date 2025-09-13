@@ -4,7 +4,7 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import * as Crypto from "expo-crypto";
+import { randomUUID } from "crypto";
 import { useState } from "react";
 import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
@@ -35,7 +35,7 @@ export const useSaveRoutine = () => {
 
       // 1. Preparar data de rutina
       const routineData: RoutineInsert = {
-        id: isEditMode ? formState.routine.id : Crypto.randomUUID(),
+        id: isEditMode ? formState.routine.id : randomUUID(),
         name: formState.routine.name.trim(),
         folder_id: formState.routine.folder_id || null,
         created_by_user_id: isEditMode
@@ -48,7 +48,7 @@ export const useSaveRoutine = () => {
         (tempBlockId, index) => {
           const block = formState.blocks[tempBlockId];
           return {
-            id: Crypto.randomUUID(),
+            id: randomUUID(),
             routine_id: routineData.id,
             type: block.type,
             order_index: index,
@@ -75,7 +75,7 @@ export const useSaveRoutine = () => {
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = formState.exercisesInBlock[tempExerciseId];
-          const realExerciseId = Crypto.randomUUID();
+          const realExerciseId = randomUUID();
 
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
@@ -100,7 +100,7 @@ export const useSaveRoutine = () => {
             const set = formState.sets[tempSetId];
 
             setsData.push({
-              id: Crypto.randomUUID(),
+              id: randomUUID(),
               exercise_in_block_id: realExerciseId,
               reps: set.reps,
               weight: set.weight,

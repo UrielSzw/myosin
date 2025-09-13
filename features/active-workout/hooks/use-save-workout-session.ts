@@ -8,7 +8,7 @@ import type {
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
-import * as Crypto from "expo-crypto";
+import { randomUUID } from "crypto";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
 
@@ -60,7 +60,7 @@ export const useSaveWorkoutSession = () => {
           : null;
 
       // 2. Preparar sesión con IDs reales y analytics
-      const realSessionId = Crypto.randomUUID();
+      const realSessionId = randomUUID();
       const sessionData: WorkoutSessionInsert = {
         id: realSessionId,
         routine_id: session.routine_id,
@@ -79,7 +79,7 @@ export const useSaveWorkoutSession = () => {
 
       activeWorkout.blocksBySession.forEach((tempBlockId, index) => {
         const block = activeWorkout.blocks[tempBlockId];
-        const realBlockId = Crypto.randomUUID();
+        const realBlockId = randomUUID();
 
         blockIdMapping[tempBlockId] = realBlockId;
 
@@ -151,7 +151,7 @@ export const useSaveWorkoutSession = () => {
       // Asignar execution_order y crear ejercicios
       exerciseExecutionData.forEach((execData, globalIndex) => {
         const exercise = activeWorkout.exercises[execData.tempId];
-        const realExerciseId = Crypto.randomUUID();
+        const realExerciseId = randomUUID();
 
         exerciseIdMapping[execData.tempId] = realExerciseId;
 
@@ -180,7 +180,7 @@ export const useSaveWorkoutSession = () => {
             // Solo guardar sets completados en el historial
             if (set.completed) {
               setsData.push({
-                id: Crypto.randomUUID(),
+                id: randomUUID(),
                 workout_exercise_id: realExerciseId,
                 original_set_id: set.original_set_id,
                 order_index: set.order_index,

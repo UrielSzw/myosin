@@ -4,7 +4,7 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import * as Crypto from "expo-crypto";
+import { randomUUID } from "crypto";
 import { useState } from "react";
 import { createRoutineService } from "../../routine-form/service/routine";
 import { useActiveWorkout } from "./use-active-workout-store";
@@ -42,7 +42,7 @@ export const useUpdateRoutine = () => {
         (tempBlockId, index) => {
           const block = activeWorkout.blocks[tempBlockId];
           return {
-            id: Crypto.randomUUID(),
+            id: randomUUID(),
             routine_id: originalRoutineId,
             type: block.type,
             order_index: index,
@@ -69,7 +69,7 @@ export const useUpdateRoutine = () => {
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = activeWorkout.exercises[tempExerciseId];
-          const realExerciseId = Crypto.randomUUID();
+          const realExerciseId = randomUUID();
 
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
@@ -94,7 +94,7 @@ export const useUpdateRoutine = () => {
             const set = activeWorkout.sets[tempSetId];
 
             setsData.push({
-              id: Crypto.randomUUID(),
+              id: randomUUID(),
               exercise_in_block_id: realExerciseId,
               reps: set.planned_reps,
               weight: set.planned_weight,

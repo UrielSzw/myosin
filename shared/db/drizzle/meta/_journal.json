@@ -8,6 +8,13 @@
       "when": 1756767389944,
       "tag": "0000_flaky_eddie_brock",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1757778491855,
+      "tag": "0001_friendly_morlun",
+      "breakpoints": true
     }
   ]
 }

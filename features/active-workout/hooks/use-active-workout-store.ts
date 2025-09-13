@@ -1,4 +1,5 @@
 import { routinesRepository } from "@/shared/db/repository/routines";
+import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
 import { BaseExercise, BaseRoutine } from "@/shared/db/schema";
 import {
   WorkoutBlockInsert,
@@ -41,6 +42,15 @@ export type ActiveWorkoutSet = WorkoutSetInsert & {
   completed_at: string | null; // Timestamp cuando se completa (no está en DB)
 };
 
+// Tipo para previous sets history
+export type PreviousSetData = {
+  order_index: number;
+  actual_weight: number | null;
+  actual_reps: number | null;
+  actual_rpe: number | null;
+  session_date: string;
+};
+
 type Store = {
   // Estado principal del workout activo
   activeWorkout: {
@@ -55,6 +65,9 @@ type Store = {
     blocksBySession: string[]; // orden de bloques
     exercisesByBlock: Record<string, string[]>; // ejercicios por bloque
     setsByExercise: Record<string, string[]>; // sets por ejercicio
+
+    // Previous sets history por ejercicio
+    exercisePreviousSets: Record<string, PreviousSetData[]>; // exercise_id → last sets
   };
 
   // Timer de descanso
@@ -97,6 +110,7 @@ type Store = {
     clearCurrentState: () => void;
     setCurrentState: (state: Store["currentState"]) => void;
     detectWorkoutChanges: () => boolean;
+    loadPreviousSetsForExercises: (exerciseIds: string[]) => Promise<void>;
   };
 
   blockActions: {
@@ -148,6 +162,7 @@ const useActiveWorkoutStore = create<Store>()(
       blocksBySession: [],
       exercisesByBlock: {},
       setsByExercise: {},
+      exercisePreviousSets: {},
     },
 
     // Timer de descanso
@@ -189,11 +204,43 @@ const useActiveWorkoutStore = create<Store>()(
 
           const { routine, blocks, exercisesInBlock, sets } = routineData;
 
+          // 2. Load previous sets for all exercises
+          const exercisePreviousSets: Record<string, PreviousSetData[]> = {};
+
+          // Get unique exercise IDs from all exercises in the routine
+          const uniqueExerciseIds = Array.from(
+            new Set(
+              Object.values(exercisesInBlock).map(
+                (data) => data.exerciseInBlock.exercise_id
+              )
+            )
+          );
+
+          // Load previous sets for each unique exercise
+          for (const exerciseId of uniqueExerciseIds) {
+            try {
+              const previousSets =
+                await workoutSessionsRepository.getLastSetsForExercise(
+                  exerciseId,
+                  "default-user"
+                );
+              exercisePreviousSets[exerciseId] = previousSets;
+            } catch (error) {
+              console.warn(
+                `Failed to load previous sets for exercise ${exerciseId}:`,
+                error
+              );
+              // Continue with empty previous sets for this exercise
+              exercisePreviousSets[exerciseId] = [];
+            }
+          }
+
           set((state) => {
-            // 2. Crear sesión de workout
+            // 3. Crear sesión de workout
             const sessionTempId = generateTempId();
             const session: ActiveWorkoutSession = {
               tempId: sessionTempId,
+              user_id: "default-user",
               id: sessionTempId,
               routine_id: routine.id,
               routine: routine, // Snapshot para referencia
@@ -215,6 +262,7 @@ const useActiveWorkoutStore = create<Store>()(
               const blockTempId = generateTempId();
               const activeBlock: ActiveWorkoutBlock = {
                 tempId: blockTempId,
+                user_id: "default-user",
                 id: blockTempId,
                 workout_session_id: sessionTempId,
                 original_block_id: block.id,
@@ -251,6 +299,7 @@ const useActiveWorkoutStore = create<Store>()(
 
               const activeExercise: ActiveWorkoutExercise = {
                 tempId: exerciseTempId,
+                user_id: "default-user",
                 id: exerciseTempId,
                 workout_block_id: activeBlock.tempId,
                 exercise_id: exerciseInBlock.exercise_id,
@@ -292,6 +341,8 @@ const useActiveWorkoutStore = create<Store>()(
 
               const activeSet: ActiveWorkoutSet = {
                 tempId: setTempId,
+                user_id: "default-user",
+                exercise_id: activeExercise.exercise_id,
                 id: setTempId,
                 workout_exercise_id: activeExercise.tempId,
                 original_set_id: set.id,
@@ -359,6 +410,7 @@ const useActiveWorkoutStore = create<Store>()(
               blocksBySession,
               exercisesByBlock,
               setsByExercise,
+              exercisePreviousSets, // Use the loaded previous sets
             };
 
             // 8. Actualizar stats
@@ -402,6 +454,7 @@ const useActiveWorkoutStore = create<Store>()(
             blocksBySession: [],
             exercisesByBlock: {},
             setsByExercise: {},
+            exercisePreviousSets: {},
           };
 
           state.stats = {
@@ -488,10 +541,51 @@ const useActiveWorkoutStore = create<Store>()(
 
         return false; // Sin cambios
       },
+
+      // Helper method to load previous sets for new exercises
+      loadPreviousSetsForExercises: async (exerciseIds: string[]) => {
+        try {
+          const newPreviousSets: Record<string, PreviousSetData[]> = {};
+
+          // Load previous sets for each exercise
+          for (const exerciseId of exerciseIds) {
+            try {
+              const previousSets =
+                await workoutSessionsRepository.getLastSetsForExercise(
+                  exerciseId,
+                  "default-user"
+                );
+              newPreviousSets[exerciseId] = previousSets;
+            } catch (error) {
+              console.warn(
+                `Failed to load previous sets for exercise ${exerciseId}:`,
+                error
+              );
+              newPreviousSets[exerciseId] = [];
+            }
+          }
+
+          // Update the store with the loaded previous sets
+          set((state) => {
+            Object.assign(
+              state.activeWorkout.exercisePreviousSets,
+              newPreviousSets
+            );
+          });
+        } catch (error) {
+          console.error(
+            "Failed to load previous sets for new exercises:",
+            error
+          );
+        }
+      },
     },
 
     blockActions: {
       addIndividualBlock: (selectedExercises) => {
+        // Extract exercise IDs first
+        const exerciseIds = selectedExercises.map((exercise) => exercise.id);
+
         set((state) => {
           if (selectedExercises.length === 0) return;
 
@@ -532,6 +626,16 @@ const useActiveWorkoutStore = create<Store>()(
           // Actualizar stats
           state.stats.totalSetsPlanned += newSets.length;
         });
+
+        // Load previous sets for newly added exercises (async, non-blocking)
+        if (exerciseIds.length > 0) {
+          // Use setTimeout to ensure this runs after the set operation is complete
+          setTimeout(() => {
+            useActiveWorkoutStore
+              .getState()
+              .mainActions.loadPreviousSetsForExercises(exerciseIds);
+          }, 0);
+        }
       },
       addMultiBlock: (selectedExercises) => {
         set((state) => {
@@ -575,6 +679,9 @@ const useActiveWorkoutStore = create<Store>()(
         });
       },
       addToBlock: (selectedExercises) => {
+        // Extract exercise IDs first
+        const exerciseIds = selectedExercises.map((exercise) => exercise.id);
+
         set((state) => {
           if (selectedExercises.length === 0) return;
 
@@ -630,6 +737,16 @@ const useActiveWorkoutStore = create<Store>()(
             currentBlock.rest_between_exercises_seconds = 0;
           }
         });
+
+        // Load previous sets for newly added exercises (async, non-blocking)
+        if (exerciseIds.length > 0) {
+          // Use setTimeout to ensure this runs after the set operation is complete
+          setTimeout(() => {
+            useActiveWorkoutStore
+              .getState()
+              .mainActions.loadPreviousSetsForExercises(exerciseIds);
+          }, 0);
+        }
       },
       deleteBlock: () => {
         set((state) => {
@@ -637,6 +754,18 @@ const useActiveWorkoutStore = create<Store>()(
 
           if (!currentBlockId) return;
 
+          // ✅ PRIMERO: Obtener ejercicios antes de eliminar índices
+          const exercisesToDelete =
+            state.activeWorkout.exercisesByBlock[currentBlockId] || [];
+
+          // ✅ SEGUNDO: Calcular sets antes de eliminar
+          const setsRemoved = exercisesToDelete.reduce((acc, exerciseId) => {
+            const setsForExercise =
+              state.activeWorkout.setsByExercise[exerciseId] || [];
+            return acc + setsForExercise.length;
+          }, 0);
+
+          // ✅ TERCERO: Ahora eliminar todo
           delete state.activeWorkout.blocks[currentBlockId];
           delete state.activeWorkout.exercisesByBlock[currentBlockId];
 
@@ -646,31 +775,21 @@ const useActiveWorkoutStore = create<Store>()(
               (bId) => bId !== currentBlockId
             );
 
-          // Encontrar y eliminar ejercicios y sets asociados
-          const exercisesToDelete = Object.values(
-            state.activeWorkout.exercisesByBlock[currentBlockId] || []
-          );
-
+          // Eliminar ejercicios y sets asociados
           exercisesToDelete.forEach((exerciseId) => {
             delete state.activeWorkout.exercises[exerciseId];
-            delete state.activeWorkout.setsByExercise[exerciseId];
-          });
 
-          Object.values(exercisesToDelete).forEach((exerciseId) => {
+            // Eliminar sets del ejercicio
             const setsToDelete =
               state.activeWorkout.setsByExercise[exerciseId] || [];
             setsToDelete.forEach((setId) => {
               delete state.activeWorkout.sets[setId];
             });
+
+            delete state.activeWorkout.setsByExercise[exerciseId];
           });
 
-          // Actualizar stats
-          const setsRemoved = exercisesToDelete.reduce((acc, exerciseId) => {
-            const setsForExercise =
-              state.activeWorkout.setsByExercise[exerciseId] || [];
-            return acc + setsForExercise.length;
-          }, 0);
-
+          // ✅ CUARTO: Actualizar stats con el cálculo correcto
           state.stats.totalSetsPlanned -= setsRemoved;
         });
       },
@@ -838,6 +957,7 @@ const useActiveWorkoutStore = create<Store>()(
           // 2. Crear nuevo ejercicio manteniendo valores importantes
           const replacedExercise: ActiveWorkoutExercise = {
             tempId: newExerciseTempId,
+            user_id: "default-user",
             id: newExerciseTempId, // Usar tempId como id temporal
             workout_block_id: currentExercise.workout_block_id,
             exercise_id: newExercise.id, // Nuevo ejercicio
@@ -995,7 +1115,8 @@ const useActiveWorkoutStore = create<Store>()(
             lastSet?.planned_reps || null,
             lastSet?.reps_range || null,
             lastSet?.reps_type || "reps",
-            exerciseInBlockId
+            exerciseInBlockId,
+            exerciseInBlock.exercise_id
           );
 
           // Agregar el nuevo set al estado

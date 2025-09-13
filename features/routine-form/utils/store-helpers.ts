@@ -13,6 +13,7 @@ const createDefaultSets = (
 ): (SetInsert & { tempId: string })[] => [
   {
     tempId: generateTempId(),
+    user_id: "default-user",
     id: "",
     order_index: 0,
     weight: null,
@@ -25,6 +26,7 @@ const createDefaultSets = (
   },
   {
     tempId: generateTempId(),
+    user_id: "default-user",
     id: "",
     order_index: 1,
     weight: null,
@@ -37,6 +39,7 @@ const createDefaultSets = (
   },
   {
     tempId: generateTempId(),
+    user_id: "default-user",
     id: "",
     order_index: 2,
     weight: null,
@@ -84,6 +87,7 @@ export const createIndividualBlocks = (
     // Crear bloque individual
     const newBlock = {
       tempId: blockTempId,
+      user_id: "default-user",
       type: "individual" as const,
       name: exercise.name,
       order_index: totalBlocks + index,
@@ -96,6 +100,7 @@ export const createIndividualBlocks = (
     // Crear exerciseInBlock
     const newExerciseInBlock = {
       tempId: exerciseInBlockTempId,
+      user_id: "default-user",
       exercise_id: exercise.id,
       block_id: "", // Se asigna al guardar
       blockTempId: blockTempId, // Para relacionar temporalmente
@@ -154,6 +159,7 @@ export const createMultiBlock = (
   // Crear el bloque multi (superset)
   const newBlock = {
     tempId: blockTempId,
+    user_id: "default-user",
     type: "superset" as const,
     name: "Superserie",
     order_index: totalBlocks,
@@ -170,6 +176,7 @@ export const createMultiBlock = (
 
     const newExerciseInBlock = {
       tempId: exerciseInBlockTempId,
+      user_id: "default-user",
       exercise_id: exercise.id,
       block_id: "", // Se asigna al guardar
       blockTempId: blockTempId, // Para relacionar temporalmente
@@ -214,6 +221,7 @@ export const createNewSetForExercise = (
 ) => {
   const newSet: SetInsert & { tempId: string } = {
     tempId: generateTempId(),
+    user_id: "default-user",
     exercise_in_block_id: "",
     id: "",
     order_index: currentSetsCount,
@@ -253,6 +261,7 @@ export const convertBlockToIndividualBlocks = (
     // Crear nuevo bloque individual
     const newBlock: BlockInsert & { tempId: string } = {
       tempId: newBlockTempId,
+      user_id: "default-user",
       type: "individual",
       name: exerciseInBlock.exercise.name,
       order_index: originalBlock.order_index + index,
@@ -268,6 +277,7 @@ export const convertBlockToIndividualBlocks = (
       exercise: BaseExercise;
     } = {
       tempId: newExerciseInBlockTempId,
+      user_id: "default-user",
       exercise_id: exerciseInBlock.exercise_id,
       block_id: newBlockTempId,
       order_index: 0, // Único ejercicio en el bloque
@@ -344,6 +354,7 @@ export const createExercises = (
       exercise: BaseExercise;
     } = {
       tempId: exerciseInBlockTempId,
+      user_id: "default-user",
       exercise,
       block_id: blockId,
       order_index: startOrderIndex + index,

@@ -1,10 +1,10 @@
-import { db } from "@/shared/db/client";
+import { db, sqlite } from "@/shared/db/client";
 import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useMainStoreActions } from "@/shared/hooks/use-main-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
-// import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
+import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -18,7 +18,7 @@ export default function RootLayout() {
   const { loadFromStorage } = useMainStoreActions();
   const { success, error } = useMigrations(db, migrations);
 
-  // useDrizzleStudio(sqlite);
+  useDrizzleStudio(sqlite);
 
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),

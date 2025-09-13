@@ -84,6 +84,7 @@ export const workoutSessionsRepository = {
     const sessions = await db
       .select({
         id: workout_sessions.id,
+        user_id: workout_sessions.user_id,
         routine_id: workout_sessions.routine_id,
         started_at: workout_sessions.started_at,
         finished_at: workout_sessions.finished_at,
@@ -121,6 +122,7 @@ export const workoutSessionsRepository = {
       .select({
         session: {
           id: workout_sessions.id,
+          user_id: workout_sessions.user_id,
           routine_id: workout_sessions.routine_id,
           started_at: workout_sessions.started_at,
           finished_at: workout_sessions.finished_at,
@@ -267,6 +269,54 @@ export const workoutSessionsRepository = {
       .limit(limit * 10); // Más sets para calcular mejor
 
     return progression;
+  },
+
+  // Obtener últimos sets para un ejercicio específico (para previous sets)
+  getLastSetsForExercise: async (
+    exerciseId: string,
+    userId: string = "default-user"
+  ) => {
+    const lastSets = await db
+      .select({
+        order_index: workout_sets.order_index,
+        actual_weight: workout_sets.actual_weight,
+        actual_reps: workout_sets.actual_reps,
+        actual_rpe: workout_sets.actual_rpe,
+        session_date: workout_sessions.started_at,
+      })
+      .from(workout_sets)
+      .innerJoin(
+        workout_exercises,
+        eq(workout_sets.workout_exercise_id, workout_exercises.id)
+      )
+      .innerJoin(
+        workout_blocks,
+        eq(workout_exercises.workout_block_id, workout_blocks.id)
+      )
+      .innerJoin(
+        workout_sessions,
+        eq(workout_blocks.workout_session_id, workout_sessions.id)
+      )
+      .where(
+        and(
+          eq(workout_sets.exercise_id, exerciseId),
+          eq(workout_sets.user_id, userId),
+          eq(workout_sets.completed, true)
+        )
+      )
+      .orderBy(desc(workout_sessions.started_at))
+      .limit(20); // Últimos 20 sets para cubrir múltiples sesiones
+
+    // Agrupar por order_index y tomar el más reciente
+    const setsByOrderIndex = new Map<number, (typeof lastSets)[0]>();
+
+    lastSets.forEach((set) => {
+      if (!setsByOrderIndex.has(set.order_index)) {
+        setsByOrderIndex.set(set.order_index, set);
+      }
+    });
+
+    return Array.from(setsByOrderIndex.values());
   },
 
   // Eliminar sesión completa

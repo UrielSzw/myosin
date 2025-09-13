@@ -15,6 +15,13 @@
       "when": 1757778491855,
       "tag": "0001_friendly_morlun",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1757780569783,
+      "tag": "0002_mushy_luminals",
+      "breakpoints": true
     }
   ]
 }

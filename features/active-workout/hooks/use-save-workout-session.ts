@@ -8,7 +8,7 @@ import type {
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
-import { randomUUID } from "crypto";
+import { generateUUID } from "@/shared/db/utils/uuid";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
 
@@ -60,9 +60,10 @@ export const useSaveWorkoutSession = () => {
           : null;
 
       // 2. Preparar sesión con IDs reales y analytics
-      const realSessionId = randomUUID();
+      const realSessionId = generateUUID();
       const sessionData: WorkoutSessionInsert = {
         id: realSessionId,
+        user_id: "default-user",
         routine_id: session.routine_id,
         started_at: session.started_at,
         finished_at: currentTime,
@@ -79,12 +80,13 @@ export const useSaveWorkoutSession = () => {
 
       activeWorkout.blocksBySession.forEach((tempBlockId, index) => {
         const block = activeWorkout.blocks[tempBlockId];
-        const realBlockId = randomUUID();
+        const realBlockId = generateUUID();
 
         blockIdMapping[tempBlockId] = realBlockId;
 
         blocksData.push({
           id: realBlockId,
+          user_id: "default-user",
           workout_session_id: realSessionId,
           original_block_id: block.original_block_id,
           type: block.type,
@@ -151,12 +153,13 @@ export const useSaveWorkoutSession = () => {
       // Asignar execution_order y crear ejercicios
       exerciseExecutionData.forEach((execData, globalIndex) => {
         const exercise = activeWorkout.exercises[execData.tempId];
-        const realExerciseId = randomUUID();
+        const realExerciseId = generateUUID();
 
         exerciseIdMapping[execData.tempId] = realExerciseId;
 
         exercisesData.push({
           id: realExerciseId,
+          user_id: "default-user",
           workout_block_id: blockIdMapping[execData.blockId],
           exercise_id: exercise.exercise_id,
           original_exercise_in_block_id: exercise.original_exercise_in_block_id,
@@ -173,6 +176,7 @@ export const useSaveWorkoutSession = () => {
       Object.entries(activeWorkout.setsByExercise).forEach(
         ([tempExerciseId, setIds]) => {
           const realExerciseId = exerciseIdMapping[tempExerciseId];
+          const exercise = activeWorkout.exercises[tempExerciseId];
 
           setIds.forEach((tempSetId) => {
             const set = activeWorkout.sets[tempSetId];
@@ -180,8 +184,10 @@ export const useSaveWorkoutSession = () => {
             // Solo guardar sets completados en el historial
             if (set.completed) {
               setsData.push({
-                id: randomUUID(),
+                id: generateUUID(),
+                user_id: "default-user",
                 workout_exercise_id: realExerciseId,
+                exercise_id: exercise.exercise_id,
                 original_set_id: set.original_set_id,
                 order_index: set.order_index,
                 planned_weight: set.planned_weight,

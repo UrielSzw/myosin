@@ -14,10 +14,11 @@ export const useFinishWorkout = () => {
   const { updateRoutine } = useUpdateRoutine();
   const { saveWorkoutSession } = useSaveWorkoutSession();
 
-  const handleValidateWorkout = () => {
+  const handleValidateWorkout = async () => {
     const changes = detectWorkoutChanges();
 
     if (!changes) {
+      await saveWorkoutSession();
       clearWorkout();
       router.back();
     } else {

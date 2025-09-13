@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { InferSelectModel, relations } from "drizzle-orm";
 import {
   blob,
@@ -10,6 +9,7 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { IRepsType, ISetType } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
+import { generateUUID } from "../utils/uuid";
 import {
   exercise_in_block,
   exercises,
@@ -24,7 +24,8 @@ export const workout_sessions = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()),
+      .$defaultFn(() => generateUUID()),
+    user_id: text("user_id").notNull().default("default-user"),
     routine_id: text("routine_id")
       .references(() => routines.id)
       .notNull(),
@@ -42,8 +43,9 @@ export const workout_sessions = sqliteTable(
     ...timestamps,
   },
   (t) => [
-    index("idx_workout_sessions_routine_id").on(t.routine_id),
-    index("idx_workout_sessions_started_at").on(t.started_at),
+    index("idx_workout_sessions_user_id").on(t.user_id),
+    index("idx_workout_sessions_routine_id").on(t.user_id, t.routine_id),
+    index("idx_workout_sessions_started_at").on(t.user_id, t.started_at),
   ]
 );
 
@@ -53,7 +55,8 @@ export const workout_blocks = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()),
+      .$defaultFn(() => generateUUID()),
+    user_id: text("user_id").notNull().default("default-user"),
     workout_session_id: text("workout_session_id")
       .references(() => workout_sessions.id, { onDelete: "cascade" })
       .notNull(),
@@ -82,8 +85,9 @@ export const workout_blocks = sqliteTable(
     ...timestamps,
   },
   (t) => [
-    index("idx_workout_blocks_session_id").on(t.workout_session_id),
-    index("idx_workout_blocks_original_id").on(t.original_block_id),
+    index("idx_workout_blocks_user_id").on(t.user_id),
+    index("idx_workout_blocks_session_id").on(t.user_id, t.workout_session_id),
+    index("idx_workout_blocks_original_id").on(t.user_id, t.original_block_id),
   ]
 );
 
@@ -93,7 +97,8 @@ export const workout_exercises = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()),
+      .$defaultFn(() => generateUUID()),
+    user_id: text("user_id").notNull().default("default-user"),
     workout_block_id: text("workout_block_id")
       .references(() => workout_blocks.id, { onDelete: "cascade" })
       .notNull(),
@@ -120,9 +125,13 @@ export const workout_exercises = sqliteTable(
     ...timestamps,
   },
   (t) => [
-    index("idx_workout_exercises_block_id").on(t.workout_block_id),
-    index("idx_workout_exercises_exercise_id").on(t.exercise_id),
-    index("idx_workout_exercises_execution_order").on(t.execution_order),
+    index("idx_workout_exercises_user_id").on(t.user_id),
+    index("idx_workout_exercises_block_id").on(t.user_id, t.workout_block_id),
+    index("idx_workout_exercises_exercise_id").on(t.user_id, t.exercise_id),
+    index("idx_workout_exercises_execution_order").on(
+      t.user_id,
+      t.execution_order
+    ),
   ]
 );
 
@@ -132,9 +141,13 @@ export const workout_sets = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()),
+      .$defaultFn(() => generateUUID()),
+    user_id: text("user_id").notNull().default("default-user"),
     workout_exercise_id: text("workout_exercise_id")
       .references(() => workout_exercises.id, { onDelete: "cascade" })
+      .notNull(),
+    exercise_id: text("exercise_id")
+      .references(() => exercises.id)
       .notNull(),
 
     // Referencia original (NULL si se agregó durante workout)
@@ -168,9 +181,14 @@ export const workout_sets = sqliteTable(
     ...timestamps,
   },
   (t) => [
-    index("idx_workout_sets_exercise_id").on(t.workout_exercise_id),
-    index("idx_workout_sets_original_id").on(t.original_set_id),
-    index("idx_workout_sets_completed").on(t.completed),
+    index("idx_workout_sets_user_id").on(t.user_id),
+    index("idx_workout_sets_exercise_id").on(t.user_id, t.exercise_id),
+    index("idx_workout_sets_workout_exercise_id").on(
+      t.user_id,
+      t.workout_exercise_id
+    ),
+    index("idx_workout_sets_original_id").on(t.user_id, t.original_set_id),
+    index("idx_workout_sets_completed").on(t.user_id, t.completed),
   ]
 );
 
@@ -235,10 +253,15 @@ export const workoutExercisesRelations = relations(
 
 // Relaciones de workout_sets
 export const workoutSetsRelations = relations(workout_sets, ({ one }) => ({
-  // Un set pertenece a un ejercicio (many-to-one)
+  // Un set pertenece a un ejercicio en workout (many-to-one)
   workoutExercise: one(workout_exercises, {
     fields: [workout_sets.workout_exercise_id],
     references: [workout_exercises.id],
+  }),
+  // Un set referencia directamente un ejercicio global (many-to-one)
+  exercise: one(exercises, {
+    fields: [workout_sets.exercise_id],
+    references: [exercises.id],
   }),
   // Un set puede referenciar un set original (many-to-one)
   originalSet: one(routine_sets, {

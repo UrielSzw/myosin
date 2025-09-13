@@ -8,9 +8,14 @@ import {
 
 export const generateTempId = () => `temp_${Date.now()}_${Math.random()}`;
 
-const createDefaultSets = (exerciseInBlockId: string): ActiveWorkoutSet[] => [
+const createDefaultSets = (
+  exerciseInBlockId: string,
+  exerciseId: string
+): ActiveWorkoutSet[] => [
   {
     tempId: generateTempId(),
+    user_id: "default-user",
+    exercise_id: exerciseId,
     id: "",
     order_index: 0,
     planned_weight: null,
@@ -29,6 +34,8 @@ const createDefaultSets = (exerciseInBlockId: string): ActiveWorkoutSet[] => [
   },
   {
     tempId: generateTempId(),
+    user_id: "default-user",
+    exercise_id: exerciseId,
     id: "",
     order_index: 1,
     planned_weight: null,
@@ -47,6 +54,8 @@ const createDefaultSets = (exerciseInBlockId: string): ActiveWorkoutSet[] => [
   },
   {
     tempId: generateTempId(),
+    user_id: "default-user",
+    exercise_id: exerciseId,
     id: "",
     order_index: 2,
     planned_weight: null,
@@ -74,10 +83,13 @@ export const createNewSetForExercise = (
     max: number | null;
   } | null,
   repsType: IRepsType,
-  exerciseInBlockId: string
+  exerciseInBlockId: string,
+  exerciseId: string
 ) => {
   const newSet: ActiveWorkoutSet = {
     tempId: generateTempId(),
+    user_id: "default-user",
+    exercise_id: exerciseId,
     id: "",
     order_index: currentSetsCount,
     planned_reps: lastSetReps || null,
@@ -154,6 +166,7 @@ export const createIndividualBlocks = (
 
     const newBlock: ActiveWorkoutBlock = {
       tempId: blockId,
+      user_id: "default-user",
       workout_session_id: "",
       id: "",
       type: "individual",
@@ -167,6 +180,7 @@ export const createIndividualBlocks = (
 
     const newExerciseInBlock: ActiveWorkoutExercise = {
       workout_block_id: blockId,
+      user_id: "default-user",
       tempId: exerciseInBlockId,
       exercise,
       execution_order: null,
@@ -178,7 +192,7 @@ export const createIndividualBlocks = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId);
+    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
 
     newBlocks.push(newBlock);
     newExercisesInBlock.push(newExerciseInBlock);
@@ -214,6 +228,7 @@ export const createMultiBlock = (
 
   const newBlock: ActiveWorkoutBlock = {
     tempId: blockId,
+    user_id: "default-user",
     workout_session_id: "",
     id: "",
     type: "superset",
@@ -228,14 +243,18 @@ export const createMultiBlock = (
   const newExercisesInBlock: ActiveWorkoutExercise[] = [];
   const newSets: ActiveWorkoutSet[] = [];
 
-  const exercisesByBlock: Record<string, string[]> = {};
+  // ✅ CORREGIDO: Crear array acumulador para los ejercicios
+  const exerciseInBlockTempIds: string[] = [];
   const setsByExercise: Record<string, string[]> = {};
 
   selectedExercises.forEach((exercise, index) => {
     const exerciseInBlockId = generateTempId();
+    // ✅ CORREGIDO: Agregar al array acumulador
+    exerciseInBlockTempIds.push(exerciseInBlockId);
 
     const newExerciseInBlock: ActiveWorkoutExercise = {
       workout_block_id: blockId,
+      user_id: "default-user",
       tempId: exerciseInBlockId,
       exercise,
       execution_order: null,
@@ -247,14 +266,18 @@ export const createMultiBlock = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId);
+    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
 
     newExercisesInBlock.push(newExerciseInBlock);
     newSets.push(...defaultSets);
 
-    exercisesByBlock[blockId] = [exerciseInBlockId];
     setsByExercise[exerciseInBlockId] = defaultSets.map((set) => set.tempId);
   });
+
+  // ✅ CORREGIDO: Asignar el array completo con TODOS los ejercicios
+  const exercisesByBlock: Record<string, string[]> = {
+    [blockId]: exerciseInBlockTempIds,
+  };
 
   return {
     newBlock,
@@ -286,6 +309,7 @@ export const createExercises = (
 
     const newExerciseInBlock: ActiveWorkoutExercise = {
       workout_block_id: blockId,
+      user_id: "default-user",
       tempId: exerciseInBlockId,
       exercise,
       execution_order: null,
@@ -297,7 +321,7 @@ export const createExercises = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId);
+    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
 
     newExercisesInBlock.push(newExerciseInBlock);
     newSets.push(...defaultSets);
@@ -330,6 +354,7 @@ export const convertBlockToIndividualBlocks = (
     // Crear nuevo bloque individual
     const newBlock: ActiveWorkoutBlock = {
       tempId: newBlockTempId,
+      user_id: "default-user",
       id: "",
       workout_session_id: originalBlock.workout_session_id,
       type: "individual",
@@ -344,6 +369,7 @@ export const convertBlockToIndividualBlocks = (
     // Crear nuevo exerciseInBlock
     const newExerciseInBlock: ActiveWorkoutExercise = {
       tempId: newExerciseInBlockTempId,
+      user_id: "default-user",
       id: "",
       workout_block_id: newBlockTempId,
       exercise_id: exerciseInBlock.exercise_id,

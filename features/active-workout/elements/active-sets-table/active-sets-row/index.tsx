@@ -1,6 +1,5 @@
 import {
   ActiveWorkoutExercise,
-  ActiveWorkoutSet,
   useActiveMainActions,
   useActiveSetActions,
   useActiveWorkout,
@@ -33,7 +32,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   const { getSetTypeColor, getSetTypeLabel, getBlockColors } = useBlockStyles();
   const { completeSet, uncompleteSet } = useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
-  const { sets } = useActiveWorkout();
+  const { sets, exercisePreviousSets } = useActiveWorkout();
 
   const [setData, setSetData] = useState({
     weight: "",
@@ -43,7 +42,13 @@ export const ActiveSetRow: React.FC<Props> = ({
 
   const blockColors = getBlockColors(blockType);
   const set = sets[setId];
-  const prevSet = {} as ActiveWorkoutSet;
+
+  // Get previous set data for this exercise and set order
+  const exercisePrevSets =
+    exercisePreviousSets[exerciseInBlock.exercise_id] || [];
+  const prevSet = exercisePrevSets.find(
+    (prevData) => prevData.order_index === set.order_index
+  );
 
   const handleSetPress = (completed: boolean, setId: string) => {
     if (completed) {

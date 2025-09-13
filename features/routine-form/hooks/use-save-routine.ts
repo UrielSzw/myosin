@@ -4,7 +4,7 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import { randomUUID } from "crypto";
+import { generateUUID } from "@/shared/db/utils/uuid";
 import { useState } from "react";
 import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
@@ -35,7 +35,7 @@ export const useSaveRoutine = () => {
 
       // 1. Preparar data de rutina
       const routineData: RoutineInsert = {
-        id: isEditMode ? formState.routine.id : randomUUID(),
+        id: isEditMode ? formState.routine.id : generateUUID(),
         name: formState.routine.name.trim(),
         folder_id: formState.routine.folder_id || null,
         created_by_user_id: isEditMode
@@ -48,7 +48,8 @@ export const useSaveRoutine = () => {
         (tempBlockId, index) => {
           const block = formState.blocks[tempBlockId];
           return {
-            id: randomUUID(),
+            id: generateUUID(),
+            user_id: "default-user",
             routine_id: routineData.id,
             type: block.type,
             order_index: index,
@@ -75,12 +76,13 @@ export const useSaveRoutine = () => {
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = formState.exercisesInBlock[tempExerciseId];
-          const realExerciseId = randomUUID();
+          const realExerciseId = generateUUID();
 
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
           exercisesInBlockData.push({
             id: realExerciseId,
+            user_id: "default-user",
             block_id: blockIdMapping[tempBlockId],
             exercise_id: exerciseInBlock.exercise_id,
             order_index: exerciseInBlock.order_index,
@@ -100,7 +102,8 @@ export const useSaveRoutine = () => {
             const set = formState.sets[tempSetId];
 
             setsData.push({
-              id: randomUUID(),
+              id: generateUUID(),
+              user_id: "default-user",
               exercise_in_block_id: realExerciseId,
               reps: set.reps,
               weight: set.weight,

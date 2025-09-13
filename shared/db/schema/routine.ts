@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import { InferSelectModel, relations } from "drizzle-orm";
 import {
   blob,
@@ -16,6 +15,7 @@ import {
   ISetType,
 } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
+import { generateUUID } from "../utils/uuid";
 
 // Tabla principal de ejercicios
 export const exercises = sqliteTable(
@@ -23,7 +23,7 @@ export const exercises = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()), // UUID
+      .$defaultFn(() => generateUUID()), // UUID
     name: text("name").notNull(),
 
     source: text("source").$type<"system" | "user">().notNull(),
@@ -48,7 +48,7 @@ export const exerciseImages = sqliteTable(
   {
     id: text("id")
       .primaryKey()
-      .$defaultFn(() => randomUUID()), // UUID
+      .$defaultFn(() => generateUUID()), // UUID
     exercise_id: text("exercise_id")
       .notNull()
       .references(() => exercises.id, { onDelete: "cascade" }),
@@ -88,7 +88,7 @@ export const exerciseEquipment = sqliteTable(
 export const folders = sqliteTable("folders", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUID()), // UUID
+    .$defaultFn(() => generateUUID()), // UUID
   name: text("name").notNull(),
   color: text("color").notNull(),
   icon: text("icon").notNull(),
@@ -101,7 +101,7 @@ export const folders = sqliteTable("folders", {
 export const routines = sqliteTable("routines", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUID()), // UUID
+    .$defaultFn(() => generateUUID()), // UUID
   name: text("name").notNull(),
   folder_id: text("folder_id").references(() => folders.id),
   created_by_user_id: text("created_by_user_id").notNull(),
@@ -112,7 +112,8 @@ export const routines = sqliteTable("routines", {
 export const routine_blocks = sqliteTable("routine_blocks", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUID()), // UUID
+    .$defaultFn(() => generateUUID()), // UUID
+  user_id: text("user_id").notNull().default("default-user"),
   routine_id: text("routine_id")
     .references(() => routines.id)
     .notNull(),
@@ -132,7 +133,8 @@ export const routine_blocks = sqliteTable("routine_blocks", {
 export const exercise_in_block = sqliteTable("exercise_in_block", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUID()), // UUID
+    .$defaultFn(() => generateUUID()), // UUID
+  user_id: text("user_id").notNull().default("default-user"),
   block_id: text("block_id")
     .references(() => routine_blocks.id)
     .notNull(),
@@ -148,7 +150,8 @@ export const exercise_in_block = sqliteTable("exercise_in_block", {
 export const routine_sets = sqliteTable("routine_sets", {
   id: text("id")
     .primaryKey()
-    .$defaultFn(() => randomUUID()), // UUID
+    .$defaultFn(() => generateUUID()), // UUID
+  user_id: text("user_id").notNull().default("default-user"),
   exercise_in_block_id: text("exercise_in_block_id")
     .references(() => exercise_in_block.id)
     .notNull(),

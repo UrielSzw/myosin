@@ -4,7 +4,8 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import { randomUUID } from "crypto";
+import { generateUUID } from "@/shared/db/utils/uuid";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createRoutineService } from "../../routine-form/service/routine";
 import { useActiveWorkout } from "./use-active-workout-store";
@@ -15,6 +16,7 @@ export const useUpdateRoutine = () => {
   const [updateState, setUpdateState] = useState<UpdateState>("idle");
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
+  const queryClient = useQueryClient();
 
   const updateRoutine = async (): Promise<string | null> => {
     if (!activeWorkout?.session) {
@@ -42,7 +44,8 @@ export const useUpdateRoutine = () => {
         (tempBlockId, index) => {
           const block = activeWorkout.blocks[tempBlockId];
           return {
-            id: randomUUID(),
+            id: generateUUID(),
+            user_id: "default-user",
             routine_id: originalRoutineId,
             type: block.type,
             order_index: index,
@@ -69,12 +72,13 @@ export const useUpdateRoutine = () => {
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = activeWorkout.exercises[tempExerciseId];
-          const realExerciseId = randomUUID();
+          const realExerciseId = generateUUID();
 
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
           exercisesInBlockData.push({
             id: realExerciseId,
+            user_id: "default-user",
             block_id: blockIdMapping[tempBlockId],
             exercise_id: exerciseInBlock.exercise_id,
             order_index: exerciseInBlock.order_index,
@@ -94,7 +98,8 @@ export const useUpdateRoutine = () => {
             const set = activeWorkout.sets[tempSetId];
 
             setsData.push({
-              id: randomUUID(),
+              id: generateUUID(),
+              user_id: "default-user",
               exercise_in_block_id: realExerciseId,
               reps: set.planned_reps,
               weight: set.planned_weight,
@@ -120,6 +125,10 @@ export const useUpdateRoutine = () => {
       );
 
       setUpdateState("success");
+      queryClient.invalidateQueries({
+        queryKey: ["workouts", "routines"],
+      });
+
       return updatedRoutine.id;
     } catch (err) {
       console.error("Error updating routine:", err);

@@ -1,0 +1,146 @@
+import type {
+  BlockInsert,
+  ExerciseInBlockInsert,
+  RoutineInsert,
+  SetInsert,
+} from "@/shared/db/schema";
+import * as Crypto from "expo-crypto";
+import { useState } from "react";
+import { createRoutineService } from "../../routine-form/service/routine";
+import { useActiveWorkout } from "./use-active-workout-store";
+
+type UpdateState = "idle" | "updating" | "success" | "error";
+
+export const useUpdateRoutine = () => {
+  const [updateState, setUpdateState] = useState<UpdateState>("idle");
+  const [error, setError] = useState<string | null>(null);
+  const activeWorkout = useActiveWorkout();
+
+  const updateRoutine = async (): Promise<string | null> => {
+    if (!activeWorkout?.session) {
+      setError("No hay workout activo para actualizar");
+      return null;
+    }
+
+    const session = activeWorkout.session;
+    const originalRoutineId = session.routine.id;
+
+    setUpdateState("updating");
+    setError(null);
+
+    try {
+      // 1. Preparar data de rutina (mantener datos originales)
+      const routineData: RoutineInsert = {
+        id: originalRoutineId,
+        name: session.routine.name,
+        folder_id: session.routine.folder_id || null,
+        created_by_user_id: session.routine.created_by_user_id,
+      };
+
+      // 2. Preparar bloques con IDs reales
+      const blocksData: BlockInsert[] = activeWorkout.blocksBySession.map(
+        (tempBlockId, index) => {
+          const block = activeWorkout.blocks[tempBlockId];
+          return {
+            id: Crypto.randomUUID(),
+            routine_id: originalRoutineId,
+            type: block.type,
+            order_index: index,
+            rest_time_seconds: block.rest_time_seconds,
+            rest_between_exercises_seconds:
+              block.rest_between_exercises_seconds,
+            name: block.name,
+          };
+        }
+      );
+
+      // 3. Crear mapping de tempId → ID real para bloques
+      const blockIdMapping: Record<string, string> = {};
+      activeWorkout.blocksBySession.forEach((tempBlockId, index) => {
+        blockIdMapping[tempBlockId] = blocksData[index].id;
+      });
+
+      // 4. Preparar exercisesInBlock con IDs reales
+      const exercisesInBlockData: ExerciseInBlockInsert[] = [];
+      const exerciseIdMapping: Record<string, string> = {};
+
+      activeWorkout.blocksBySession.forEach((tempBlockId) => {
+        const exerciseIds = activeWorkout.exercisesByBlock[tempBlockId] || [];
+
+        exerciseIds.forEach((tempExerciseId) => {
+          const exerciseInBlock = activeWorkout.exercises[tempExerciseId];
+          const realExerciseId = Crypto.randomUUID();
+
+          exerciseIdMapping[tempExerciseId] = realExerciseId;
+
+          exercisesInBlockData.push({
+            id: realExerciseId,
+            block_id: blockIdMapping[tempBlockId],
+            exercise_id: exerciseInBlock.exercise_id,
+            order_index: exerciseInBlock.order_index,
+            notes: exerciseInBlock.notes,
+          });
+        });
+      });
+
+      // 5. Preparar sets con IDs reales
+      const setsData: SetInsert[] = [];
+
+      Object.entries(activeWorkout.setsByExercise).forEach(
+        ([tempExerciseId, setIds]) => {
+          const realExerciseId = exerciseIdMapping[tempExerciseId];
+
+          setIds.forEach((tempSetId) => {
+            const set = activeWorkout.sets[tempSetId];
+
+            setsData.push({
+              id: Crypto.randomUUID(),
+              exercise_in_block_id: realExerciseId,
+              reps: set.planned_reps,
+              weight: set.planned_weight,
+              rpe: set.planned_rpe,
+              order_index: set.order_index,
+              set_type: set.set_type,
+              reps_type: set.reps_type,
+              reps_range: set.reps_range,
+            });
+          });
+        }
+      );
+
+      // 6. Ejecutar actualización completa (delete & recreate)
+      const updatedRoutine = await createRoutineService.updateRoutine(
+        originalRoutineId,
+        {
+          routine: routineData,
+          blocks: blocksData,
+          exercisesInBlock: exercisesInBlockData,
+          sets: setsData,
+        }
+      );
+
+      setUpdateState("success");
+      return updatedRoutine.id;
+    } catch (err) {
+      console.error("Error updating routine:", err);
+      setError("Error al actualizar la rutina. Intenta nuevamente.");
+      setUpdateState("error");
+      return null;
+    }
+  };
+
+  const resetUpdateState = () => {
+    setUpdateState("idle");
+    setError(null);
+  };
+
+  return {
+    updateRoutine,
+    updateState,
+    error,
+    resetUpdateState,
+    isLoading: updateState === "updating",
+    isSuccess: updateState === "success",
+    isError: updateState === "error",
+  };
+};

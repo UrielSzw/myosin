@@ -1,14 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
-import { router } from "expo-router";
 import { Flag, Timer, X } from "lucide-react-native";
 import React, { useState } from "react";
-import { Alert, TouchableOpacity, View } from "react-native";
-import {
-  useActiveMainActions,
-  useActiveWorkout,
-} from "../../hooks/use-active-workout-store";
+import { TouchableOpacity, View } from "react-native";
+import { useActiveWorkout } from "../../hooks/use-active-workout-store";
+import { useFinishWorkout } from "../../hooks/use-finish-workout";
 import { ElapsedTime } from "./elapsed-time";
 import { ProgressLine } from "./progress-line";
 
@@ -17,29 +14,7 @@ export const ActiveWorkoutHeader = () => {
 
   const { colors, isDarkMode } = useColorScheme();
   const { session } = useActiveWorkout();
-  const { clearWorkout } = useActiveMainActions();
-
-  const handleFinishWorkout = () => {
-    // onFinishWorkout(elapsedTime);
-  };
-
-  const handleExitWorkout = () => {
-    Alert.alert(
-      "Confirmar",
-      "Esto eliminará todo el progreso del entrenamiento. ¿Estás seguro?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Sí, eliminar",
-          style: "destructive",
-          onPress: () => {
-            clearWorkout();
-            router.back();
-          },
-        },
-      ]
-    );
-  };
+  const { handleFinishWorkout, handleExitWorkout } = useFinishWorkout();
 
   if (!session) return null;
 

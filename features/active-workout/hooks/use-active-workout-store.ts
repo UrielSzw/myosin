@@ -23,6 +23,7 @@ import {
 export type ActiveWorkoutSession = WorkoutSessionInsert & {
   tempId: string;
   routine: BaseRoutine; // Snapshot de la rutina para referencia
+  original_sets_count: number; // Para detectar eliminaciones
 };
 
 export type ActiveWorkoutBlock = WorkoutBlockInsert & {
@@ -95,6 +96,7 @@ type Store = {
     ) => void;
     clearCurrentState: () => void;
     setCurrentState: (state: Store["currentState"]) => void;
+    detectWorkoutChanges: () => boolean;
   };
 
   blockActions: {
@@ -202,6 +204,7 @@ const useActiveWorkoutStore = create<Store>()(
               total_sets_completed: 0,
               total_volume_kg: null,
               average_rpe: null,
+              original_sets_count: 0, // Se calculará después
             };
 
             // 3. Transformar bloques de routine a active workout
@@ -348,6 +351,7 @@ const useActiveWorkoutStore = create<Store>()(
               session: {
                 ...session,
                 total_sets_planned: Object.keys(activeSets).length,
+                original_sets_count: Object.keys(activeSets).length,
               },
               blocks: activeBlocks,
               exercises: activeExercises,
@@ -452,6 +456,37 @@ const useActiveWorkoutStore = create<Store>()(
             ...stateUpdate,
           };
         });
+      },
+
+      detectWorkoutChanges: () => {
+        const state = useActiveWorkoutStore.getState();
+        const { activeWorkout } = state;
+
+        if (!activeWorkout.session) return false;
+
+        // 1. Check bloques agregados
+        for (const block of Object.values(activeWorkout.blocks)) {
+          if (block.was_added_during_workout) return true;
+        }
+
+        // 2. Check ejercicios agregados/reemplazados
+        for (const exercise of Object.values(activeWorkout.exercises)) {
+          if (exercise.was_added_during_workout) return true;
+          if (exercise.original_exercise_in_block_id === null) return true;
+        }
+
+        // 3. Check sets agregados
+        for (const set of Object.values(activeWorkout.sets)) {
+          if (set.original_set_id === null) return true;
+        }
+
+        // 4. Check eliminaciones por diferencia de count
+        const currentSetsCount = Object.keys(activeWorkout.sets).length;
+        const originalSetsCount = activeWorkout.session.original_sets_count;
+
+        if (currentSetsCount !== originalSetsCount) return true;
+
+        return false; // Sin cambios
       },
     },
 

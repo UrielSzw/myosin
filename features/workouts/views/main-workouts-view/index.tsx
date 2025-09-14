@@ -31,14 +31,10 @@ export const MainWorkoutsView = ({
 
   return (
     <>
-      <MainView folders={folders}>
+      <MainView folders={folders} routinesCount={routines.length}>
         {routines.length > 0 && (
-          <View style={{ marginBottom: 24 }}>
-            <Typography
-              variant="h5"
-              weight="semibold"
-              style={{ marginBottom: 16 }}
-            >
+          <View style={{ marginBottom: 24, marginTop: 16 }}>
+            <Typography variant="h5" weight="semibold">
               Rutinas
             </Typography>
           </View>

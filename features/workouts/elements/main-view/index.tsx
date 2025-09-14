@@ -2,9 +2,10 @@ import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { Button } from "@/shared/ui/button";
+import { HintBox } from "@/shared/ui/hint-box";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
-import { FolderPlus } from "lucide-react-native";
+import { Folder, FolderPlus } from "lucide-react-native";
 import { View } from "react-native";
 import DraggableFlatList, {
   RenderItemParams,
@@ -16,9 +17,14 @@ import { FolderItem } from "./folder-item";
 type Props = {
   children: React.ReactNode;
   folders?: FolderWithMetrics[];
+  routinesCount?: number;
 };
 
-export const MainView: React.FC<Props> = ({ folders, children }) => {
+export const MainView: React.FC<Props> = ({
+  folders,
+  children,
+  routinesCount = 0,
+}) => {
   const { colors } = useColorScheme();
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
@@ -65,25 +71,37 @@ export const MainView: React.FC<Props> = ({ folders, children }) => {
         style={{ minHeight: "100%" }}
         activationDistance={15}
         ListHeaderComponent={() => (
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-            }}
-          >
-            <Typography variant="h5" weight="semibold">
-              Carpetas
-            </Typography>
-            <Button
-              variant="ghost"
-              size="sm"
-              onPress={handleCreateFolder}
-              icon={<FolderPlus size={18} color={colors.primary[500]} />}
+          <View style={{ marginBottom: 16 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: !folders || folders.length === 0 ? 16 : 0,
+              }}
             >
-              Nueva
-            </Button>
+              <Typography variant="h5" weight="semibold">
+                Carpetas
+              </Typography>
+              <Button
+                variant="ghost"
+                size="sm"
+                onPress={handleCreateFolder}
+                icon={<FolderPlus size={18} color={colors.primary[500]} />}
+              >
+                Nueva
+              </Button>
+            </View>
+
+            {/* Micro EmptyState para carpetas */}
+            {(!folders || folders.length === 0) && routinesCount > 0 && (
+              <HintBox
+                variant="promotional"
+                icon={<Folder size={16} color={colors.primary[500]} />}
+              >
+                Organiza tus rutinas en carpetas temáticas
+              </HintBox>
+            )}
           </View>
         )}
         ListFooterComponent={() => <>{children}</>}

@@ -1,5 +1,7 @@
 import { BlockInsert } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { ReorderExercise } from "@/shared/types/reorder";
+import { IBlockType } from "@/shared/types/workout";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { ArrowLeft } from "lucide-react-native";
@@ -9,35 +11,46 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { DraggableList } from "./draggable-list";
 
 type Props = {
-  blocks: (BlockInsert & { tempId: string })[];
-  onReorder: (reorderedBlocks: (BlockInsert & { tempId: string })[]) => void;
+  block: BlockInsert & { tempId: string };
+  exercises: ReorderExercise[];
+  onReorder: (reorderedExercises: ReorderExercise[]) => void;
   onCancel: () => void;
 };
 
-export const ReorderBlocksFeature: React.FC<Props> = ({
-  blocks,
+export const ReorderExercisesFeature: React.FC<Props> = ({
+  block,
+  exercises,
   onReorder,
   onCancel,
 }) => {
   const { colors } = useColorScheme();
 
-  const [reorderedBlocks, setReorderedBlocks] = useState(blocks);
+  const [reorderedExercises, setReorderedExercises] =
+    useState<ReorderExercise[]>(exercises);
 
-  const handleReorder = ({
-    data,
-  }: {
-    data: (BlockInsert & { tempId: string })[];
-  }) => {
-    // Update orderIndex for each block
-    const updatedBlocks = data.map((block, index) => ({
-      ...block,
-      orderIndex: index,
+  const getBlockTypeLabel = (type: IBlockType) => {
+    switch (type) {
+      case "superset":
+        return "Superserie";
+      case "circuit":
+        return "Circuito";
+      default:
+        return "Individual";
+    }
+  };
+
+  const handleReorder = ({ data }: { data: ReorderExercise[] }) => {
+    // Update orderIndex for each exercise
+    const updatedExercises: ReorderExercise[] = data.map((exercise, index) => ({
+      ...exercise,
+      order_index: index,
     }));
-    setReorderedBlocks(updatedBlocks);
+
+    setReorderedExercises(updatedExercises);
   };
 
   const handleSave = () => {
-    onReorder(reorderedBlocks);
+    onReorder(reorderedExercises);
   };
 
   const handleCancel = () => {
@@ -63,9 +76,14 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
           <ArrowLeft size={18} color={colors.text} />
         </Button>
 
-        <Typography variant="h6" weight="semibold">
-          Reordenar Bloques
-        </Typography>
+        <View style={{ flex: 1, alignItems: "center" }}>
+          <Typography variant="h6" weight="semibold">
+            Reordenar Ejercicios
+          </Typography>
+          <Typography variant="caption" color="textMuted">
+            {getBlockTypeLabel(block.type)}
+          </Typography>
+        </View>
 
         <Button
           variant="primary"
@@ -94,13 +112,14 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
           color="textMuted"
           style={{ textAlign: "center" }}
         >
-          Mantén presionado un bloque por 300ms para arrastrarlo y reordenar
+          Mantén presionado un ejercicio por 300ms para arrastrarlo y reordenar
         </Typography>
       </View>
 
       {/* Draggable List */}
       <DraggableList
-        reorderedBlocks={reorderedBlocks}
+        reorderedExercises={reorderedExercises}
+        blockType={block.type}
         onReorder={handleReorder}
       />
     </SafeAreaView>

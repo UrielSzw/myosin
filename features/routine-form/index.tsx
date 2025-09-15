@@ -44,7 +44,7 @@ export const RoutineFormFeature = () => {
           <RoutineInfo />
 
           <BlocksList>
-            {blocksByRoutine.map((blockId, index) => (
+            {blocksByRoutine.map((blockId) => (
               <BlockItem
                 key={blockId}
                 blockId={blockId}

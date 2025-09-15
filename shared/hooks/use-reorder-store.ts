@@ -14,6 +14,8 @@ type Store = {
       ExerciseInBlockInsert & { tempId: string; exercise: BaseExercise }
     >;
     exercisesByBlock: Record<string, string[]>;
+    block: (BlockInsert & { tempId: string }) | null;
+    exercisesIdsInCurrentBlock: string[];
   };
 
   reorderBlocksActions: {
@@ -27,6 +29,8 @@ type Store = {
       >
     ) => void;
     setExercisesByBlock: (exercisesByBlock: Record<string, string[]>) => void;
+    setBlock: (block: (BlockInsert & { tempId: string }) | null) => void;
+    setExercisesIdsInCurrentBlock: (ids: string[]) => void;
   };
 };
 
@@ -36,6 +40,8 @@ const useReorderStore = create<Store>()(
       blocks: {},
       exercisesInBlock: {},
       exercisesByBlock: {},
+      block: null,
+      exercisesIdsInCurrentBlock: [],
     },
 
     reorderBlocksActions: {
@@ -50,6 +56,14 @@ const useReorderStore = create<Store>()(
       setExercisesByBlock: (exercisesByBlock) =>
         set((state) => {
           state.blocksState.exercisesByBlock = exercisesByBlock;
+        }),
+      setBlock: (block) =>
+        set((state) => {
+          state.blocksState.block = block;
+        }),
+      setExercisesIdsInCurrentBlock: (ids) =>
+        set((state) => {
+          state.blocksState.exercisesIdsInCurrentBlock = ids;
         }),
     },
   }))

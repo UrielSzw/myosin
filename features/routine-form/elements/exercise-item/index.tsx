@@ -1,10 +1,12 @@
 import { IBlockType } from "@/shared/types/workout";
+import { router } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { IToogleSheet } from "../../hooks/use-form-routine-sheets";
 import {
   useMainActions,
   useRoutineFormState,
 } from "../../hooks/use-routine-form-store";
+import { useReorderExercises } from "../../shared/use-reorder-exercises";
 import { SetsTable } from "../sets-table";
 import { SetsItem } from "../sets-table/sets-item";
 import { ExerciseHeader } from "./exercise-header";
@@ -26,6 +28,7 @@ export const ExerciseItem: React.FC<Props> = ({
 }) => {
   const { exercisesInBlock, setsByExercise } = useRoutineFormState();
   const { setCurrentState } = useMainActions();
+  const { initializeReorder } = useReorderExercises();
 
   const exerciseInBlock = exercisesInBlock[exerciseInBlockId];
 
@@ -40,8 +43,8 @@ export const ExerciseItem: React.FC<Props> = ({
   };
 
   const handleLongPressExercise = () => {
-    // setBlockToReorder(block);
-    // router.push("/reorder-exercises");
+    initializeReorder(blockId);
+    router.push("/routines/reorder-exercises");
   };
 
   const setIds = setsByExercise[exerciseInBlockId] || [];

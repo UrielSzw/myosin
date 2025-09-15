@@ -6,6 +6,7 @@ import {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { ReorderExercise } from "@/shared/types/reorder";
 import { IRepsType, ISetType } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
@@ -62,6 +63,9 @@ type Store = {
       newOrder: Record<string, BlockInsert & { tempId: string }>
     ) => void;
     setNewOrderBlocksIds: (newOrderIds: string[]) => void;
+
+    setNewOrderExercises: (newOrder: Record<string, ReorderExercise>) => void;
+    setNewOrderExercisesIds: (blockId: string, newOrderIds: string[]) => void;
   };
 
   mainActions: {
@@ -151,6 +155,31 @@ const useRoutineFormStore = create<Store>()(
           if (!state.formState) return;
 
           state.formState.blocksByRoutine = newOrderIds;
+        });
+      },
+      setNewOrderExercises: (newOrder) => {
+        set((state) => {
+          if (!state.formState) return;
+
+          state.formState.exercisesInBlock = newOrder;
+        });
+      },
+      setNewOrderExercisesIds: (blockId, newOrderIds) => {
+        set((state) => {
+          if (!state.formState) return;
+
+          console.log("=== STORE UPDATE DEBUG ===");
+          console.log("Block ID:", blockId);
+          console.log("New order IDs:", newOrderIds);
+          console.log("Before exercisesByBlock:", state.formState.exercisesByBlock[blockId]);
+
+          state.formState.exercisesByBlock = {
+            ...state.formState.exercisesByBlock,
+            [blockId]: newOrderIds,
+          };
+
+          console.log("After exercisesByBlock:", state.formState.exercisesByBlock[blockId]);
+          console.log("=== END STORE UPDATE DEBUG ===");
         });
       },
     },

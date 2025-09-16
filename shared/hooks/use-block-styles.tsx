@@ -54,6 +54,12 @@ export const useBlockStyles = () => {
         return "RP";
       case "mechanical":
         return "M";
+      case "eccentric":
+        return "E";
+      case "partial":
+        return "P";
+      case "isometric":
+        return "I";
       default:
         return "";
     }
@@ -73,6 +79,12 @@ export const useBlockStyles = () => {
         return colors.secondary[500];
       case "mechanical":
         return colors.success[500];
+      case "eccentric":
+        return "#8B5CF6"; // Purple
+      case "partial":
+        return "#F97316"; // Orange
+      case "isometric":
+        return "#06B6D4"; // Cyan
       default:
         return colors.primary[500];
     }

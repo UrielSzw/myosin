@@ -5,7 +5,10 @@ export type ISetType =
   | "failure"
   | "cluster"
   | "rest-pause"
-  | "mechanical";
+  | "mechanical"
+  | "eccentric"
+  | "partial"
+  | "isometric";
 
 export type IRepsType = "reps" | "range" | "time" | "distance";
 

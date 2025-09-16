@@ -38,6 +38,9 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
       { type: "cluster" as const, label: "Cluster" },
       { type: "rest-pause" as const, label: "Rest-Pause" },
       { type: "mechanical" as const, label: "Mecánico" },
+      { type: "eccentric" as const, label: "Excéntrico" },
+      { type: "partial" as const, label: "Parciales" },
+      { type: "isometric" as const, label: "Isométrico" },
     ];
 
     // Función para mostrar información

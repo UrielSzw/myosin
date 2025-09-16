@@ -1,9 +1,18 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { ISetType } from "@/shared/types/workout";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { forwardRef } from "react";
+import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { InfoIcon } from "lucide-react-native";
+import React, { forwardRef, useState } from "react";
 import { TouchableOpacity } from "react-native";
+import Animated, {
+  Easing,
+  SlideInLeft,
+  SlideInRight,
+  SlideOutLeft,
+  SlideOutRight,
+} from "react-native-reanimated";
 import { Typography } from "../../typography";
+import { SetTypeDetail } from "./set-type-detail";
 
 type Props = {
   onSelectSetType: (type: ISetType) => void;
@@ -15,6 +24,12 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ onSelectSetType, onDeleteSet, currentSetType }, ref) => {
     const { colors } = useColorScheme();
 
+    // Estados para la navegación
+    const [viewMode, setViewMode] = useState<"selection" | "info">("selection");
+    const [selectedInfoType, setSelectedInfoType] = useState<ISetType | null>(
+      null
+    );
+
     const setTypes = [
       { type: "normal" as const, label: "Normal" },
       { type: "warmup" as const, label: "Calentamiento" },
@@ -25,11 +40,44 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
       { type: "mechanical" as const, label: "Mecánico" },
     ];
 
+    // Función para mostrar información
+    const handleShowInfo = (setType: ISetType, event: any) => {
+      event.stopPropagation(); // Evitar que se seleccione el tipo
+      setSelectedInfoType(setType);
+      setViewMode("info");
+    };
+
+    // Función para volver a la selección
+    const handleBackToSelection = () => {
+      setViewMode("selection");
+    };
+
+    // Función para seleccionar desde la vista de info
+    const handleSelectFromInfo = (setType: ISetType) => {
+      onSelectSetType(setType);
+      // El sheet se cerrará automáticamente por el componente padre
+    };
+
+    // Configuración de animaciones
+    const slideInFromRight = SlideInRight.duration(300).easing(
+      Easing.bezier(0.25, 0.1, 0.25, 1)
+    );
+    const slideInFromLeft = SlideInLeft.duration(300).easing(
+      Easing.bezier(0.25, 0.1, 0.25, 1)
+    );
+    const slideOutToLeft = SlideOutLeft.duration(300).easing(
+      Easing.bezier(0.25, 0.1, 0.25, 1)
+    );
+    const slideOutToRight = SlideOutRight.duration(300).easing(
+      Easing.bezier(0.25, 0.1, 0.25, 1)
+    );
+
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={["50%"]}
+        snapPoints={viewMode === "selection" ? ["50%"] : ["75%"]}
         enablePanDownToClose
+        onDismiss={handleBackToSelection}
         backgroundStyle={{
           backgroundColor: colors.surface,
           shadowColor: "#000",
@@ -39,47 +87,88 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
           },
           shadowOpacity: 0.1,
           shadowRadius: 8,
-          elevation: 8, // Para Android
+          elevation: 8,
         }}
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
       >
-        <BottomSheetView style={{ padding: 16, paddingBottom: 40 }}>
-          <Typography
-            variant="h3"
-            weight="semibold"
-            style={{ marginBottom: 16 }}
-          >
-            Tipo de Serie
-          </Typography>
-
-          {setTypes.map((option) => (
-            <TouchableOpacity
-              key={option.type}
-              onPress={() => onSelectSetType(option.type)}
-              style={{
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.border,
-                backgroundColor:
-                  currentSetType === option.type
-                    ? colors.primary[500] + "20"
-                    : "transparent",
-              }}
+        <BottomSheetScrollView
+          style={{ padding: 16, paddingBottom: 40, flex: 1 }}
+        >
+          {viewMode === "selection" ? (
+            <Animated.View
+              key="selection-view"
+              entering={slideInFromLeft}
+              exiting={slideOutToLeft}
+              style={{ flex: 1 }}
             >
-              <Typography variant="body1">{option.label}</Typography>
-            </TouchableOpacity>
-          ))}
+              <Typography
+                variant="h3"
+                weight="semibold"
+                style={{ marginBottom: 16 }}
+              >
+                Tipo de Serie
+              </Typography>
 
-          <TouchableOpacity
-            onPress={onDeleteSet}
-            style={{ paddingVertical: 16, paddingHorizontal: 16 }}
-          >
-            <Typography variant="body1" style={{ color: colors.error[500] }}>
-              Eliminar Serie
-            </Typography>
-          </TouchableOpacity>
-        </BottomSheetView>
+              {setTypes.map((option) => (
+                <TouchableOpacity
+                  key={option.type}
+                  onPress={() => onSelectSetType(option.type)}
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    paddingVertical: 16,
+                    paddingHorizontal: 16,
+                    borderBottomWidth: 1,
+                    borderBottomColor: colors.border,
+                    backgroundColor:
+                      currentSetType === option.type
+                        ? colors.primary[500] + "20"
+                        : "transparent",
+                  }}
+                >
+                  <Typography variant="body1">{option.label}</Typography>
+
+                  <TouchableOpacity
+                    onPress={(event) => handleShowInfo(option.type, event)}
+                    style={{
+                      padding: 4,
+                      borderRadius: 12,
+                      backgroundColor: colors.primary[500] + "20",
+                    }}
+                  >
+                    <InfoIcon size={16} color={colors.primary[500]} />
+                  </TouchableOpacity>
+                </TouchableOpacity>
+              ))}
+
+              <TouchableOpacity
+                onPress={onDeleteSet}
+                style={{ paddingVertical: 16, paddingHorizontal: 16 }}
+              >
+                <Typography
+                  variant="body1"
+                  style={{ color: colors.error[500] }}
+                >
+                  Eliminar Serie
+                </Typography>
+              </TouchableOpacity>
+            </Animated.View>
+          ) : (
+            <Animated.View
+              key="info-view"
+              entering={slideInFromRight}
+              exiting={slideOutToRight}
+              style={{ flex: 1 }}
+            >
+              <SetTypeDetail
+                setType={selectedInfoType!}
+                onBack={handleBackToSelection}
+                onSelectMethod={handleSelectFromInfo}
+              />
+            </Animated.View>
+          )}
+        </BottomSheetScrollView>
       </BottomSheetModal>
     );
   }

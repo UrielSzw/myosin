@@ -159,6 +159,7 @@ export const routine_sets = sqliteTable("routine_sets", {
   reps: integer("reps"),
   weight: real("weight"),
   rpe: real("rpe"),
+  tempo: text("tempo"), // "3-1-2-1" o NULL
 
   order_index: integer("order_index").notNull(),
 

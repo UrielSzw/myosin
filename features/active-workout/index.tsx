@@ -19,6 +19,8 @@ export const ActiveWorkoutFeature = () => {
     blockOptionsBottomSheetRef,
     exerciseOptionsBottomSheetRef,
     restTimerSheetRef,
+    rpeSelectorBottomSheetRef,
+    tempoMetronomeRef,
   } = useActiveWorkoutSheets();
 
   return (
@@ -49,6 +51,8 @@ export const ActiveWorkoutFeature = () => {
         blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
         exerciseOptionsBottomSheetRef={exerciseOptionsBottomSheetRef}
         restTimerSheetRef={restTimerSheetRef}
+        rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
+        tempoMetronomeRef={tempoMetronomeRef}
       />
     </ScreenWrapper>
   );

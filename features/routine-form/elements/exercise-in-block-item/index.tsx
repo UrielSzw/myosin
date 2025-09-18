@@ -5,7 +5,6 @@ import { Timer } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 import { useRoutineFormState } from "../../hooks/use-routine-form-store";
-import { BlockLine } from "../block-line";
 
 type Props = {
   exerciseInBlockId: string;
@@ -40,12 +39,12 @@ const ExerciseInBlockItemComponent: React.FC<Props> = ({
           }}
         >
           {/* Exercise Number with Connection to Line */}
-          <BlockLine
+          {/* <BlockLine
             block={block}
             exerciseIndex={exerciseInBlock.order_index}
             blockColors={blockColors}
             exercisesCount={exercisesCount}
-          />
+          /> */}
 
           {/* Exercise Details */}
           {children}

@@ -20,6 +20,8 @@ export const RoutineFormFeature = () => {
     restTimeBottomSheetRef,
     blockOptionsBottomSheetRef,
     exerciseOptionsBottomSheetRef,
+    rpeSelectorBottomSheetRef,
+    tempoSelectorBottomSheetRef,
   } = useFormRoutineSheets();
 
   const blockCount = blocksByRoutine.length;
@@ -65,6 +67,8 @@ export const RoutineFormFeature = () => {
         restTimeBottomSheetRef={restTimeBottomSheetRef}
         repsTypeBottomSheetRef={repsTypeBottomSheetRef}
         setTypeBottomSheetRef={setTypeBottomSheetRef}
+        rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
+        tempoSelectorBottomSheetRef={tempoSelectorBottomSheetRef}
       />
     </ScreenWrapper>
   );

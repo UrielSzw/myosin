@@ -1,12 +1,14 @@
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
-import { useRef } from 'react';
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { useRef } from "react";
 
 export type IToogleSheet =
-  | 'setType'
-  | 'repsType'
-  | 'restTime'
-  | 'blockOptions'
-  | 'exerciseOptions';
+  | "setType"
+  | "repsType"
+  | "restTime"
+  | "blockOptions"
+  | "exerciseOptions"
+  | "rpeSelector"
+  | "tempoSelector";
 
 export const useFormRoutineSheets = () => {
   const setTypeBottomSheetRef = useRef<BottomSheetModal>(null);
@@ -14,6 +16,8 @@ export const useFormRoutineSheets = () => {
   const restTimeBottomSheetRef = useRef<BottomSheetModal>(null);
   const blockOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
   const exerciseOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
+  const rpeSelectorBottomSheetRef = useRef<BottomSheetModal>(null);
+  const tempoSelectorBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handleCloseSheets = () => {
     setTypeBottomSheetRef.current?.close();
@@ -21,24 +25,32 @@ export const useFormRoutineSheets = () => {
     restTimeBottomSheetRef.current?.close();
     blockOptionsBottomSheetRef.current?.close();
     exerciseOptionsBottomSheetRef.current?.close();
+    rpeSelectorBottomSheetRef.current?.close();
+    tempoSelectorBottomSheetRef.current?.close();
   };
 
   const handleToggleSheet = (sheet?: IToogleSheet) => {
     switch (sheet) {
-      case 'setType':
+      case "setType":
         setTypeBottomSheetRef.current?.present();
         break;
-      case 'repsType':
+      case "repsType":
         repsTypeBottomSheetRef.current?.present();
         break;
-      case 'restTime':
+      case "restTime":
         restTimeBottomSheetRef.current?.present();
         break;
-      case 'blockOptions':
+      case "blockOptions":
         blockOptionsBottomSheetRef.current?.present();
         break;
-      case 'exerciseOptions':
+      case "exerciseOptions":
         exerciseOptionsBottomSheetRef.current?.present();
+        break;
+      case "rpeSelector":
+        rpeSelectorBottomSheetRef.current?.present();
+        break;
+      case "tempoSelector":
+        tempoSelectorBottomSheetRef.current?.present();
         break;
       default:
         handleCloseSheets();
@@ -53,5 +65,7 @@ export const useFormRoutineSheets = () => {
     restTimeBottomSheetRef,
     blockOptionsBottomSheetRef,
     exerciseOptionsBottomSheetRef,
+    rpeSelectorBottomSheetRef,
+    tempoSelectorBottomSheetRef,
   };
 };

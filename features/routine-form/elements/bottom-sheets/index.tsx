@@ -1,8 +1,10 @@
-import { ISetType } from "@/shared/types/workout";
+import { ISetType, RPEValue } from "@/shared/types/workout";
+import { RPESelector } from "@/shared/ui/rpe-selector";
 import { BlockOptionsBottomSheet } from "@/shared/ui/sheets/block-options-sheet";
 import { ExerciseOptionsBottomSheet } from "@/shared/ui/sheets/exercise-options-sheet";
 import { RestTimeBottomSheet } from "@/shared/ui/sheets/rest-time-sheet";
 import { SetTypeBottomSheet } from "@/shared/ui/sheets/set-type-sheet";
+import { TempoSelector } from "@/shared/ui/tempo-selector";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import React, { useCallback } from "react";
 import {
@@ -20,6 +22,8 @@ type Props = {
   restTimeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   blockOptionsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   exerciseOptionsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
+  rpeSelectorBottomSheetRef: React.RefObject<BottomSheetModal | null>;
+  tempoSelectorBottomSheetRef: React.RefObject<BottomSheetModal | null>;
 };
 
 export const BottomSheets: React.FC<Props> = ({
@@ -28,18 +32,21 @@ export const BottomSheets: React.FC<Props> = ({
   restTimeBottomSheetRef,
   blockOptionsBottomSheetRef,
   exerciseOptionsBottomSheetRef,
+  rpeSelectorBottomSheetRef,
+  tempoSelectorBottomSheetRef,
 }) => {
   const {
     currentRestTime,
     isCurrentBlockMulti,
     currentSetType,
     currentExerciseName,
+    currentSetTempo,
   } = useRoutineFormCurrentState();
 
   const { setExerciseModalMode, setIsExerciseModalOpen, clearCurrentState } =
     useMainActions();
 
-  const { deleteSet, updateSetType } = useSetActions();
+  const { deleteSet, updateSetType, updateRpe, updateTempo } = useSetActions();
   const { updateRestTime, deleteBlock, convertBlockToIndividual } =
     useBlockActions();
   const { deleteExercise } = useExerciseActions();
@@ -108,6 +115,28 @@ export const BottomSheets: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setExerciseModalMode, setIsExerciseModalOpen]);
 
+  const handleUpdateRpe = useCallback(
+    (rpe: RPEValue | null) => {
+      console.log("Selected RPE:", rpe);
+
+      updateRpe(rpe);
+      rpeSelectorBottomSheetRef.current?.dismiss();
+      clearCurrentState();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [clearCurrentState]
+  );
+
+  const handleUpdateTempo = useCallback(
+    (tempo: string | null) => {
+      updateTempo(tempo);
+      tempoSelectorBottomSheetRef.current?.dismiss();
+      clearCurrentState();
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [clearCurrentState]
+  );
+
   return (
     <>
       <SetTypeBottomSheet
@@ -139,6 +168,15 @@ export const BottomSheets: React.FC<Props> = ({
         onShowReplace={handleShowReplaceModal}
         isInMultipleExercisesBlock={isCurrentBlockMulti}
         exerciseName={currentExerciseName}
+      />
+
+      <RPESelector onSelect={handleUpdateRpe} ref={rpeSelectorBottomSheetRef} />
+
+      <TempoSelector
+        ref={tempoSelectorBottomSheetRef}
+        onSelect={handleUpdateTempo}
+        onDismiss={() => tempoSelectorBottomSheetRef.current?.dismiss()}
+        selectedTempo={currentSetTempo || ""}
       />
     </>
   );

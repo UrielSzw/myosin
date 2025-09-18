@@ -160,6 +160,8 @@ export const workout_sets = sqliteTable(
     planned_reps: integer("planned_reps"),
     planned_rpe: real("planned_rpe"),
 
+    planned_tempo: text("planned_tempo"), // "3-1-2-1" o NULL
+
     // Datos reales ejecutados
     actual_weight: real("actual_weight"),
     actual_reps: integer("actual_reps"),

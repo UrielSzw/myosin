@@ -7,7 +7,7 @@ import {
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
 import { ReorderExercise } from "@/shared/types/reorder";
-import { IRepsType, ISetType } from "@/shared/types/workout";
+import { IRepsType, ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { routinesService } from "../../workouts/service/routines";
@@ -51,6 +51,7 @@ type Store = {
     currentRestTimeType?: "between-exercises" | "between-rounds" | null;
     currentRestTime?: number | null;
     currentSetType?: ISetType | null;
+    currentSetTempo?: string | null;
 
     currentExercisesCount?: number | null;
     currentExerciseName?: string | null;
@@ -103,6 +104,8 @@ type Store = {
     ) => void;
     deleteSet: () => void;
     updateSetType: (setType: ISetType) => void;
+    updateRpe: (rpe: RPEValue | null) => void;
+    updateTempo: (tempo: string | null) => void;
   };
 };
 
@@ -140,6 +143,7 @@ const useRoutineFormStore = create<Store>()(
       currentSetType: null,
       currentExerciseName: null,
       isCurrentBlockMulti: false,
+      currentSetTempo: null,
     },
 
     sharedActions: {
@@ -168,18 +172,10 @@ const useRoutineFormStore = create<Store>()(
         set((state) => {
           if (!state.formState) return;
 
-          console.log("=== STORE UPDATE DEBUG ===");
-          console.log("Block ID:", blockId);
-          console.log("New order IDs:", newOrderIds);
-          console.log("Before exercisesByBlock:", state.formState.exercisesByBlock[blockId]);
-
           state.formState.exercisesByBlock = {
             ...state.formState.exercisesByBlock,
             [blockId]: newOrderIds,
           };
-
-          console.log("After exercisesByBlock:", state.formState.exercisesByBlock[blockId]);
-          console.log("=== END STORE UPDATE DEBUG ===");
         });
       },
     },
@@ -376,6 +372,7 @@ const useRoutineFormStore = create<Store>()(
             currentSetType: null,
             currentExerciseName: null,
             isCurrentBlockMulti: false,
+            currentSetTempo: null,
           };
         });
       },
@@ -881,12 +878,6 @@ const useRoutineFormStore = create<Store>()(
           const setIds =
             state.formState.setsByExercise[exerciseInBlockId] || [];
 
-          console.log(
-            "Set IDs for exerciseInBlockId",
-            exerciseInBlockId,
-            setIds
-          );
-
           const allSets = setIds
             .map((id) => state.formState.sets[id])
             .filter(Boolean)
@@ -994,6 +985,30 @@ const useRoutineFormStore = create<Store>()(
 
           if (set) {
             state.formState.sets[setId] = { ...set, set_type: setType };
+          }
+        });
+      },
+      updateRpe: (rpe) => {
+        set((state) => {
+          if (!state.currentState.currentSetId) return;
+
+          const setId = state.currentState.currentSetId;
+          const set = state.formState.sets[setId];
+
+          if (set) {
+            state.formState.sets[setId] = { ...set, rpe };
+          }
+        });
+      },
+      updateTempo: (tempo) => {
+        set((state) => {
+          if (!state.currentState.currentSetId) return;
+
+          const setId = state.currentState.currentSetId;
+          const set = state.formState.sets[setId];
+
+          if (set) {
+            state.formState.sets[setId] = { ...set, tempo };
           }
         });
       },

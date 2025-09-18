@@ -2,7 +2,7 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IBlockType, IRepsType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { ChevronDown, Plus } from "lucide-react-native";
+import { ChevronDown, Plus, Timer } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 import { IToogleSheet } from "../../hooks/use-form-routine-sheets";
@@ -99,6 +99,14 @@ export const SetsTable: React.FC<Props> = ({
             </Typography>
             <ChevronDown size={12} color={colors.textMuted} />
           </TouchableOpacity>
+        </View>
+        <View style={{ width: 50, alignItems: "center" }}>
+          <Typography variant="caption" weight="medium" color="textMuted">
+            RPE
+          </Typography>
+        </View>
+        <View style={{ width: 40, alignItems: "center" }}>
+          <Timer size={12} color={colors.textMuted} />
         </View>
       </View>
 

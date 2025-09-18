@@ -55,12 +55,12 @@ export const ActiveSetsTable: React.FC<Props> = ({
             PREV
           </Typography>
         </View>
-        <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
+        <View style={{ flex: 0.9, paddingHorizontal: 8, alignItems: "center" }}>
           <Typography variant="caption" weight="medium" color="textMuted">
             KG
           </Typography>
         </View>
-        <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
+        <View style={{ flex: 0.9, paddingHorizontal: 8, alignItems: "center" }}>
           <TouchableOpacity
             style={{
               flexDirection: "row",
@@ -87,6 +87,11 @@ export const ActiveSetsTable: React.FC<Props> = ({
             </Typography>
             <ChevronDown size={12} color={colors.textMuted} />
           </TouchableOpacity>
+        </View>
+        <View style={{ flex: 0.8, paddingHorizontal: 8, alignItems: "center" }}>
+          <Typography variant="caption" weight="medium" color="textMuted">
+            RPE
+          </Typography>
         </View>
         <View style={{ width: 40, alignItems: "center" }}>
           <Check size={16} color={colors.textMuted} />

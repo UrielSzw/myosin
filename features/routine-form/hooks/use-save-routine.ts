@@ -112,6 +112,7 @@ export const useSaveRoutine = () => {
               set_type: set.set_type,
               reps_type: set.reps_type,
               reps_range: set.reps_range,
+              tempo: set.tempo,
             });
           });
         }

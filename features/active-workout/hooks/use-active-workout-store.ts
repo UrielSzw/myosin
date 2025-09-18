@@ -7,7 +7,7 @@ import {
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
-import { IRepsType, ISetType } from "@/shared/types/workout";
+import { IRepsType, ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import {
@@ -88,6 +88,8 @@ type Store = {
     currentRepsType?: IRepsType | null;
     currentSetType?: ISetType | null;
     exerciseModalMode?: "add-new" | "replace" | "add-to-block" | null;
+    currentRpeValue?: RPEValue | null;
+    currentTempo?: string | null;
 
     currentExercisesCount?: number | null;
     currentExerciseName?: string | null;
@@ -142,6 +144,7 @@ type Store = {
     uncompleteSet: (setId: string) => void;
     deleteSet: () => void;
     updateSetType: (setType: ISetType) => void;
+    updateRpe: (rpe: RPEValue | null) => void;
   };
 
   timerActions: {
@@ -178,6 +181,9 @@ const useActiveWorkoutStore = create<Store>()(
       currentRepsType: null,
       currentSetType: null,
       exerciseModalMode: null,
+      currentExercisesCount: null,
+      currentRpeValue: null,
+      currentExerciseName: null,
     },
 
     // Stats calculadas
@@ -349,6 +355,7 @@ const useActiveWorkoutStore = create<Store>()(
                 order_index: set.order_index,
                 reps_type: set.reps_type,
                 set_type: set.set_type,
+                planned_tempo: set.tempo,
                 // Valores planificados (del routine)
                 planned_weight: set.weight,
                 planned_reps: set.reps,
@@ -499,6 +506,8 @@ const useActiveWorkoutStore = create<Store>()(
             currentExerciseName: null,
             isCurrentBlockMulti: false,
             exerciseModalMode: null,
+            currentRpeValue: null,
+            currentTempo: null,
           };
         });
       },
@@ -1249,6 +1258,19 @@ const useActiveWorkoutStore = create<Store>()(
           if (!set) return;
 
           set.set_type = setType;
+        });
+      },
+
+      updateRpe: (rpe) => {
+        set((state) => {
+          if (!state.currentState.currentSetId) return;
+
+          const setId = state.currentState.currentSetId;
+          const set = state.activeWorkout.sets[setId];
+
+          if (set) {
+            state.activeWorkout.sets[setId] = { ...set, actual_rpe: rpe };
+          }
         });
       },
     },

@@ -79,7 +79,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
 
         {/* Exercises List with Continuous Visual Line */}
         <View style={{ position: "relative" }}>
-          {exercisesInBlockIds.length > 1 && (
+          {/* {exercisesInBlockIds.length > 1 && (
             <View
               style={{
                 position: "absolute",
@@ -92,7 +92,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
                 zIndex: 1,
               }}
             />
-          )}
+          )} */}
 
           {exercisesInBlockIds.map((exerciseInBlockId) => (
             <ExerciseInBlockItem

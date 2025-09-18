@@ -8,6 +8,7 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IRepsType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
+import { Timer } from "lucide-react-native";
 import React, { useCallback } from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 
@@ -85,6 +86,23 @@ export const SetsItem = React.memo<Props>(
       },
       [set.reps_range?.min, set.tempId, updateSet]
     );
+
+    const handleShowRPESelector = useCallback(() => {
+      setCurrentState({
+        currentSetId: set.tempId,
+      });
+
+      onToggleSheet("rpeSelector");
+    }, [onToggleSheet, set.tempId, setCurrentState]);
+
+    const handleShowTempoSelector = useCallback(() => {
+      setCurrentState({
+        currentSetId: set.tempId,
+        currentSetTempo: set.tempo,
+      });
+
+      onToggleSheet("tempoSelector");
+    }, [onToggleSheet, set.tempId, set.tempo, setCurrentState]);
 
     if (!set) return null;
 
@@ -353,6 +371,66 @@ export const SetsItem = React.memo<Props>(
               />
             </TouchableOpacity>
           )}
+        </View>
+
+        {/* RPE Input - Ultra Compact */}
+        <View style={{ width: 50, alignItems: "center" }}>
+          <TouchableOpacity
+            style={{
+              minHeight: 32,
+              minWidth: 36,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 6,
+              paddingVertical: 4,
+              backgroundColor: "transparent",
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 6,
+            }}
+            accessible={true}
+            accessibilityLabel={`RPE para set ${setNumber}`}
+            accessibilityHint="Toca para configurar RPE"
+            onPress={handleShowRPESelector}
+          >
+            <Typography
+              variant="caption"
+              style={{
+                color: colors.textMuted,
+                fontSize: 12,
+                fontWeight: "500",
+              }}
+            >
+              {set.rpe ? set.rpe.toString() : "-"}
+            </Typography>
+          </TouchableOpacity>
+        </View>
+
+        {/* TEMPO Input - Ultra Compact */}
+        <View style={{ width: 40, alignItems: "center" }}>
+          <TouchableOpacity
+            style={{
+              minHeight: 32,
+              minWidth: 32,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 4,
+              paddingVertical: 4,
+              backgroundColor: "transparent",
+              borderWidth: 1,
+              borderColor: colors.border,
+              borderRadius: 6,
+            }}
+            accessible={true}
+            accessibilityLabel={`Tempo para set ${setNumber}`}
+            accessibilityHint="Toca para configurar tempo"
+            onPress={handleShowTempoSelector}
+          >
+            <Timer
+              size={14}
+              color={set.tempo ? colors.primary[500] : colors.textMuted}
+            />
+          </TouchableOpacity>
         </View>
       </View>
     );

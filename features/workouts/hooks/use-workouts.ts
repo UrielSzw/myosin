@@ -4,7 +4,8 @@ import { useRef, useState } from "react";
 import { useRoutineOptions } from "./use-routine-options";
 
 export const useWorkouts = () => {
-  const { handleDeleteRoutine, handleEditRoutine } = useRoutineOptions();
+  const { handleDeleteRoutine, handleEditRoutine, handleRemoveTrainingDays } =
+    useRoutineOptions();
 
   const routineOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
   const [routineToMove, setRoutineToMove] = useState<RoutineWithMetrics | null>(
@@ -36,6 +37,14 @@ export const useWorkouts = () => {
     setSelectedRoutine(null);
   };
 
+  const handleClearTrainingDays = async () => {
+    if (!selectedRoutine) return;
+
+    await handleRemoveTrainingDays(selectedRoutine);
+    routineOptionsBottomSheetRef.current?.dismiss();
+    setSelectedRoutine(null);
+  };
+
   return {
     routineOptionsBottomSheetRef,
     routineToMove,
@@ -43,5 +52,7 @@ export const useWorkouts = () => {
     handleRoutineOptions,
     handleDelete,
     handleEdit,
+    handleClearTrainingDays,
+    selectedRoutine,
   };
 };

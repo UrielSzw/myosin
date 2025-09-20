@@ -129,8 +129,6 @@ export const ActiveSetRow: React.FC<Props> = ({
       key={set.tempId}
       style={{
         backgroundColor: isSetCompleted ? blockColors.light : "transparent",
-        borderRadius: 8,
-        marginBottom: set?.planned_tempo ? 2 : 0,
       }}
     >
       {/* Main Set Row */}

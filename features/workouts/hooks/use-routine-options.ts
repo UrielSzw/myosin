@@ -46,9 +46,43 @@ export const useRoutineOptions = () => {
     router.push(`/routines/edit/${routine.id}` as any);
   };
 
+  const handleRemoveTrainingDays = async (routine: RoutineWithMetrics) => {
+    Alert.alert(
+      "Quitar Días de Entrenamiento",
+      `¿Estás seguro que deseas quitar los días de entrenamiento de "${routine.name}"?`,
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Quitar",
+          style: "destructive",
+          onPress: async () => {
+            setIsDeleting(true);
+            try {
+              await routinesService.clearRoutineTrainingDays(routine.id);
+
+              queryClient.invalidateQueries({ queryKey: ["workouts"] });
+            } catch (error) {
+              console.error("Error removing training days:", error);
+              Alert.alert(
+                "Error",
+                "No se pudieron quitar los días de entrenamiento. Intenta nuevamente."
+              );
+            } finally {
+              setIsDeleting(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   return {
     handleDeleteRoutine,
     handleEditRoutine,
+    handleRemoveTrainingDays,
     isDeleting,
   };
 };

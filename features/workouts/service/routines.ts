@@ -12,4 +12,5 @@ export const routinesService = {
   updateRoutineFolderId: routinesRepository.updateRoutineFolderId,
   reorderFolders: foldersRepository.reorderFolders,
   getAllRoutinesCount: routinesRepository.getAllRoutinesCount,
+  clearRoutineTrainingDays: routinesRepository.clearRoutineTrainingDays,
 };

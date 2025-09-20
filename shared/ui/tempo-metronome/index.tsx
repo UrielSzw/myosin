@@ -17,6 +17,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Button } from "../button";
 
 // ============================================================================
 // CONSTANTS & TYPES
@@ -583,14 +584,11 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
           {/* Controls */}
           <View style={styles.controls}>
             {state.timerState === "idle" && (
-              <TouchableOpacity
+              <Button
                 onPress={handleStart}
-                style={[
-                  styles.primaryButton,
-                  { backgroundColor: colors.success[500] },
-                ]}
+                iconPosition="left"
+                icon={<Play size={24} color="#ffffff" />}
               >
-                <Play size={24} color="#ffffff" />
                 <Typography
                   variant="button"
                   weight="semibold"
@@ -598,18 +596,15 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                 >
                   Iniciar
                 </Typography>
-              </TouchableOpacity>
+              </Button>
             )}
 
             {state.timerState === "running" && (
-              <TouchableOpacity
+              <Button
                 onPress={handlePause}
-                style={[
-                  styles.primaryButton,
-                  { backgroundColor: colors.warning[500] },
-                ]}
+                icon={<Pause size={24} color="#ffffff" />}
+                iconPosition="left"
               >
-                <Pause size={24} color="#ffffff" />
                 <Typography
                   variant="button"
                   weight="semibold"
@@ -617,18 +612,15 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                 >
                   Pausar
                 </Typography>
-              </TouchableOpacity>
+              </Button>
             )}
 
             {state.timerState === "paused" && (
-              <TouchableOpacity
+              <Button
                 onPress={handleResume}
-                style={[
-                  styles.primaryButton,
-                  { backgroundColor: colors.success[500] },
-                ]}
+                icon={<Play size={24} color="#ffffff" />}
+                iconPosition="left"
               >
-                <Play size={24} color="#ffffff" />
                 <Typography
                   variant="button"
                   weight="semibold"
@@ -636,27 +628,22 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                 >
                   Continuar
                 </Typography>
-              </TouchableOpacity>
+              </Button>
             )}
 
             {(state.timerState === "running" ||
               state.timerState === "paused" ||
               state.currentCycle > 0) && (
-              <TouchableOpacity
+              <Button
                 onPress={handleReset}
-                style={[
-                  styles.secondaryButton,
-                  {
-                    borderColor: colors.border,
-                    backgroundColor: "transparent",
-                  },
-                ]}
+                icon={<RotateCcw size={24} color={colors.textMuted} />}
+                iconPosition="left"
+                variant="outline"
               >
-                <RotateCcw size={20} color={colors.textMuted} />
                 <Typography variant="body1" weight="medium" color="textMuted">
                   Reiniciar
                 </Typography>
-              </TouchableOpacity>
+              </Button>
             )}
           </View>
         </BottomSheetView>
@@ -744,6 +731,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingBottom: 50,
     gap: 16,
+    marginTop: 20,
   },
   primaryButton: {
     flexDirection: "row",

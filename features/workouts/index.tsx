@@ -21,10 +21,12 @@ export const WorkoutsFeature = () => {
   const {
     routineOptionsBottomSheetRef,
     routineToMove,
+    selectedRoutine,
     setRoutineToMove,
     handleRoutineOptions,
     handleDelete,
     handleEdit,
+    handleClearTrainingDays,
   } = useWorkouts();
 
   // Fix para el bug de layout inicial
@@ -84,8 +86,10 @@ export const WorkoutsFeature = () => {
 
       <RoutineOptionsBottomSheet
         ref={routineOptionsBottomSheetRef}
+        routine={selectedRoutine}
         onDelete={handleDelete}
         onEdit={handleEdit}
+        onClearTrainingDays={handleClearTrainingDays}
       />
     </ScreenWrapper>
   );

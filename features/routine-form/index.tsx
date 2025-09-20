@@ -7,11 +7,13 @@ import { BottomSheets } from "./elements/bottom-sheets";
 import { CreateRoutineHeader } from "./elements/create-routine-header";
 import { ExerciseModal } from "./elements/exercise-modal";
 import { RoutineInfo } from "./elements/routine-info";
+import { VolumePreview } from "./elements/volume-preview";
 import { useFormRoutineSheets } from "./hooks/use-form-routine-sheets";
 import { useRoutineFormState } from "./hooks/use-routine-form-store";
 
 export const RoutineFormFeature = () => {
-  const { blocksByRoutine } = useRoutineFormState();
+  const { blocksByRoutine, exercisesInBlock, sets, exercisesByBlock, routine } =
+    useRoutineFormState();
 
   const {
     handleToggleSheet,
@@ -44,6 +46,14 @@ export const RoutineFormFeature = () => {
           }`}
         >
           <RoutineInfo />
+
+          <VolumePreview
+            exercisesInBlock={exercisesInBlock}
+            sets={sets}
+            trainingDays={routine.training_days || []}
+            blocksByRoutine={blocksByRoutine}
+            exercisesByBlock={exercisesByBlock}
+          />
 
           <BlocksList>
             {blocksByRoutine.map((blockId) => (

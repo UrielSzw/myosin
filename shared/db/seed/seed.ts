@@ -1,10 +1,5 @@
 import { db } from "../client";
-import {
-  exerciseEquipment,
-  exerciseImages,
-  exerciseMuscleGroups,
-  exercises,
-} from "../schema";
+import { exerciseImages, exercises } from "../schema";
 import { exercisesSeed } from "./seed.exercises";
 
 export const loadExercisesSeed = async () => {
@@ -24,23 +19,25 @@ export const loadExercisesSeed = async () => {
         source: ex.source,
         created_by_user_id: ex.created_by_user_id,
         main_muscle_group: ex.main_muscle_group,
+        muscle_groups: ex.muscle_groups,
         primary_equipment: ex.primary_equipment,
-        instructions: JSON.stringify(ex.instructions),
+        instructions: ex.instructions,
+        equipment: ex.equipment,
       });
 
       // Insert muscles
-      await db.insert(exerciseMuscleGroups).values({
-        exercise_id: ex.id,
-        muscle_group: ex.main_muscle_group,
-      });
+      // await db.insert(exerciseMuscleGroups).values({
+      //   exercise_id: ex.id,
+      //   muscle_group: ex.main_muscle_group,
+      // });
 
       // Insert equipment
-      for (const eq of ex.equipment) {
-        await db.insert(exerciseEquipment).values({
-          exercise_id: ex.id,
-          equipment: eq,
-        });
-      }
+      // for (const eq of ex.equipment) {
+      //   await db.insert(exerciseEquipment).values({
+      //     exercise_id: ex.id,
+      //     equipment: eq,
+      //   });
+      // }
 
       // Insert images (vacías por ahora)
       for (const [index, url] of ex.images.entries()) {

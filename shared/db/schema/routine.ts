@@ -32,7 +32,10 @@ export const exercises = sqliteTable(
     main_muscle_group: text("main_muscle_group").notNull(),
     primary_equipment: text("primary_equipment").notNull(),
 
-    instructions: text("instructions").notNull(),
+    muscle_groups: text("muscle_groups", { mode: "json" }).notNull(),
+    instructions: text("instructions", { mode: "json" }).notNull(),
+    equipment: text("equipment", { mode: "json" }).notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -105,6 +108,10 @@ export const routines = sqliteTable("routines", {
   name: text("name").notNull(),
   folder_id: text("folder_id").references(() => folders.id),
   created_by_user_id: text("created_by_user_id").notNull(),
+
+  // Análisis de volumen - días de entrenamiento
+  training_days: text("training_days", { mode: "json" }).$type<string[]>(),
+
   ...timestamps,
 });
 

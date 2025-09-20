@@ -1,6 +1,7 @@
 import { Card } from "@/shared/ui/card";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
+import { WeekDaySelector } from "@/shared/ui/week-day-selector";
 import React, { useCallback, useMemo, useState } from "react";
 import {
   useMainActions,
@@ -8,8 +9,8 @@ import {
 } from "../../hooks/use-routine-form-store";
 
 export const RoutineInfo = () => {
-  const { name } = useRoutineInfoState();
-  const { setRoutineName } = useMainActions();
+  const { name, training_days } = useRoutineInfoState();
+  const { setRoutineName, setTrainingDays } = useMainActions();
 
   // Estado para rastrear si el usuario ha interactuado con el campo
   const [hasInteracted, setHasInteracted] = useState(false);
@@ -111,6 +112,11 @@ export const RoutineInfo = () => {
         required={true}
         accessibilityLabel="Nombre de la rutina"
         accessibilityHint="Ingresa un nombre descriptivo para tu rutina de ejercicios"
+      />
+
+      <WeekDaySelector
+        selectedDays={training_days || []}
+        onDaysChange={setTrainingDays}
       />
     </Card>
   );

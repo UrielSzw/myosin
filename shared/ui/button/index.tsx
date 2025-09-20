@@ -75,7 +75,8 @@ export const Button: React.FC<ButtonProps> = ({
         return {
           ...baseStyles,
           backgroundColor: colors.primary[500],
-          borderWidth: 0,
+          borderColor: colors.primary[500],
+          borderWidth: 2,
         };
       case "secondary":
         return {
@@ -88,7 +89,7 @@ export const Button: React.FC<ButtonProps> = ({
           ...baseStyles,
           backgroundColor: "transparent",
           borderWidth: 2,
-          borderColor: colors.primary[500],
+          borderColor: colors.textMuted,
         };
       case "ghost":
         return {

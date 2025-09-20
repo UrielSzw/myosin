@@ -137,6 +137,12 @@ export const BottomSheets: React.FC<Props> = ({
     [clearCurrentState]
   );
 
+  const handleDismissTempoSelector = useCallback(() => {
+    tempoSelectorBottomSheetRef.current?.dismiss();
+    clearCurrentState();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clearCurrentState]);
+
   return (
     <>
       <SetTypeBottomSheet
@@ -175,7 +181,7 @@ export const BottomSheets: React.FC<Props> = ({
       <TempoSelector
         ref={tempoSelectorBottomSheetRef}
         onSelect={handleUpdateTempo}
-        onDismiss={() => tempoSelectorBottomSheetRef.current?.dismiss()}
+        onDismiss={handleDismissTempoSelector}
         selectedTempo={currentSetTempo || ""}
       />
     </>

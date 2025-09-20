@@ -41,6 +41,7 @@ export const useSaveRoutine = () => {
         created_by_user_id: isEditMode
           ? formState.routine.created_by_user_id
           : "default-user",
+        training_days: formState.routine.training_days || null,
       };
 
       // 2. Preparar bloques (eliminar tempId y asignar IDs reales)

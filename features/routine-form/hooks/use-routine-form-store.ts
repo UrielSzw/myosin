@@ -79,6 +79,7 @@ type Store = {
     clearCurrentState: () => void;
     setCurrentState: (state: Store["currentState"]) => void;
     setRoutineName: (name: string) => void;
+    setTrainingDays: (days: string[]) => void;
   };
 
   blockActions: {
@@ -118,6 +119,7 @@ const useRoutineFormStore = create<Store>()(
         name: "",
         folder_id: null,
         created_by_user_id: "",
+        training_days: [],
       },
       blocks: {},
       exercisesInBlock: {},
@@ -192,6 +194,7 @@ const useRoutineFormStore = create<Store>()(
                 name: "",
                 folder_id: null,
                 created_by_user_id: "", // Se asigna al guardar
+                training_days: [],
               },
               blocks: {},
               exercisesInBlock: {},
@@ -298,6 +301,7 @@ const useRoutineFormStore = create<Store>()(
                   name: routineData.routine.name,
                   folder_id: routineData.routine.folder_id,
                   created_by_user_id: routineData.routine.created_by_user_id,
+                  training_days: routineData.routine.training_days || [],
                 },
                 blocks: blocksWithTempId,
                 exercisesInBlock: exercisesInBlockWithTempId,
@@ -318,6 +322,7 @@ const useRoutineFormStore = create<Store>()(
                   name: "",
                   folder_id: null,
                   created_by_user_id: "",
+                  training_days: [],
                 },
                 blocks: {},
                 exercisesInBlock: {},
@@ -339,6 +344,7 @@ const useRoutineFormStore = create<Store>()(
               name: "",
               folder_id: null,
               created_by_user_id: "",
+              training_days: [],
             },
             blocks: {},
             exercisesInBlock: {},
@@ -387,6 +393,11 @@ const useRoutineFormStore = create<Store>()(
       setRoutineName: (name: string) => {
         set((state) => {
           state.formState.routine.name = name;
+        });
+      },
+      setTrainingDays: (days: string[]) => {
+        set((state) => {
+          state.formState.routine.training_days = days;
         });
       },
     },

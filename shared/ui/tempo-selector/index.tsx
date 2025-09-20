@@ -9,7 +9,7 @@ import {
   Pause,
   Square,
 } from "lucide-react-native";
-import React, { forwardRef, useCallback, useState } from "react";
+import React, { forwardRef, useCallback, useEffect, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 interface TempoPhase {
@@ -18,6 +18,13 @@ interface TempoPhase {
   color: string;
   icon: "ArrowDown" | "Pause" | "ArrowUp" | "Square";
 }
+
+type TempoValues = {
+  eccentric: number;
+  pause1: number;
+  concentric: number;
+  pause2: number;
+};
 
 interface Props {
   selectedTempo?: string;
@@ -116,21 +123,29 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
       };
     };
 
-    const [customTempo, setCustomTempo] = useState(() =>
-      selectedTempo ? parseTempoValues(selectedTempo) : null
+    // Estado local principal - fuente única de verdad
+    const [localTempo, setLocalTempo] = useState<TempoValues>(() =>
+      selectedTempo
+        ? parseTempoValues(selectedTempo)
+        : { eccentric: 2, pause1: 0, concentric: 2, pause2: 0 }
     );
-
     const [isCustomMode, setIsCustomMode] = useState(false);
 
-    const formatTempo = useCallback((values: typeof customTempo) => {
-      if (!values) return "";
+    // Sincronizar con selectedTempo cuando cambie externamente
+    useEffect(() => {
+      if (selectedTempo) {
+        setLocalTempo(parseTempoValues(selectedTempo));
+      }
+    }, [selectedTempo]);
 
+    const formatTempo = useCallback((values: TempoValues) => {
       return `${values.eccentric}-${values.pause1}-${values.concentric}-${values.pause2}`;
     }, []);
 
     const handlePresetSelect = useCallback(
       (tempo: string) => {
-        setCustomTempo(parseTempoValues(tempo));
+        const tempoValues = parseTempoValues(tempo);
+        setLocalTempo(tempoValues);
         setIsCustomMode(false);
         onSelect(tempo);
         // Auto-dismiss when selecting preset
@@ -140,22 +155,26 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
     );
 
     const handleCustomTempoChange = useCallback(
-      (phase: keyof typeof customTempo, delta: number) => {
-        setCustomTempo((prev) => {
-          if (!prev) return prev;
-
+      (phase: keyof TempoValues, delta: number) => {
+        setLocalTempo((prev) => {
           const newValue = Math.max(0, Math.min(9, prev[phase] + delta));
-          const newTempo = { ...prev, [phase]: newValue };
-          // Solo actualizar estado local, NO llamar onSelect aquí
-          return newTempo;
+          return { ...prev, [phase]: newValue };
         });
       },
-      [] // Remover onSelect y formatTempo de las dependencias
+      []
     );
+
+    const handleCustomModeToggle = useCallback(() => {
+      setIsCustomMode(true);
+      // Si no hay tempo seleccionado, inicializar con valores por defecto
+      if (!selectedTempo) {
+        setLocalTempo({ eccentric: 2, pause1: 0, concentric: 2, pause2: 0 });
+      }
+    }, [selectedTempo]);
 
     const handleClear = useCallback(() => {
       onSelect(null);
-      setCustomTempo({ eccentric: 2, pause1: 0, concentric: 2, pause2: 0 });
+      setLocalTempo({ eccentric: 2, pause1: 0, concentric: 2, pause2: 0 });
       setIsCustomMode(false);
     }, [onSelect]);
 
@@ -163,7 +182,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
       onDismiss?.();
     }, [onDismiss]);
 
-    const currentTempoString = formatTempo(customTempo);
+    const currentTempoString = formatTempo(localTempo);
 
     // Detectar si el tempo actual coincide con algún preset
     const matchingPreset = PRESET_TEMPOS.find(
@@ -375,7 +394,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setIsCustomMode(true)}
+              onPress={handleCustomModeToggle}
               style={{
                 flex: 1,
                 paddingVertical: 12,
@@ -553,12 +572,12 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                   "pause1",
                   "concentric",
                   "pause2",
-                ][index] as keyof typeof customTempo;
-                const value = customTempo ? customTempo[phaseKey] : 0;
+                ][index] as keyof TempoValues;
+                const value = localTempo[phaseKey];
 
                 return (
                   <View
-                    key={phaseKey}
+                    key={String(phaseKey)}
                     style={{
                       backgroundColor: colors.background,
                       borderWidth: 1,
@@ -730,7 +749,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
 
             <TouchableOpacity
               onPress={() => {
-                onSelect(currentTempoString);
+                onSelect(formatTempo(localTempo));
                 handleDismiss();
               }}
               style={{

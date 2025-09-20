@@ -1,0 +1,1 @@
+ALTER TABLE `routines` ADD `training_days` blob DEFAULT '[]';

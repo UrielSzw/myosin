@@ -5,17 +5,27 @@ import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
-import { Dumbbell, Hash, Play } from "lucide-react-native";
+import { Calendar, Dumbbell, Hash, Play } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
-interface RoutineCardProps {
+type Props = {
   routine: RoutineWithMetrics;
   onLongPress?: (routine: RoutineWithMetrics | null) => void;
   onPress: (routine: RoutineWithMetrics | null) => void;
-}
+};
 
-export const RoutineCard: React.FC<RoutineCardProps> = ({
+const WEEK_DAYS = [
+  { key: "monday", short: "L", full: "Lunes" },
+  { key: "tuesday", short: "M", full: "Martes" },
+  { key: "wednesday", short: "X", full: "Miércoles" },
+  { key: "thursday", short: "J", full: "Jueves" },
+  { key: "friday", short: "V", full: "Viernes" },
+  { key: "saturday", short: "S", full: "Sábado" },
+  { key: "sunday", short: "D", full: "Domingo" },
+];
+
+export const RoutineCard: React.FC<Props> = ({
   routine,
   onLongPress,
   onPress,
@@ -25,14 +35,16 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
 
   // Verificar si es una rutina reciente (modificada en los últimos 7 días)
   const isRecent = () => {
-    const updatedDate = routine.updated_at;
+    // const updatedDate = routine.updated_at;
 
-    if (!updatedDate) return false;
+    // if (!updatedDate) return false;
 
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+    // const weekAgo = new Date();
+    // weekAgo.setDate(weekAgo.getDate() - 7);
 
-    return updatedDate > weekAgo;
+    // return updatedDate > weekAgo;
+
+    return routine.training_days && routine.training_days.length > 0;
   };
 
   const handleSelectRoutine = () => {
@@ -47,6 +59,15 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
     } catch (error) {
       console.error("Error iniciando workout:", error);
     }
+  };
+
+  const formatDays = (days: string[]) => {
+    return days
+      .map((day) => {
+        const weekDay = WEEK_DAYS.find((d) => d.key === day);
+        return weekDay ? weekDay.short : day;
+      })
+      .join(" - ");
   };
 
   return (
@@ -109,6 +130,18 @@ export const RoutineCard: React.FC<RoutineCardProps> = ({
               {routine.exercisesCount !== 1 ? "s" : ""}
             </Typography>
           </View>
+
+          {/* Dias de la semana */}
+          {routine.training_days && routine.training_days.length > 0 && (
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+            >
+              <Calendar size={14} color={colors.textMuted} />
+              <Typography variant="caption" color="textMuted">
+                {formatDays(routine.training_days)}
+              </Typography>
+            </View>
+          )}
 
           {/* Tiempo estimado */}
           {/* <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>

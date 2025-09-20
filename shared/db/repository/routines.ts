@@ -40,6 +40,7 @@ export const routinesRepository = {
         blocksCount: sql<number>`COUNT(DISTINCT ${routine_blocks.id})`,
         exercisesCount: sql<number>`COUNT(${exercise_in_block.id})`,
         folder_id: routines.folder_id,
+        training_days: routines.training_days,
       })
       .from(routines)
       .leftJoin(routine_blocks, eq(routine_blocks.routine_id, routines.id))
@@ -131,7 +132,9 @@ export const routinesRepository = {
           created_by_user_id: exercises.created_by_user_id,
           main_muscle_group: exercises.main_muscle_group,
           primary_equipment: exercises.primary_equipment,
+          muscle_groups: exercises.muscle_groups,
           instructions: exercises.instructions,
+          equipment: exercises.equipment,
           created_at: exercises.created_at,
           updated_at: exercises.updated_at,
         },
@@ -177,6 +180,7 @@ export const routinesRepository = {
         .set({
           name: data.routine.name,
           folder_id: data.routine.folder_id,
+          training_days: data.routine.training_days,
         })
         .where(eq(routines.id, routineId))
         .returning();
@@ -298,5 +302,12 @@ export const routinesRepository = {
       .limit(1);
 
     return result[0].count;
+  },
+
+  clearRoutineTrainingDays: async (routineId: string): Promise<void> => {
+    await db
+      .update(routines)
+      .set({ training_days: null })
+      .where(eq(routines.id, routineId));
   },
 };

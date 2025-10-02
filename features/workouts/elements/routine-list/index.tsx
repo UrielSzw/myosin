@@ -1,5 +1,6 @@
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import React from "react";
+import { View } from "react-native";
 import { RoutineCard } from "../routine-card";
 
 type Props = {
@@ -23,6 +24,8 @@ export const RoutineList: React.FC<Props> = ({
           onPress={onPressRoutine}
         />
       ))}
+
+      <View style={{ height: 40 }} />
     </>
   );
 };

@@ -1,3 +1,4 @@
+import { InferSelectModel } from "drizzle-orm";
 import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { timestamps } from "../utils/schema-utils";
 import { generateUUID } from "../utils/uuid";
@@ -30,3 +31,8 @@ export const user_preferences = sqliteTable(
   },
   (t) => [index("idx_user_preferences_user_id").on(t.user_id)]
 );
+
+export type BaseUserPreferences = Omit<
+  InferSelectModel<typeof user_preferences>,
+  "id" | "created_at" | "updated_at" | "user_id"
+>;

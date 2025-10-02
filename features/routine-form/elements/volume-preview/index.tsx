@@ -86,8 +86,6 @@ export const VolumePreview: React.FC<Props> = ({
         });
       });
 
-      console.log("Exercises for Volume Calculation:", exercisesForCalculation);
-
       if (exercisesForCalculation.length === 0) {
         return { volumeByCategory: [], totalSets: 0 };
       }

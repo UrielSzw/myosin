@@ -1,12 +1,15 @@
+import { prRepository } from "@/shared/db/repository/pr";
 import { routinesRepository } from "@/shared/db/repository/routines";
 import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
 import { BaseExercise, BaseRoutine } from "@/shared/db/schema";
+import type { BasePRCurrent } from "@/shared/db/schema/pr";
 import {
   WorkoutBlockInsert,
   WorkoutExerciseInsert,
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
+import { computeEpley1RM } from "@/shared/db/utils/pr";
 import { IRepsType, ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
@@ -35,11 +38,13 @@ export type ActiveWorkoutBlock = WorkoutBlockInsert & {
 export type ActiveWorkoutExercise = WorkoutExerciseInsert & {
   tempId: string;
   exercise: BaseExercise; // Snapshot del ejercicio para UI
+  pr?: BasePRCurrent | null;
 };
 
 export type ActiveWorkoutSet = WorkoutSetInsert & {
   tempId: string;
   completed_at: string | null; // Timestamp cuando se completa (no está en DB)
+  was_pr?: boolean;
 };
 
 // Tipo para previous sets history
@@ -68,6 +73,18 @@ type Store = {
 
     // Previous sets history por ejercicio
     exercisePreviousSets: Record<string, PreviousSetData[]>; // exercise_id → last sets
+    // Session-best PRs: solo UN PR por ejercicio máximo (el mejor de la sesión)
+    sessionBestPRs: Record<
+      string,
+      {
+        tempSetId: string;
+        exercise_id: string;
+        weight: number;
+        reps: number;
+        estimated_1rm: number;
+        created_at: string;
+      }
+    >; // exercise_id → best PR data
   };
 
   // Timer de descanso
@@ -113,6 +130,19 @@ type Store = {
     setCurrentState: (state: Store["currentState"]) => void;
     detectWorkoutChanges: () => boolean;
     loadPreviousSetsForExercises: (exerciseIds: string[]) => Promise<void>;
+
+    // PR Management
+    setSessionBestPR: (
+      exerciseId: string,
+      prData: {
+        tempSetId: string;
+        weight: number;
+        reps: number;
+        estimated_1rm: number;
+      }
+    ) => void;
+    removeSessionPR: (exerciseId: string) => void;
+    clearAllSessionPRs: () => void;
   };
 
   blockActions: {
@@ -139,6 +169,8 @@ type Store = {
         actualWeight: number | null;
         actualReps: number | null;
         actualRpe: number | null;
+        estimated1RM: number | null;
+        isPR: boolean;
       }
     ) => boolean;
     uncompleteSet: (setId: string) => void;
@@ -166,6 +198,7 @@ const useActiveWorkoutStore = create<Store>()(
       exercisesByBlock: {},
       setsByExercise: {},
       exercisePreviousSets: {},
+      sessionBestPRs: {},
     },
 
     // Timer de descanso
@@ -241,6 +274,18 @@ const useActiveWorkoutStore = create<Store>()(
             }
           }
 
+          // 3. Load current PRs for all exercises in the routine
+          let prMap: Record<string, BasePRCurrent | null> = {};
+          try {
+            prMap = await prRepository.getCurrentPRsForExercises(
+              "default-user",
+              uniqueExerciseIds
+            );
+          } catch (error) {
+            console.warn("Failed to load PRs for exercises:", error);
+            prMap = {};
+          }
+
           set((state) => {
             // 3. Crear sesión de workout
             const sessionTempId = generateTempId();
@@ -309,12 +354,13 @@ const useActiveWorkoutStore = create<Store>()(
                 id: exerciseTempId,
                 workout_block_id: activeBlock.tempId,
                 exercise_id: exerciseInBlock.exercise_id,
-                exercise: exercise, // Snapshot del ejercicio
+                exercise: exercise as BaseExercise, // Snapshot del ejercicio
                 original_exercise_in_block_id: exerciseInBlock.id,
                 order_index: exerciseInBlock.order_index,
                 execution_order: null, // Se asigna cuando se ejecuta
                 notes: exerciseInBlock.notes,
                 was_added_during_workout: false,
+                pr: prMap[exerciseInBlock.exercise_id] || null,
               };
 
               activeExercises[exerciseTempId] = activeExercise;
@@ -418,6 +464,7 @@ const useActiveWorkoutStore = create<Store>()(
               exercisesByBlock,
               setsByExercise,
               exercisePreviousSets, // Use the loaded previous sets
+              sessionBestPRs: {},
             };
 
             // 8. Actualizar stats
@@ -462,6 +509,7 @@ const useActiveWorkoutStore = create<Store>()(
             exercisesByBlock: {},
             setsByExercise: {},
             exercisePreviousSets: {},
+            sessionBestPRs: {},
           };
 
           state.stats = {
@@ -587,6 +635,32 @@ const useActiveWorkoutStore = create<Store>()(
             error
           );
         }
+      },
+
+      // PR Management Actions
+      setSessionBestPR: (exerciseId: string, prData) => {
+        set((state) => {
+          state.activeWorkout.sessionBestPRs[exerciseId] = {
+            tempSetId: prData.tempSetId,
+            exercise_id: exerciseId,
+            weight: prData.weight,
+            reps: prData.reps,
+            estimated_1rm: prData.estimated_1rm,
+            created_at: new Date().toISOString(),
+          };
+        });
+      },
+
+      removeSessionPR: (exerciseId: string) => {
+        set((state) => {
+          delete state.activeWorkout.sessionBestPRs[exerciseId];
+        });
+      },
+
+      clearAllSessionPRs: () => {
+        set((state) => {
+          state.activeWorkout.sessionBestPRs = {};
+        });
       },
     },
 
@@ -1143,16 +1217,55 @@ const useActiveWorkoutStore = create<Store>()(
 
         set((state) => {
           const set = state.activeWorkout.sets[setId];
+          const exerciseInBlock =
+            state.activeWorkout.exercises[exerciseInBlockId];
 
-          if (!set || set.completed) return;
+          if (!set || set.completed || !exerciseInBlock) return;
 
-          const { actualWeight, actualReps, actualRpe } = completionData;
+          const { actualWeight, actualReps, actualRpe, estimated1RM, isPR } =
+            completionData;
 
           set.completed = true;
           set.completed_at = new Date().toISOString();
           set.actual_weight = actualWeight;
           set.actual_reps = actualReps;
           set.actual_rpe = actualRpe;
+          set.was_pr = isPR || false;
+
+          // Handle PR detection and session-best tracking
+          if (isPR && actualWeight && actualReps && estimated1RM) {
+            const exerciseId = set.exercise_id;
+            const currentSessionBest =
+              state.activeWorkout.sessionBestPRs[exerciseId];
+
+            // Only keep the best PR per exercise in the session
+            if (
+              !currentSessionBest ||
+              estimated1RM > currentSessionBest.estimated_1rm
+            ) {
+              // Clear was_pr from previous best set if it exists
+              if (currentSessionBest) {
+                const prevBestSet =
+                  state.activeWorkout.sets[currentSessionBest.tempSetId];
+                if (prevBestSet) {
+                  prevBestSet.was_pr = false;
+                }
+              }
+
+              // Set new session best
+              state.activeWorkout.sessionBestPRs[exerciseId] = {
+                tempSetId: set.tempId,
+                exercise_id: exerciseId,
+                weight: actualWeight,
+                reps: actualReps,
+                estimated_1rm: estimated1RM,
+                created_at: new Date().toISOString(),
+              };
+            } else {
+              // This PR is not better than current session best
+              set.was_pr = false;
+            }
+          }
 
           state.stats.totalSetsCompleted += 1;
 
@@ -1206,6 +1319,81 @@ const useActiveWorkoutStore = create<Store>()(
           const set = state.activeWorkout.sets[setId];
 
           if (!set || !set.completed) return;
+
+          // If this set was the session-best PR, handle accordingly
+          if (set.was_pr) {
+            const exerciseId = set.exercise_id;
+            const currentSessionBest =
+              state.activeWorkout.sessionBestPRs[exerciseId];
+
+            // If this was the session-best PR, remove it and find new best
+            if (
+              currentSessionBest &&
+              currentSessionBest.tempSetId === set.tempId
+            ) {
+              delete state.activeWorkout.sessionBestPRs[exerciseId];
+
+              // Find the next best completed set for this exercise (excluding the one being uncompleted)
+              const completedSetsForExercise = Object.values(
+                state.activeWorkout.sets
+              ).filter(
+                (s) =>
+                  s.exercise_id === exerciseId &&
+                  s.completed &&
+                  s.tempId !== setId &&
+                  s.actual_weight &&
+                  s.actual_reps
+              );
+
+              if (completedSetsForExercise.length > 0) {
+                // Find the set with the highest estimated 1RM
+                const newBestSet = completedSetsForExercise.reduce((max, s) => {
+                  const currentEst = computeEpley1RM(
+                    s.actual_weight!,
+                    s.actual_reps!
+                  );
+                  const maxEst = computeEpley1RM(
+                    max.actual_weight!,
+                    max.actual_reps!
+                  );
+                  return currentEst > maxEst ? s : max;
+                });
+
+                const newBestEst = computeEpley1RM(
+                  newBestSet.actual_weight!,
+                  newBestSet.actual_reps!
+                );
+
+                // Check if this new best is still a PR compared to historical PR
+                const exerciseInBlock = Object.values(
+                  state.activeWorkout.exercises
+                ).find((ex) => ex.exercise_id === exerciseId);
+
+                // Always set as session best if it's the best in session
+                // Mark as PR if: 1) no historical PR, or 2) beats historical PR
+                const isHistoricalPR = exerciseInBlock?.pr
+                  ? newBestEst > exerciseInBlock.pr.estimated_1rm
+                  : true; // If no historical PR, any session best is a "PR"
+
+                if (isHistoricalPR) {
+                  // Set new session best
+                  state.activeWorkout.sessionBestPRs[exerciseId] = {
+                    tempSetId: newBestSet.tempId,
+                    exercise_id: exerciseId,
+                    weight: newBestSet.actual_weight!,
+                    reps: newBestSet.actual_reps!,
+                    estimated_1rm: newBestEst,
+                    created_at:
+                      newBestSet.completed_at || new Date().toISOString(),
+                  };
+
+                  newBestSet.was_pr = true;
+                }
+              }
+            }
+
+            set.was_pr = false;
+          }
 
           set.completed = false;
           set.completed_at = null;

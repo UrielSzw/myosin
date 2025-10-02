@@ -1,7 +1,7 @@
 import { db, sqlite } from "@/shared/db/client";
 import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
-import { useMainStoreActions } from "@/shared/hooks/use-main-store";
+import { useUserPreferencesLoad } from "@/shared/hooks/use-user-preferences-store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -15,7 +15,7 @@ import "react-native-reanimated";
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
-  const { loadFromStorage } = useMainStoreActions();
+  const loadUserPreferences = useUserPreferencesLoad();
   const { success, error } = useMigrations(db, migrations);
 
   useDrizzleStudio(sqlite);
@@ -27,9 +27,9 @@ export default function RootLayout() {
   useEffect(() => {
     if (loaded) {
       // Load data from storage when app starts
-      loadFromStorage();
+      loadUserPreferences("default-user");
     }
-  }, [loaded, loadFromStorage]);
+  }, [loaded, loadUserPreferences]);
 
   useEffect(() => {
     if (success) {
@@ -106,6 +106,13 @@ export default function RootLayout() {
             name="workout/active"
             options={{
               presentation: "fullScreenModal",
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="profile/workout-config"
+            options={{
+              presentation: "modal",
               headerShown: false,
             }}
           />

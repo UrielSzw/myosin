@@ -24,6 +24,7 @@ export const RoutineFormFeature = () => {
     exerciseOptionsBottomSheetRef,
     rpeSelectorBottomSheetRef,
     tempoSelectorBottomSheetRef,
+    routineSettingsBottomSheetRef,
   } = useFormRoutineSheets();
 
   const blockCount = blocksByRoutine.length;
@@ -45,7 +46,9 @@ export const RoutineFormFeature = () => {
             blockCount === 1 ? "bloque" : "bloques"
           }`}
         >
-          <RoutineInfo />
+          <RoutineInfo
+            onOpenSettings={() => handleToggleSheet("routineSettings")}
+          />
 
           <VolumePreview
             exercisesInBlock={exercisesInBlock}
@@ -79,6 +82,7 @@ export const RoutineFormFeature = () => {
         setTypeBottomSheetRef={setTypeBottomSheetRef}
         rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
         tempoSelectorBottomSheetRef={tempoSelectorBottomSheetRef}
+        routineSettingsBottomSheetRef={routineSettingsBottomSheetRef}
       />
     </ScreenWrapper>
   );

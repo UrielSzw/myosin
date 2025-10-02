@@ -37,6 +37,9 @@ export const useUpdateRoutine = () => {
         name: session.routine.name,
         folder_id: session.routine.folder_id || null,
         created_by_user_id: session.routine.created_by_user_id,
+        show_rpe: session.routine.show_rpe,
+        show_tempo: session.routine.show_tempo,
+        training_days: session.routine.training_days,
       };
 
       // 2. Preparar bloques con IDs reales
@@ -108,6 +111,7 @@ export const useUpdateRoutine = () => {
               set_type: set.set_type,
               reps_type: set.reps_type,
               reps_range: set.reps_range,
+              tempo: set.planned_tempo,
             });
           });
         }

@@ -20,7 +20,7 @@ export const ActiveSetsTable: React.FC<Props> = ({
   blockType,
   children,
 }) => {
-  const { sets, setsByExercise } = useActiveWorkout();
+  const { sets, setsByExercise, session } = useActiveWorkout();
   const { colors } = useColorScheme();
   const { getRepsColumnTitle, getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();
@@ -88,11 +88,16 @@ export const ActiveSetsTable: React.FC<Props> = ({
             <ChevronDown size={12} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
-        <View style={{ flex: 0.8, paddingHorizontal: 8, alignItems: "center" }}>
-          <Typography variant="caption" weight="medium" color="textMuted">
-            RPE
-          </Typography>
-        </View>
+
+        {session?.routine?.show_tempo && (
+          <View
+            style={{ flex: 0.8, paddingHorizontal: 8, alignItems: "center" }}
+          >
+            <Typography variant="caption" weight="medium" color="textMuted">
+              RPE
+            </Typography>
+          </View>
+        )}
         <View style={{ width: 40, alignItems: "center" }}>
           <Check size={16} color={colors.textMuted} />
         </View>

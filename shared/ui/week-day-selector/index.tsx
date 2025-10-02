@@ -24,7 +24,7 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
   onDaysChange,
   disabled = false,
 }) => {
-  const { colors } = useColorScheme();
+  const { colors, isDarkMode } = useColorScheme();
 
   const handleDayToggle = (dayKey: string) => {
     if (disabled) return;
@@ -71,6 +71,8 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
                   ? colors.primary[500]
                   : pressed
                   ? colors.gray[100]
+                  : isDarkMode
+                  ? colors.gray[800]
                   : colors.gray[50],
                 borderWidth: 1,
                 borderColor: isSelected

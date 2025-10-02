@@ -23,6 +23,7 @@ const createDefaultSets = (
     exercise_in_block_id: exerciseInBlockId,
     reps_range: null,
     rpe: null,
+    tempo: null,
   },
   {
     tempId: generateTempId(),
@@ -36,6 +37,7 @@ const createDefaultSets = (
     exercise_in_block_id: exerciseInBlockId,
     reps_range: null,
     rpe: null,
+    tempo: null,
   },
   {
     tempId: generateTempId(),
@@ -49,6 +51,7 @@ const createDefaultSets = (
     exercise_in_block_id: exerciseInBlockId,
     reps_range: null,
     rpe: null,
+    tempo: null,
   },
 ];
 
@@ -231,6 +234,7 @@ export const createNewSetForExercise = (
     reps_type: repsType,
     set_type: "normal" as ISetType,
     rpe: null,
+    tempo: null,
   };
 
   return newSet;

@@ -1,14 +1,20 @@
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Card } from "@/shared/ui/card";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
 import { WeekDaySelector } from "@/shared/ui/week-day-selector";
+import { Settings as SettingsIcon } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
+import { Pressable, View } from "react-native";
 import {
   useMainActions,
   useRoutineInfoState,
 } from "../../hooks/use-routine-form-store";
 
-export const RoutineInfo = () => {
+export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
+  onOpenSettings,
+}) => {
+  const { colors } = useColorScheme();
   const { name, training_days } = useRoutineInfoState();
   const { setRoutineName, setTrainingDays } = useMainActions();
 
@@ -88,15 +94,32 @@ export const RoutineInfo = () => {
       accessible={true}
       accessibilityLabel="Información de la rutina"
     >
-      <Typography
-        variant="h6"
-        weight="semibold"
-        style={{ marginBottom: 16 }}
-        accessible={true}
-        accessibilityRole="header"
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+        }}
       >
-        Información de la Rutina
-      </Typography>
+        <Typography
+          variant="h6"
+          weight="semibold"
+          accessible={true}
+          accessibilityRole="header"
+        >
+          Información de la Rutina
+        </Typography>
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Ajustes de la rutina"
+          onPress={() => onOpenSettings?.()}
+          style={{ padding: 8 }}
+        >
+          <SettingsIcon size={20} color={colors.textMuted} />
+        </Pressable>
+      </View>
 
       <EnhancedInput
         value={name || ""}

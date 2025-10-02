@@ -31,6 +31,7 @@ const createDefaultSets = (
     completed: false,
     completed_at: null,
     original_set_id: null,
+    planned_tempo: null,
   },
   {
     tempId: generateTempId(),
@@ -51,6 +52,7 @@ const createDefaultSets = (
     completed: false,
     completed_at: null,
     original_set_id: null,
+    planned_tempo: null,
   },
   {
     tempId: generateTempId(),
@@ -71,6 +73,7 @@ const createDefaultSets = (
     completed: false,
     completed_at: null,
     original_set_id: null,
+    planned_tempo: null,
   },
 ];
 
@@ -105,6 +108,7 @@ export const createNewSetForExercise = (
     completed_at: null,
     original_set_id: null,
     workout_exercise_id: exerciseInBlockId,
+    planned_tempo: null,
   };
 
   return newSet;

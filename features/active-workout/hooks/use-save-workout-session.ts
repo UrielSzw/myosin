@@ -1,7 +1,9 @@
+import { prRepository } from "@/shared/db/repository/pr";
 import {
   workoutSessionsRepository,
   type CreateWorkoutSessionData,
 } from "@/shared/db/repository/workout-sessions";
+import type { PRCurrentInsert, PRHistoryInsert } from "@/shared/db/schema/pr";
 import type {
   WorkoutBlockInsert,
   WorkoutExerciseInsert,
@@ -200,6 +202,7 @@ export const useSaveWorkoutSession = () => {
                 reps_type: set.reps_type,
                 reps_range: set.reps_range,
                 completed: true,
+                planned_tempo: set.planned_tempo,
               });
             }
           });
@@ -218,6 +221,52 @@ export const useSaveWorkoutSession = () => {
         await workoutSessionsRepository.createWorkoutSessionWithData(
           createData
         );
+
+      // Persistir PRs buffer: usar sessionBestPRs (solo 1 PR por ejercicio máximo)
+      try {
+        const sessionPRs = Object.values(activeWorkout.sessionBestPRs || {});
+
+        const prHistoryArray: PRHistoryInsert[] = sessionPRs.map((pr) => ({
+          user_id: "default-user",
+          exercise_id: pr.exercise_id,
+          weight: pr.weight,
+          reps: pr.reps,
+          estimated_1rm: pr.estimated_1rm,
+          workout_session_id: savedSession.id,
+          workout_set_id: null,
+          source: "auto",
+        }));
+
+        const prCurrentArray: PRCurrentInsert[] = sessionPRs.map((pr) => ({
+          user_id: "default-user",
+          exercise_id: pr.exercise_id,
+          best_weight: pr.weight,
+          best_reps: pr.reps,
+          estimated_1rm: pr.estimated_1rm,
+          achieved_at: pr.created_at,
+          source: "auto",
+        }));
+
+        // Insert each history row
+        for (const h of prHistoryArray) {
+          try {
+            await prRepository.insertPRHistory(h);
+          } catch (e) {
+            console.warn("Failed to insert PR history", h.exercise_id, e);
+          }
+        }
+
+        // Upsert each current PR
+        for (const c of prCurrentArray) {
+          try {
+            await prRepository.upsertCurrentPR(c);
+          } catch (e) {
+            console.warn("Failed to upsert current PR", c.exercise_id, e);
+          }
+        }
+      } catch (err) {
+        console.warn("Error persisting session PRs:", err);
+      }
 
       setSaveState("success");
       return savedSession.id;

@@ -4,14 +4,17 @@ import {
   useActiveSetActions,
   useActiveWorkout,
 } from "@/features/active-workout/hooks/use-active-workout-store";
+import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { Check, Timer } from "lucide-react-native";
+import { Check, Timer, Trophy } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
+import { usePRCelebration } from "../../../hooks/use-pr-celebration";
 
 type Props = {
   setId: string;
@@ -32,7 +35,19 @@ export const ActiveSetRow: React.FC<Props> = ({
   const { getSetTypeColor, getSetTypeLabel, getBlockColors } = useBlockStyles();
   const { completeSet, uncompleteSet } = useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
-  const { sets, exercisePreviousSets } = useActiveWorkout();
+  const { sets, exercisePreviousSets, session } = useActiveWorkout();
+
+  // Centralized PR logic hook
+  const { validatePR } = usePRLogic(exerciseInBlock.exercise_id, setId);
+
+  // PR Celebration hook
+  const {
+    triggerCelebration,
+    resetCelebration,
+    glowStyle,
+    borderStyle,
+    prColor,
+  } = usePRCelebration();
 
   const [setData, setSetData] = useState({
     weight: "",
@@ -41,6 +56,9 @@ export const ActiveSetRow: React.FC<Props> = ({
 
   const blockColors = getBlockColors(blockType);
   const set = sets[setId];
+
+  // Check if this set is currently marked as a PR (from store state)
+  const isCurrentPR = set?.was_pr || false;
 
   // Get previous set data for this exercise and set order
   const exercisePrevSets =
@@ -52,10 +70,17 @@ export const ActiveSetRow: React.FC<Props> = ({
   const handleSetPress = (completed: boolean, setId: string) => {
     if (completed) {
       uncompleteSet(setId);
+      resetCelebration();
     } else {
       const userWeightInput = setData.weight ? Number(setData.weight) : null;
       const userRepsInput = setData.reps ? Number(setData.reps) : null;
       const userRpeInput = set.actual_rpe || null;
+
+      // Use centralized PR validation logic
+      const prValidation = validatePR(
+        userWeightInput || set.planned_weight || 0,
+        userRepsInput || set?.reps_range?.min || set.planned_reps || 0
+      );
 
       const shouldStartTimer = completeSet(
         exerciseInBlock.tempId,
@@ -66,14 +91,22 @@ export const ActiveSetRow: React.FC<Props> = ({
           actualReps:
             userRepsInput || set?.reps_range?.min || set.planned_reps || 0,
           actualRpe: userRpeInput || set.planned_rpe || 0,
+          estimated1RM: prValidation.estimatedOneRM,
+          isPR: prValidation.isPR,
         }
       );
+
+      if (prValidation.isPR) {
+        triggerCelebration();
+      }
 
       if (shouldStartTimer) {
         onToggleSheet("restTimer");
       }
     }
   };
+
+  console.log("isPR", isCurrentPR);
 
   const getRepsPlaceholder = () => {
     if (set.reps_type === "range") {
@@ -128,9 +161,31 @@ export const ActiveSetRow: React.FC<Props> = ({
     <View
       key={set.tempId}
       style={{
-        backgroundColor: isSetCompleted ? blockColors.light : "transparent",
+        backgroundColor: isCurrentPR
+          ? prColor + "22"
+          : isSetCompleted
+          ? blockColors.light
+          : "transparent",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
+      {/* PR Border Accent */}
+      {isCurrentPR && isSetCompleted && (
+        <Animated.View
+          style={[
+            {
+              position: "absolute",
+              left: 0,
+              top: 0,
+              bottom: 0,
+              width: 3,
+              backgroundColor: prColor,
+            },
+            borderStyle,
+          ]}
+        />
+      )}
       {/* Main Set Row */}
       <View
         style={{
@@ -248,54 +303,56 @@ export const ActiveSetRow: React.FC<Props> = ({
         </View>
 
         {/* RPE Input */}
-        <View style={{ flex: 0.8, paddingHorizontal: 8 }}>
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={handleOpenRpeSelector}
-            accessible={true}
-            accessibilityRole="button"
-            style={{
-              minHeight: 44,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: 8,
-              paddingVertical: 8,
-            }}
-          >
-            {/* Visual element más pequeño, similar al set type */}
-            <View
+        {session?.routine?.show_rpe && (
+          <View style={{ flex: 0.8, paddingHorizontal: 8 }}>
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={handleOpenRpeSelector}
+              accessible={true}
+              accessibilityRole="button"
               style={{
-                paddingHorizontal: 10,
-                paddingVertical: 4,
-                borderRadius: 6,
-                backgroundColor: set.actual_rpe
-                  ? colors.primary[500] + "15"
-                  : "transparent",
-                borderWidth: 1,
-                borderColor: set.actual_rpe
-                  ? colors.primary[500] + "40"
-                  : colors.border,
-                minWidth: 44,
-                alignItems: "center",
+                minHeight: 44,
                 justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 8,
+                paddingVertical: 8,
               }}
             >
-              <Typography
-                variant="body2"
-                weight={set.actual_rpe ? "semibold" : "normal"}
+              {/* Visual element más pequeño, similar al set type */}
+              <View
                 style={{
-                  color: set.actual_rpe
-                    ? colors.primary[500]
-                    : colors.textMuted,
-                  fontSize: 14,
-                  textAlign: "center",
+                  paddingHorizontal: 10,
+                  paddingVertical: 4,
+                  borderRadius: 6,
+                  backgroundColor: set.actual_rpe
+                    ? colors.primary[500] + "15"
+                    : "transparent",
+                  borderWidth: 1,
+                  borderColor: set.actual_rpe
+                    ? colors.primary[500] + "40"
+                    : colors.border,
+                  minWidth: 44,
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                {set.actual_rpe || set.planned_rpe}
-              </Typography>
-            </View>
-          </TouchableOpacity>
-        </View>
+                <Typography
+                  variant="body2"
+                  weight={set.actual_rpe ? "semibold" : "normal"}
+                  style={{
+                    color: set.actual_rpe
+                      ? colors.primary[500]
+                      : colors.textMuted,
+                    fontSize: 14,
+                    textAlign: "center",
+                  }}
+                >
+                  {set.actual_rpe || set.planned_rpe}
+                </Typography>
+              </View>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* Complete Button */}
         <View style={{ width: 40, alignItems: "center" }}>
@@ -326,33 +383,44 @@ export const ActiveSetRow: React.FC<Props> = ({
             accessibilityState={{ checked: isSetCompleted }}
           >
             {/* Visual element mantiene el mismo tamaño */}
-            <View
-              style={{
-                width: 32,
-                height: 32,
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 8,
-                backgroundColor: isSetCompleted
-                  ? blockColors.primary
-                  : colors.background,
-                borderWidth: isSetCompleted ? 0 : 2,
-                borderColor: isSetCompleted ? "transparent" : colors.border,
-                shadowColor: isSetCompleted
-                  ? blockColors.primary
-                  : "transparent",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                elevation: isSetCompleted ? 3 : 0,
-              }}
+            <Animated.View
+              style={[
+                {
+                  width: 32,
+                  height: 32,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 8,
+                  backgroundColor: isSetCompleted
+                    ? isCurrentPR
+                      ? prColor
+                      : blockColors.primary
+                    : colors.background,
+                  borderWidth: isSetCompleted ? 0 : 2,
+                  borderColor: isSetCompleted ? "transparent" : colors.border,
+                  shadowColor: isSetCompleted
+                    ? isCurrentPR
+                      ? prColor
+                      : blockColors.primary
+                    : "transparent",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: isSetCompleted ? 3 : 0,
+                },
+                isCurrentPR && isSetCompleted ? glowStyle : {},
+              ]}
             >
-              <Check
-                size={16}
-                color={isSetCompleted ? "#ffffff" : colors.textMuted}
-                strokeWidth={isSetCompleted ? 2.5 : 2}
-              />
-            </View>
+              {isCurrentPR && isSetCompleted ? (
+                <Trophy size={14} color="#ffffff" strokeWidth={2.5} />
+              ) : (
+                <Check
+                  size={16}
+                  color={isSetCompleted ? "#ffffff" : colors.textMuted}
+                  strokeWidth={isSetCompleted ? 2.5 : 2}
+                />
+              )}
+            </Animated.View>
           </TouchableOpacity>
         </View>
       </View>

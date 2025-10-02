@@ -7,6 +7,7 @@ export type IToogleSheet =
   | "restTime"
   | "blockOptions"
   | "exerciseOptions"
+  | "routineSettings"
   | "rpeSelector"
   | "tempoSelector";
 
@@ -18,6 +19,7 @@ export const useFormRoutineSheets = () => {
   const exerciseOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
   const rpeSelectorBottomSheetRef = useRef<BottomSheetModal>(null);
   const tempoSelectorBottomSheetRef = useRef<BottomSheetModal>(null);
+  const routineSettingsBottomSheetRef = useRef<BottomSheetModal>(null);
 
   const handleCloseSheets = () => {
     setTypeBottomSheetRef.current?.close();
@@ -49,6 +51,9 @@ export const useFormRoutineSheets = () => {
       case "rpeSelector":
         rpeSelectorBottomSheetRef.current?.present();
         break;
+      case "routineSettings":
+        routineSettingsBottomSheetRef.current?.present();
+        break;
       case "tempoSelector":
         tempoSelectorBottomSheetRef.current?.present();
         break;
@@ -67,5 +72,6 @@ export const useFormRoutineSheets = () => {
     exerciseOptionsBottomSheetRef,
     rpeSelectorBottomSheetRef,
     tempoSelectorBottomSheetRef,
+    routineSettingsBottomSheetRef,
   };
 };

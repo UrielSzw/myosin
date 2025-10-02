@@ -111,6 +111,10 @@ export const routines = sqliteTable("routines", {
 
   // Análisis de volumen - días de entrenamiento
   training_days: text("training_days", { mode: "json" }).$type<string[]>(),
+  show_rpe: integer("show_rpe", { mode: "boolean" }).default(true).notNull(),
+  show_tempo: integer("show_tempo", { mode: "boolean" })
+    .default(true)
+    .notNull(),
 
   ...timestamps,
 });
@@ -250,7 +254,11 @@ export const foldersRelations = relations(folders, ({ many }) => ({
 // 1. Tipos base (entidades puras)
 export type BaseRoutine = InferSelectModel<typeof routines>;
 export type BaseFolder = InferSelectModel<typeof folders>;
-export type BaseExercise = InferSelectModel<typeof exercises>;
+export type BaseExercise = InferSelectModel<typeof exercises> & {
+  muscle_groups: string[];
+  instructions: string[];
+  equipment: string[];
+};
 export type BaseBlock = InferSelectModel<typeof routine_blocks>;
 export type BaseExerciseInBlock = InferSelectModel<typeof exercise_in_block>;
 export type BaseSet = InferSelectModel<typeof routine_sets>;

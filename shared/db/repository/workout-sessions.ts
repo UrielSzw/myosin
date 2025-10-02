@@ -11,6 +11,7 @@ import {
 import type {
   BaseWorkoutSession,
   WorkoutBlockInsert,
+  WorkoutBlockWithExercises,
   WorkoutExerciseInsert,
   WorkoutSessionFull,
   WorkoutSessionInsert,
@@ -213,7 +214,7 @@ export const workoutSessionsRepository = {
     return {
       ...sessionData.session,
       routine: sessionData.routine,
-      blocks: blocksWithExercises,
+      blocks: blocksWithExercises as WorkoutBlockWithExercises[],
     };
   },
 

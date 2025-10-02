@@ -70,7 +70,11 @@ type Store = {
   };
 
   mainActions: {
-    initializeForm: (routineId?: string) => Promise<void>;
+    initializeForm: (
+      routineId?: string,
+      show_rpe?: boolean,
+      show_tempo?: boolean
+    ) => Promise<void>;
     clearForm: () => void;
     setIsExerciseModalOpen: (isOpen: boolean) => void;
     setExerciseModalMode: (
@@ -80,6 +84,9 @@ type Store = {
     setCurrentState: (state: Store["currentState"]) => void;
     setRoutineName: (name: string) => void;
     setTrainingDays: (days: string[]) => void;
+    setRoutineFlags: (
+      flags: Partial<{ show_rpe: boolean; show_tempo: boolean }>
+    ) => void;
   };
 
   blockActions: {
@@ -120,6 +127,8 @@ const useRoutineFormStore = create<Store>()(
         folder_id: null,
         created_by_user_id: "",
         training_days: [],
+        show_rpe: false,
+        show_tempo: false,
       },
       blocks: {},
       exercisesInBlock: {},
@@ -183,7 +192,7 @@ const useRoutineFormStore = create<Store>()(
     },
 
     mainActions: {
-      initializeForm: async (routineId) => {
+      initializeForm: async (routineId, show_rpe, show_tempo) => {
         set((state) => {
           // Para crear nueva rutina
           if (!routineId) {
@@ -195,6 +204,8 @@ const useRoutineFormStore = create<Store>()(
                 folder_id: null,
                 created_by_user_id: "", // Se asigna al guardar
                 training_days: [],
+                show_rpe: show_rpe ?? false,
+                show_tempo: show_tempo ?? false,
               },
               blocks: {},
               exercisesInBlock: {},
@@ -256,7 +267,7 @@ const useRoutineFormStore = create<Store>()(
                     ...exerciseInBlock,
                     tempId,
                     block_id: blockTempId,
-                    exercise,
+                    exercise: exercise as BaseExercise,
                   };
 
                   // Agregar al índice exercisesByBlock
@@ -302,6 +313,8 @@ const useRoutineFormStore = create<Store>()(
                   folder_id: routineData.routine.folder_id,
                   created_by_user_id: routineData.routine.created_by_user_id,
                   training_days: routineData.routine.training_days || [],
+                  show_rpe: routineData.routine.show_rpe || false,
+                  show_tempo: routineData.routine.show_tempo || false,
                 },
                 blocks: blocksWithTempId,
                 exercisesInBlock: exercisesInBlockWithTempId,
@@ -313,6 +326,7 @@ const useRoutineFormStore = create<Store>()(
             });
           } catch (error) {
             console.error("Error loading routine for edit:", error);
+
             // Fallback a modo create si hay error
             set((state) => {
               state.formState = {
@@ -323,6 +337,8 @@ const useRoutineFormStore = create<Store>()(
                   folder_id: null,
                   created_by_user_id: "",
                   training_days: [],
+                  show_rpe: show_rpe || false,
+                  show_tempo: show_tempo || false,
                 },
                 blocks: {},
                 exercisesInBlock: {},
@@ -345,6 +361,8 @@ const useRoutineFormStore = create<Store>()(
               folder_id: null,
               created_by_user_id: "",
               training_days: [],
+              show_rpe: false,
+              show_tempo: false,
             },
             blocks: {},
             exercisesInBlock: {},
@@ -398,6 +416,16 @@ const useRoutineFormStore = create<Store>()(
       setTrainingDays: (days: string[]) => {
         set((state) => {
           state.formState.routine.training_days = days;
+        });
+      },
+      setRoutineFlags: (
+        flags: Partial<{ show_rpe: boolean; show_tempo: boolean }>
+      ) => {
+        set((state) => {
+          if (!state.formState) return;
+
+          const current = state.formState.routine as any;
+          state.formState.routine = { ...(current || {}), ...flags } as any;
         });
       },
     },

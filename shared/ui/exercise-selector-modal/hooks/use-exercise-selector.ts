@@ -13,6 +13,8 @@ export const useExerciseSelector = () => {
   const [selectedCategory, setSelectedCategory] =
     useState<IExerciseMuscle | null>(null);
 
+  console.log("Selected Exercises:", selectedExercises);
+
   // Función para filtrar ejercicios en memoria
   const getFilteredExercises = useCallback(
     (exercises: BaseExercise[]) => {
@@ -24,7 +26,9 @@ export const useExerciseSelector = () => {
         filtered = filtered.filter(
           (exercise) =>
             exercise.name.toLowerCase().includes(query) ||
-            exercise.instructions?.toLowerCase().includes(query)
+            exercise.instructions?.some((instruction) =>
+              instruction.toLowerCase().includes(query)
+            )
         );
       }
 

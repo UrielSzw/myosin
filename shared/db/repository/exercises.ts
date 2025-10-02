@@ -5,6 +5,6 @@ export const exercisesRepository = {
   findAll: async (): Promise<BaseExercise[]> => {
     const rows = await db.select().from(exercises);
 
-    return rows;
+    return rows as BaseExercise[];
   },
 };

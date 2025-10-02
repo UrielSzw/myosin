@@ -15,6 +15,7 @@ import {
   useSetActions,
 } from "../../hooks/use-routine-form-store";
 import { RepsTypeBottomSheet } from "../reps-type-sheet";
+import { RoutineSettingsBottomSheet } from "../routine-settings-sheet";
 
 type Props = {
   setTypeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
@@ -24,6 +25,7 @@ type Props = {
   exerciseOptionsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   rpeSelectorBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   tempoSelectorBottomSheetRef: React.RefObject<BottomSheetModal | null>;
+  routineSettingsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
 };
 
 export const BottomSheets: React.FC<Props> = ({
@@ -34,6 +36,7 @@ export const BottomSheets: React.FC<Props> = ({
   exerciseOptionsBottomSheetRef,
   rpeSelectorBottomSheetRef,
   tempoSelectorBottomSheetRef,
+  routineSettingsBottomSheetRef,
 }) => {
   const {
     currentRestTime,
@@ -184,6 +187,8 @@ export const BottomSheets: React.FC<Props> = ({
         onDismiss={handleDismissTempoSelector}
         selectedTempo={currentSetTempo || ""}
       />
+
+      <RoutineSettingsBottomSheet ref={routineSettingsBottomSheetRef} />
     </>
   );
 };

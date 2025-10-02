@@ -25,11 +25,13 @@ export const SetsTable: React.FC<Props> = ({
   exerciseInBlockId,
   onToggleSheet,
 }) => {
-  const { setsByExercise, sets } = useRoutineFormState();
+  const { setsByExercise, sets, routine } = useRoutineFormState();
   const { colors } = useColorScheme();
   const { getRepsColumnTitle, getBlockColors } = useBlockStyles();
   const { addSet } = useSetActions();
   const { setCurrentState } = useMainActions();
+
+  const { show_rpe, show_tempo } = routine;
 
   const blockColors = getBlockColors(blockType);
 
@@ -100,14 +102,20 @@ export const SetsTable: React.FC<Props> = ({
             <ChevronDown size={12} color={colors.textMuted} />
           </TouchableOpacity>
         </View>
-        <View style={{ width: 50, alignItems: "center" }}>
-          <Typography variant="caption" weight="medium" color="textMuted">
-            RPE
-          </Typography>
-        </View>
-        <View style={{ width: 40, alignItems: "center" }}>
-          <Timer size={12} color={colors.textMuted} />
-        </View>
+
+        {show_rpe && (
+          <View style={{ width: 50, alignItems: "center" }}>
+            <Typography variant="caption" weight="medium" color="textMuted">
+              RPE
+            </Typography>
+          </View>
+        )}
+
+        {show_tempo && (
+          <View style={{ width: 40, alignItems: "center" }}>
+            <Timer size={12} color={colors.textMuted} />
+          </View>
+        )}
       </View>
 
       {/* Set Rows */}

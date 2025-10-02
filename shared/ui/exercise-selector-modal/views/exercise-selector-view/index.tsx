@@ -111,7 +111,6 @@ export const ExerciseSelectorView: React.FC<Props> = ({
         extraData={selectedExercises}
         contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20 }}
         style={{ flex: 1 }}
-        estimatedItemSize={100}
       />
 
       {/* Footer */}

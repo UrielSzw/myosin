@@ -19,22 +19,6 @@ type Props = {
 export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
   const { colors } = useColorScheme();
 
-  // Parse instructions - pueden venir como array, string JSON, o string normal
-  const instructions = Array.isArray(exercise.instructions)
-    ? exercise.instructions
-    : typeof exercise.instructions === "string"
-    ? (() => {
-        try {
-          // Intentar parsear como JSON primero
-          const parsed = JSON.parse(exercise.instructions);
-          return Array.isArray(parsed) ? parsed : [exercise.instructions];
-        } catch {
-          // Si no es JSON, split por \n
-          return exercise.instructions.split("\n").filter(Boolean);
-        }
-      })()
-    : [];
-
   // Las imágenes vienen del schema - por ahora array vacío pero preparado para futuro
   const images: string[] = []; // TODO: Cuando se implemente ejercicios con imágenes
 
@@ -123,12 +107,12 @@ export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
       </Card>
 
       {/* Instructions */}
-      {instructions.length > 0 && (
-        <InstructionsList instructions={instructions} />
+      {exercise.instructions.length > 0 && (
+        <InstructionsList instructions={exercise.instructions} />
       )}
 
       {/* Empty state for instructions */}
-      {instructions.length === 0 && (
+      {exercise.instructions.length === 0 && (
         <Card variant="outlined" padding="lg">
           <View style={{ alignItems: "center", paddingVertical: 20 }}>
             <Info size={32} color={colors.textMuted} />

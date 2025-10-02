@@ -5,6 +5,7 @@ import type {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useState } from "react";
 import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
@@ -17,6 +18,7 @@ export const useSaveRoutine = () => {
   const [error, setError] = useState<string | null>(null);
   const formState = useRoutineFormState();
   const validation = useRoutineValidation();
+  const { show_rpe, show_tempo } = useUserPreferences() || {};
 
   const saveRoutine = async (): Promise<string | null> => {
     // Usar la validación centralizada
@@ -42,6 +44,8 @@ export const useSaveRoutine = () => {
           ? formState.routine.created_by_user_id
           : "default-user",
         training_days: formState.routine.training_days || null,
+        show_rpe: formState.routine.show_rpe || show_rpe || false,
+        show_tempo: formState.routine.show_tempo || show_tempo || false,
       };
 
       // 2. Preparar bloques (eliminar tempId y asignar IDs reales)

@@ -1,9 +1,12 @@
 import { getThemeColors } from "../constants/colors";
-import { useColorSchemeState, useMainStoreActions } from "./use-main-store";
+import {
+  useUserPreferences,
+  useUserPreferencesActions,
+} from "./use-user-preferences-store";
 
 export const useColorScheme = () => {
-  const colorScheme = useColorSchemeState();
-  const { setColorScheme } = useMainStoreActions();
+  const colorScheme = useUserPreferences()?.theme ?? "dark";
+  const { setColorScheme } = useUserPreferencesActions();
 
   const isDarkMode = colorScheme === "dark";
   const colors = getThemeColors(isDarkMode);

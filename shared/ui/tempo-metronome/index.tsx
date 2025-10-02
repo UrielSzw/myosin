@@ -27,7 +27,7 @@ const COUNTDOWN_SECONDS = 5; // Configurable countdown duration
 const TICK_INTERVAL = 100; // Update interval in milliseconds for smooth animations
 
 interface TempoMetronomeProps {
-  tempo?: string; // Format: "2-1-4-0" (eccentric-pause1-concentric-pause2)
+  tempo?: string | null; // Format: "2-1-4-0" (eccentric-pause1-concentric-pause2)
 }
 
 interface TempoPhase {
@@ -79,7 +79,7 @@ type Action =
 // HELPER FUNCTIONS
 // ============================================================================
 
-const parseTempoString = (tempoString?: string): TempoPhase[] => {
+const parseTempoString = (tempoString?: string | null): TempoPhase[] => {
   if (!tempoString) return [];
 
   const [eccentric, pause1, concentric, pause2] = tempoString

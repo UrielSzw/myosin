@@ -1,9 +1,10 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
+import { getDayKey } from "@/shared/utils/date-utils";
 import { Zap } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
-import { useTodaySummary } from "../../hooks/use-tracker-data";
+import { useDayDataSummary } from "../../hooks/use-tracker-data";
 
 type Props = {
   selectedDate: string;
@@ -12,14 +13,43 @@ type Props = {
 export const TrackerHeader: React.FC<Props> = ({ selectedDate }) => {
   const { colors } = useColorScheme();
 
-  // Obtener resumen del día usando React Query
-  const { data: todaySummary } = useTodaySummary();
+  // Obtener resumen del día seleccionado usando React Query
+  const { data: daySummary } = useDayDataSummary(selectedDate);
 
-  // Calcular progreso total del día
-  const totalMetrics = todaySummary?.summary.length || 0;
-  const completedTargets = todaySummary?.completedTargets || 0;
-  const progressPercentage =
-    totalMetrics > 0 ? Math.round((completedTargets / totalMetrics) * 100) : 0;
+  // Helper para calcular progreso ponderado
+  const calculateOverallProgress = (summary: typeof daySummary) => {
+    if (!summary || !summary.summary.length) return 0;
+
+    const metricsWithTargets = summary.summary.filter(
+      (s) => s.metric.default_target && s.metric.default_target > 0
+    );
+
+    if (metricsWithTargets.length === 0) return 0;
+
+    const totalProgress = metricsWithTargets.reduce(
+      (acc, metricSummary) => acc + Math.min(metricSummary.progress, 100),
+      0
+    );
+
+    return Math.round(totalProgress / metricsWithTargets.length);
+  };
+
+  // Calcular progreso total del día usando promedio ponderado del progreso real
+  const totalMetrics = daySummary?.summary.length || 0;
+  const metricsWithTargets =
+    daySummary?.summary.filter(
+      (s) => s.metric.default_target && s.metric.default_target > 0
+    ).length || 0;
+  const progressPercentage = calculateOverallProgress(daySummary);
+
+  // Determinar el texto descriptivo
+  const getProgressLabel = () => {
+    if (totalMetrics === 0) return "Sin métricas";
+    if (metricsWithTargets === 0) return "Sin objetivos definidos";
+
+    const isToday = selectedDate === getDayKey();
+    return isToday ? "Progreso del día" : `Progreso del ${selectedDate}`;
+  };
 
   return (
     <View
@@ -54,7 +84,7 @@ export const TrackerHeader: React.FC<Props> = ({ selectedDate }) => {
                 }}
               >
                 <Typography variant="body2" color="textMuted">
-                  Progreso del día
+                  {getProgressLabel()}
                 </Typography>
                 <View
                   style={{

@@ -116,6 +116,14 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="metric/create"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+              gestureEnabled: false,
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>

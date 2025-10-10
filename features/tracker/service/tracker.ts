@@ -520,6 +520,55 @@ export const trackerService = {
     };
   },
 
+  /**
+   * Obtiene resumen de cualquier día específico (similar a getTodaySummary pero para cualquier fecha)
+   */
+  getDayDataSummary: async (
+    dayKey: string,
+    userId: string = "default-user"
+  ) => {
+    const dayData = await trackerService.getDayData(dayKey, userId);
+
+    const summary = dayData.metrics.map((metric) => {
+      const totalValue = metric.aggregate?.sum_normalized || 0;
+      const entriesCount = metric.entries.length;
+      const hasTarget = metric.default_target && metric.default_target > 0;
+
+      let progress = 0;
+      let status: "not_started" | "in_progress" | "completed" | "exceeded" =
+        "not_started";
+
+      if (hasTarget) {
+        progress = (totalValue / metric.default_target!) * 100;
+
+        if (progress === 0) status = "not_started";
+        else if (progress < 100) status = "in_progress";
+        else if (progress >= 100 && progress < 120) status = "completed";
+        else status = "exceeded";
+      } else if (entriesCount > 0) {
+        status = "in_progress";
+      }
+
+      return {
+        metric,
+        totalValue,
+        entriesCount,
+        progress: Math.round(progress),
+        status,
+        displayValue: `${totalValue.toFixed(1)} ${metric.unit}`,
+      };
+    });
+
+    return {
+      dayKey: dayData.day_key,
+      summary,
+      totalMetricsWithData: summary.filter((s) => s.entriesCount > 0).length,
+      completedTargets: summary.filter(
+        (s) => s.status === "completed" || s.status === "exceeded"
+      ).length,
+    };
+  },
+
   // ==================== INITIALIZATION ====================
 
   // ==================== TEMPLATES ====================

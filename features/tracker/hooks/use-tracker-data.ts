@@ -29,6 +29,8 @@ export const trackerQueryKeys = {
     [...trackerQueryKeys.all, "history", userId, metricId, days] as const,
   todaySummary: (userId?: string) =>
     [...trackerQueryKeys.all, "summary", "today", userId] as const,
+  daySummary: (userId: string, dayKey: string) =>
+    [...trackerQueryKeys.all, "summary", "day", userId, dayKey] as const,
   stats: (userId?: string) =>
     [...trackerQueryKeys.all, "stats", userId] as const,
 };
@@ -472,6 +474,22 @@ export const useTodaySummary = (userId: string = "default-user") => {
     staleTime: 1000 * 30, // 30 segundos
     gcTime: 1000 * 60 * 2, // 2 minutos
     refetchOnWindowFocus: true,
+  });
+};
+
+/**
+ * Hook para obtener resumen de cualquier día específico
+ */
+export const useDayDataSummary = (
+  dayKey: string,
+  userId: string = "default-user"
+) => {
+  return useQuery({
+    queryKey: trackerQueryKeys.daySummary(userId, dayKey),
+    queryFn: () => trackerService.getDayDataSummary(dayKey, userId),
+    staleTime: 1000 * 60 * 5, // 5 minutos (datos históricos cambian menos)
+    gcTime: 1000 * 60 * 10, // 10 minutos
+    refetchOnWindowFocus: dayKey === getDayKey(), // Solo refrescar si es hoy
   });
 };
 

@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
 import { Plus, X } from "lucide-react-native";
@@ -9,58 +8,6 @@ import {
   useAddMetricFromTemplate,
   useAvailableTemplates,
 } from "../../hooks/use-tracker-data";
-
-// Métricas predefinidas (temporalmente aquí hasta implementar custom metrics)
-const PREDEFINED_METRICS = [
-  {
-    id: "protein",
-    slug: "protein",
-    name: "Proteína",
-    type: "counter" as const,
-    unit: "g",
-    canonical_unit: "g",
-    conversion_factor: 1,
-    default_target: 150,
-    color: "#10B981",
-    icon: "Beef",
-  },
-  {
-    id: "water",
-    slug: "water",
-    name: "Agua",
-    type: "counter" as const,
-    unit: "L",
-    canonical_unit: "ml",
-    conversion_factor: 1000,
-    default_target: 2.5,
-    color: "#3B82F6",
-    icon: "Droplets",
-  },
-  {
-    id: "weight",
-    slug: "weight",
-    name: "Peso",
-    type: "value" as const,
-    unit: "kg",
-    canonical_unit: "kg",
-    conversion_factor: 1,
-    default_target: null,
-    color: "#EF4444",
-    icon: "Scale",
-  },
-  {
-    id: "sleep",
-    slug: "sleep",
-    name: "Sueño",
-    type: "value" as const,
-    unit: "horas",
-    canonical_unit: "min",
-    conversion_factor: 60,
-    default_target: 8,
-    color: "#6366F1",
-    icon: "Moon",
-  },
-];
 
 type Props = {
   visible: boolean;
@@ -244,17 +191,17 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
               Métrica Personalizada
             </Typography>
 
-            <Button
+            {/* <Button
               variant="outline"
               fullWidth
               onPress={() => {
-                // TODO: Abrir creador de métrica personalizada
-                console.log("Create custom metric");
+                onClose();
+                router.push("/metric/create");
               }}
               icon={<Plus size={20} color={colors.primary[500]} />}
             >
               Crear Métrica Personalizada
-            </Button>
+            </Button> */}
           </View>
         </ScrollView>
       </View>

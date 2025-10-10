@@ -15,7 +15,10 @@ export const DatePicker: React.FC<Props> = ({ selectedDate, onDateChange }) => {
   const { colors } = useColorScheme();
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
+    // Usar el dateString directamente para evitar problemas de timezone
+    const [year, month, day] = dateString.split("-").map(Number);
+    const date = new Date(year, month - 1, day); // month es 0-indexed
+
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
@@ -35,13 +38,17 @@ export const DatePicker: React.FC<Props> = ({ selectedDate, onDateChange }) => {
   };
 
   const goToPreviousDay = () => {
-    const date = new Date(selectedDate);
+    // Crear fecha correctamente evitando problemas de timezone
+    const [year, month, day] = selectedDate.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
     date.setDate(date.getDate() - 1);
     onDateChange(getDayKey(date));
   };
 
   const goToNextDay = () => {
-    const date = new Date(selectedDate);
+    // Crear fecha correctamente evitando problemas de timezone
+    const [year, month, day] = selectedDate.split("-").map(Number);
+    const date = new Date(year, month - 1, day);
     const today = getDayKey();
 
     // Don't go beyond today

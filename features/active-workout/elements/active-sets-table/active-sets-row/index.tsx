@@ -47,6 +47,7 @@ export const ActiveSetRow: React.FC<Props> = ({
     glowStyle,
     borderStyle,
     prColor,
+    prColorLight,
   } = usePRCelebration();
 
   const [setData, setSetData] = useState({
@@ -161,16 +162,22 @@ export const ActiveSetRow: React.FC<Props> = ({
     <View
       key={set.tempId}
       style={{
-        backgroundColor: isCurrentPR
-          ? prColor + "22"
-          : isSetCompleted
-          ? blockColors.light
-          : "transparent",
+        backgroundColor:
+          isCurrentPR && isSetCompleted
+            ? prColorLight
+            : isSetCompleted
+            ? blockColors.light
+            : "transparent",
         position: "relative",
         overflow: "hidden",
+        borderRadius: isCurrentPR && isSetCompleted ? 8 : 0,
+        margin: isCurrentPR && isSetCompleted ? 2 : 0,
+        borderWidth: isCurrentPR && isSetCompleted ? 1 : 0,
+        borderColor:
+          isCurrentPR && isSetCompleted ? prColor + "40" : "transparent",
       }}
     >
-      {/* PR Border Accent */}
+      {/* PR Border Accent with gradient effect */}
       {isCurrentPR && isSetCompleted && (
         <Animated.View
           style={[
@@ -179,8 +186,12 @@ export const ActiveSetRow: React.FC<Props> = ({
               left: 0,
               top: 0,
               bottom: 0,
-              width: 3,
+              width: 4,
               backgroundColor: prColor,
+              shadowColor: prColor,
+              shadowOffset: { width: 2, height: 0 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
             },
             borderStyle,
           ]}
@@ -403,10 +414,10 @@ export const ActiveSetRow: React.FC<Props> = ({
                       ? prColor
                       : blockColors.primary
                     : "transparent",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  elevation: isSetCompleted ? 3 : 0,
+                  shadowOffset: { width: 0, height: isCurrentPR ? 3 : 2 },
+                  shadowOpacity: isCurrentPR ? 0.4 : 0.2,
+                  shadowRadius: isCurrentPR ? 6 : 4,
+                  elevation: isSetCompleted ? (isCurrentPR ? 5 : 3) : 0,
                 },
                 isCurrentPR && isSetCompleted ? glowStyle : {},
               ]}

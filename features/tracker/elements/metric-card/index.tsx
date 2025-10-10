@@ -4,6 +4,7 @@ import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
+import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { useDayData } from "../../hooks/use-tracker-data";
 
 type Props = {
@@ -39,6 +40,65 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
   const progressPercentage = getProgressPercentage();
   const isCompleted = progressPercentage === 100;
 
+  // Componente SVG para anillo de progreso preciso
+  const ProgressRing = () => {
+    if (progressPercentage === null) return null;
+
+    const size = 52;
+    const strokeWidth = 3;
+    const radius = (size - strokeWidth) / 2;
+    const circumference = radius * 2 * Math.PI;
+    const strokeDasharray = circumference;
+    const strokeDashoffset =
+      circumference - (progressPercentage / 100) * circumference;
+
+    return (
+      <Svg
+        width={size}
+        height={size}
+        style={{
+          position: "absolute",
+          top: -2,
+          left: -2,
+          transform: [{ rotate: "-90deg" }],
+        }}
+      >
+        {/* Gradiente dorado para estado completado */}
+        <Defs>
+          <LinearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
+            <Stop offset="0" stopColor="#FFD700" stopOpacity="1" />
+            <Stop offset="0.5" stopColor="#FFA500" stopOpacity="1" />
+            <Stop offset="1" stopColor="#FF8C00" stopOpacity="1" />
+          </LinearGradient>
+        </Defs>
+
+        {/* Background circle */}
+        <Circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          stroke={colors.gray[200]}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+        />
+        {/* Progress circle */}
+        {progressPercentage > 0 && (
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={isCompleted ? "url(#goldGradient)" : metric.color}
+            strokeWidth={strokeWidth}
+            fill="transparent"
+            strokeDasharray={strokeDasharray}
+            strokeDashoffset={strokeDashoffset}
+            strokeLinecap="round"
+          />
+        )}
+      </Svg>
+    );
+  };
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -49,36 +109,16 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
         borderRadius: 16,
         padding: 16,
         borderWidth: isCompleted ? 2 : 1,
-        borderColor: isCompleted ? colors.secondary[300] : colors.border,
+        borderColor: isCompleted ? "#FFD700" : colors.border,
         elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3,
+        shadowColor: isCompleted ? "#FFD700" : "#000",
+        shadowOffset: { width: 0, height: isCompleted ? 2 : 1 },
+        shadowOpacity: isCompleted ? 0.3 : 0.1,
+        shadowRadius: isCompleted ? 8 : 3,
         position: "relative",
       }}
       activeOpacity={0.7}
     >
-      {/* Achievement Badge */}
-      {isCompleted && (
-        <View
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            width: 24,
-            height: 24,
-            backgroundColor: colors.secondary[300],
-            borderRadius: 12,
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1,
-          }}
-        >
-          <Icons.PartyPopper size={16} color={colors.text} />
-        </View>
-      )}
-
       {/* Metric Label */}
       <Typography
         variant="caption"
@@ -97,77 +137,21 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
             width: 48,
             height: 48,
             borderRadius: 24,
-            backgroundColor: metric.color + "20",
+            backgroundColor: isCompleted ? "#FFD70020" : metric.color + "20",
             alignItems: "center",
             justifyContent: "center",
             position: "relative",
           }}
         >
-          {/* Background ring */}
-          {progressPercentage !== null && (
-            <View
-              style={{
-                position: "absolute",
-                width: 52,
-                height: 52,
-                borderRadius: 26,
-                borderWidth: 3,
-                borderColor: colors.gray[200],
-                top: -2,
-                left: -2,
-              }}
+          {/* SVG Progress Ring */}
+          <ProgressRing />
+
+          {IconComponent && (
+            <IconComponent
+              size={24}
+              color={isCompleted ? "#FFA500" : metric.color}
             />
           )}
-
-          {/* Progress ring */}
-          {progressPercentage !== null && progressPercentage > 0 && (
-            <View
-              style={{
-                position: "absolute",
-                width: 52,
-                height: 52,
-                borderRadius: 26,
-                borderWidth: 3,
-                borderColor: "transparent",
-                top: -2,
-                left: -2,
-                transform: [{ rotate: "-90deg" }],
-              }}
-            >
-              <View
-                style={{
-                  position: "absolute",
-                  width: "100%",
-                  height: "100%",
-                  borderRadius: 26,
-                  borderWidth: 3,
-                  borderColor: "transparent",
-                  borderTopColor: metric.color,
-                  borderRightColor:
-                    progressPercentage > 25 ? metric.color : "transparent",
-                  borderBottomColor:
-                    progressPercentage > 50 ? metric.color : "transparent",
-                  borderLeftColor:
-                    progressPercentage > 75 ? metric.color : "transparent",
-                }}
-              />
-              {/* Complete the circle at 100% */}
-              {progressPercentage === 100 && (
-                <View
-                  style={{
-                    position: "absolute",
-                    width: "100%",
-                    height: "100%",
-                    borderRadius: 26,
-                    borderWidth: 3,
-                    borderColor: metric.color,
-                  }}
-                />
-              )}
-            </View>
-          )}
-
-          {IconComponent && <IconComponent size={24} color={metric.color} />}
         </View>
       </View>
 

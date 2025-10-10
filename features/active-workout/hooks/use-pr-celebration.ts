@@ -43,7 +43,7 @@ export const usePRCelebration = () => {
 
   // Animated styles
   const glowStyle = useAnimatedStyle(() => ({
-    shadowColor: colors.warning[500],
+    shadowColor: "#FFD700", // Gold color consistent with tracker
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: glowPulse.value * 0.6,
     shadowRadius: glowPulse.value * 8,
@@ -63,7 +63,9 @@ export const usePRCelebration = () => {
     glowStyle,
     borderStyle,
 
-    // Colors
-    prColor: colors.warning[500],
+    // Colors - using gold gradient similar to tracker
+    prColor: "#FFD700", // Primary gold
+    prColorSecondary: "#FFA500", // Secondary orange-gold
+    prColorLight: "#FFD70020", // Light gold for backgrounds
   };
 };

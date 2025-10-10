@@ -1,7 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { HapticTab } from "@/shared/ui/haptic-tab";
 import { Tabs } from "expo-router";
-import { BarChart3, Dumbbell, User } from "lucide-react-native";
+import { Activity, BarChart3, Dumbbell, User } from "lucide-react-native";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -31,6 +31,15 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="tracker"
+        options={{
+          title: "Tracker",
+          tabBarIcon: ({ color, size }) => (
+            <Activity size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="index"
         options={{
           title: "Rutinas",
@@ -40,9 +49,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="history"
+        name="analytics"
         options={{
-          title: "Historial",
+          title: "Análiticas",
           tabBarIcon: ({ color, size }) => (
             <BarChart3 size={size} color={color} />
           ),

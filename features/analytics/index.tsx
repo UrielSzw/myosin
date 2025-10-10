@@ -69,5 +69,3 @@ export const AnalyticsFeature: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-export default AnalyticsFeature;

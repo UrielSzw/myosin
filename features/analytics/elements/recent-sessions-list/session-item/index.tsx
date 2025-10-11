@@ -1,6 +1,7 @@
 import { SessionData } from "@/features/analytics/types/session";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { useRouter } from "expo-router";
 import { Calendar, Clock, Target } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
@@ -39,13 +40,16 @@ export const SessionItem: React.FC<{
   session: SessionData;
   colors: any;
 }> = ({ session, colors }) => {
+  const router = useRouter();
   const completionRate = Math.round(
     (session.total_sets_completed / session.total_sets_planned) * 100
   );
   const isCompleted = completionRate === 100;
   const timeAgo = getTimeAgo(session.started_at);
 
-  const handleSessionPress = () => {};
+  const handleSessionPress = () => {
+    router.push(`/workout-session/${session.id}` as any);
+  };
 
   return (
     <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>

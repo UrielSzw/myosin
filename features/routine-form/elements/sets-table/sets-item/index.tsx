@@ -193,6 +193,7 @@ export const SetsItem = React.memo<Props>(
               value={`${set.weight || ""}`}
               onChangeText={handleWeightChange}
               placeholder="0"
+              placeholderTextColor={colors.textMuted}
               keyboardType="numeric"
               style={{
                 // Input visual más compacto
@@ -248,6 +249,7 @@ export const SetsItem = React.memo<Props>(
                   value={`${set.reps_range?.min || ""}`}
                   onChangeText={handleRepsMinChange}
                   placeholder="0"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
                   style={{
                     backgroundColor: "transparent",
@@ -290,6 +292,7 @@ export const SetsItem = React.memo<Props>(
                   value={`${set.reps_range?.max || ""}`}
                   onChangeText={handleRepsMaxChange}
                   placeholder="0"
+                  placeholderTextColor={colors.textMuted}
                   keyboardType="numeric"
                   style={{
                     backgroundColor: "transparent",
@@ -326,6 +329,7 @@ export const SetsItem = React.memo<Props>(
                 value={`${set.reps || ""}`}
                 onChangeText={handleRepsChange}
                 placeholder="0"
+                placeholderTextColor={colors.textMuted}
                 keyboardType="numeric"
                 style={{
                   // Input visual más compacto

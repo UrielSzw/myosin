@@ -19,25 +19,13 @@ export const loadExercisesSeed = async () => {
         source: ex.source,
         created_by_user_id: ex.created_by_user_id,
         main_muscle_group: ex.main_muscle_group,
-        muscle_groups: ex.muscle_groups,
+        secondary_muscle_groups: ex.secondary_muscle_groups,
         primary_equipment: ex.primary_equipment,
+        exercise_type: ex.exercise_type,
         instructions: ex.instructions,
         equipment: ex.equipment,
+        similar_exercises: ex.similar_exercises,
       });
-
-      // Insert muscles
-      // await db.insert(exerciseMuscleGroups).values({
-      //   exercise_id: ex.id,
-      //   muscle_group: ex.main_muscle_group,
-      // });
-
-      // Insert equipment
-      // for (const eq of ex.equipment) {
-      //   await db.insert(exerciseEquipment).values({
-      //     exercise_id: ex.id,
-      //     equipment: eq,
-      //   });
-      // }
 
       // Insert images (vacías por ahora)
       for (const [index, url] of ex.images.entries()) {

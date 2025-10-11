@@ -1,3 +1,4 @@
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,
@@ -131,6 +132,11 @@ export const useUpdateRoutine = () => {
       setUpdateState("success");
       queryClient.invalidateQueries({
         queryKey: ["workouts", "routines"],
+      });
+
+      // Invalidar analíticas del dashboard
+      queryClient.invalidateQueries({
+        queryKey: ANALYTICS_QUERY_KEY,
       });
 
       return updatedRoutine.id;

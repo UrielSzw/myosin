@@ -1,4 +1,6 @@
+import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
@@ -50,7 +52,7 @@ export const ActiveExerciseHeader: React.FC<Props> = ({
           </Typography>
         </View>
         <Typography variant="caption" color="textMuted">
-          {exerciseMainMuscle}
+          {EXERCISE_CATEGORY_LABELS[exerciseMainMuscle as IExerciseMuscle]}
         </Typography>
       </View>
     </TouchableOpacity>

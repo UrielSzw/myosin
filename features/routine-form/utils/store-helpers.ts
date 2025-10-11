@@ -213,6 +213,7 @@ export const createMultiBlock = (
 };
 
 export const createNewSetForExercise = (
+  exerciseInBlockId: string, // ← Agregar este parámetro
   currentSetsCount: number,
   lastSetWeight: number | null,
   lastSetReps: number | null,
@@ -225,7 +226,7 @@ export const createNewSetForExercise = (
   const newSet: SetInsert & { tempId: string } = {
     tempId: generateTempId(),
     user_id: "default-user",
-    exercise_in_block_id: "",
+    exercise_in_block_id: exerciseInBlockId, // ← Usar el parámetro
     id: "",
     order_index: currentSetsCount,
     reps: lastSetReps || null,

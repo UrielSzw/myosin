@@ -78,8 +78,9 @@ export const VolumePreview: React.FC<Props> = ({
             exerciseId: exerciseInBlock.exercise.id,
             mainMuscle: exerciseInBlock.exercise
               .main_muscle_group as IExerciseMuscle,
-            secondaryMuscles: exerciseInBlock.exercise.muscle_groups
-              ? (exerciseInBlock.exercise.muscle_groups as IExerciseMuscle[])
+            secondaryMuscles: exerciseInBlock.exercise.secondary_muscle_groups
+              ? (exerciseInBlock.exercise
+                  .secondary_muscle_groups as IExerciseMuscle[])
               : [],
             setsCount: weeklySets,
           });
@@ -180,7 +181,7 @@ export const VolumePreview: React.FC<Props> = ({
   const volumeDataForDisplay: MuscleVolumeData[] =
     volumeData.volumeByCategory.map((item) => ({
       category: item.category,
-      sets: Math.round(item.sets), // Redondear para mostrar sets enteros
+      sets: item.sets,
       percentage: item.percentage,
     }));
 

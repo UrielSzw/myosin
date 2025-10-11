@@ -1,3 +1,4 @@
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { prRepository } from "@/shared/db/repository/pr";
 import {
   workoutSessionsRepository,
@@ -11,6 +12,7 @@ import type {
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
 
@@ -20,6 +22,7 @@ export const useSaveWorkoutSession = () => {
   const [saveState, setSaveState] = useState<SaveSessionState>("idle");
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
+  const queryClient = useQueryClient();
 
   const saveWorkoutSession = async (): Promise<string | null> => {
     if (!activeWorkout?.session) {
@@ -269,6 +272,12 @@ export const useSaveWorkoutSession = () => {
       }
 
       setSaveState("success");
+
+      // Invalidar analíticas del dashboard
+      queryClient.invalidateQueries({
+        queryKey: ANALYTICS_QUERY_KEY,
+      });
+
       return savedSession.id;
     } catch (err) {
       console.error("Error saving workout session:", err);

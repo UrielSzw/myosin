@@ -3,7 +3,7 @@ import { ISetType } from "@/shared/types/workout";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { InfoIcon } from "lucide-react-native";
 import React, { forwardRef, useState } from "react";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
   SlideInLeft,
@@ -95,7 +95,7 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
       >
         <BottomSheetScrollView
-          style={{ padding: 16, paddingBottom: 40, flex: 1 }}
+          style={{ padding: 16, paddingBottom: 60, flex: 1 }}
         >
           {viewMode === "selection" ? (
             <Animated.View
@@ -171,6 +171,8 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
               />
             </Animated.View>
           )}
+
+          <View style={{ height: 100 }} />
         </BottomSheetScrollView>
       </BottomSheetModal>
     );

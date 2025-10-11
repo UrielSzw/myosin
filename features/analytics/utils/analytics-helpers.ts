@@ -1,4 +1,4 @@
-import type { AnalyticsDashboardData } from "../service/analyticsService";
+import { AnalyticsDashboardData } from "../types/dashboard";
 
 /**
  * Crea datos por defecto seguros para cuando no hay datos disponibles

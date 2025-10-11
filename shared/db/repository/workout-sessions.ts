@@ -179,7 +179,27 @@ export const workoutSessionsRepository = {
 
     // 4. Obtener sets
     const sets = await db
-      .select()
+      .select({
+        id: workout_sets.id,
+        user_id: workout_sets.user_id,
+        workout_exercise_id: workout_sets.workout_exercise_id,
+        exercise_id: workout_sets.exercise_id,
+        original_set_id: workout_sets.original_set_id,
+        order_index: workout_sets.order_index,
+        planned_weight: workout_sets.planned_weight,
+        planned_reps: workout_sets.planned_reps,
+        planned_rpe: workout_sets.planned_rpe,
+        planned_tempo: workout_sets.planned_tempo,
+        actual_weight: workout_sets.actual_weight,
+        actual_reps: workout_sets.actual_reps,
+        actual_rpe: workout_sets.actual_rpe,
+        set_type: workout_sets.set_type,
+        reps_type: workout_sets.reps_type,
+        reps_range: workout_sets.reps_range,
+        completed: workout_sets.completed,
+        created_at: workout_sets.created_at,
+        updated_at: workout_sets.updated_at,
+      })
       .from(workout_sets)
       .where(
         inArray(

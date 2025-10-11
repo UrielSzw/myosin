@@ -3,7 +3,6 @@ import {
   blob,
   index,
   integer,
-  primaryKey,
   real,
   sqliteTable,
   text,
@@ -11,6 +10,8 @@ import {
 import {
   IExerciseEquipment,
   IExerciseMuscle,
+  IExerciseSource,
+  IExerciseType,
   IRepsType,
   ISetType,
 } from "../../types/workout";
@@ -21,20 +22,34 @@ import { generateUUID } from "../utils/uuid";
 export const exercises = sqliteTable(
   "exercises",
   {
-    id: text("id")
-      .primaryKey()
-      .$defaultFn(() => generateUUID()), // UUID
+    id: text("id").primaryKey(), // UUID
     name: text("name").notNull(),
 
-    source: text("source").$type<"system" | "user">().notNull(),
+    source: text("source").$type<IExerciseSource>().notNull(),
     created_by_user_id: text("created_by_user_id"),
 
-    main_muscle_group: text("main_muscle_group").notNull(),
-    primary_equipment: text("primary_equipment").notNull(),
+    main_muscle_group: text("main_muscle_group")
+      .$type<IExerciseMuscle>()
+      .notNull(),
+    primary_equipment: text("primary_equipment")
+      .$type<IExerciseEquipment>()
+      .notNull(),
+    exercise_type: text("exercise_type").$type<IExerciseType>().notNull(),
 
-    muscle_groups: text("muscle_groups", { mode: "json" }).notNull(),
-    instructions: text("instructions", { mode: "json" }).notNull(),
-    equipment: text("equipment", { mode: "json" }).notNull(),
+    secondary_muscle_groups: text("secondary_muscle_groups", {
+      mode: "json",
+    })
+      .$type<IExerciseMuscle[]>()
+      .notNull(),
+    instructions: text("instructions", { mode: "json" })
+      .$type<string[]>()
+      .notNull(),
+    equipment: text("equipment", { mode: "json" })
+      .$type<IExerciseEquipment[]>()
+      .notNull(),
+    similar_exercises: text("similar_exercises", { mode: "json" }).$type<
+      string[]
+    >(),
 
     ...timestamps,
   },
@@ -59,32 +74,6 @@ export const exerciseImages = sqliteTable(
     order: integer("order").notNull(), // para saber en qué secuencia mostrarlas
   },
   (t) => [index("idx_exercise_images_exercise_id").on(t.exercise_id)]
-);
-
-// Tabla intermedia: ejercicio ↔ músculos (n:n)
-export const exerciseMuscleGroups = sqliteTable(
-  "exercise_muscle_groups",
-  {
-    exercise_id: text("exercise_id").notNull(),
-    muscle_group: text("muscle_group").$type<IExerciseMuscle>().notNull(),
-  },
-  (t) => [
-    primaryKey({ columns: [t.exercise_id, t.muscle_group] }),
-    index("idx_exercise_muscle").on(t.muscle_group),
-  ]
-);
-
-// Tabla intermedia: ejercicio ↔ equipamiento (n:n)
-export const exerciseEquipment = sqliteTable(
-  "exercise_equipment",
-  {
-    exercise_id: text("exercise_id").notNull(),
-    equipment: text("equipment").$type<IExerciseEquipment>().notNull(),
-  },
-  (t) => [
-    primaryKey({ columns: [t.exercise_id, t.equipment] }),
-    index("idx_exercise_equipment").on(t.equipment),
-  ]
 );
 
 // ---------------- Carpetas ----------------
@@ -254,11 +243,7 @@ export const foldersRelations = relations(folders, ({ many }) => ({
 // 1. Tipos base (entidades puras)
 export type BaseRoutine = InferSelectModel<typeof routines>;
 export type BaseFolder = InferSelectModel<typeof folders>;
-export type BaseExercise = InferSelectModel<typeof exercises> & {
-  muscle_groups: string[];
-  instructions: string[];
-  equipment: string[];
-};
+export type BaseExercise = InferSelectModel<typeof exercises>;
 export type BaseBlock = InferSelectModel<typeof routine_blocks>;
 export type BaseExerciseInBlock = InferSelectModel<typeof exercise_in_block>;
 export type BaseSet = InferSelectModel<typeof routine_sets>;
@@ -295,3 +280,8 @@ export type ExerciseInBlockInsert = Omit<
   "created_at" | "updated_at"
 >;
 export type SetInsert = Omit<BaseSet, "created_at" | "updated_at">;
+
+// 5. Otros tipos útiles
+export type ExerciseInsert = Omit<BaseExercise, "created_at" | "updated_at"> & {
+  images: string[];
+};

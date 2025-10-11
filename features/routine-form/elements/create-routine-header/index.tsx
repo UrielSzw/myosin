@@ -1,3 +1,4 @@
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
@@ -39,6 +40,11 @@ export const CreateRoutineHeader = () => {
     if (savedRoutineId) {
       queryClient.invalidateQueries({
         queryKey: ["workouts", "routines"],
+      });
+
+      // Invalidar analíticas del dashboard
+      queryClient.invalidateQueries({
+        queryKey: ANALYTICS_QUERY_KEY,
       });
 
       clearForm();

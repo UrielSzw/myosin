@@ -7,7 +7,12 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import { IRepsType, ISetType } from "../../types/workout";
+import {
+  IExerciseEquipment,
+  IExerciseMuscle,
+  IRepsType,
+  ISetType,
+} from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
 import { generateUUID } from "../utils/uuid";
 import {
@@ -289,9 +294,9 @@ export type WorkoutExerciseWithSets = BaseWorkoutExercise & {
   exercise: {
     id: string;
     name: string;
-    main_muscle_group: string;
-    primary_equipment: string;
-    instructions: string;
+    main_muscle_group: IExerciseMuscle;
+    primary_equipment: IExerciseEquipment;
+    instructions: string[];
   };
   sets: BaseWorkoutSet[];
 };

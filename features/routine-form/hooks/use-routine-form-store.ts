@@ -885,6 +885,7 @@ const useRoutineFormStore = create<Store>()(
 
           const newSet: SetInsert & { tempId: string } =
             createNewSetForExercise(
+              exerciseInBlockId,
               currentSets.length,
               lastSet?.weight || null,
               lastSet?.reps || null,

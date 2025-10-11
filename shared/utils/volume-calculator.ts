@@ -2,7 +2,6 @@ import { eq } from "drizzle-orm";
 import { db } from "../db/client";
 import {
   exercise_in_block,
-  exerciseMuscleGroups,
   exercises,
   routine_blocks,
   routine_sets,
@@ -107,12 +106,12 @@ export class VolumeCalculator {
   private static async getSecondaryMuscles(
     exerciseId: string
   ): Promise<IExerciseMuscle[]> {
-    const muscleGroups = await db
+    const exercise = await db
       .select()
-      .from(exerciseMuscleGroups)
-      .where(eq(exerciseMuscleGroups.exercise_id, exerciseId));
+      .from(exercises)
+      .where(eq(exercises.id, exerciseId));
 
-    return muscleGroups.map((mg) => mg.muscle_group);
+    return exercise[0]?.secondary_muscle_groups || [];
   }
 
   /**
@@ -311,6 +310,8 @@ export class VolumeCalculator {
         }
       });
     });
+
+    console.log("Calculated Category Volume:", categoryVolume);
 
     return categoryVolume;
   }

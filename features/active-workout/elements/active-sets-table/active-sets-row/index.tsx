@@ -107,8 +107,6 @@ export const ActiveSetRow: React.FC<Props> = ({
     }
   };
 
-  console.log("isPR", isCurrentPR);
-
   const getRepsPlaceholder = () => {
     if (set.reps_type === "range") {
       return `${set.reps_range?.min || 0}-${set.reps_range?.max || 0}`;
@@ -171,8 +169,6 @@ export const ActiveSetRow: React.FC<Props> = ({
         position: "relative",
         overflow: "hidden",
         borderRadius: isCurrentPR && isSetCompleted ? 8 : 0,
-        margin: isCurrentPR && isSetCompleted ? 2 : 0,
-        borderWidth: isCurrentPR && isSetCompleted ? 1 : 0,
         borderColor:
           isCurrentPR && isSetCompleted ? prColor + "40" : "transparent",
       }}

@@ -1,3 +1,4 @@
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -27,6 +28,10 @@ export const useRoutineOptions = () => {
             try {
               await routinesService.deleteRoutine(routine.id);
               queryClient.invalidateQueries({ queryKey: ["workouts"] });
+
+              queryClient.invalidateQueries({
+                queryKey: ANALYTICS_QUERY_KEY,
+              });
             } catch (error) {
               console.error("Error deleting routine:", error);
               Alert.alert(
@@ -64,6 +69,9 @@ export const useRoutineOptions = () => {
               await routinesService.clearRoutineTrainingDays(routine.id);
 
               queryClient.invalidateQueries({ queryKey: ["workouts"] });
+
+              // Invalidar analíticas del dashboard
+              queryClient.invalidateQueries({ queryKey: ANALYTICS_QUERY_KEY });
             } catch (error) {
               console.error("Error removing training days:", error);
               Alert.alert(

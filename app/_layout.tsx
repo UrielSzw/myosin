@@ -124,6 +124,13 @@ export default function RootLayout() {
               gestureEnabled: false,
             }}
           />
+          <Stack.Screen
+            name="workout-session/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>

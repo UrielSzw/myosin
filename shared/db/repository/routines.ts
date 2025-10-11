@@ -132,7 +132,7 @@ export const routinesRepository = {
           created_by_user_id: exercises.created_by_user_id,
           main_muscle_group: exercises.main_muscle_group,
           primary_equipment: exercises.primary_equipment,
-          muscle_groups: exercises.muscle_groups,
+          secondary_muscle_groups: exercises.secondary_muscle_groups,
           instructions: exercises.instructions,
           equipment: exercises.equipment,
           created_at: exercises.created_at,

@@ -13,37 +13,52 @@ export type WeekDay =
 // Categorías principales de músculos para análisis de volumen
 export const MUSCLE_CATEGORIES = {
   chest: {
-    muscles: ["chest"] as const,
+    muscles: ["chest_upper", "chest_middle", "chest_lower"] as const,
     display: "Pecho",
     icon: "💪",
   },
   back: {
-    muscles: ["back", "lats", "traps"] as const,
+    muscles: [
+      "lats",
+      "rhomboids",
+      "mid_traps",
+      "lower_traps",
+      "upper_traps",
+      "erector_spinae",
+    ] as const,
     display: "Espalda",
     icon: "🔙",
   },
   shoulders: {
-    muscles: ["shoulders", "rear_delts"] as const,
+    muscles: ["front_delts", "side_delts", "rear_delts"] as const,
     display: "Hombros",
     icon: "🏋️",
   },
   arms: {
-    muscles: ["biceps", "triceps", "forearms", "arms"] as const,
+    muscles: ["biceps", "triceps", "forearms"] as const,
     display: "Brazos",
     icon: "💪",
   },
   legs: {
-    muscles: ["quads", "hamstrings", "glutes", "calves", "legs"] as const,
+    muscles: ["quads", "hamstrings", "glutes", "calves"] as const,
     display: "Piernas",
     icon: "🦵",
   },
   core: {
-    muscles: ["core", "obliques"] as const,
+    muscles: ["rectus_abdominis", "obliques", "transverse_abdominis"] as const,
     display: "Core",
     icon: "🎯",
   },
   other: {
-    muscles: ["lower_back", "hip_flexors", "full_body"] as const,
+    muscles: [
+      "lower_back",
+      "hip_flexors",
+      "hip_adductors",
+      "hip_abductors",
+      "serratus_anterior",
+      "rotator_cuff",
+      "full_body",
+    ] as const,
     display: "Otros",
     icon: "⚡",
   },

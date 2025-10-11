@@ -3,7 +3,7 @@ import {
   EXERCISE_EQUIPMENT_LABELS,
 } from "@/shared/constants/exercise";
 import { BaseExercise } from "@/shared/db/schema";
-import { Dumbbell, Info, Plus } from "lucide-react-native";
+import { Check, Dumbbell, Info, Plus } from "lucide-react-native";
 import { memo } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -108,13 +108,12 @@ export const ExerciseCard: React.FC<Props> = memo(
             >
               <Button
                 variant={isSelected ? "secondary" : "primary"}
+                style={{ paddingVertical: isSelected ? 10 : 8 }}
                 size="sm"
                 onPress={() => onSelectExercise(exercise)}
                 icon={
                   isSelected ? (
-                    <Typography variant="body2" weight="medium">
-                      ✓
-                    </Typography>
+                    <Check size={16} color="#ffffff" />
                   ) : (
                     <Plus size={16} color="#ffffff" />
                   )

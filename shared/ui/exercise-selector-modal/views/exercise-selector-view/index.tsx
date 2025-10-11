@@ -1,6 +1,6 @@
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { IExerciseMuscle } from "@/shared/types/workout";
+import { useExerciseFilters } from "@/shared/hooks/use-exercise-filters";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { View } from "react-native";
@@ -15,13 +15,9 @@ type Props = {
   selectedExercises: Record<string, BaseExercise>;
   selectedExercisesLength: number;
   exerciseModalMode?: "add-new" | "add-to-block" | "replace" | null;
-  searchQuery: string;
-  selectedCategory: IExerciseMuscle | null;
   onClose: () => void;
   onSelectExercise: (exercise: BaseExercise) => void;
   onSeeMoreInfo: (exercise: BaseExercise) => void;
-  onSearchQueryChange: (query: string) => void;
-  onCategoryPress: (category: IExerciseMuscle) => void;
   onAddAsIndividual: () => void;
   onAddMultiBlock: () => void;
   onAddToReplace: () => void;
@@ -34,19 +30,25 @@ export const ExerciseSelectorView: React.FC<Props> = ({
   selectedExercises,
   selectedExercisesLength,
   exerciseModalMode,
-  searchQuery,
-  selectedCategory,
   onClose,
   onSelectExercise,
   onSeeMoreInfo,
-  onSearchQueryChange,
-  onCategoryPress,
   onAddAsIndividual,
   onAddMultiBlock,
   onAddToReplace,
   onAddToBlock,
 }) => {
   const { colors } = useColorScheme();
+
+  // Usar el hook de filtros
+  const {
+    filters,
+    filteredExercises,
+    activeFiltersList,
+    updateFilter,
+    toggleQuickFilter,
+    clearAllFilters,
+  } = useExerciseFilters(exercises);
 
   const renderExerciseCard = useCallback(
     ({ item, index }: { item: BaseExercise; index: number }) => (
@@ -96,21 +98,27 @@ export const ExerciseSelectorView: React.FC<Props> = ({
       />
 
       <ExerciseSelectorSearch
-        searchQuery={searchQuery}
-        selectedCategory={selectedCategory}
-        onSearchQueryChange={onSearchQueryChange}
-        onCategoryPress={onCategoryPress}
+        searchQuery={filters.searchQuery}
+        selectedCategory={filters.mainCategory}
+        selectedQuickFilters={filters.quickFilters}
+        activeFiltersList={activeFiltersList}
+        onSearchQueryChange={(query) => updateFilter("searchQuery", query)}
+        onCategorySelect={(category) => updateFilter("mainCategory", category)}
+        onQuickFilterToggle={toggleQuickFilter}
+        onClearAllFilters={clearAllFilters}
       />
 
       {/* Exercises List */}
       <FlashList
-        data={exercises}
+        data={filteredExercises}
+        key={`${filters.mainCategory}-${filters.quickFilters.join("-")}`}
         keyExtractor={(item) => item.id}
         renderItem={renderExerciseCard}
         getItemType={getItemType}
         extraData={selectedExercises}
         contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20 }}
         style={{ flex: 1 }}
+        drawDistance={800}
       />
 
       {/* Footer */}

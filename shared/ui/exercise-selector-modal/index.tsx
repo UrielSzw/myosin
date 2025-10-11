@@ -1,6 +1,6 @@
 import { BaseExercise } from "@/shared/db/schema";
 import { useExercises } from "@/shared/hooks/use-exercises";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "react-native";
 import Animated, {
   Easing,
@@ -38,22 +38,13 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
     selectedExercisesArray,
     selectedExercisesLength,
     infoExercise,
-    searchQuery,
-    selectedCategory,
     handleSelectExercise,
     handleSeeMoreInfo,
     handleCloseExerciseDetail,
     clearSelectedExercises,
-    handleSearchQueryChange,
-    handleCategoryPress,
-    getFilteredExercises,
   } = useExerciseSelector();
 
   // Aplicar filtros a los ejercicios
-  const filteredExercises = useMemo(
-    () => getFilteredExercises(exercises),
-    [exercises, getFilteredExercises]
-  );
 
   // Fix para el bug de layout inicial (similar a WorkoutsFeature)
   const [isInitialMount, setIsInitialMount] = useState(true);
@@ -130,18 +121,14 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
           style={{ flex: 1 }}
         >
           <ExerciseSelectorView
-            exercises={filteredExercises}
+            exercises={exercises || []}
             loading={loading}
             selectedExercises={selectedExercises}
             selectedExercisesLength={selectedExercisesLength}
             exerciseModalMode={exerciseModalMode}
-            searchQuery={searchQuery}
-            selectedCategory={selectedCategory}
             onClose={onClose}
             onSelectExercise={handleSelectExercise}
             onSeeMoreInfo={handleSeeMoreInfo}
-            onSearchQueryChange={handleSearchQueryChange}
-            onCategoryPress={handleCategoryPress}
             onAddAsIndividual={handleAddAsIndividualAction}
             onAddMultiBlock={handleAddMultiBlock}
             onAddToReplace={handleAddToReplace}

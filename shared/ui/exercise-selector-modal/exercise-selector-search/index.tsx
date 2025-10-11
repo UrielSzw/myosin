@@ -1,32 +1,42 @@
 import {
-  EXERCISE_CATEGORIES,
-  EXERCISE_CATEGORY_LABELS,
-} from "@/shared/constants/exercise";
+  MainCategory,
+  QuickFilterType,
+} from "@/shared/constants/exercise-filters";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { IExerciseMuscle } from "@/shared/types/workout";
 import { Search, X } from "lucide-react-native";
 import React from "react";
-import { FlatList, TextInput, TouchableOpacity, View } from "react-native";
-import { Typography } from "../../typography";
+import { TextInput, TouchableOpacity, View } from "react-native";
+import { ActiveFilters } from "../active-filters";
+import { CategoryTabs } from "../category-tabs";
+import { QuickFilters } from "../quick-filters";
 
 interface Props {
   searchQuery: string;
-  selectedCategory: IExerciseMuscle | null;
+  selectedCategory: MainCategory;
+  selectedQuickFilters: QuickFilterType[];
+  activeFiltersList: {
+    id: string;
+    label: string;
+    type: "category" | "quick" | "muscle" | "equipment";
+    onRemove: () => void;
+  }[];
   onSearchQueryChange: (query: string) => void;
-  onCategoryPress: (category: IExerciseMuscle) => void;
+  onCategorySelect: (category: MainCategory) => void;
+  onQuickFilterToggle: (filter: QuickFilterType) => void;
+  onClearAllFilters: () => void;
 }
 
 export const ExerciseSelectorSearch: React.FC<Props> = ({
   searchQuery,
   selectedCategory,
+  selectedQuickFilters,
+  activeFiltersList,
   onSearchQueryChange,
-  onCategoryPress,
+  onCategorySelect,
+  onQuickFilterToggle,
+  onClearAllFilters,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
-
-  const handlePressCategory = (category: IExerciseMuscle) => {
-    onCategoryPress(category);
-  };
 
   return (
     <>
@@ -63,40 +73,23 @@ export const ExerciseSelectorSearch: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Categories */}
-      <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
-        <FlatList
-          horizontal
-          data={EXERCISE_CATEGORIES}
-          keyExtractor={(item) => item}
-          contentContainerStyle={{ gap: 8 }}
-          renderItem={({ item: category }) => (
-            <TouchableOpacity
-              onPress={() => handlePressCategory(category)}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 8,
-                borderRadius: 20,
-                backgroundColor:
-                  selectedCategory === category
-                    ? colors.primary[500]
-                    : isDarkMode
-                    ? colors.gray[800]
-                    : colors.gray[100],
-              }}
-            >
-              <Typography
-                variant="body2"
-                weight="medium"
-                color={selectedCategory === category ? "white" : "text"}
-              >
-                {EXERCISE_CATEGORY_LABELS[category]}
-              </Typography>
-            </TouchableOpacity>
-          )}
-          showsHorizontalScrollIndicator={false}
-        />
-      </View>
+      {/* Category Tabs */}
+      <CategoryTabs
+        selectedCategory={selectedCategory}
+        onCategorySelect={onCategorySelect}
+      />
+
+      {/* Quick Filters */}
+      <QuickFilters
+        selectedFilters={selectedQuickFilters}
+        onFilterToggle={onQuickFilterToggle}
+      />
+
+      {/* Active Filters */}
+      <ActiveFilters
+        activeFilters={activeFiltersList}
+        onClearAll={onClearAllFilters}
+      />
     </>
   );
 };

@@ -1,11 +1,9 @@
 import { BaseFolder } from "@/shared/db/schema";
-import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
-import { router } from "expo-router";
-import { Plus } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
 import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store";
+import { ExpandableCreateButton } from "./expandable-create-button";
 
 type Props = {
   selectedFolder: BaseFolder | null;
@@ -13,10 +11,6 @@ type Props = {
 
 export const Header: React.FC<Props> = ({ selectedFolder }) => {
   const totalRoutines = useWorkoutsMetricsStore((state) => state.totalRoutines);
-
-  const handleCreateRoutine = () => {
-    router.push("/routines/create");
-  };
 
   return (
     <View
@@ -44,12 +38,7 @@ export const Header: React.FC<Props> = ({ selectedFolder }) => {
         </Typography>
       </View>
 
-      <Button
-        variant="primary"
-        size="sm"
-        onPress={handleCreateRoutine}
-        icon={<Plus size={20} color="#ffffff" />}
-      />
+      <ExpandableCreateButton />
     </View>
   );
 };

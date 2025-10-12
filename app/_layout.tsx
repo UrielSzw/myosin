@@ -69,6 +69,22 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
+            name="routines/templates"
+            options={{
+              // presentation: "modal",
+              headerShown: false,
+              // gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
+            name="routines/template-detail/[id]"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+              // gestureEnabled: false,
+            }}
+          />
+          <Stack.Screen
             name="folders/create"
             options={{
               presentation: "modal",

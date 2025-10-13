@@ -26,7 +26,9 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         : []),
       {
         type: "add-exercise",
-        label: "Agregar ejercicio",
+        label: isMultiBlock
+          ? "Agregar ejercicio al bloque"
+          : "Agregar ejercicio (superserie)",
         method: onShowAddExerciseModal,
       },
     ];
@@ -36,7 +38,12 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         ref={ref}
         title="Opciones de Bloque"
         options={options}
-        warningOption={{ label: "Eliminar bloque", method: onDelete }}
+        warningOption={{
+          label: isMultiBlock
+            ? "Eliminar bloque (todos los ejercicios)"
+            : "Eliminar ejercicio",
+          method: onDelete,
+        }}
       />
     );
   }

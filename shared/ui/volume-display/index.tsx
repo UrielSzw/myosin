@@ -1,10 +1,10 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { MUSCLE_CATEGORIES } from "@/shared/utils/muscle-categories";
-import { Typography } from "@/shared/ui/typography";
 import { Card } from "@/shared/ui/card";
+import { Typography } from "@/shared/ui/typography";
+import { MUSCLE_CATEGORIES } from "@/shared/utils/muscle-categories";
+import { Activity, Target } from "lucide-react-native";
 import React from "react";
-import { View, ScrollView } from "react-native";
-import { TrendingUp, Activity, Target } from "lucide-react-native";
+import { ScrollView, View } from "react-native";
 
 export interface MuscleVolumeData {
   category: string;
@@ -104,7 +104,11 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
     return (
       <Card variant="outlined" padding="lg">
         <View style={{ alignItems: "center", paddingVertical: 20 }}>
-          <Activity size={32} color={colors.gray[400]} style={{ marginBottom: 8 }} />
+          <Activity
+            size={32}
+            color={colors.gray[400]}
+            style={{ marginBottom: 8 }}
+          />
           <Typography variant="body1" color="textMuted" align="center">
             No hay datos de volumen disponibles
           </Typography>
@@ -119,8 +123,14 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
   return (
     <Card variant="outlined" padding="lg">
       <View style={{ marginBottom: 16 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginBottom: 4 }}>
-          <TrendingUp size={20} color={colors.primary[500]} />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 4,
+          }}
+        >
           <Typography variant="h6" weight="semibold">
             {title}
           </Typography>
@@ -143,9 +153,13 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
           marginBottom: 16,
         }}
       >
-        <Target size={16} color={colors.primary[500]} style={{ marginRight: 8 }} />
+        <Target
+          size={16}
+          color={colors.primary[500]}
+          style={{ marginRight: 8 }}
+        />
         <Typography variant="body2" color="textMuted">
-          Total: 
+          Total:
         </Typography>
         <Typography variant="body1" weight="semibold" style={{ marginLeft: 4 }}>
           {totalSets} sets semanales
@@ -167,15 +181,28 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
       </ScrollView>
 
       {/* Leyenda de categorías */}
-      <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: colors.border }}>
-        <Typography variant="caption" color="textMuted" style={{ marginBottom: 8 }}>
+      <View
+        style={{
+          marginTop: 16,
+          paddingTop: 16,
+          borderTopWidth: 1,
+          borderTopColor: colors.border,
+        }}
+      >
+        <Typography
+          variant="caption"
+          color="textMuted"
+          style={{ marginBottom: 8 }}
+        >
           Distribución por grupos musculares principales
         </Typography>
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
           {Object.keys(MUSCLE_CATEGORIES).map((category) => {
-            const hasData = filteredData.some((item) => item.category === category);
+            const hasData = filteredData.some(
+              (item) => item.category === category
+            );
             if (!hasData) return null;
-            
+
             return (
               <View
                 key={category}
@@ -194,7 +221,8 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
                     width: 8,
                     height: 8,
                     borderRadius: 4,
-                    backgroundColor: categoryColors[category] || colors.gray[500],
+                    backgroundColor:
+                      categoryColors[category] || colors.gray[500],
                   }}
                 />
                 <Typography variant="caption" color="textMuted">

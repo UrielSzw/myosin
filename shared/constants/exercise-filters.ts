@@ -4,64 +4,101 @@ import {
   IExerciseType,
 } from "../types/workout";
 
-// Categorías principales simplificadas
-export type MainCategory = "all" | "push" | "pull" | "legs";
+// Categorías principales basadas en músculos específicos
+export type MainCategory =
+  | "all"
+  | "chest"
+  | "shoulders"
+  | "biceps"
+  | "triceps"
+  | "back"
+  | "quads"
+  | "hamstrings"
+  | "glutes"
+  | "calves"
+  | "abs"
+  | "others";
 
-export const MAIN_CATEGORIES: MainCategory[] = ["all", "push", "pull", "legs"];
+export const MAIN_CATEGORIES: MainCategory[] = [
+  "all",
+  "chest",
+  "shoulders",
+  "biceps",
+  "triceps",
+  "back",
+  "quads",
+  "hamstrings",
+  "glutes",
+  "calves",
+  "abs",
+  "others",
+];
 
 export const MAIN_CATEGORY_LABELS: Record<MainCategory, string> = {
   all: "Todos",
-  push: "Empuje",
-  pull: "Tracción",
-  legs: "Piernas",
+  chest: "Pecho",
+  shoulders: "Hombros",
+  biceps: "Bíceps",
+  triceps: "Tríceps",
+  back: "Espalda",
+  quads: "Cuádriceps",
+  hamstrings: "Isquiotibiales",
+  glutes: "Glúteos",
+  calves: "Gemelos",
+  abs: "Abdominales",
+  others: "Otros",
 };
 
 // Iconos minimalistas para categorías
-export const MAIN_CATEGORY_ICONS: Record<MainCategory, string> = {
+export const MAIN_CATEGORY_ICONS: Record<string, string> = {
   all: "LayoutGrid",
-  push: "TrendingUp",
-  pull: "TrendingDown",
-  legs: "Footprints",
+  others: "MoreHorizontal",
 };
 
 // Mapeo de músculos a categorías principales
 export const MUSCLE_TO_CATEGORY: Record<IExerciseMuscle, MainCategory> = {
-  // Push
-  chest_upper: "push",
-  chest_middle: "push",
-  chest_lower: "push",
-  front_delts: "push",
-  side_delts: "push",
-  rear_delts: "push",
-  triceps: "push",
+  // Pecho
+  chest_upper: "chest",
+  chest_middle: "chest",
+  chest_lower: "chest",
 
-  // Pull
-  lats: "pull",
-  rhomboids: "pull",
-  mid_traps: "pull",
-  lower_traps: "pull",
-  upper_traps: "pull",
-  biceps: "pull",
-  forearms: "pull",
+  // Hombros
+  front_delts: "shoulders",
+  side_delts: "shoulders",
+  rear_delts: "shoulders",
 
-  // Legs & Core
-  quads: "legs",
-  hamstrings: "legs",
-  glutes: "legs",
-  calves: "legs",
-  hip_flexors: "legs",
-  hip_adductors: "legs",
-  hip_abductors: "legs",
-  rectus_abdominis: "legs",
-  obliques: "legs",
-  transverse_abdominis: "legs",
-  erector_spinae: "legs",
-  lower_back: "legs",
+  // Brazos
+  biceps: "biceps",
+  triceps: "triceps",
+  forearms: "others",
+
+  // Espalda
+  lats: "back",
+  rhomboids: "back",
+  mid_traps: "others",
+  lower_traps: "others",
+  upper_traps: "others",
+
+  // Piernas
+  quads: "quads",
+  hamstrings: "hamstrings",
+  glutes: "glutes",
+  calves: "calves",
+  hip_flexors: "others",
+  hip_adductors: "others",
+  hip_abductors: "others",
+
+  // Core/Abs
+  rectus_abdominis: "abs",
+  obliques: "abs",
+  transverse_abdominis: "abs",
+  erector_spinae: "others",
+  lower_back: "others",
 
   // Specialized
-  serratus_anterior: "push",
-  rotator_cuff: "pull",
-  full_body: "all",
+  serratus_anterior: "others",
+  rotator_cuff: "others",
+  full_body: "others",
 };
 
 // Filtros rápidos más comunes

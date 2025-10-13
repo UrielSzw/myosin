@@ -41,9 +41,17 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
       <Typography
         variant="body1"
         weight="medium"
-        style={{ marginBottom: 12, color: colors.text }}
+        style={{ marginBottom: 4, color: colors.text }}
       >
-        Días de entrenamiento
+        Cuándo hacer esta rutina
+      </Typography>
+      <Typography
+        variant="caption"
+        color="textMuted"
+        style={{ marginBottom: 12 }}
+      >
+        Opcional - selecciona los días que entrenarás para calcular el volumen
+        semanal
       </Typography>
       <ScrollView
         horizontal

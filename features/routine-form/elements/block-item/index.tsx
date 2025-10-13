@@ -1,4 +1,3 @@
-import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { Card } from "@/shared/ui/card";
 import { router } from "expo-router";
 import React from "react";
@@ -21,11 +20,9 @@ type Props = {
 export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
   const { blocks, exercisesByBlock } = useRoutineFormState();
   const { setCurrentState } = useMainActions();
-  const { getBlockColors } = useBlockStyles();
   const { initializeReorder } = useReorderBlocks();
 
   const block = blocks[blockId];
-  const blockColors = getBlockColors(block?.type);
   const exercisesInBlockIds = exercisesByBlock[blockId] || [];
 
   const handleLongPress = () => {

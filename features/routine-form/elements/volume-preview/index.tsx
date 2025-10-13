@@ -9,9 +9,14 @@ import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { MuscleVolumeData, VolumeDisplay } from "@/shared/ui/volume-display";
 import { VolumeCalculator } from "@/shared/utils/volume-calculator";
-import { Calendar, TrendingUp } from "lucide-react-native";
-import React, { useMemo } from "react";
-import { View } from "react-native";
+import {
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  TrendingUp,
+} from "lucide-react-native";
+import React, { useMemo, useState } from "react";
+import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   exercisesInBlock: Record<
@@ -40,6 +45,7 @@ export const VolumePreview: React.FC<Props> = ({
   exercisesByBlock,
 }) => {
   const { colors } = useColorScheme();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Calcular volumen en tiempo real
   const volumeData = useMemo(() => {
@@ -133,48 +139,44 @@ export const VolumePreview: React.FC<Props> = ({
 
   if (!blocksByRoutine.length) {
     return (
-      <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 8,
-          }}
-        >
-          <Calendar size={18} color={colors.gray[400]} />
-          <Typography variant="body1" weight="medium" color="textMuted">
-            Análisis de Volumen
-          </Typography>
-        </View>
-        <Typography variant="body2" color="textMuted">
-          Agrega bloques y ejercicios para ver el análisis de volumen por grupo
-          muscular
-        </Typography>
-      </Card>
-    );
-  }
-
-  if (!blocksByRoutine.length) {
-    return (
-      <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 8,
-          }}
-        >
-          <TrendingUp size={18} color={colors.gray[400]} />
-          <Typography variant="body1" weight="medium" color="textMuted">
-            Análisis de Volumen
-          </Typography>
-        </View>
-        <Typography variant="body2" color="textMuted">
-          Agrega ejercicios para ver el análisis de volumen por grupo muscular
-        </Typography>
-      </Card>
+      <TouchableOpacity
+        onPress={() => setIsExpanded(!isExpanded)}
+        activeOpacity={0.7}
+      >
+        <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <Calendar size={18} color={colors.gray[400]} />
+              <Typography variant="body1" weight="medium" color="textMuted">
+                Análisis de Volumen
+              </Typography>
+            </View>
+            <View style={{ marginLeft: 8 }}>
+              {isExpanded ? (
+                <ChevronDown size={20} color={colors.textMuted} />
+              ) : (
+                <ChevronRight size={20} color={colors.textMuted} />
+              )}
+            </View>
+          </View>
+          {isExpanded && (
+            <View style={{ marginTop: 12 }}>
+              <Typography variant="body2" color="textMuted">
+                Agrega bloques y ejercicios para ver el análisis de volumen por
+                grupo muscular
+              </Typography>
+            </View>
+          )}
+        </Card>
+      </TouchableOpacity>
     );
   }
 
@@ -187,14 +189,56 @@ export const VolumePreview: React.FC<Props> = ({
 
   return (
     <View style={{ marginBottom: 20 }}>
-      <VolumeDisplay
-        volumeData={volumeDataForDisplay}
-        totalSets={Math.round(volumeData.totalSets)}
-        title="Volumen Semanal Estimado"
-        subtitle={`${trainingDays.length} día${
-          trainingDays.length !== 1 ? "s" : ""
-        } de entrenamiento por semana`}
-      />
+      <TouchableOpacity
+        onPress={() => setIsExpanded(!isExpanded)}
+        activeOpacity={0.7}
+      >
+        <Card variant="outlined" padding="lg">
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <View
+              style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
+            >
+              <TrendingUp size={18} color={colors.primary[500]} />
+              <Typography variant="body1" weight="medium">
+                Volumen total
+              </Typography>
+              <Typography
+                variant="body1"
+                weight="semibold"
+                style={{ color: colors.primary[500] }}
+              >
+                {Math.round(volumeData.totalSets)} sets
+              </Typography>
+            </View>
+            <View style={{ marginLeft: 8 }}>
+              {isExpanded ? (
+                <ChevronDown size={20} color={colors.textMuted} />
+              ) : (
+                <ChevronRight size={20} color={colors.textMuted} />
+              )}
+            </View>
+          </View>
+        </Card>
+      </TouchableOpacity>
+
+      {isExpanded && (
+        <View style={{ marginTop: 12 }}>
+          <VolumeDisplay
+            volumeData={volumeDataForDisplay}
+            totalSets={Math.round(volumeData.totalSets)}
+            title="Distribución por Grupo Muscular"
+            subtitle={`${trainingDays.length} día${
+              trainingDays.length !== 1 ? "s" : ""
+            } de entrenamiento por semana`}
+          />
+        </View>
+      )}
     </View>
   );
 };

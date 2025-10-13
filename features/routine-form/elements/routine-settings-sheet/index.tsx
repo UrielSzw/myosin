@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import React, { forwardRef, useCallback, useState } from "react";
@@ -24,22 +23,22 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
       routine?.show_tempo || false
     );
 
-    const handleClose = useCallback(() => {
-      ref && (ref as any).current?.dismiss();
-      onClose?.();
-    }, [onClose, ref]);
+    // Apply changes immediately when switch values change
+    const handleRpeChange = useCallback(
+      (value: boolean) => {
+        setShowRpe(value);
+        setRoutineFlags({ show_rpe: value, show_tempo: showTempo });
+      },
+      [setRoutineFlags, showTempo]
+    );
 
-    // Apply changes to the routine store immediately (form state) so the UI reflects choices.
-    // The routine DB persistence happens when user saves the routine.
-    const applyToStore = useCallback(() => {
-      // Use store action to update routine flags in form state
-      setRoutineFlags({ show_rpe: showRpe, show_tempo: showTempo });
-    }, [setRoutineFlags, showRpe, showTempo]);
-
-    const handleSave = useCallback(() => {
-      applyToStore();
-      handleClose();
-    }, [applyToStore, handleClose]);
+    const handleTempoChange = useCallback(
+      (value: boolean) => {
+        setShowTempo(value);
+        setRoutineFlags({ show_rpe: showRpe, show_tempo: value });
+      },
+      [setRoutineFlags, showRpe]
+    );
 
     return (
       <BottomSheetModal
@@ -77,7 +76,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
             </View>
             <Switch
               value={showRpe}
-              onValueChange={setShowRpe}
+              onValueChange={handleRpeChange}
               accessibilityLabel="Mostrar RPE"
               trackColor={{
                 false: colors.gray[300],
@@ -96,7 +95,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
             </View>
             <Switch
               value={showTempo}
-              onValueChange={setShowTempo}
+              onValueChange={handleTempoChange}
               accessibilityLabel="Mostrar Tempo"
               trackColor={{
                 false: colors.gray[300],
@@ -104,23 +103,6 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
               }}
               thumbColor="#ffffff"
             />
-          </View>
-
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              marginTop: 16,
-            }}
-          >
-            <Button
-              variant="ghost"
-              onPress={handleClose}
-              style={{ marginRight: 8 }}
-            >
-              Cancelar
-            </Button>
-            <Button onPress={handleSave}>Guardar</Button>
           </View>
         </BottomSheetScrollView>
       </BottomSheetModal>

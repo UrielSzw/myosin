@@ -6,12 +6,7 @@ import {
 } from "@/shared/constants/exercise-filters";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import {
-  Footprints,
-  LayoutGrid,
-  TrendingDown,
-  TrendingUp,
-} from "lucide-react-native";
+import { LayoutGrid, MoreHorizontal } from "lucide-react-native";
 import React from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 
@@ -35,12 +30,8 @@ export const CategoryTabs: React.FC<Props> = ({
     switch (iconName) {
       case "LayoutGrid":
         return <LayoutGrid size={size} color={iconColor} />;
-      case "TrendingUp":
-        return <TrendingUp size={size} color={iconColor} />;
-      case "TrendingDown":
-        return <TrendingDown size={size} color={iconColor} />;
-      case "Footprints":
-        return <Footprints size={size} color={iconColor} />;
+      case "MoreHorizontal":
+        return <MoreHorizontal size={size} color={iconColor} />;
       default:
         return null;
     }

@@ -35,13 +35,13 @@ export const ExerciseSelectorFooter: React.FC<Props> = ({
         <View style={{ gap: 12 }}>
           {selectedExercisesLength > 1 && (
             <Button variant="primary" fullWidth onPress={onAddMultiBlock}>
-              Agregar {selectedExercisesLength} ejercicios en bloque
+              Agregar como superset
             </Button>
           )}
           <Button variant="outline" fullWidth onPress={onAddAsIndividual}>
-            Agregar {selectedExercisesLength} ejercicio
-            {selectedExercisesLength > 1 ? "s" : ""} individual
-            {selectedExercisesLength > 1 ? "es" : ""}
+            {selectedExercisesLength > 1
+              ? "Agregar por separado"
+              : "Agregar ejercicio"}
           </Button>
         </View>
       )}
@@ -54,8 +54,7 @@ export const ExerciseSelectorFooter: React.FC<Props> = ({
 
       {exerciseModalMode === "add-to-block" && (
         <Button variant="primary" fullWidth onPress={onAddToBlock}>
-          Agregar {selectedExercisesLength} ejercicio
-          {selectedExercisesLength > 1 ? "s" : ""} al bloque
+          Agregar al superset
         </Button>
       )}
     </View>

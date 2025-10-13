@@ -89,7 +89,7 @@ export const Button: React.FC<ButtonProps> = ({
           ...baseStyles,
           backgroundColor: "transparent",
           borderWidth: 2,
-          borderColor: colors.textMuted,
+          borderColor: colors.primary[500],
         };
       case "ghost":
         return {

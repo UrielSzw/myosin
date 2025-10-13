@@ -28,7 +28,7 @@ export const ExerciseListTop = ({ exercisesInBlockCount }: Props) => {
         Ejercicios ({exercisesInBlockCount})
       </Typography>
 
-      <Button variant="outline" size="sm" onPress={handleOpenModal}>
+      <Button variant="ghost" size="sm" onPress={handleOpenModal}>
         + Agregar Ejercicio
       </Button>
     </View>

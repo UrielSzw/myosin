@@ -16,7 +16,8 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
   (_props, ref) => {
     const { colors, isDarkMode } = useColorScheme();
     const { adjustRestTimer, skipRestTimer } = useActiveRestTimerActions();
-    const { totalTime, startedAt } = useActiveRestTimer() || {};
+    const restTimerStore = useActiveRestTimer();
+    const { totalTime, startedAt } = restTimerStore || {};
 
     const audioPlayer = useAudioPlayer(
       require("@/assets/audio/timer-complete.wav")
@@ -28,6 +29,13 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
         shouldPlayInBackground: false,
       });
     }, []);
+
+    // 🔥 SOLUCIÓN SIMPLE: Si el timer del store desaparece, cerrar el sheet
+    React.useEffect(() => {
+      if (!restTimerStore && ref && "current" in ref && ref.current) {
+        ref.current.dismiss();
+      }
+    }, [restTimerStore, ref]);
 
     const playCompletionAlert = useCallback(() => {
       // Vibración existente

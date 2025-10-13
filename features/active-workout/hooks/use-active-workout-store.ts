@@ -1284,6 +1284,12 @@ const useActiveWorkoutStore = create<Store>()(
 
           state.stats.totalSetsCompleted += 1;
 
+          // 🔥 SOLUCIÓN SIMPLE: Si hay un timer activo, resetearlo
+          const wasTimerActive = state.restTimer?.isActive;
+          if (wasTimerActive) {
+            state.restTimer = null; // Reset del timer
+          }
+
           const nextSetId = state.activeWorkout.setsByExercise[
             exerciseInBlockId
           ].find(

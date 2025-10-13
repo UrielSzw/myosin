@@ -120,11 +120,11 @@ export const shouldShowRestTimer = (
   isLastExercise: boolean
 ) => {
   if (block.type === "individual") {
-    // Don't show for the last set of the last exercise in a block
-    if (!nextSet) return false;
-
     // Don't show rest timer for drop sets or rest-pause sets (should be done immediately)
-    if (nextSet.set_type === "drop" || nextSet.set_type === "rest-pause") {
+    if (
+      nextSet &&
+      (nextSet.set_type === "drop" || nextSet.set_type === "rest-pause")
+    ) {
       return false;
     }
 

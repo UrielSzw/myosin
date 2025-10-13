@@ -206,3 +206,27 @@ export const DEFAULT_FILTERS: ExerciseFilters = {
   specificMuscles: [],
   specificEquipment: [],
 };
+
+// Tipos para los handlers de filtros
+export interface ExerciseFilterHandlers {
+  updateFilter: <K extends keyof ExerciseFilters>(
+    key: K,
+    value: ExerciseFilters[K]
+  ) => void;
+  toggleQuickFilter: (filterId: QuickFilterType) => void;
+  toggleSpecificMuscle: (muscle: IExerciseMuscle) => void;
+  toggleSpecificEquipment: (equipment: IExerciseEquipment) => void;
+  clearAllFilters: () => void;
+}
+
+// Tipos para los datos derivados de los filtros
+export interface ExerciseFilterData {
+  filteredExercises: import("../db/schema").BaseExercise[];
+  activeFiltersCount: number;
+  activeFiltersList: {
+    id: string;
+    label: string;
+    type: "category" | "quick" | "muscle" | "equipment";
+    onRemove: () => void;
+  }[];
+}

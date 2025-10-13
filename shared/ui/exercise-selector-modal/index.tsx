@@ -1,4 +1,5 @@
 import { BaseExercise } from "@/shared/db/schema";
+import { useExerciseFilters } from "@/shared/hooks/use-exercise-filters";
 import { useExercises } from "@/shared/hooks/use-exercises";
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal } from "react-native";
@@ -33,6 +34,10 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
   onAddToBlock,
 }) => {
   const { exercises, loading, error } = useExercises();
+
+  // Hook de filtros elevado al modal padre
+  const filtersHook = useExerciseFilters(exercises || []);
+
   const {
     selectedExercises,
     selectedExercisesArray,
@@ -72,22 +77,52 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
   const handleAddAsIndividualAction = useCallback(() => {
     onAddAsIndividual(selectedExercisesArray);
     clearSelectedExercises();
-  }, [onAddAsIndividual, selectedExercisesArray, clearSelectedExercises]);
+    filtersHook.clearAllFilters(); // Reset filtros al cerrar
+  }, [
+    onAddAsIndividual,
+    selectedExercisesArray,
+    clearSelectedExercises,
+    filtersHook,
+  ]);
 
   const handleAddMultiBlock = useCallback(() => {
     onAddAsBlock(selectedExercisesArray);
     clearSelectedExercises();
-  }, [onAddAsBlock, selectedExercisesArray, clearSelectedExercises]);
+    filtersHook.clearAllFilters(); // Reset filtros al cerrar
+  }, [
+    onAddAsBlock,
+    selectedExercisesArray,
+    clearSelectedExercises,
+    filtersHook,
+  ]);
 
   const handleAddToReplace = useCallback(() => {
     onReplaceExercise(selectedExercisesArray);
     clearSelectedExercises();
-  }, [onReplaceExercise, selectedExercisesArray, clearSelectedExercises]);
+    filtersHook.clearAllFilters(); // Reset filtros al cerrar
+  }, [
+    onReplaceExercise,
+    selectedExercisesArray,
+    clearSelectedExercises,
+    filtersHook,
+  ]);
 
   const handleAddToBlockAction = useCallback(() => {
     onAddToBlock(selectedExercisesArray);
     clearSelectedExercises();
-  }, [onAddToBlock, selectedExercisesArray, clearSelectedExercises]);
+    filtersHook.clearAllFilters(); // Reset filtros al cerrar
+  }, [
+    onAddToBlock,
+    selectedExercisesArray,
+    clearSelectedExercises,
+    filtersHook,
+  ]);
+
+  // Handler para cerrar modal
+  const handleCloseModal = useCallback(() => {
+    onClose();
+    filtersHook.clearAllFilters(); // Reset filtros al cerrar
+  }, [onClose, filtersHook]);
 
   // Early return para error state
   if (error) {
@@ -121,18 +156,31 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
           style={{ flex: 1 }}
         >
           <ExerciseSelectorView
-            exercises={exercises || []}
+            exercises={filtersHook.filteredExercises}
             loading={loading}
             selectedExercises={selectedExercises}
             selectedExercisesLength={selectedExercisesLength}
             exerciseModalMode={exerciseModalMode}
-            onClose={onClose}
+            onClose={handleCloseModal}
             onSelectExercise={handleSelectExercise}
             onSeeMoreInfo={handleSeeMoreInfo}
             onAddAsIndividual={handleAddAsIndividualAction}
             onAddMultiBlock={handleAddMultiBlock}
             onAddToReplace={handleAddToReplace}
             onAddToBlock={handleAddToBlockAction}
+            filters={filtersHook.filters}
+            filterHandlers={{
+              updateFilter: filtersHook.updateFilter,
+              toggleQuickFilter: filtersHook.toggleQuickFilter,
+              toggleSpecificMuscle: filtersHook.toggleSpecificMuscle,
+              toggleSpecificEquipment: filtersHook.toggleSpecificEquipment,
+              clearAllFilters: filtersHook.clearAllFilters,
+            }}
+            filterData={{
+              filteredExercises: filtersHook.filteredExercises,
+              activeFiltersCount: filtersHook.activeFiltersCount,
+              activeFiltersList: filtersHook.activeFiltersList,
+            }}
           />
         </Animated.View>
       )}

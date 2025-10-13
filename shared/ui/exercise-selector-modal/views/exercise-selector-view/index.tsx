@@ -1,6 +1,10 @@
+import {
+  ExerciseFilterData,
+  ExerciseFilterHandlers,
+  ExerciseFilters,
+} from "@/shared/constants/exercise-filters";
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useExerciseFilters } from "@/shared/hooks/use-exercise-filters";
 import { FlashList } from "@shopify/flash-list";
 import React, { useCallback } from "react";
 import { View } from "react-native";
@@ -22,10 +26,13 @@ type Props = {
   onAddMultiBlock: () => void;
   onAddToReplace: () => void;
   onAddToBlock: () => void;
+  // Props de filtros
+  filters: ExerciseFilters;
+  filterHandlers: ExerciseFilterHandlers;
+  filterData: ExerciseFilterData;
 };
 
 export const ExerciseSelectorView: React.FC<Props> = ({
-  exercises,
   loading,
   selectedExercises,
   selectedExercisesLength,
@@ -37,18 +44,15 @@ export const ExerciseSelectorView: React.FC<Props> = ({
   onAddMultiBlock,
   onAddToReplace,
   onAddToBlock,
+  // Props de filtros
+  filters,
+  filterHandlers,
+  filterData,
 }) => {
   const { colors } = useColorScheme();
 
-  // Usar el hook de filtros
-  const {
-    filters,
-    filteredExercises,
-    activeFiltersList,
-    updateFilter,
-    toggleQuickFilter,
-    clearAllFilters,
-  } = useExerciseFilters(exercises);
+  const { updateFilter, toggleQuickFilter, clearAllFilters } = filterHandlers;
+  const { filteredExercises, activeFiltersList } = filterData;
 
   const renderExerciseCard = useCallback(
     ({ item, index }: { item: BaseExercise; index: number }) => (

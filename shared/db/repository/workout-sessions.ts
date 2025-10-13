@@ -1,4 +1,4 @@
-import { and, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNotNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   exercises,
@@ -400,6 +400,25 @@ export const workoutSessionsRepository = {
       .innerJoin(routines, eq(workout_sessions.routine_id, routines.id))
       .orderBy(desc(workout_sessions.started_at))
       .limit(limit);
+  },
+
+  // Verificar si una rutina específica ya fue realizada
+  hasRoutineBeenPerformed: async (
+    routineId: string,
+    userId: string = "default-user"
+  ): Promise<boolean> => {
+    const result = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(workout_sessions)
+      .where(
+        and(
+          eq(workout_sessions.routine_id, routineId),
+          eq(workout_sessions.user_id, userId),
+          isNotNull(workout_sessions.finished_at) // Solo completadas
+        )
+      );
+
+    return result[0].count > 0;
   },
 };
 

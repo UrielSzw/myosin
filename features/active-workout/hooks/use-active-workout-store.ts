@@ -28,6 +28,7 @@ export type ActiveWorkoutSession = WorkoutSessionInsert & {
   tempId: string;
   routine: BaseRoutine; // Snapshot de la rutina para referencia
   original_sets_count: number; // Para detectar eliminaciones
+  hasBeenPerformed: boolean; // Si esta rutina ya fue realizada antes
 };
 
 export type ActiveWorkoutBlock = WorkoutBlockInsert & {
@@ -286,8 +287,21 @@ const useActiveWorkoutStore = create<Store>()(
             prMap = {};
           }
 
+          // 4. Check if this routine has been performed before
+          let hasBeenPerformed = false;
+          try {
+            hasBeenPerformed =
+              await workoutSessionsRepository.hasRoutineBeenPerformed(
+                routineId,
+                "default-user"
+              );
+          } catch (error) {
+            console.warn("Failed to check routine performance history:", error);
+            hasBeenPerformed = false;
+          }
+
           set((state) => {
-            // 3. Crear sesión de workout
+            // 5. Crear sesión de workout
             const sessionTempId = generateTempId();
             const session: ActiveWorkoutSession = {
               tempId: sessionTempId,
@@ -303,9 +317,10 @@ const useActiveWorkoutStore = create<Store>()(
               total_volume_kg: null,
               average_rpe: null,
               original_sets_count: 0, // Se calculará después
+              hasBeenPerformed, // Boolean si esta rutina ya fue realizada antes
             };
 
-            // 3. Transformar bloques de routine a active workout
+            // 6. Transformar bloques de routine a active workout
             const activeBlocks: Record<string, ActiveWorkoutBlock> = {};
             const blocksBySession: string[] = [];
 
@@ -330,7 +345,7 @@ const useActiveWorkoutStore = create<Store>()(
               blocksBySession.push(blockTempId);
             });
 
-            // 4. Transformar ejercicios
+            // 7. Transformar ejercicios
             const activeExercises: Record<string, ActiveWorkoutExercise> = {};
             const exercisesByBlock: Record<string, string[]> = {};
 
@@ -372,7 +387,7 @@ const useActiveWorkoutStore = create<Store>()(
               exercisesByBlock[activeBlock.tempId].push(exerciseTempId);
             });
 
-            // 5. Transformar sets
+            // 8. Transformar sets
             const activeSets: Record<string, ActiveWorkoutSet> = {};
             const setsByExercise: Record<string, string[]> = {};
 
@@ -424,7 +439,7 @@ const useActiveWorkoutStore = create<Store>()(
               setsByExercise[activeExercise.tempId].push(setTempId);
             });
 
-            // 6. Ordenar índices por order_index
+            // 9. Ordenar índices por order_index
             Object.keys(exercisesByBlock).forEach((blockId) => {
               exercisesByBlock[blockId].sort((a, b) => {
                 const exerciseA = activeExercises[a];
@@ -450,7 +465,7 @@ const useActiveWorkoutStore = create<Store>()(
               return (blockA?.order_index || 0) - (blockB?.order_index || 0);
             });
 
-            // 7. Actualizar estado
+            // 10. Actualizar estado
             state.activeWorkout = {
               session: {
                 ...session,
@@ -467,13 +482,13 @@ const useActiveWorkoutStore = create<Store>()(
               sessionBestPRs: {},
             };
 
-            // 8. Actualizar stats
+            // 11. Actualizar stats
             state.stats = {
               totalSetsPlanned: Object.keys(activeSets).length,
               totalSetsCompleted: 0,
             };
 
-            // 9. Limpiar estado temporal
+            // 12. Limpiar estado temporal
             state.currentState = {
               currentBlockId: null,
               currentExerciseInBlockId: null,
@@ -488,7 +503,7 @@ const useActiveWorkoutStore = create<Store>()(
               isCurrentBlockMulti: false,
             };
 
-            // 10. Limpiar timer
+            // 13. Limpiar timer
             state.restTimer = null;
           });
         } catch (error) {

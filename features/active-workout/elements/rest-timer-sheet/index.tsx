@@ -2,6 +2,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { Pause, Play, Timer } from "lucide-react-native";
 import React, { forwardRef, useCallback } from "react";
 import { TouchableOpacity, Vibration, View } from "react-native";
@@ -17,11 +18,31 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
     const { adjustRestTimer, skipRestTimer } = useActiveRestTimerActions();
     const { totalTime, startedAt } = useActiveRestTimer() || {};
 
-    // Función para la vibración de completado
-    const playCompletionAlert = useCallback(() => {
-      Vibration.vibrate([100, 50, 500, 50, 100]);
-      console.log("🔔 Timer completed!");
+    const audioPlayer = useAudioPlayer(
+      require("@/assets/audio/timer-complete.wav")
+    );
+
+    React.useEffect(() => {
+      setAudioModeAsync({
+        playsInSilentMode: true, // Reproduce aunque el celular esté en silencio
+        shouldPlayInBackground: false,
+      });
     }, []);
+
+    const playCompletionAlert = useCallback(() => {
+      // Vibración existente
+      Vibration.vibrate([100, 50, 500, 50, 100]);
+
+      // NUEVO: Sonido de completion
+      try {
+        audioPlayer.seekTo(0); // Reset posición al inicio
+        audioPlayer.play();
+      } catch (error) {
+        console.log("Error playing completion sound:", error);
+      }
+
+      console.log("🔔 Timer completed!");
+    }, [audioPlayer]);
 
     const restTimeSeconds = totalTime || 0;
 

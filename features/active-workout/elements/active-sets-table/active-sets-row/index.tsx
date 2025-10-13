@@ -272,7 +272,13 @@ export const ActiveSetRow: React.FC<Props> = ({
             onChangeText={(value) =>
               setSetData((prev) => ({ ...prev, weight: value }))
             }
-            placeholder={set.planned_weight?.toString() || "0"}
+            placeholder={
+              session?.hasBeenPerformed
+                ? prevSet?.actual_weight?.toString() ||
+                  set.planned_weight?.toString() ||
+                  "0"
+                : set.planned_weight?.toString() || "0"
+            }
             keyboardType="numeric"
             placeholderTextColor={colors.textMuted}
             style={{

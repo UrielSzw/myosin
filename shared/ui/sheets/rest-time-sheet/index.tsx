@@ -15,8 +15,9 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
     const { colors } = useColorScheme();
 
     const [selectedTime, setSelectedTime] = useState<number | null>(null);
-    console.log({ currentRestTime });
-    const showSelectedTime = selectedTime || currentRestTime;
+
+    const showSelectedTime =
+      selectedTime !== null ? selectedTime : currentRestTime;
 
     // Predefined rest time options (in seconds)
     const quickOptions = [
@@ -59,6 +60,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
 
     const handleSave = () => {
       onSelectRestTime(showSelectedTime);
+      setSelectedTime(null);
     };
 
     return (

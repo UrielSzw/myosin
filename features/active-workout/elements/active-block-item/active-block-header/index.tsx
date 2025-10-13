@@ -5,7 +5,7 @@ import {
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import { Timer } from "lucide-react-native";
+import { Timer, Zap } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
 
@@ -56,6 +56,17 @@ export const BlockHeader: React.FC<Props> = ({
     onToggleSheet("restTime");
   };
 
+  const getBlockTitle = () => {
+    const blockLetter = String.fromCharCode(65 + block.order_index); // A, B, C...
+    const blockTypeLabel = getBlockTypeLabel(block.type);
+
+    if (block.type === "individual") {
+      return `Bloque ${blockLetter}`;
+    }
+
+    return `${blockTypeLabel} ${blockLetter}`;
+  };
+
   return (
     <TouchableOpacity
       onPress={handlePress}
@@ -67,7 +78,7 @@ export const BlockHeader: React.FC<Props> = ({
         borderBottomColor: colors.border,
       }}
     >
-      {/* First Row - Block Title and Main Controls */}
+      {/* First Row - Block Title and Timer */}
       <View
         style={{
           flexDirection: "row",
@@ -79,10 +90,10 @@ export const BlockHeader: React.FC<Props> = ({
         {/* Left - Block Title */}
         <View
           style={{
-            flex: 1,
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
+            flex: 1,
           }}
         >
           {getBlockTypeIcon(block.type)}
@@ -91,147 +102,85 @@ export const BlockHeader: React.FC<Props> = ({
             weight="semibold"
             style={{ color: blockColors.primary }}
           >
-            {block.name ||
-              `${getBlockTypeLabel(block.type)} ${block.order_index + 1}`}
+            {getBlockTitle()}
           </Typography>
         </View>
-      </View>
 
-      {/* Second Row - Exercise Count and Rest Times */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        {/* Left - Exercise Count */}
-        <Typography variant="caption" color="textMuted">
-          {exercisesIds.length} ejercicio
-          {exercisesIds.length !== 1 ? "s" : ""}
-        </Typography>
+        {/* Right - Timer Buttons (estandarizados) */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+          }}
+        >
+          {/* Timer Principal (siempre visible) */}
+          <TouchableOpacity
+            onPress={handleUpdateRestBetweenRounds}
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              paddingHorizontal: 10,
+              paddingVertical: 6,
+              backgroundColor: blockColors.primary + "15",
+              borderRadius: 6,
+              minHeight: 32,
+              minWidth: 60,
+            }}
+          >
+            <Timer size={14} color={blockColors.primary} />
+            <Typography
+              variant="caption"
+              weight="medium"
+              style={{
+                color: blockColors.primary,
+                marginLeft: 4,
+              }}
+            >
+              {block.type === "individual"
+                ? formatRestTime(block.rest_time_seconds)
+                : `Sets: ${formatRestTime(block.rest_time_seconds)}`}
+            </Typography>
+          </TouchableOpacity>
 
-        {/* Right - Rest Time Buttons */}
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-          {exercisesIds.length > 1 ? (
-            // Multi-exercise blocks: show 2 buttons
-            <>
-              {/* Rest Between Exercises */}
-              <TouchableOpacity
-                onPress={handleUpdateRestBetweenExercises}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  // Área clickeable mínima para accesibilidad
-                  minHeight: 36,
-                  minWidth: 36,
-                  paddingVertical: 6,
-                  paddingHorizontal: 8,
-                  backgroundColor: blockColors.primary + "10",
-                  borderRadius: 4,
-                  borderWidth: 1,
-                  borderColor: blockColors.border,
-                }}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel="Configurar tiempo de descanso entre ejercicios"
-                accessibilityHint="Toca para ajustar el tiempo de descanso entre ejercicios"
-                accessibilityValue={{
-                  text: formatRestTime(block.rest_between_exercises_seconds),
-                }}
-              >
-                <Timer size={12} color={blockColors.primary} />
-                <Typography
-                  variant="caption"
-                  weight="medium"
-                  style={{
-                    color: blockColors.primary,
-                    marginLeft: 3,
-                    fontSize: 10,
-                  }}
-                >
-                  Entre: {formatRestTime(block.rest_between_exercises_seconds)}
-                </Typography>
-              </TouchableOpacity>
-
-              {/* Rest Between Rounds */}
-              <TouchableOpacity
-                onPress={handleUpdateRestBetweenRounds}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  // Área clickeable mínima para accesibilidad
-                  minHeight: 36,
-                  minWidth: 36,
-                  paddingVertical: 6,
-                  paddingHorizontal: 8,
-                  backgroundColor: blockColors.primary + "15",
-                  borderRadius: 4,
-                  borderWidth: 1,
-                  borderColor: blockColors.border,
-                }}
-                accessible={true}
-                accessibilityRole="button"
-                accessibilityLabel="Configurar tiempo de descanso entre vueltas"
-                accessibilityHint="Toca para ajustar el tiempo de descanso entre vueltas del bloque"
-                accessibilityValue={{
-                  text: formatRestTime(block.rest_time_seconds),
-                }}
-              >
-                <Timer size={12} color={blockColors.primary} />
-                <Typography
-                  variant="caption"
-                  weight="medium"
-                  style={{
-                    color: blockColors.primary,
-                    marginLeft: 3,
-                    fontSize: 10,
-                  }}
-                >
-                  Vueltas: {formatRestTime(block.rest_time_seconds)}
-                </Typography>
-              </TouchableOpacity>
-            </>
-          ) : (
-            // Individual exercises: show 1 button (between sets)
+          {/* Timer Secundario (solo para multi-ejercicios) */}
+          {block.type !== "individual" && (
             <TouchableOpacity
-              onPress={handleUpdateRestBetweenRounds}
+              onPress={handleUpdateRestBetweenExercises}
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                // Área clickeable mínima para accesibilidad
-                minHeight: 36,
-                minWidth: 36,
+                paddingHorizontal: 10,
                 paddingVertical: 6,
-                paddingHorizontal: 8,
                 backgroundColor: blockColors.primary + "15",
-                borderRadius: 4,
-                borderWidth: 1,
-                borderColor: blockColors.border,
-              }}
-              accessible={true}
-              accessibilityRole="button"
-              accessibilityLabel="Configurar tiempo de descanso entre series"
-              accessibilityHint="Toca para ajustar el tiempo de descanso entre series"
-              accessibilityValue={{
-                text: formatRestTime(block.rest_time_seconds),
+                borderRadius: 6,
+                minHeight: 32,
+                minWidth: 60,
               }}
             >
-              <Timer size={12} color={blockColors.primary} />
+              <Zap size={14} color={blockColors.primary} />
               <Typography
                 variant="caption"
                 weight="medium"
                 style={{
                   color: blockColors.primary,
-                  marginLeft: 3,
-                  fontSize: 10,
+                  marginLeft: 4,
                 }}
               >
-                {formatRestTime(block.rest_time_seconds)}
+                Entre: {formatRestTime(block.rest_between_exercises_seconds)}
               </Typography>
             </TouchableOpacity>
           )}
         </View>
+      </View>
+
+      {/* Second Row - Exercise Count Only */}
+      <View>
+        <Typography variant="caption" color="textMuted">
+          {exercisesIds.length > 1
+            ? `${exercisesIds.length} ejercicios`
+            : "Individual"}
+        </Typography>
       </View>
     </TouchableOpacity>
   );

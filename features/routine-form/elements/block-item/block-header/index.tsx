@@ -49,6 +49,17 @@ export const BlockHeader: React.FC<Props> = ({
     onToggleSheet("restTime");
   };
 
+  const getBlockTitle = () => {
+    const blockLetter = String.fromCharCode(65 + block.order_index); // A, B, C...
+    const blockTypeLabel = getBlockTypeLabel(block.type);
+
+    if (block.type === "individual") {
+      return `Bloque ${blockLetter}`;
+    }
+
+    return `${blockTypeLabel} ${blockLetter}`;
+  };
+
   return (
     <View
       style={{
@@ -87,8 +98,7 @@ export const BlockHeader: React.FC<Props> = ({
             weight="semibold"
             style={{ color: blockColors.primary }}
           >
-            {block.name ||
-              `${getBlockTypeLabel(block.type)} ${block.order_index + 1}`}
+            {getBlockTitle()}
           </Typography>
         </View>
       </View>
@@ -118,15 +128,12 @@ export const BlockHeader: React.FC<Props> = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  // Área clickeable mínima para accesibilidad
-                  minHeight: 36,
-                  minWidth: 36,
+                  paddingHorizontal: 10,
                   paddingVertical: 6,
-                  paddingHorizontal: 8,
                   backgroundColor: blockColors.primary + "10",
-                  borderRadius: 4,
-                  borderWidth: 1,
-                  borderColor: blockColors.border,
+                  borderRadius: 6,
+                  minHeight: 32,
+                  minWidth: 60,
                 }}
                 accessible={true}
                 accessibilityRole="button"
@@ -136,14 +143,13 @@ export const BlockHeader: React.FC<Props> = ({
                   text: formatRestTime(block.rest_between_exercises_seconds),
                 }}
               >
-                <Timer size={12} color={blockColors.primary} />
+                <Timer size={14} color={blockColors.primary} />
                 <Typography
                   variant="caption"
                   weight="medium"
                   style={{
                     color: blockColors.primary,
-                    marginLeft: 3,
-                    fontSize: 10,
+                    marginLeft: 4,
                   }}
                 >
                   Entre: {formatRestTime(block.rest_between_exercises_seconds)}
@@ -156,15 +162,12 @@ export const BlockHeader: React.FC<Props> = ({
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  // Área clickeable mínima para accesibilidad
-                  minHeight: 36,
-                  minWidth: 36,
+                  paddingHorizontal: 10,
                   paddingVertical: 6,
-                  paddingHorizontal: 8,
                   backgroundColor: blockColors.primary + "15",
-                  borderRadius: 4,
-                  borderWidth: 1,
-                  borderColor: blockColors.border,
+                  borderRadius: 6,
+                  minHeight: 32,
+                  minWidth: 60,
                 }}
                 accessible={true}
                 accessibilityRole="button"
@@ -174,14 +177,13 @@ export const BlockHeader: React.FC<Props> = ({
                   text: formatRestTime(block.rest_time_seconds),
                 }}
               >
-                <Timer size={12} color={blockColors.primary} />
+                <Timer size={14} color={blockColors.primary} />
                 <Typography
                   variant="caption"
                   weight="medium"
                   style={{
                     color: blockColors.primary,
-                    marginLeft: 3,
-                    fontSize: 10,
+                    marginLeft: 4,
                   }}
                 >
                   Vueltas: {formatRestTime(block.rest_time_seconds)}
@@ -195,15 +197,12 @@ export const BlockHeader: React.FC<Props> = ({
               style={{
                 flexDirection: "row",
                 alignItems: "center",
-                // Área clickeable mínima para accesibilidad
-                minHeight: 36,
-                minWidth: 36,
+                paddingHorizontal: 10,
                 paddingVertical: 6,
-                paddingHorizontal: 8,
                 backgroundColor: blockColors.primary + "15",
-                borderRadius: 4,
-                borderWidth: 1,
-                borderColor: blockColors.border,
+                borderRadius: 6,
+                minHeight: 32,
+                minWidth: 60,
               }}
               accessible={true}
               accessibilityRole="button"
@@ -213,14 +212,13 @@ export const BlockHeader: React.FC<Props> = ({
                 text: formatRestTime(block.rest_time_seconds),
               }}
             >
-              <Timer size={12} color={blockColors.primary} />
+              <Timer size={14} color={blockColors.primary} />
               <Typography
                 variant="caption"
                 weight="medium"
                 style={{
                   color: blockColors.primary,
-                  marginLeft: 3,
-                  fontSize: 10,
+                  marginLeft: 4,
                 }}
               >
                 {formatRestTime(block.rest_time_seconds)}

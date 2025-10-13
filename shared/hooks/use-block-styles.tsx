@@ -119,7 +119,6 @@ export const useBlockStyles = () => {
   };
 
   const formatRestTime = (seconds: number) => {
-    if (seconds === 0) return "Sin descanso";
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

@@ -6,19 +6,21 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { Timer, Zap } from "lucide-react-native";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
 
 type Props = {
   block: ActiveWorkoutBlock;
-  onToggleSheet: (sheet?: IActiveToggleSheet) => void;
   exercisesIds: string[];
+  onToggleSheet: (sheet?: IActiveToggleSheet) => void;
+  onPress: () => void;
 };
 
 export const BlockHeader: React.FC<Props> = ({
   block,
-  onToggleSheet,
   exercisesIds,
+  onToggleSheet,
+  onPress,
 }) => {
   const { colors } = useColorScheme();
   const {
@@ -29,14 +31,6 @@ export const BlockHeader: React.FC<Props> = ({
   } = useBlockStyles();
   const blockColors = getBlockColors(block.type);
   const { setCurrentState } = useActiveMainActions();
-
-  const handlePress = () => {
-    setCurrentState({
-      currentBlockId: block.tempId,
-      isCurrentBlockMulti: block.type !== "individual",
-    });
-    onToggleSheet("blockOptions");
-  };
 
   const handleUpdateRestBetweenExercises = () => {
     setCurrentState({
@@ -68,8 +62,8 @@ export const BlockHeader: React.FC<Props> = ({
   };
 
   return (
-    <TouchableOpacity
-      onPress={handlePress}
+    <Pressable
+      onPress={onPress}
       style={{
         paddingHorizontal: 16,
         paddingVertical: 12,
@@ -182,6 +176,6 @@ export const BlockHeader: React.FC<Props> = ({
             : "Individual"}
         </Typography>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };

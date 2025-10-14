@@ -140,6 +140,7 @@ export const ActiveBottomSheets: React.FC<Props> = ({
         onConvertToIndividual={handleConvertBlockToIndividual}
         onShowAddExerciseModal={handleShowAddExerciseModal}
         isMultiBlock={!!isCurrentBlockMulti}
+        onShowReplace={handleShowReplaceModal}
       />
 
       <ExerciseOptionsBottomSheet

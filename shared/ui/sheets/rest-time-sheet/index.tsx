@@ -1,7 +1,12 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import { Minus, Plus, Timer } from "lucide-react-native";
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useCallback, useState } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { Typography } from "../../typography";
 
@@ -63,6 +68,18 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
       setSelectedTime(null);
     };
 
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
     return (
       <BottomSheetModal
         ref={ref}
@@ -80,6 +97,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
           elevation: 8, // Para Android
         }}
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetView style={{ padding: 16, paddingBottom: 40 }}>
           <View

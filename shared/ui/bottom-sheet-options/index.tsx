@@ -1,7 +1,12 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import React, { forwardRef } from "react";
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import React, { forwardRef, useCallback } from "react";
 import { Platform, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -27,6 +32,18 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
       option?.method();
     };
 
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
     return (
       <BottomSheetModal
         ref={ref}
@@ -45,6 +62,7 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
           elevation: 8, // Para Android
         }}
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetView style={{ padding: 16, paddingBottom: 40 }}>
           <Typography

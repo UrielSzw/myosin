@@ -3,7 +3,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell } from "lucide-react-native";
-import { TouchableOpacity, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 type Props = {
   exerciseName: string;
@@ -19,7 +19,7 @@ export const ActiveExerciseHeader: React.FC<Props> = ({
   const { colors } = useColorScheme();
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={onPress}
       style={{
         flexDirection: "row",
@@ -55,6 +55,6 @@ export const ActiveExerciseHeader: React.FC<Props> = ({
           {EXERCISE_CATEGORY_LABELS[exerciseMainMuscle as IExerciseMuscle]}
         </Typography>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };

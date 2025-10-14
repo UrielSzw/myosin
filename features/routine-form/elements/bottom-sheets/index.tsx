@@ -6,7 +6,9 @@ import { RestTimeBottomSheet } from "@/shared/ui/sheets/rest-time-sheet";
 import { SetTypeBottomSheet } from "@/shared/ui/sheets/set-type-sheet";
 import { TempoSelector } from "@/shared/ui/tempo-selector";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import { router } from "expo-router";
 import React, { useCallback } from "react";
+import { Vibration } from "react-native";
 import {
   useBlockActions,
   useExerciseActions,
@@ -14,6 +16,8 @@ import {
   useRoutineFormCurrentState,
   useSetActions,
 } from "../../hooks/use-routine-form-store";
+import { useReorderBlocks } from "../../shared/use-reorder-blocks";
+import { useReorderExercises } from "../../shared/use-reorder-exercises";
 import { RepsTypeBottomSheet } from "../reps-type-sheet";
 import { RoutineSettingsBottomSheet } from "../routine-settings-sheet";
 
@@ -44,6 +48,7 @@ export const BottomSheets: React.FC<Props> = ({
     currentSetType,
     currentExerciseName,
     currentSetTempo,
+    currentBlockId,
   } = useRoutineFormCurrentState();
 
   const { setExerciseModalMode, setIsExerciseModalOpen, clearCurrentState } =
@@ -53,6 +58,9 @@ export const BottomSheets: React.FC<Props> = ({
   const { updateRestTime, deleteBlock, convertBlockToIndividual } =
     useBlockActions();
   const { deleteExercise } = useExerciseActions();
+
+  const { initializeReorder } = useReorderExercises();
+  const { initializeReorder: initializeReorderBlocks } = useReorderBlocks();
 
   const handleUpdateSetType = useCallback(
     (type: ISetType) => {
@@ -146,6 +154,25 @@ export const BottomSheets: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clearCurrentState]);
 
+  const handleReorderExercises = useCallback(() => {
+    if (!currentBlockId) return;
+    blockOptionsBottomSheetRef.current?.dismiss();
+    initializeReorder(currentBlockId);
+    router.push("/routines/reorder-exercises");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentBlockId, initializeReorder]);
+
+  const handleReorderBlocks = useCallback(() => {
+    if (!currentBlockId) return;
+    blockOptionsBottomSheetRef.current?.dismiss();
+
+    Vibration.vibrate(50);
+    initializeReorderBlocks();
+    router.push("/routines/reorder-blocks");
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentBlockId, initializeReorderBlocks]);
+
   return (
     <>
       <SetTypeBottomSheet
@@ -168,7 +195,11 @@ export const BottomSheets: React.FC<Props> = ({
         onDelete={handleDeleteBlock}
         onConvertToIndividual={handleConvertBlockToIndividual}
         onShowAddExerciseModal={handleShowAddExerciseModal}
+        onShowReplace={handleShowReplaceModal}
+        onReorderExercises={handleReorderExercises}
+        onReorderBlocks={handleReorderBlocks}
         isMultiBlock={!!isCurrentBlockMulti}
+        exerciseName={currentExerciseName}
       />
 
       <ExerciseOptionsBottomSheet

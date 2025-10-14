@@ -13,12 +13,14 @@ type Props = {
   exerciseInBlockId: string;
   block: ActiveWorkoutBlock;
   onToggleSheet: (sheet?: IActiveToggleSheet) => void;
+  onPressIndividualBlock: () => void;
 };
 
 export const ActiveExerciseDetails: React.FC<Props> = ({
   exerciseInBlockId,
   block,
   onToggleSheet,
+  onPressIndividualBlock,
 }) => {
   const { setCurrentState } = useActiveMainActions();
   const { exercises, setsByExercise } = useActiveWorkout();
@@ -27,10 +29,15 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
   const sets = setsByExercise[exerciseInBlockId] || [];
 
   const handlePress = () => {
+    if (block.type === "individual") {
+      onPressIndividualBlock();
+      return;
+    }
+
     setCurrentState({
       currentBlockId: block.tempId,
       currentExerciseInBlockId: exerciseInBlock.tempId,
-      isCurrentBlockMulti: block.type !== "individual",
+      isCurrentBlockMulti: true,
       currentExerciseName: exerciseInBlock.exercise.name,
     });
     onToggleSheet("exerciseOptions");

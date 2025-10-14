@@ -17,6 +17,7 @@ type Props = {
   blockType: IBlockType;
   blockId: string;
   onToggleSheet: (sheet?: IToogleSheet) => void;
+  onPressIndividualBlock: () => void;
 };
 
 export const ExerciseItem: React.FC<Props> = ({
@@ -25,6 +26,7 @@ export const ExerciseItem: React.FC<Props> = ({
   blockType,
   blockId,
   onToggleSheet,
+  onPressIndividualBlock,
 }) => {
   const { exercisesInBlock, setsByExercise } = useRoutineFormState();
   const { setCurrentState } = useMainActions();
@@ -33,6 +35,11 @@ export const ExerciseItem: React.FC<Props> = ({
   const exerciseInBlock = exercisesInBlock[exerciseInBlockId];
 
   const handlePress = () => {
+    if (blockType === "individual") {
+      onPressIndividualBlock();
+      return;
+    }
+
     setCurrentState({
       currentBlockId: blockId,
       currentExerciseInBlockId: exerciseInBlock.tempId,

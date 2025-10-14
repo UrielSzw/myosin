@@ -18,7 +18,7 @@ type Props = {
 };
 
 export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
-  const { blocks, exercisesByBlock } = useRoutineFormState();
+  const { blocks, exercisesByBlock, exercisesInBlock } = useRoutineFormState();
   const { setCurrentState } = useMainActions();
   const { initializeReorder } = useReorderBlocks();
 
@@ -32,10 +32,23 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
   };
 
   const handlePress = () => {
-    setCurrentState({
-      currentBlockId: blockId,
-      isCurrentBlockMulti: block.type !== "individual",
-    });
+    if (block.type === "individual") {
+      const exerciseInBlockId = exercisesInBlockIds[0];
+      const exerciseInBlock = exercisesInBlock[exerciseInBlockId];
+
+      setCurrentState({
+        currentBlockId: blockId,
+        currentExerciseInBlockId: exerciseInBlock?.tempId,
+        currentExerciseName: exerciseInBlock?.exercise.name || "",
+        isCurrentBlockMulti: false,
+      });
+    } else {
+      setCurrentState({
+        currentBlockId: blockId,
+        isCurrentBlockMulti: true,
+      });
+    }
+
     onToggleSheet("blockOptions");
   };
 
@@ -104,6 +117,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
                 blockType={block.type}
                 blockId={block.tempId}
                 onToggleSheet={onToggleSheet}
+                onPressIndividualBlock={handlePress}
               />
             </ExerciseInBlockItem>
           ))}

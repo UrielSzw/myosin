@@ -1,6 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import React, { forwardRef, useCallback, useState } from "react";
 import { StyleSheet, Switch, View } from "react-native";
 import {
@@ -8,12 +13,9 @@ import {
   useRoutineFormState,
 } from "../../hooks/use-routine-form-store";
 
-type Props = {
-  onClose?: () => void;
-};
-
-export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
-  ({ onClose }, ref) => {
+export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
+  // eslint-disable-next-line no-empty-pattern
+  ({}, ref) => {
     const { colors } = useColorScheme();
     const { setRoutineFlags } = useMainActions();
     const { routine } = useRoutineFormState();
@@ -40,6 +42,18 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
       [setRoutineFlags, showRpe]
     );
 
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
     return (
       <BottomSheetModal
         ref={ref}
@@ -57,6 +71,8 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal, Props>(
           elevation: 8, // Para Android
         }}
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
           <Typography

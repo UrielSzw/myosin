@@ -205,39 +205,6 @@ export const SetTypeDetail: React.FC<Props> = ({
           </Typography>
         </Card>
 
-        {/* Research Notes - Solo si existe */}
-        {methodInfo.researchNotes && (
-          <Card variant="outlined" padding="lg" style={{ marginBottom: 32 }}>
-            <Typography
-              variant="h5"
-              weight="semibold"
-              style={{ marginBottom: 12 }}
-            >
-              Evidencia Científica
-            </Typography>
-            <View
-              style={{
-                backgroundColor: colors.info[500] + "10",
-                padding: 16,
-                borderRadius: 8,
-                borderLeftWidth: 4,
-                borderLeftColor: colors.info[500],
-              }}
-            >
-              <Typography
-                variant="body2"
-                style={{
-                  color: colors.text,
-                  lineHeight: 22,
-                  fontStyle: "italic",
-                }}
-              >
-                {methodInfo.researchNotes}
-              </Typography>
-            </View>
-          </Card>
-        )}
-
         {/* Action Button */}
         <TouchableOpacity
           onPress={() => onSelectMethod(setType)}

@@ -26,8 +26,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Ideal para principiantes y como base del programa. Perfecto para ejercicios compuestos pesados y cuando el objetivo principal es la fuerza máxima.",
-    researchNotes:
-      "Método estándar respaldado por décadas de investigación en entrenamiento de fuerza.",
   },
   warmup: {
     type: "warmup",
@@ -44,8 +42,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Siempre al inicio de cada ejercicio o cuando se incrementa significativamente la carga. Especialmente importante en ejercicios compuestos pesados.",
-    researchNotes:
-      "El calentamiento específico puede mejorar el rendimiento hasta un 5-10% según múltiples estudios.",
   },
   failure: {
     type: "failure",
@@ -63,8 +59,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "En las últimas series de ejercicios aislados o al final del entrenamiento. Evitar en ejercicios compuestos pesados por riesgo de lesión.",
-    researchNotes:
-      "Estudios indican que no es necesario llegar al fallo en cada serie, pero su uso estratégico puede optimizar la hipertrofia.",
   },
   drop: {
     type: "drop",
@@ -81,8 +75,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Al final del entrenamiento o como serie finalizadora. Ideal para ejercicios de aislamiento y con máquinas donde es fácil cambiar el peso.",
-    researchNotes:
-      "Investigaciones muestran que pueden generar similar hipertrofia que series adicionales tradicionales con menor tiempo de entrenamiento.",
   },
   cluster: {
     type: "cluster",
@@ -99,8 +91,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Para entrenamiento de potencia, fuerza-velocidad, o cuando se busca mantener alta intensidad con mayor volumen. Excelente para deportistas.",
-    researchNotes:
-      "Estudios confirman que permiten mantener mayor velocidad y potencia comparado con series tradicionales continuas.",
   },
   "rest-pause": {
     type: "rest-pause",
@@ -117,8 +107,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Con ejercicios compuestos o aislados usando cargas del 85-95% 1RM. Ideal para fases de intensificación o cuando el tiempo es limitado.",
-    researchNotes:
-      "Técnica respaldada por investigación que muestra efectividad similar a múltiples series tradicionales con menor tiempo total.",
   },
   mechanical: {
     type: "mechanical",
@@ -135,8 +123,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Con ejercicios que tienen variaciones claras de dificultad mecánica. Ideal para entrenamiento de hipertrofia avanzada y cuando se busca variedad.",
-    researchNotes:
-      "Método emergente con evidencia preliminar prometedora para maximizar el estímulo hipertrófico sin equipamiento adicional.",
   },
   eccentric: {
     type: "eccentric",
@@ -153,8 +139,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Para superar mesetas de fuerza, en fases de intensificación, o cuando se busca máximo estímulo hipertrófico. Ideal para ejercicios con máquinas o con compañero de entrenamiento.",
-    researchNotes:
-      "Estudios demuestran que pueden generar hasta 40% más fuerza que contracciones concéntricas, con mayor activación muscular y adaptaciones únicas.",
   },
   partial: {
     type: "partial",
@@ -171,8 +155,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "Al final de series tradicionales para extender el trabajo, para superar puntos débiles específicos, o en entrenamiento de fuerza con cargas muy altas. Común en powerlifting.",
-    researchNotes:
-      "Investigaciones muestran efectividad para desarrollo de fuerza específica y como método de intensificación cuando se combina con rango completo.",
   },
   isometric: {
     type: "isometric",
@@ -189,8 +171,6 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
     ],
     whenToUse:
       "En rehabilitación, para mejorar estabilidad, en calistenia avanzada, o para fortalecer puntos débiles específicos. Excelente para core y ejercicios de estabilización.",
-    researchNotes:
-      "Ampliamente utilizado en fisioterapia y calistenia. Estudios confirman su efectividad para fuerza específica del ángulo y estabilidad articular.",
   },
 };
 

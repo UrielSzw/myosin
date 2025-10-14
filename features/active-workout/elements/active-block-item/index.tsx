@@ -37,6 +37,7 @@ export const ActiveBlockItem: React.FC<Props> = ({
         currentBlockId: block.tempId,
         currentExerciseInBlockId: exerciseInBlock?.tempId,
         currentExerciseName: exerciseInBlock?.exercise.name || "",
+        currentExerciseId: exerciseInBlock?.exercise.id || null,
         isCurrentBlockMulti: false,
       });
     } else {

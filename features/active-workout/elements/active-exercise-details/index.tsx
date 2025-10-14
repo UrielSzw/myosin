@@ -39,6 +39,7 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
       currentExerciseInBlockId: exerciseInBlock.tempId,
       isCurrentBlockMulti: true,
       currentExerciseName: exerciseInBlock.exercise.name,
+      currentExerciseId: exerciseInBlock?.exercise.id || null,
     });
     onToggleSheet("exerciseOptions");
   };

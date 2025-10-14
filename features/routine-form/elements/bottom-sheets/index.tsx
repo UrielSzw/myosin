@@ -115,6 +115,7 @@ export const BottomSheets: React.FC<Props> = ({
     setIsExerciseModalOpen(true);
 
     exerciseOptionsBottomSheetRef.current?.dismiss();
+    blockOptionsBottomSheetRef.current?.dismiss();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setExerciseModalMode, setIsExerciseModalOpen]);
 

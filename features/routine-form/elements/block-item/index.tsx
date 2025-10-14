@@ -40,6 +40,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
         currentBlockId: blockId,
         currentExerciseInBlockId: exerciseInBlock?.tempId,
         currentExerciseName: exerciseInBlock?.exercise.name || "",
+        currentExerciseId: exerciseInBlock?.exercise.id || null,
         isCurrentBlockMulti: false,
       });
     } else {

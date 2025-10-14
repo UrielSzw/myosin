@@ -7,6 +7,7 @@ import {
   useExerciseActions,
   useExerciseModalState,
   useMainActions,
+  useRoutineFormCurrentState,
 } from "../../hooks/use-routine-form-store";
 
 type Props = {
@@ -18,6 +19,7 @@ export const ExerciseModal: React.FC<Props> = ({ onToggleSheet }) => {
   const { setIsExerciseModalOpen } = useMainActions();
   const { addIndividualBlock, addMultiBlock, addToBlock } = useBlockActions();
   const { replaceExercise } = useExerciseActions();
+  const { currentExerciseId } = useRoutineFormCurrentState();
 
   const handleCloseModal = () => {
     setIsExerciseModalOpen(false);
@@ -56,6 +58,7 @@ export const ExerciseModal: React.FC<Props> = ({ onToggleSheet }) => {
       exerciseModalMode={exerciseModalMode}
       onReplaceExercise={handleReplaceExercise}
       onAddToBlock={handleAddToBlock}
+      exerciseIdToExclude={currentExerciseId}
     />
   );
 };

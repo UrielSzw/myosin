@@ -6,7 +6,7 @@ import {
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { FlashList } from "@shopify/flash-list";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { View } from "react-native";
 import { ExerciseCard } from "../../exercise-card";
 import { ExerciseSelectorFooter } from "../../exercise-selector-footer";
@@ -52,14 +52,59 @@ export const ExerciseSelectorView: React.FC<Props> = ({
   const { colors } = useColorScheme();
 
   const { updateFilter, toggleQuickFilter, clearAllFilters } = filterHandlers;
-  const { filteredExercises, activeFiltersList } = filterData;
+  const { filteredExercises, activeFiltersList, replaceData } = filterData;
 
-  const renderExerciseCard = useCallback(
-    ({ item, index }: { item: BaseExercise; index: number }) => (
+  // Construir lista simplificada para replace mode
+  const structuredData = useMemo(() => {
+    if (exerciseModalMode !== "replace" || !replaceData) {
+      // Modo normal: solo ejercicios sin badges especiales
+      return filteredExercises.map((exercise, index) => ({
+        exercise,
+        index,
+        isRecommended: false,
+      }));
+    }
+
+    const items: {
+      exercise: BaseExercise;
+      index: number;
+      isRecommended: boolean;
+    }[] = [];
+
+    // Ejercicios similares con badge "Recomendado" primero
+    replaceData.similarExercises.forEach((exercise, idx) => {
+      items.push({
+        exercise,
+        index: idx,
+        isRecommended: true,
+      });
+    });
+
+    // Otros ejercicios sin badge especial
+    const otherExercises = filteredExercises.filter(
+      (ex) =>
+        ex.id !== replaceData.exerciseToReplace.id &&
+        !replaceData.similarExercises.some((sim) => sim.id === ex.id)
+    );
+
+    otherExercises.forEach((exercise, idx) => {
+      items.push({
+        exercise,
+        index: idx + replaceData.similarExercises.length,
+        isRecommended: false,
+      });
+    });
+
+    return items;
+  }, [exerciseModalMode, replaceData, filteredExercises]);
+
+  const renderItem = useCallback(
+    ({ item }: { item: (typeof structuredData)[0] }) => (
       <ExerciseCard
-        exercise={item}
-        index={index}
-        isSelected={selectedExercises[item.id] !== undefined}
+        exercise={item.exercise}
+        index={item.index}
+        isSelected={selectedExercises[item.exercise.id] !== undefined}
+        isRecommended={item.isRecommended}
         onSelectExercise={onSelectExercise}
         onSeeMoreInfo={onSeeMoreInfo}
         colors={colors}
@@ -99,6 +144,7 @@ export const ExerciseSelectorView: React.FC<Props> = ({
         onClose={onClose}
         selectedExercises={selectedExercises}
         exerciseModalMode={exerciseModalMode}
+        exerciseToReplace={replaceData?.exerciseToReplace}
       />
 
       <ExerciseSelectorSearch
@@ -114,10 +160,10 @@ export const ExerciseSelectorView: React.FC<Props> = ({
 
       {/* Exercises List */}
       <FlashList
-        data={filteredExercises}
+        data={structuredData}
         key={`${filters.mainCategory}-${filters.quickFilters.join("-")}`}
-        keyExtractor={(item) => item.id}
-        renderItem={renderExerciseCard}
+        keyExtractor={(item, index) => `exercise-${item.exercise.id}`}
+        renderItem={renderItem}
         getItemType={getItemType}
         extraData={selectedExercises}
         contentContainerStyle={{ paddingBottom: 40, paddingHorizontal: 20 }}

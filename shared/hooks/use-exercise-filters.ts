@@ -11,8 +11,17 @@ import { BaseExercise } from "@/shared/db/schema";
 import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { useCallback, useMemo, useState } from "react";
 
-export const useExerciseFilters = (allExercises: BaseExercise[]) => {
+export const useExerciseFilters = (
+  allExercises: BaseExercise[],
+  idToExclude: string | null
+) => {
   const [filters, setFilters] = useState<ExerciseFilters>(DEFAULT_FILTERS);
+
+  // Obtener el ejercicio que se va a reemplazar
+  const exerciseToReplace = useMemo(() => {
+    if (!idToExclude) return null;
+    return allExercises.find((ex) => ex.id === idToExclude) || null;
+  }, [allExercises, idToExclude]);
 
   // Función para actualizar filtros individuales
   const updateFilter = <K extends keyof ExerciseFilters>(
@@ -116,9 +125,9 @@ export const useExerciseFilters = (allExercises: BaseExercise[]) => {
     [filters]
   );
 
-  // Ejercicios filtrados
+  // Ejercicios filtrados con lógica de similares
   const filteredExercises = useMemo(() => {
-    return allExercises.filter((exercise) => {
+    const baseFiltered = allExercises.filter((exercise) => {
       // Filtro de búsqueda por texto
       if (filters.searchQuery) {
         const query = filters.searchQuery.toLowerCase();
@@ -164,7 +173,49 @@ export const useExerciseFilters = (allExercises: BaseExercise[]) => {
 
       return true;
     });
-  }, [allExercises, filters, passesEquipmentFilter]);
+
+    // Si estamos en modo replace y hay ejercicio a reemplazar, priorizamos similares
+    if (exerciseToReplace && exerciseToReplace.similar_exercises) {
+      const similarIds = exerciseToReplace.similar_exercises;
+
+      // Separar ejercicios similares y otros
+      const similarExercises = baseFiltered.filter(
+        (ex) => similarIds.includes(ex.id) && ex.id !== exerciseToReplace.id
+      );
+
+      const otherExercises = baseFiltered.filter(
+        (ex) => !similarIds.includes(ex.id) && ex.id !== exerciseToReplace.id
+      );
+
+      // Retornar similares primero, luego otros
+      return [...similarExercises, ...otherExercises];
+    }
+
+    // Modo normal: solo excluir el ejercicio si aplica
+    return baseFiltered.filter((ex) => ex.id !== idToExclude);
+  }, [
+    allExercises,
+    filters,
+    passesEquipmentFilter,
+    exerciseToReplace,
+    idToExclude,
+  ]);
+
+  // Datos adicionales para UI de replace
+  const replaceData = useMemo(() => {
+    if (!exerciseToReplace) return null;
+
+    const similarIds = exerciseToReplace.similar_exercises || [];
+    const similarExercises = filteredExercises.filter((ex) =>
+      similarIds.includes(ex.id)
+    );
+
+    return {
+      exerciseToReplace,
+      similarExercises,
+      hasSimilarExercises: similarExercises.length > 0,
+    };
+  }, [exerciseToReplace, filteredExercises]);
 
   // Contador de filtros activos
   const activeFiltersCount = useMemo(() => {
@@ -239,5 +290,6 @@ export const useExerciseFilters = (allExercises: BaseExercise[]) => {
     toggleSpecificMuscle,
     toggleSpecificEquipment,
     clearAllFilters,
+    replaceData,
   };
 };

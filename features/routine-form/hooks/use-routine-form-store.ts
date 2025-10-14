@@ -46,6 +46,7 @@ type Store = {
     currentBlockId?: string | null;
     currentExerciseInBlockId?: string | null;
     currentSetId?: string | null;
+    currentExerciseId?: string | null;
 
     currentRepsType?: IRepsType | null;
     currentRestTimeType?: "between-exercises" | "between-rounds" | null;
@@ -155,6 +156,7 @@ const useRoutineFormStore = create<Store>()(
       currentExerciseName: null,
       isCurrentBlockMulti: false,
       currentSetTempo: null,
+      currentExerciseId: null,
     },
 
     sharedActions: {
@@ -397,6 +399,7 @@ const useRoutineFormStore = create<Store>()(
             currentExerciseName: null,
             isCurrentBlockMulti: false,
             currentSetTempo: null,
+            currentExerciseId: null,
           };
         });
       },

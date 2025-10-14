@@ -99,6 +99,7 @@ export const ActiveBottomSheets: React.FC<Props> = ({
   const handleShowReplaceModal = useCallback(() => {
     setExerciseModalMode("replace");
     exerciseOptionsBottomSheetRef.current?.dismiss();
+    blockOptionsBottomSheetRef.current?.dismiss();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setExerciseModalMode]);
 

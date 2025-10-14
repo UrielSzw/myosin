@@ -10,12 +10,14 @@ type Props = {
   onClose: () => void;
   selectedExercises: Record<string, BaseExercise>;
   exerciseModalMode?: "add-new" | "add-to-block" | "replace" | null;
+  exerciseToReplace?: BaseExercise | null;
 };
 
 export const ExerciseSelectorHeader: React.FC<Props> = ({
   onClose,
   selectedExercises,
   exerciseModalMode,
+  exerciseToReplace,
 }) => {
   const { colors } = useColorScheme();
 
@@ -35,10 +37,14 @@ export const ExerciseSelectorHeader: React.FC<Props> = ({
       <View style={{ flex: 1 }}>
         <Typography variant="h5" weight="semibold">
           {exerciseModalMode === "replace"
-            ? "Reemplazar Ejercicio"
+            ? "Reemplazar"
             : "Seleccionar Ejercicios"}
         </Typography>
-        {exerciseModalMode === "replace" ? (
+        {exerciseModalMode === "replace" && exerciseToReplace ? (
+          <Typography variant="body2" color="textMuted">
+            {exerciseToReplace.name}
+          </Typography>
+        ) : exerciseModalMode === "replace" ? (
           <Typography variant="body2" color="textMuted">
             {selectedExercisesLength > 0
               ? `Reemplazando ${selectedExercisesLength} ejercicio`

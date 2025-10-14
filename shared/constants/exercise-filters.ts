@@ -229,4 +229,9 @@ export interface ExerciseFilterData {
     type: "category" | "quick" | "muscle" | "equipment";
     onRemove: () => void;
   }[];
+  replaceData?: {
+    exerciseToReplace: import("../db/schema").BaseExercise;
+    similarExercises: import("../db/schema").BaseExercise[];
+    hasSimilarExercises: boolean;
+  } | null;
 }

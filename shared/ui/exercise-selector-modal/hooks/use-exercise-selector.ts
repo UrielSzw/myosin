@@ -2,7 +2,7 @@ import { BaseExercise } from "@/shared/db/schema";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { useCallback, useMemo, useState } from "react";
 
-export const useExerciseSelector = () => {
+export const useExerciseSelector = (isReplaceMode: boolean) => {
   const [selectedExercises, setSelectedExercises] = useState<
     Record<string, BaseExercise>
   >({});
@@ -12,8 +12,6 @@ export const useExerciseSelector = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedCategory, setSelectedCategory] =
     useState<IExerciseMuscle | null>(null);
-
-  console.log("Selected Exercises:", selectedExercises);
 
   // Función para filtrar ejercicios en memoria
   const getFilteredExercises = useCallback(
@@ -56,19 +54,27 @@ export const useExerciseSelector = () => {
   );
 
   // Handlers
-  const handleSelectExercise = useCallback((exercise: BaseExercise) => {
-    setSelectedExercises((prev) => {
-      if (prev[exercise.id]) {
-        // Si ya está seleccionado, lo removemos
-        const newState = { ...prev };
-        delete newState[exercise.id];
-        return newState;
-      } else {
-        // Si no está seleccionado, lo agregamos
-        return { ...prev, [exercise.id]: exercise };
-      }
-    });
-  }, []);
+  const handleSelectExercise = useCallback(
+    (exercise: BaseExercise) => {
+      setSelectedExercises((prev) => {
+        if (prev[exercise.id]) {
+          // Si ya está seleccionado, lo removemos
+          const newState = { ...prev };
+          delete newState[exercise.id];
+          return newState;
+        } else {
+          if (isReplaceMode) {
+            // En modo replace, solo permitimos uno
+            return { [exercise.id]: exercise };
+          }
+
+          // Si no está seleccionado, lo agregamos
+          return { ...prev, [exercise.id]: exercise };
+        }
+      });
+    },
+    [isReplaceMode]
+  );
 
   const handleSeeMoreInfo = useCallback((exercise: BaseExercise) => {
     setInfoExercise(exercise);

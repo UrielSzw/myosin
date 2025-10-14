@@ -16,7 +16,7 @@ type Props = {
 export const ActiveExerciseModal: React.FC<Props> = ({
   blockOptionsBottomSheetRef,
 }) => {
-  const { exerciseModalMode } = useActiveWorkoutState();
+  const { exerciseModalMode, currentExerciseId } = useActiveWorkoutState();
   const { clearCurrentState } = useActiveMainActions();
 
   const { addIndividualBlock, addMultiBlock, addToBlock } =
@@ -56,6 +56,7 @@ export const ActiveExerciseModal: React.FC<Props> = ({
       exerciseModalMode={exerciseModalMode}
       onReplaceExercise={handleReplaceExercise}
       onAddToBlock={handleAddToBlock}
+      exerciseIdToExclude={currentExerciseId}
     />
   );
 };

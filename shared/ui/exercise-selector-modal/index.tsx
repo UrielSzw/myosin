@@ -22,6 +22,7 @@ type Props = {
   onReplaceExercise: (selectedExercises: BaseExercise[]) => void;
   onAddToBlock: (selectedExercises: BaseExercise[]) => void;
   exerciseModalMode?: "add-new" | "add-to-block" | "replace" | null;
+  exerciseIdToExclude?: string | null;
 };
 
 export const ExerciseSelectorModal: React.FC<Props> = ({
@@ -32,11 +33,15 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
   exerciseModalMode,
   onReplaceExercise,
   onAddToBlock,
+  exerciseIdToExclude = null,
 }) => {
   const { exercises, loading, error } = useExercises();
 
+  const idToExclude =
+    exerciseModalMode === "replace" ? exerciseIdToExclude : null;
+
   // Hook de filtros elevado al modal padre
-  const filtersHook = useExerciseFilters(exercises || []);
+  const filtersHook = useExerciseFilters(exercises || [], idToExclude);
 
   const {
     selectedExercises,
@@ -47,7 +52,7 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
     handleSeeMoreInfo,
     handleCloseExerciseDetail,
     clearSelectedExercises,
-  } = useExerciseSelector();
+  } = useExerciseSelector(exerciseModalMode === "replace");
 
   // Aplicar filtros a los ejercicios
 
@@ -180,6 +185,7 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
               filteredExercises: filtersHook.filteredExercises,
               activeFiltersCount: filtersHook.activeFiltersCount,
               activeFiltersList: filtersHook.activeFiltersList,
+              replaceData: filtersHook.replaceData,
             }}
           />
         </Animated.View>

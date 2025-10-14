@@ -100,6 +100,7 @@ type Store = {
   currentState: {
     currentBlockId?: string | null;
     currentExerciseInBlockId?: string | null;
+    currentExerciseId?: string | null;
     currentSetId?: string | null;
     currentRestTime?: number | null;
     currentRestTimeType?: "between-exercises" | "between-rounds" | null;
@@ -218,6 +219,7 @@ const useActiveWorkoutStore = create<Store>()(
       currentExercisesCount: null,
       currentRpeValue: null,
       currentExerciseName: null,
+      currentExerciseId: null,
     },
 
     // Stats calculadas
@@ -544,6 +546,7 @@ const useActiveWorkoutStore = create<Store>()(
             currentExercisesCount: null,
             currentExerciseName: null,
             isCurrentBlockMulti: false,
+            currentExerciseId: null,
           };
 
           state.restTimer = null;

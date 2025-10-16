@@ -1,6 +1,10 @@
 import { BaseWorkoutSet } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import {
+  getMeasurementTemplate,
+  hasWeightMeasurement,
+} from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { Check, X } from "lucide-react-native";
 import React from "react";
@@ -15,9 +19,46 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
   const { colors } = useColorScheme();
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
 
+  // Get measurement template for dynamic headers (assume all sets have same template)
+  const measurementTemplate =
+    sets.length > 0
+      ? getMeasurementTemplate(sets[0].measurement_template)
+      : null;
+
   const formatValue = (value: number | null): string => {
     if (value === null) return "-";
     return value % 1 === 0 ? value.toString() : value.toFixed(1);
+  };
+
+  const formatActualValues = (set: BaseWorkoutSet): string => {
+    if (!set.completed) return "No completado";
+
+    if (!measurementTemplate) return "-";
+
+    const primaryValue = set.actual_primary_value;
+    const secondaryValue = set.actual_secondary_value;
+
+    if (measurementTemplate.fields.length === 1) {
+      // Single metric template
+      const field = measurementTemplate.fields[0];
+      return `${formatValue(primaryValue)}${field.unit}`;
+    } else {
+      // Dual metric template
+      const primaryField = measurementTemplate.fields[0];
+      const secondaryField = measurementTemplate.fields[1];
+      return `${formatValue(primaryValue)}${primaryField.unit} × ${formatValue(
+        secondaryValue
+      )}${secondaryField.unit}`;
+    }
+  };
+
+  const getVolumeDisplay = (set: BaseWorkoutSet): string => {
+    if (!set.completed || !hasWeightMeasurement(set.measurement_template))
+      return "";
+
+    const weight = set.actual_primary_value || 0;
+    const reps = set.actual_secondary_value || 0;
+    return `Vol: ${(weight * reps).toLocaleString()}kg`;
   };
 
   const getRPEColor = (rpe: number | null, planned: number | null) => {
@@ -50,7 +91,10 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
         </View>
         <View style={{ flex: 1, paddingHorizontal: 8 }}>
           <Typography variant="caption" weight="medium" color="textMuted">
-            Realizado
+            {measurementTemplate?.fields.length === 1
+              ? measurementTemplate.fields[0].label
+              : measurementTemplate?.fields.map((f) => f.label).join(" × ") ||
+                "Realizado"}
           </Typography>
         </View>
         <View style={{ width: 50, alignItems: "center" }}>
@@ -121,25 +165,18 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
                 color: set.completed ? colors.text : colors.textMuted,
               }}
             >
-              {set.completed
-                ? `${formatValue(set.actual_weight)}kg × ${formatValue(
-                    set.actual_reps
-                  )}`
-                : "No completado"}
+              {formatActualValues(set)}
             </Typography>
-            {set.completed && (
-              <Typography
-                variant="caption"
-                color="textMuted"
-                style={{ fontSize: 10 }}
-              >
-                Vol:{" "}
-                {(
-                  (set.actual_weight || 0) * (set.actual_reps || 0)
-                ).toLocaleString()}
-                kg
-              </Typography>
-            )}
+            {set.completed &&
+              hasWeightMeasurement(set.measurement_template) && (
+                <Typography
+                  variant="caption"
+                  color="textMuted"
+                  style={{ fontSize: 10 }}
+                >
+                  {getVolumeDisplay(set)}
+                </Typography>
+              )}
           </View>
 
           {/* RPE */}
@@ -195,38 +232,41 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
         </View>
       ))}
 
-      {/* Summary Row */}
-      {sets.length > 0 && (
-        <View
-          style={{
-            flexDirection: "row",
-            paddingVertical: 8,
-            borderTopWidth: 1,
-            borderTopColor: colors.border,
-            marginTop: 8,
-          }}
-        >
-          <View style={{ width: 40 }} />
-          <View style={{ flex: 1, paddingHorizontal: 8 }}>
-            <Typography variant="caption" color="textMuted">
-              Total Realizado
-            </Typography>
-            <Typography variant="body2" weight="semibold">
-              {sets
-                .filter((set) => set.completed)
-                .reduce(
-                  (sum, set) =>
-                    sum + (set.actual_weight || 0) * (set.actual_reps || 0),
-                  0
-                )
-                .toLocaleString()}
-              kg
-            </Typography>
+      {/* Summary Row - only show for weight-based exercises */}
+      {sets.length > 0 &&
+        hasWeightMeasurement(sets[0].measurement_template) && (
+          <View
+            style={{
+              flexDirection: "row",
+              paddingVertical: 8,
+              borderTopWidth: 1,
+              borderTopColor: colors.border,
+              marginTop: 8,
+            }}
+          >
+            <View style={{ width: 40 }} />
+            <View style={{ flex: 1, paddingHorizontal: 8 }}>
+              <Typography variant="caption" color="textMuted">
+                Total Realizado
+              </Typography>
+              <Typography variant="body2" weight="semibold">
+                {sets
+                  .filter((set) => set.completed)
+                  .reduce(
+                    (sum, set) =>
+                      sum +
+                      (set.actual_primary_value || 0) *
+                        (set.actual_secondary_value || 0),
+                    0
+                  )
+                  .toLocaleString()}
+                kg
+              </Typography>
+            </View>
+            <View style={{ width: 50 }} />
+            <View style={{ width: 40 }} />
           </View>
-          <View style={{ width: 50 }} />
-          <View style={{ width: 40 }} />
-        </View>
-      )}
+        )}
     </View>
   );
 };

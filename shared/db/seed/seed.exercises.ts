@@ -1,6 +1,6 @@
 import { ExerciseInsert } from "../schema";
 
-const exercisesChest = [
+const exercisesChest: ExerciseInsert[] = [
   {
     id: "uuid-press-banca-barra",
     name: "Press de banca con barra",
@@ -25,6 +25,7 @@ const exercisesChest = [
       "uuid-press-smith",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-banca-mancuernas",
@@ -49,6 +50,7 @@ const exercisesChest = [
       "uuid-flexiones",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-inclinado-barra",
@@ -74,6 +76,7 @@ const exercisesChest = [
       "uuid-flexiones-declinadas",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-inclinado-mancuernas",
@@ -98,6 +101,7 @@ const exercisesChest = [
       "uuid-flexiones-declinadas",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-declinado-barra",
@@ -123,6 +127,7 @@ const exercisesChest = [
       "uuid-aperturas-plano-mancuernas",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-aperturas-plano-mancuernas",
@@ -146,6 +151,7 @@ const exercisesChest = [
       "uuid-aperturas-maquina",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-aperturas-inclinadas-mancuernas",
@@ -169,6 +175,7 @@ const exercisesChest = [
       "uuid-aperturas-maquina",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-aperturas-maquina",
@@ -190,6 +197,7 @@ const exercisesChest = [
     ],
     similar_exercises: ["uuid-aperturas-plano-mancuernas", "uuid-cruce-poleas"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-cruce-poleas",
@@ -211,6 +219,7 @@ const exercisesChest = [
     ],
     similar_exercises: ["uuid-flexiones", "uuid-press-banca-barra"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-fondos-paralelas-pecho",
@@ -234,6 +243,7 @@ const exercisesChest = [
       "uuid-press-inclinado-barra",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-flexiones",
@@ -241,7 +251,7 @@ const exercisesChest = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "chest_middle",
-    secondary_muscle_groups: ["triceps", "front_delts", "core"],
+    secondary_muscle_groups: ["triceps", "front_delts", "rectus_abdominis"],
     primary_equipment: "bodyweight",
     equipment: ["bodyweight"],
     exercise_type: "compound",
@@ -254,6 +264,7 @@ const exercisesChest = [
     ],
     similar_exercises: ["uuid-press-banca-barra", "uuid-press-banda-elastica"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-flexiones-declinadas",
@@ -261,7 +272,7 @@ const exercisesChest = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "chest_upper",
-    secondary_muscle_groups: ["triceps", "front_delts", "core"],
+    secondary_muscle_groups: ["triceps", "front_delts", "rectus_abdominis"],
     primary_equipment: "bodyweight",
     equipment: ["bodyweight", "flat_bench"],
     exercise_type: "compound",
@@ -277,6 +288,7 @@ const exercisesChest = [
       "uuid-press-inclinado-mancuernas",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-maquina-pecho",
@@ -302,6 +314,7 @@ const exercisesChest = [
       "uuid-aperturas-maquina",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-smith",
@@ -325,6 +338,7 @@ const exercisesChest = [
       "uuid-press-banca-mancuernas",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-banda-elastica",
@@ -345,10 +359,11 @@ const exercisesChest = [
     ],
     similar_exercises: ["uuid-press-banca-barra", "uuid-flexiones"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesShoulders = [
+const exercisesShoulders: ExerciseInsert[] = [
   {
     id: "uuid-press-militar-barra-001",
     name: "Press militar con barra",
@@ -373,6 +388,7 @@ const exercisesShoulders = [
       "uuid-press-arnold-003",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-militar-mancuernas-002",
@@ -397,6 +413,7 @@ const exercisesShoulders = [
       "uuid-press-hombros-maquina-011",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-arnold-003",
@@ -420,6 +437,7 @@ const exercisesShoulders = [
       "uuid-press-militar-barra-001",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevaciones-laterales-mancuernas-004",
@@ -443,6 +461,7 @@ const exercisesShoulders = [
       "uuid-elevaciones-frontales-mancuernas-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevaciones-frontales-mancuernas-005",
@@ -465,6 +484,7 @@ const exercisesShoulders = [
       "uuid-press-militar-mancuernas-002",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevaciones-laterales-polea-006",
@@ -488,6 +508,7 @@ const exercisesShoulders = [
       "uuid-remo-menton-polea-008",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-remo-menton-barra-007",
@@ -495,7 +516,7 @@ const exercisesShoulders = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "side_delts",
-    secondary_muscle_groups: ["front_delts", "trapezius"],
+    secondary_muscle_groups: ["front_delts", "upper_traps"],
     primary_equipment: "barbell",
     equipment: ["barbell"],
     exercise_type: "compound",
@@ -511,6 +532,7 @@ const exercisesShoulders = [
       "uuid-elevaciones-laterales-polea-006",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-remo-menton-polea-008",
@@ -518,7 +540,7 @@ const exercisesShoulders = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "side_delts",
-    secondary_muscle_groups: ["front_delts", "trapezius"],
+    secondary_muscle_groups: ["front_delts", "upper_traps"],
     primary_equipment: "cable_machine",
     equipment: ["cable_machine"],
     exercise_type: "compound",
@@ -531,6 +553,7 @@ const exercisesShoulders = [
     ],
     similar_exercises: ["uuid-pajaros-mancuernas-009", "uuid-face-pull-010"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-pajaros-mancuernas-009",
@@ -551,6 +574,7 @@ const exercisesShoulders = [
     ],
     similar_exercises: ["uuid-face-pull-010", "uuid-pajaros-mancuernas-009"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-face-pull-010",
@@ -574,6 +598,7 @@ const exercisesShoulders = [
       "uuid-press-militar-barra-001",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-press-hombros-maquina-011",
@@ -598,6 +623,7 @@ const exercisesShoulders = [
       "uuid-press-militar-barra-001",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-plancha-serrato-012",
@@ -618,10 +644,11 @@ const exercisesShoulders = [
     ],
     similar_exercises: ["uuid-plancha-frontal-005"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesTriceps = [
+const exercisesTriceps: ExerciseInsert[] = [
   {
     id: "uuid-triceps-dips-001",
     name: "Fondos en paralelas (tríceps)",
@@ -644,6 +671,7 @@ const exercisesTriceps = [
       "uuid-triceps-machineext-009",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-pushdown-bar-002",
@@ -667,6 +695,7 @@ const exercisesTriceps = [
       "uuid-triceps-bandext-010",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-frenchpress-ez-003",
@@ -690,6 +719,7 @@ const exercisesTriceps = [
       "uuid-triceps-overhead-db-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-frenchpress-db-004",
@@ -713,6 +743,7 @@ const exercisesTriceps = [
       "uuid-triceps-overhead-db-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-overhead-db-005",
@@ -736,6 +767,7 @@ const exercisesTriceps = [
       "uuid-triceps-bandext-010",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-ropepushdown-006",
@@ -759,6 +791,7 @@ const exercisesTriceps = [
       "uuid-triceps-machineext-009",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-kickback-db-007",
@@ -782,6 +815,7 @@ const exercisesTriceps = [
       "uuid-triceps-frenchpress-db-004",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-closepushups-008",
@@ -805,6 +839,7 @@ const exercisesTriceps = [
       "uuid-triceps-pushdown-bar-002",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-machineext-009",
@@ -828,6 +863,7 @@ const exercisesTriceps = [
       "uuid-triceps-pushdown-bar-002",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-triceps-bandext-010",
@@ -851,10 +887,11 @@ const exercisesTriceps = [
       "uuid-triceps-overhead-db-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesBack = [
+const exercisesBack: ExerciseInsert[] = [
   {
     id: "uuid-pullups-001",
     name: "Dominadas",
@@ -874,6 +911,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-latpulldown-002", "uuid-bandrow-014"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-latpulldown-002",
@@ -894,6 +932,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-pullups-001", "uuid-latpulldown-behindneck-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-latpulldown-behindneck-003",
@@ -914,6 +953,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-latpulldown-002", "uuid-pullups-001"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-bentoverrow-barbell-004",
@@ -944,6 +984,7 @@ const exercisesBack = [
       "uuid-lowrow-cable-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-onearmrow-db-005",
@@ -968,6 +1009,7 @@ const exercisesBack = [
       "uuid-lowrow-cable-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-seatedrow-machine-006",
@@ -992,6 +1034,7 @@ const exercisesBack = [
       "uuid-bandrow-014",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-lowrow-cable-007",
@@ -1012,6 +1055,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-onearmrow-db-005", "uuid-seatedrow-machine-006"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-deadlift-008",
@@ -1042,6 +1086,7 @@ const exercisesBack = [
       "uuid-bentoverrow-barbell-004",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-stiffdeadlift-009",
@@ -1062,6 +1107,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-deadlift-008", "uuid-stiffdeadlift-009"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-pullover-db-010",
@@ -1082,6 +1128,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-deadlift-008", "uuid-onearmrow-db-005"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-tbarrow-011",
@@ -1102,6 +1149,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-lowrow-cable-007", "uuid-onearmrow-db-005"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-facepull-012",
@@ -1122,6 +1170,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-tbarrow-011", "uuid-bentoverrow-barbell-004"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-shrug-db-013",
@@ -1142,6 +1191,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-remo-menton-barra-007"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-bandrow-014",
@@ -1162,6 +1212,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-seatedrow-machine-006", "uuid-lowrow-cable-007"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-superman-015",
@@ -1182,6 +1233,7 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-extension-lumbar-011", "uuid-goodmornings-016"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-goodmornings-016",
@@ -1203,10 +1255,11 @@ const exercisesBack = [
     ],
     similar_exercises: ["uuid-superman-015", "uuid-peso-muerto-rumano-013"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesBiceps = [
+const exercisesBiceps: ExerciseInsert[] = [
   {
     id: "uuid-curl-barra-001",
     name: "Curl de bíceps con barra",
@@ -1230,6 +1283,7 @@ const exercisesBiceps = [
       "uuid-curl-banda-elastica-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-mancuernas-002",
@@ -1253,6 +1307,7 @@ const exercisesBiceps = [
       "uuid-curl-banda-elastica-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-alternado-003",
@@ -1272,6 +1327,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-mancuernas-002", "uuid-curl-barra-001"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-martillo-004",
@@ -1291,6 +1347,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-mancuernas-002", "uuid-curl-alternado-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-predicador-005",
@@ -1310,6 +1367,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-predicador-005", "uuid-curl-maquina-009"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-polea-baja-006",
@@ -1329,6 +1387,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-barra-001", "uuid-curl-banda-elastica-007"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-banda-elastica-007",
@@ -1351,6 +1410,7 @@ const exercisesBiceps = [
       "uuid-curl-mancuernas-002",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-concentrado-008",
@@ -1373,6 +1433,7 @@ const exercisesBiceps = [
       "uuid-curl-banda-elastica-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-maquina-009",
@@ -1392,6 +1453,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-maquina-009", "uuid-curl-polea-baja-006"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-inverso-010",
@@ -1411,6 +1473,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-polea-baja-006", "uuid-curl-barra-001"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-muneca-011",
@@ -1430,6 +1493,7 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-muneca-inverso-012"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-muneca-inverso-012",
@@ -1448,10 +1512,11 @@ const exercisesBiceps = [
     ],
     similar_exercises: ["uuid-curl-muneca-011"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesCore = [
+const exercisesCore: ExerciseInsert[] = [
   {
     id: "uuid-crunch-001",
     name: "Crunch abdominal clásico",
@@ -1474,6 +1539,7 @@ const exercisesCore = [
       "uuid-crunch-inverso-004",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-crunch-maquina-002",
@@ -1493,6 +1559,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-crunch-001", "uuid-crunch-polea-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-crunch-polea-003",
@@ -1502,7 +1569,7 @@ const exercisesCore = [
     main_muscle_group: "rectus_abdominis",
     secondary_muscle_groups: [],
     primary_equipment: "cable_machine",
-    equipment: ["cable_machine", "kneeling_pad"],
+    equipment: ["cable_machine"],
     exercise_type: "isolation",
     instructions: [
       "Arrodillate frente a la polea alta con cuerda, agarrando ambos extremos",
@@ -1512,6 +1579,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-crunch-001", "uuid-ab-wheel-010"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-crunch-inverso-004",
@@ -1533,6 +1601,7 @@ const exercisesCore = [
       "uuid-elevacion-rodillas-009",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-plancha-frontal-005",
@@ -1551,6 +1620,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-ab-wheel-010", "uuid-dead-bug-015"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-plancha-lateral-006",
@@ -1569,6 +1639,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-giros-rusos-007", "uuid-plancha-frontal-005"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-giros-rusos-007",
@@ -1588,6 +1659,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-plancha-lateral-006", "uuid-ab-wheel-010"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevacion-piernas-008",
@@ -1606,6 +1678,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-elevacion-rodillas-009", "uuid-ab-wheel-010"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevacion-rodillas-009",
@@ -1627,6 +1700,7 @@ const exercisesCore = [
       "uuid-crunch-inverso-004",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-ab-wheel-010",
@@ -1636,7 +1710,7 @@ const exercisesCore = [
     main_muscle_group: "rectus_abdominis",
     secondary_muscle_groups: ["obliques", "lower_back"],
     primary_equipment: "ab_wheel",
-    equipment: ["ab_wheel", "kneeling_pad"],
+    equipment: ["ab_wheel"],
     exercise_type: "isolation",
     instructions: [
       "Arrodillate sobre un pad y sujetá la rueda abdominal con ambas manos",
@@ -1648,6 +1722,7 @@ const exercisesCore = [
       "uuid-plancha-frontal-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-extension-lumbar-011",
@@ -1667,6 +1742,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-superman-015", "uuid-goodmornings-016"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-superman-012",
@@ -1685,6 +1761,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-extension-lumbar-011", "uuid-goodmornings-016"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-peso-muerto-rumano-013",
@@ -1707,6 +1784,7 @@ const exercisesCore = [
       "uuid-peso-muerto-una-pierna-018",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-bird-dog-014",
@@ -1726,6 +1804,7 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-dead-bug-015", "uuid-extension-lumbar-011"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-dead-bug-015",
@@ -1745,10 +1824,11 @@ const exercisesCore = [
     ],
     similar_exercises: ["uuid-plancha-frontal-005", "uuid-bird-dog-014"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesLegs = [
+const exercisesLegs: ExerciseInsert[] = [
   {
     id: "uuid-sentadilla-barra-001",
     name: "Sentadilla con barra",
@@ -1772,6 +1852,7 @@ const exercisesLegs = [
       "uuid-sentadilla-smith-004",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-sentadilla-frontal-002",
@@ -1795,6 +1876,7 @@ const exercisesLegs = [
       "uuid-sentadilla-goblet-003",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-sentadilla-goblet-003",
@@ -1819,6 +1901,7 @@ const exercisesLegs = [
       "uuid-prensa-piernas-005",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-sentadilla-smith-004",
@@ -1842,6 +1925,7 @@ const exercisesLegs = [
       "uuid-sentadilla-goblet-003",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-prensa-piernas-005",
@@ -1865,6 +1949,7 @@ const exercisesLegs = [
       "uuid-sentadilla-goblet-003",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-zancadas-006",
@@ -1889,6 +1974,7 @@ const exercisesLegs = [
       "uuid-sentadilla-goblet-003",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-zancadas-bulgaras-007",
@@ -1909,6 +1995,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-zancadas-006", "uuid-step-up-008"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-step-up-008",
@@ -1928,6 +2015,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-zancadas-006", "uuid-sentadilla-goblet-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-peso-muerto-rumano-009",
@@ -1950,6 +2038,7 @@ const exercisesLegs = [
       "uuid-stiffdeadlift-009",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-acostado-010",
@@ -1968,6 +2057,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-curl-sentado-011"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-curl-sentado-011",
@@ -1989,6 +2079,7 @@ const exercisesLegs = [
       "uuid-sentadilla-barra-001",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-extension-piernas-012",
@@ -2007,6 +2098,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-hip-thrust-013", "uuid-sentadilla-goblet-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-hip-thrust-013",
@@ -2027,6 +2119,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-hip-thrust-013", "uuid-glute-bridge-014"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-glute-bridge-014",
@@ -2046,6 +2139,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-abduccion-banda-016"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-abduccion-maquina-015",
@@ -2065,6 +2159,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-abduccion-maquina-015"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-abduccion-banda-016",
@@ -2087,6 +2182,7 @@ const exercisesLegs = [
       "uuid-peso-muerto-una-pierna-018",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-adduccion-maquina-017",
@@ -2106,6 +2202,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-elevaciones-talones-sentado-020"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-peso-muerto-una-pierna-018",
@@ -2125,6 +2222,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-elevaciones-talones-019"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevaciones-talones-019",
@@ -2144,6 +2242,7 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-elevaciones-talones-sentado-020"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-elevaciones-talones-sentado-020",
@@ -2163,10 +2262,11 @@ const exercisesLegs = [
     ],
     similar_exercises: ["uuid-elevaciones-talones-019"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 
-const exercisesFullBody = [
+const exercisesFullBody: ExerciseInsert[] = [
   {
     id: "uuid-burpees-001",
     name: "Burpees",
@@ -2197,6 +2297,7 @@ const exercisesFullBody = [
       "uuid-battle-ropes-011",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-swing-kettlebell-002",
@@ -2204,7 +2305,12 @@ const exercisesFullBody = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "glutes",
-    secondary_muscle_groups: ["hamstrings", "lower_back", "shoulders", "quads"],
+    secondary_muscle_groups: [
+      "hamstrings",
+      "lower_back",
+      "front_delts",
+      "quads",
+    ],
     primary_equipment: "kettlebell",
     equipment: ["kettlebell"],
     exercise_type: "compound",
@@ -2217,6 +2323,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-clean-press-dumbbell-007", "uuid-deadlift-008"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-thruster-003",
@@ -2240,6 +2347,7 @@ const exercisesFullBody = [
       "uuid-clean-press-dumbbell-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-clean-barbell-004",
@@ -2269,6 +2377,7 @@ const exercisesFullBody = [
       "uuid-clean-press-dumbbell-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-snatch-barbell-005",
@@ -2280,7 +2389,7 @@ const exercisesFullBody = [
       "quads",
       "glutes",
       "hamstrings",
-      "shoulders",
+      "front_delts",
       "upper_traps",
     ],
     primary_equipment: "barbell",
@@ -2295,6 +2404,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-power-clean-008", "uuid-clean-barbell-004"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-remo-renegado-006",
@@ -2320,6 +2430,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-onearmrow-db-005", "uuid-seatedrow-machine-006"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-clean-press-dumbbell-007",
@@ -2327,7 +2438,7 @@ const exercisesFullBody = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "full_body",
-    secondary_muscle_groups: ["quads", "glutes", "shoulders", "triceps"],
+    secondary_muscle_groups: ["quads", "glutes", "front_delts", "triceps"],
     primary_equipment: "dumbbell",
     equipment: ["dumbbell"],
     exercise_type: "compound",
@@ -2340,6 +2451,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-thruster-003", "uuid-clean-barbell-004"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-power-clean-008",
@@ -2369,6 +2481,7 @@ const exercisesFullBody = [
       "uuid-clean-press-dumbbell-007",
     ],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-stepup-press-009",
@@ -2389,6 +2502,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-step-up-008", "uuid-zancadas-006"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-turkish-getup-010",
@@ -2396,7 +2510,12 @@ const exercisesFullBody = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "full_body",
-    secondary_muscle_groups: ["shoulders", "glutes", "core", "quads"],
+    secondary_muscle_groups: [
+      "front_delts",
+      "glutes",
+      "rectus_abdominis",
+      "quads",
+    ],
     primary_equipment: "kettlebell",
     equipment: ["kettlebell", "bodyweight"],
     exercise_type: "compound",
@@ -2409,6 +2528,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: [],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-battle-ropes-011",
@@ -2416,8 +2536,8 @@ const exercisesFullBody = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "full_body",
-    secondary_muscle_groups: ["shoulders", "biceps", "triceps", "core", "lats"],
-    primary_equipment: "rope",
+    secondary_muscle_groups: ["front_delts", "biceps", "triceps", "lats"],
+    primary_equipment: "other",
     equipment: ["bodyweight", "resistance_band"],
     exercise_type: "compound",
     instructions: [
@@ -2428,6 +2548,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-burpees-001", "uuid-mountain-climbers-012"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-mountain-climbers-012",
@@ -2452,6 +2573,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-burpees-001", "uuid-bear-crawl-014"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-box-jump-013",
@@ -2471,6 +2593,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-burpees-001", "uuid-step-up-008"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-bear-crawl-014",
@@ -2478,7 +2601,7 @@ const exercisesFullBody = [
     source: "system",
     created_by_user_id: null,
     main_muscle_group: "full_body",
-    secondary_muscle_groups: ["shoulders", "core", "quads", "glutes"],
+    secondary_muscle_groups: ["front_delts", "obliques", "quads", "glutes"],
     primary_equipment: "bodyweight",
     equipment: ["bodyweight"],
     exercise_type: "compound",
@@ -2490,6 +2613,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-mountain-climbers-012", "uuid-burpees-001"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
   {
     id: "uuid-sentadilla-press-015",
@@ -2510,6 +2634,7 @@ const exercisesFullBody = [
     ],
     similar_exercises: ["uuid-thruster-003", "uuid-sentadilla-goblet-003"],
     images: [],
+    default_measurement_template: "weight_reps",
   },
 ];
 

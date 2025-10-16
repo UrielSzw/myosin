@@ -49,9 +49,15 @@ export const useSaveWorkoutSession = () => {
       const totalSetsCompleted = completedSets.length;
 
       // Calcular volumen total (peso * reps de sets completados)
+      // Calcular volumen para weight_reps y weight_reps_range templates (weight * reps)
       const totalVolumeKg = completedSets.reduce((total, set) => {
-        if (set.actual_weight && set.actual_reps) {
-          return total + set.actual_weight * set.actual_reps;
+        if (
+          (set.measurement_template === "weight_reps" ||
+            set.measurement_template === "weight_reps_range") &&
+          set.actual_primary_value &&
+          set.actual_secondary_value
+        ) {
+          return total + set.actual_primary_value * set.actual_secondary_value;
         }
         return total;
       }, 0);
@@ -195,17 +201,18 @@ export const useSaveWorkoutSession = () => {
                 exercise_id: exercise.exercise_id,
                 original_set_id: set.original_set_id,
                 order_index: set.order_index,
-                planned_weight: set.planned_weight,
-                planned_reps: set.planned_reps,
+                measurement_template: set.measurement_template,
+                planned_primary_value: set.planned_primary_value,
+                planned_secondary_value: set.planned_secondary_value,
+                planned_primary_range: set.planned_primary_range,
+                planned_secondary_range: set.planned_secondary_range,
                 planned_rpe: set.planned_rpe,
-                actual_weight: set.actual_weight,
-                actual_reps: set.actual_reps,
+                planned_tempo: set.planned_tempo,
+                actual_primary_value: set.actual_primary_value,
+                actual_secondary_value: set.actual_secondary_value,
                 actual_rpe: set.actual_rpe,
                 set_type: set.set_type,
-                reps_type: set.reps_type,
-                reps_range: set.reps_range,
                 completed: true,
-                planned_tempo: set.planned_tempo,
               });
             }
           });

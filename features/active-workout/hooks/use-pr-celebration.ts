@@ -1,4 +1,3 @@
-import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import * as Haptics from "expo-haptics";
 import { useCallback } from "react";
 import {
@@ -10,8 +9,6 @@ import {
 } from "react-native-reanimated";
 
 export const usePRCelebration = () => {
-  const { colors } = useColorScheme();
-
   // Animation values
   const glowPulse = useSharedValue(0);
   const borderSlide = useSharedValue(-100);

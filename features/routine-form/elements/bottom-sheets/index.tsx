@@ -18,12 +18,12 @@ import {
 } from "../../hooks/use-routine-form-store";
 import { useReorderBlocks } from "../../shared/use-reorder-blocks";
 import { useReorderExercises } from "../../shared/use-reorder-exercises";
-import { RepsTypeBottomSheet } from "../reps-type-sheet";
+import { MeasurementTemplateSelector } from "../measurement-template-selector";
 import { RoutineSettingsBottomSheet } from "../routine-settings-sheet";
 
 type Props = {
   setTypeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
-  repsTypeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
+  measurementTemplateBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   restTimeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   blockOptionsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
   exerciseOptionsBottomSheetRef: React.RefObject<BottomSheetModal | null>;
@@ -34,7 +34,7 @@ type Props = {
 
 export const BottomSheets: React.FC<Props> = ({
   setTypeBottomSheetRef,
-  repsTypeBottomSheetRef,
+  measurementTemplateBottomSheetRef,
   restTimeBottomSheetRef,
   blockOptionsBottomSheetRef,
   exerciseOptionsBottomSheetRef,
@@ -183,7 +183,7 @@ export const BottomSheets: React.FC<Props> = ({
         currentSetType={currentSetType}
       />
 
-      <RepsTypeBottomSheet ref={repsTypeBottomSheetRef} />
+      <MeasurementTemplateSelector ref={measurementTemplateBottomSheetRef} />
 
       <RestTimeBottomSheet
         ref={restTimeBottomSheetRef}

@@ -6,8 +6,12 @@ import {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import {
+  MeasurementTemplateId,
+  getDefaultTemplate,
+} from "@/shared/types/measurement";
 import { ReorderExercise } from "@/shared/types/reorder";
-import { IRepsType, ISetType, RPEValue } from "@/shared/types/workout";
+import { ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { routinesService } from "../../workouts/service/routines";
@@ -16,8 +20,9 @@ import {
   createExercises,
   createIndividualBlocks,
   createMultiBlock,
-  createNewSetForExercise,
 } from "../utils/store-helpers";
+
+const generateTempId = () => `temp_${Date.now()}_${Math.random()}`;
 
 type Store = {
   exerciseModalState: {
@@ -48,7 +53,7 @@ type Store = {
     currentSetId?: string | null;
     currentExerciseId?: string | null;
 
-    currentRepsType?: IRepsType | null;
+    currentMeasurementTemplate?: MeasurementTemplateId | null;
     currentRestTimeType?: "between-exercises" | "between-rounds" | null;
     currentRestTime?: number | null;
     currentSetType?: ISetType | null;
@@ -101,12 +106,15 @@ type Store = {
 
   exerciseActions: {
     deleteExercise: () => void;
-    updateRepsType: (repsType: IRepsType) => void;
+    updateMeasurementTemplate: (templateId: MeasurementTemplateId) => void;
     replaceExercise: (selectedExercises: BaseExercise[]) => void;
   };
 
   setActions: {
-    addSet: (exerciseInBlockId: string, repsType: IRepsType) => void;
+    addSet: (
+      exerciseInBlockId: string,
+      templateId?: MeasurementTemplateId
+    ) => void;
     updateSet: (
       setId: string,
       updates: Partial<SetInsert & { tempId: string }>
@@ -138,7 +146,6 @@ const useRoutineFormStore = create<Store>()(
       exercisesByBlock: {},
       setsByExercise: {},
     },
-    selectedExercises: [],
     exerciseModalState: {
       isExerciseModalOpen: false,
       exerciseModalMode: null,
@@ -148,7 +155,7 @@ const useRoutineFormStore = create<Store>()(
       currentBlockId: null,
       currentExerciseInBlockId: null,
       currentSetId: null,
-      currentRepsType: null,
+      currentMeasurementTemplate: null,
       currentRestTimeType: null,
       currentRestTime: null,
       currentExercisesCount: null,
@@ -391,7 +398,7 @@ const useRoutineFormStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
+            currentMeasurementTemplate: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -478,7 +485,7 @@ const useRoutineFormStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
+            currentMeasurementTemplate: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -664,7 +671,7 @@ const useRoutineFormStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
+            currentMeasurementTemplate: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -815,7 +822,7 @@ const useRoutineFormStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
+            currentMeasurementTemplate: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -853,10 +860,14 @@ const useRoutineFormStore = create<Store>()(
         });
       },
 
-      updateRepsType: (repsType) => {
+      updateMeasurementTemplate: (templateId) => {
         set((state) => {
           const { currentState, formState } = state;
-          if (!formState || !currentState.currentExerciseInBlockId || !repsType)
+          if (
+            !formState ||
+            !currentState.currentExerciseInBlockId ||
+            !templateId
+          )
             return;
 
           const exerciseInBlockId = currentState.currentExerciseInBlockId;
@@ -866,7 +877,15 @@ const useRoutineFormStore = create<Store>()(
             const set = formState.sets[setId];
 
             if (set) {
-              state.formState.sets[setId].reps_type = repsType;
+              // Reset measurement values when changing template
+              state.formState.sets[setId] = {
+                ...set,
+                measurement_template: templateId,
+                primary_value: null,
+                secondary_value: null,
+                primary_range: null,
+                secondary_range: null,
+              };
             }
           });
         });
@@ -874,30 +893,46 @@ const useRoutineFormStore = create<Store>()(
     },
 
     setActions: {
-      addSet: (exerciseInBlockId, repsType) => {
+      addSet: (exerciseInBlockId, templateId) => {
         set((state) => {
           const exerciseInBlock =
             state.formState.exercisesInBlock[exerciseInBlockId];
-
           if (!exerciseInBlock) return;
 
-          const currentSets = state.formState.setsByExercise[exerciseInBlockId];
-
+          const currentSets =
+            state.formState.setsByExercise[exerciseInBlockId] || [];
           const lastSet =
-            state.formState.sets[currentSets[currentSets.length - 1]];
+            currentSets.length > 0
+              ? state.formState.sets[currentSets[currentSets.length - 1]]
+              : null;
 
-          const newSet: SetInsert & { tempId: string } =
-            createNewSetForExercise(
-              exerciseInBlockId,
-              currentSets.length,
-              lastSet?.weight || null,
-              lastSet?.reps || null,
-              lastSet.reps_range || null,
-              repsType
-            );
+          // Use provided template or exercise's default or global default
+          const measurementTemplate =
+            templateId ||
+            exerciseInBlock.exercise.default_measurement_template ||
+            getDefaultTemplate();
 
-          // Agregar el nuevo set al estado
+          const newSet: SetInsert & { tempId: string } = {
+            tempId: generateTempId(),
+            user_id: "default-user",
+            exercise_in_block_id: exerciseInBlockId,
+            id: "",
+            order_index: currentSets.length,
+            measurement_template: measurementTemplate,
+            primary_value: lastSet?.primary_value || null,
+            secondary_value: lastSet?.secondary_value || null,
+            primary_range: lastSet?.primary_range || null,
+            secondary_range: lastSet?.secondary_range || null,
+            set_type: "normal",
+            rpe: null,
+            tempo: null,
+          };
+
+          // Add to state
           state.formState.sets[newSet.tempId] = newSet;
+          if (!state.formState.setsByExercise[exerciseInBlockId]) {
+            state.formState.setsByExercise[exerciseInBlockId] = [];
+          }
           state.formState.setsByExercise[exerciseInBlockId].push(newSet.tempId);
         });
       },
@@ -941,8 +976,8 @@ const useRoutineFormStore = create<Store>()(
               const currentFieldValue = (nextSet as any)[field];
               const originalFieldValue = (originalSet as any)[field];
 
-              if (field === "reps_range") {
-                // Para reps_range, comparar sub-campos individualmente
+              if (field === "primary_range" || field === "secondary_range") {
+                // Para ranges, comparar sub-campos individualmente
                 const currentMin = currentFieldValue?.min;
                 const currentMax = currentFieldValue?.max;
                 const originalMin = originalFieldValue?.min;
@@ -969,7 +1004,7 @@ const useRoutineFormStore = create<Store>()(
                   (autoUpdates as any)[field] = value;
                 }
               } else {
-                // Para campos normales (weight, reps, etc.)
+                // Para campos normales (primary_value, secondary_value, etc.)
                 const shouldAutoComplete =
                   // Campo vacío en el set siguiente
                   currentFieldValue === "" ||

@@ -1,6 +1,10 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { IBlockType, IRepsType } from "@/shared/types/workout";
+import {
+  getDefaultTemplate,
+  getMeasurementTemplate,
+} from "@/shared/types/measurement";
+import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { ChevronDown, Plus, Timer } from "lucide-react-native";
 import React from "react";
@@ -27,7 +31,7 @@ export const SetsTable: React.FC<Props> = ({
 }) => {
   const { setsByExercise, sets, routine } = useRoutineFormState();
   const { colors } = useColorScheme();
-  const { getRepsColumnTitle, getBlockColors } = useBlockStyles();
+  const { getBlockColors } = useBlockStyles();
   const { addSet } = useSetActions();
   const { setCurrentState } = useMainActions();
 
@@ -36,18 +40,21 @@ export const SetsTable: React.FC<Props> = ({
   const blockColors = getBlockColors(blockType);
 
   const setId = setsByExercise[exerciseInBlockId]?.[0];
-  const repsType: IRepsType = sets[setId]?.reps_type || "reps";
+  const currentSet = sets[setId];
+  const template = getMeasurementTemplate(
+    currentSet?.measurement_template || getDefaultTemplate()
+  );
 
-  const handleRepsType = () => {
+  const handleMeasurementTemplate = () => {
     setCurrentState({
       currentExerciseInBlockId: exerciseInBlockId,
-      currentRepsType: repsType,
+      currentMeasurementTemplate: template.id,
     });
-    onToggleSheet("repsType");
+    onToggleSheet("measurementTemplate");
   };
 
   const handleAddSet = () => {
-    addSet(exerciseInBlockId, repsType);
+    addSet(exerciseInBlockId, template.id);
   };
 
   return (
@@ -68,40 +75,51 @@ export const SetsTable: React.FC<Props> = ({
             SET
           </Typography>
         </View>
-        <View style={{ flex: 1, paddingHorizontal: 8 }}>
-          <Typography variant="caption" weight="medium" color="textMuted">
-            KG
-          </Typography>
-        </View>
-        <View style={{ flex: 1, paddingHorizontal: 8 }}>
-          <TouchableOpacity
-            onPress={handleRepsType}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-              // Área clickeable mínima para accesibilidad
-              minHeight: 44,
-              paddingVertical: 12,
-              paddingHorizontal: 8,
-              // Margin negativo para mantener alineación visual
-              marginHorizontal: -8,
-              marginVertical: -12,
-            }}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel={`Cambiar tipo de repeticiones`}
-            accessibilityHint={`Actualmente configurado para ${getRepsColumnTitle(
-              repsType
-            )}. Toca para cambiar`}
-            accessibilityValue={{ text: getRepsColumnTitle(repsType) }}
-          >
-            <Typography variant="caption" weight="medium" color="textMuted">
-              {getRepsColumnTitle(repsType)}
-            </Typography>
-            <ChevronDown size={12} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
+
+        {/* Dynamic Measurement Headers - Single TouchableOpacity covering all fields */}
+        <TouchableOpacity
+          onPress={handleMeasurementTemplate}
+          style={{
+            flexDirection: "row",
+            // For single columns, use fixed width instead of flex to avoid full width
+            ...(template.fields.length === 1
+              ? { width: "50%" } // Fixed width for single column
+              : { flex: template.fields.length }), // Flex for dual columns
+            minHeight: 44,
+            paddingVertical: 12,
+            paddingHorizontal: 8,
+            marginHorizontal: -8,
+            marginVertical: -12,
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Cambiar template de medición"
+          accessibilityHint={`Actualmente: ${template.name}. Toca para cambiar`}
+          accessibilityValue={{ text: template.name }}
+        >
+          {template.fields.map((field, index) => (
+            <View key={field.id} style={{ flex: 1, paddingHorizontal: 8 }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Typography variant="caption" weight="medium" color="textMuted">
+                  {field.label}
+                </Typography>
+                {index === template.fields.length - 1 && (
+                  <ChevronDown
+                    size={12}
+                    color={colors.textMuted}
+                    style={{ marginLeft: 4 }}
+                  />
+                )}
+              </View>
+            </View>
+          ))}
+        </TouchableOpacity>
 
         {show_rpe && (
           <View style={{ width: 50, alignItems: "center" }}>

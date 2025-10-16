@@ -1,5 +1,6 @@
 import { WorkoutExerciseWithSets } from "@/shared/db/schema/workout-session";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { supportsPRCalculation } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell, Trophy } from "lucide-react-native";
 import React from "react";
@@ -19,11 +20,16 @@ export const SessionExerciseItem: React.FC<Props> = ({
 }) => {
   const { colors } = useColorScheme();
 
-  // Check if any set is a PR based on high estimated 1RM
+  // Check if any set is a PR based on high estimated 1RM - only for exercises that support PR calculation
   const hasPR = exercise.sets.some((set) => {
-    if (!set.completed || !set.actual_weight || !set.actual_reps) return false;
-    const estimatedOneRM = set.actual_weight * (1 + set.actual_reps / 30);
-    return estimatedOneRM > set.actual_weight * 1.2; // Simple heuristic
+    if (!set.completed || !supportsPRCalculation(set.measurement_template))
+      return false;
+    if (!set.actual_primary_value || !set.actual_secondary_value) return false;
+
+    const weight = set.actual_primary_value;
+    const reps = set.actual_secondary_value;
+    const estimatedOneRM = weight * (1 + reps / 30);
+    return estimatedOneRM > weight * 1.2; // Simple heuristic
   });
 
   const completedSets = exercise.sets.filter((set) => set.completed).length;

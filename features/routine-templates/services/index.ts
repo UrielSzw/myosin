@@ -104,14 +104,15 @@ export const convertTemplateToCreateData = (
       id: generateUUID(),
       user_id: "default-user",
       exercise_in_block_id: exerciseInBlockId,
-      reps: setTemplate.reps,
-      weight: setTemplate.weight,
+      measurement_template: setTemplate.measurement_template,
+      primary_value: setTemplate.primary_value,
+      secondary_value: setTemplate.secondary_value,
+      primary_range: setTemplate.primary_range,
+      secondary_range: setTemplate.secondary_range,
       rpe: setTemplate.rpe,
       tempo: setTemplate.tempo,
       order_index: setTemplate.order_index,
       set_type: setTemplate.set_type,
-      reps_type: setTemplate.reps_type,
-      reps_range: setTemplate.reps_range,
     };
   });
 

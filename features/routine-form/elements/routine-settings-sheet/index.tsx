@@ -20,26 +20,29 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
     const { setRoutineFlags } = useMainActions();
     const { routine } = useRoutineFormState();
 
-    const [showRpe, setShowRpe] = useState<boolean>(routine?.show_rpe || false);
-    const [showTempo, setShowTempo] = useState<boolean>(
-      routine?.show_tempo || false
-    );
+    console.log("🐛 RENDER RoutineSettingsBottomSheet:", routine?.show_rpe);
+
+    const [showRpe, setShowRpe] = useState<boolean | null>(null);
+    const [showTempo, setShowTempo] = useState<boolean | null>(null);
+
+    const renderShowRpe = showRpe ?? routine?.show_rpe ?? false;
+    const renderShowTempo = showTempo ?? routine?.show_tempo ?? false;
 
     // Apply changes immediately when switch values change
     const handleRpeChange = useCallback(
       (value: boolean) => {
         setShowRpe(value);
-        setRoutineFlags({ show_rpe: value, show_tempo: showTempo });
+        setRoutineFlags({ show_rpe: value, show_tempo: renderShowTempo });
       },
-      [setRoutineFlags, showTempo]
+      [setRoutineFlags, renderShowTempo]
     );
 
     const handleTempoChange = useCallback(
       (value: boolean) => {
         setShowTempo(value);
-        setRoutineFlags({ show_rpe: showRpe, show_tempo: value });
+        setRoutineFlags({ show_rpe: renderShowRpe, show_tempo: value });
       },
-      [setRoutineFlags, showRpe]
+      [setRoutineFlags, renderShowRpe]
     );
 
     const renderBackdrop = useCallback(
@@ -91,7 +94,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
               </Typography>
             </View>
             <Switch
-              value={showRpe}
+              value={renderShowRpe}
               onValueChange={handleRpeChange}
               accessibilityLabel="Mostrar RPE"
               trackColor={{
@@ -110,7 +113,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
               </Typography>
             </View>
             <Switch
-              value={showTempo}
+              value={renderShowTempo}
               onValueChange={handleTempoChange}
               accessibilityLabel="Mostrar Tempo"
               trackColor={{

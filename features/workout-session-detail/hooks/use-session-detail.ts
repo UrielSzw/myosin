@@ -1,5 +1,9 @@
 import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
 import { WorkoutSessionFull } from "@/shared/db/schema/workout-session";
+import {
+  hasWeightMeasurement,
+  supportsPRCalculation,
+} from "@/shared/types/measurement";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 
@@ -60,10 +64,12 @@ const calculateSessionAnalytics = (
         if (set.completed) {
           blockCompleted++;
 
-          // Volume calculation
-          const weight = set.actual_weight || 0;
-          const reps = set.actual_reps || 0;
-          totalVolume += weight * reps;
+          // Volume calculation - only for weight-based exercises
+          if (hasWeightMeasurement(set.measurement_template)) {
+            const weight = set.actual_primary_value || 0;
+            const reps = set.actual_secondary_value || 0;
+            totalVolume += weight * reps;
+          }
 
           // RPE tracking
           if (set.actual_rpe) {
@@ -71,14 +77,18 @@ const calculateSessionAnalytics = (
             rpeCount++;
           }
 
-          // PR tracking - need to implement proper PR detection logic
-          // For now, detect potential PRs based on high estimated 1RM
-          if (set.actual_weight && set.actual_reps) {
-            const estimatedOneRM =
-              set.actual_weight * (1 + set.actual_reps / 30);
+          // PR tracking - only for exercises that support PR calculation
+          if (
+            supportsPRCalculation(set.measurement_template) &&
+            set.actual_primary_value &&
+            set.actual_secondary_value
+          ) {
+            const weight = set.actual_primary_value;
+            const reps = set.actual_secondary_value;
+            const estimatedOneRM = weight * (1 + reps / 30);
 
             // Simple heuristic: if estimated 1RM is unusually high for this weight/rep combo
-            const isLikelyPR = estimatedOneRM > set.actual_weight * 1.2;
+            const isLikelyPR = estimatedOneRM > weight * 1.2;
 
             if (isLikelyPR) {
               prCount++;
@@ -87,8 +97,8 @@ const calculateSessionAnalytics = (
             // Add to best sets
             bestSets.push({
               exerciseName: exercise.exercise.name,
-              weight: set.actual_weight,
-              reps: set.actual_reps,
+              weight,
+              reps,
               estimatedOneRM,
               isPR: isLikelyPR,
             });
@@ -101,13 +111,17 @@ const calculateSessionAnalytics = (
           }
         }
 
-        // Planned vs Actual comparison
-        if (set.planned_weight && set.actual_weight) {
-          totalWeightDifference += set.actual_weight - set.planned_weight;
-          totalSetsWithPlanned++;
-        }
-        if (set.planned_reps && set.actual_reps) {
-          totalRepsDifference += set.actual_reps - set.planned_reps;
+        // Planned vs Actual comparison - only for weight-based exercises
+        if (hasWeightMeasurement(set.measurement_template)) {
+          if (set.planned_primary_value && set.actual_primary_value) {
+            totalWeightDifference +=
+              set.actual_primary_value - set.planned_primary_value;
+            totalSetsWithPlanned++;
+          }
+          if (set.planned_secondary_value && set.actual_secondary_value) {
+            totalRepsDifference +=
+              set.actual_secondary_value - set.planned_secondary_value;
+          }
         }
       });
     });

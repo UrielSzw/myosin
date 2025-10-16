@@ -1,5 +1,6 @@
 import { useActiveWorkout } from "@/features/active-workout/hooks/use-active-workout-store";
 import { computeEpley1RM } from "@/shared/db/utils/pr";
+import { supportsPRCalculation } from "@/shared/types/measurement";
 import { useMemo } from "react";
 
 export interface PRValidationResult {
@@ -22,14 +23,19 @@ export interface SessionPRData {
 /**
  * Hook centralizado para toda la lógica de Personal Records
  * Maneja validación, comparación y gestión de PRs de sesión
+ * Calcula PRs para templates weight_reps y weight_reps_range
  */
 export const usePRLogic = (exerciseId: string, tempSetId: string) => {
-  const { exercises, sessionBestPRs } = useActiveWorkout();
+  const { exercises, sessionBestPRs, sets } = useActiveWorkout();
 
-  // Obtener datos del ejercicio actual
+  // Obtener datos del ejercicio actual y set actual
   const exercise = useMemo(() => {
     return Object.values(exercises).find((ex) => ex.exercise_id === exerciseId);
   }, [exercises, exerciseId]);
+
+  const currentSet = useMemo(() => {
+    return Object.values(sets).find((s) => s.tempId === tempSetId);
+  }, [sets, tempSetId]);
 
   // PR histórico del ejercicio (cargado al inicializar workout)
   const historicalPR = exercise?.pr;
@@ -39,11 +45,26 @@ export const usePRLogic = (exerciseId: string, tempSetId: string) => {
 
   /**
    * Valida si un peso/reps constituye un PR
+   * Calcula PRs para weight_reps y weight_reps_range templates
    */
   const validatePR = (
     weight: number | null,
     reps: number | null
   ): PRValidationResult => {
+    // Guard clause: Solo calcular PRs para templates que soporten peso+reps
+    if (
+      !currentSet?.measurement_template ||
+      !supportsPRCalculation(currentSet.measurement_template)
+    ) {
+      return {
+        isPersonalBest: false,
+        isSessionBest: false,
+        isPR: false,
+        estimatedOneRM: 0,
+        improvementOver: "none",
+      };
+    }
+
     // Validar inputs
     if (!weight || !reps || weight <= 0 || reps <= 0) {
       return {

@@ -10,8 +10,6 @@ export type ISetType =
   | "partial"
   | "isometric";
 
-export type IRepsType = "reps" | "range" | "time" | "distance";
-
 export type IBlockType = "individual" | "superset" | "circuit";
 
 export type IExerciseMuscle =
@@ -91,7 +89,8 @@ export type IExerciseEquipment =
   | "flat_bench"
   | "incline_bench"
   | "decline_bench"
-  | "preacher_bench";
+  | "preacher_bench"
+  | "other";
 
 export type IExerciseSource = "system" | "user";
 

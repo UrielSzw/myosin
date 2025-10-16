@@ -18,7 +18,7 @@ export const RoutineFormFeature = () => {
   const {
     handleToggleSheet,
     setTypeBottomSheetRef,
-    repsTypeBottomSheetRef,
+    measurementTemplateBottomSheetRef,
     restTimeBottomSheetRef,
     blockOptionsBottomSheetRef,
     exerciseOptionsBottomSheetRef,
@@ -78,7 +78,7 @@ export const RoutineFormFeature = () => {
         blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
         exerciseOptionsBottomSheetRef={exerciseOptionsBottomSheetRef}
         restTimeBottomSheetRef={restTimeBottomSheetRef}
-        repsTypeBottomSheetRef={repsTypeBottomSheetRef}
+        measurementTemplateBottomSheetRef={measurementTemplateBottomSheetRef}
         setTypeBottomSheetRef={setTypeBottomSheetRef}
         rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
         tempoSelectorBottomSheetRef={tempoSelectorBottomSheetRef}

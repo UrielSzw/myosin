@@ -10,7 +10,8 @@ import {
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
 import { computeEpley1RM } from "@/shared/db/utils/pr";
-import { IRepsType, ISetType, RPEValue } from "@/shared/types/workout";
+import { MeasurementTemplateId } from "@/shared/types/measurement";
+import { ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import {
@@ -42,7 +43,10 @@ export type ActiveWorkoutExercise = WorkoutExerciseInsert & {
   pr?: BasePRCurrent | null;
 };
 
-export type ActiveWorkoutSet = WorkoutSetInsert & {
+export type ActiveWorkoutSet = Omit<
+  WorkoutSetInsert,
+  "actual_primary_range" | "actual_secondary_range"
+> & {
   tempId: string;
   completed_at: string | null; // Timestamp cuando se completa (no está en DB)
   was_pr?: boolean;
@@ -51,8 +55,9 @@ export type ActiveWorkoutSet = WorkoutSetInsert & {
 // Tipo para previous sets history
 export type PreviousSetData = {
   order_index: number;
-  actual_weight: number | null;
-  actual_reps: number | null;
+  measurement_template: MeasurementTemplateId;
+  actual_primary_value: number | null;
+  actual_secondary_value: number | null;
   actual_rpe: number | null;
   session_date: string;
 };
@@ -104,7 +109,6 @@ type Store = {
     currentSetId?: string | null;
     currentRestTime?: number | null;
     currentRestTimeType?: "between-exercises" | "between-rounds" | null;
-    currentRepsType?: IRepsType | null;
     currentSetType?: ISetType | null;
     exerciseModalMode?: "add-new" | "replace" | "add-to-block" | null;
     currentRpeValue?: RPEValue | null;
@@ -168,8 +172,8 @@ type Store = {
       setId: string,
       blockId: string,
       completionData: {
-        actualWeight: number | null;
-        actualReps: number | null;
+        primaryValue: number | null;
+        secondaryValue: number | null;
         actualRpe: number | null;
         estimated1RM: number | null;
         isPR: boolean;
@@ -213,7 +217,6 @@ const useActiveWorkoutStore = create<Store>()(
       currentSetId: null,
       currentRestTime: null,
       currentRestTimeType: null,
-      currentRepsType: null,
       currentSetType: null,
       exerciseModalMode: null,
       currentExercisesCount: null,
@@ -416,17 +419,18 @@ const useActiveWorkoutStore = create<Store>()(
                 workout_exercise_id: activeExercise.tempId,
                 original_set_id: set.id,
                 order_index: set.order_index,
-                reps_type: set.reps_type,
+                measurement_template: set.measurement_template,
                 set_type: set.set_type,
                 planned_tempo: set.tempo,
                 // Valores planificados (del routine)
-                planned_weight: set.weight,
-                planned_reps: set.reps,
+                planned_primary_value: set.primary_value,
+                planned_secondary_value: set.secondary_value,
+                planned_primary_range: set.primary_range,
+                planned_secondary_range: set.secondary_range,
                 planned_rpe: set.rpe,
-                reps_range: set.reps_range,
                 // Valores reales (se completan durante workout)
-                actual_weight: null,
-                actual_reps: null,
+                actual_primary_value: null,
+                actual_secondary_value: null,
                 actual_rpe: null,
                 completed: false,
                 completed_at: null, // Campo extra para el timestamp
@@ -497,7 +501,6 @@ const useActiveWorkoutStore = create<Store>()(
               currentSetId: null,
               currentRestTime: null,
               currentRestTimeType: null,
-              currentRepsType: null,
               currentSetType: null,
               exerciseModalMode: null,
               currentExercisesCount: null,
@@ -540,7 +543,6 @@ const useActiveWorkoutStore = create<Store>()(
             currentSetId: null,
             currentRestTime: null,
             currentRestTimeType: null,
-            currentRepsType: null,
             currentSetType: null,
             exerciseModalMode: null,
             currentExercisesCount: null,
@@ -564,7 +566,6 @@ const useActiveWorkoutStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -1013,7 +1014,6 @@ const useActiveWorkoutStore = create<Store>()(
             currentBlockId: null,
             currentExerciseInBlockId: null,
             currentSetId: null,
-            currentRepsType: null,
             currentRestTimeType: null,
             currentRestTime: null,
             currentExercisesCount: null,
@@ -1185,7 +1185,6 @@ const useActiveWorkoutStore = create<Store>()(
             currentSetId: null,
             currentRestTime: null,
             currentRestTimeType: null,
-            currentRepsType: null,
             currentSetType: null,
             exerciseModalMode: null,
             currentExercisesCount: null,
@@ -1212,10 +1211,10 @@ const useActiveWorkoutStore = create<Store>()(
 
           const newSet: ActiveWorkoutSet = createNewSetForExercise(
             currentSets.length,
-            lastSet?.planned_weight || null,
-            lastSet?.planned_reps || null,
-            lastSet?.reps_range || null,
-            lastSet?.reps_type || "reps",
+            lastSet?.planned_primary_value || null,
+            lastSet?.planned_secondary_value || null,
+            lastSet?.planned_primary_range || null,
+            lastSet?.measurement_template || "weight_reps",
             exerciseInBlockId,
             exerciseInBlock.exercise_id
           );
@@ -1240,18 +1239,30 @@ const useActiveWorkoutStore = create<Store>()(
 
           if (!set || set.completed || !exerciseInBlock) return;
 
-          const { actualWeight, actualReps, actualRpe, estimated1RM, isPR } =
-            completionData;
+          const {
+            primaryValue,
+            secondaryValue,
+            actualRpe,
+            estimated1RM,
+            isPR,
+          } = completionData;
 
           set.completed = true;
           set.completed_at = new Date().toISOString();
-          set.actual_weight = actualWeight;
-          set.actual_reps = actualReps;
+          set.actual_primary_value = primaryValue;
+          set.actual_secondary_value = secondaryValue;
           set.actual_rpe = actualRpe;
           set.was_pr = isPR || false;
 
-          // Handle PR detection and session-best tracking
-          if (isPR && actualWeight && actualReps && estimated1RM) {
+          // Handle PR detection and session-best tracking (weight_reps and weight_reps_range templates)
+          if (
+            isPR &&
+            (set.measurement_template === "weight_reps" ||
+              set.measurement_template === "weight_reps_range") &&
+            primaryValue &&
+            secondaryValue &&
+            estimated1RM
+          ) {
             const exerciseId = set.exercise_id;
             const currentSessionBest =
               state.activeWorkout.sessionBestPRs[exerciseId];
@@ -1274,8 +1285,8 @@ const useActiveWorkoutStore = create<Store>()(
               state.activeWorkout.sessionBestPRs[exerciseId] = {
                 tempSetId: set.tempId,
                 exercise_id: exerciseId,
-                weight: actualWeight,
-                reps: actualReps,
+                weight: primaryValue, // weight is primary_value
+                reps: secondaryValue, // reps is secondary_value
                 estimated_1rm: estimated1RM,
                 created_at: new Date().toISOString(),
               };
@@ -1365,27 +1376,29 @@ const useActiveWorkoutStore = create<Store>()(
                   s.exercise_id === exerciseId &&
                   s.completed &&
                   s.tempId !== setId &&
-                  s.actual_weight &&
-                  s.actual_reps
+                  (s.measurement_template === "weight_reps" ||
+                    s.measurement_template === "weight_reps_range") &&
+                  s.actual_primary_value &&
+                  s.actual_secondary_value
               );
 
               if (completedSetsForExercise.length > 0) {
                 // Find the set with the highest estimated 1RM
                 const newBestSet = completedSetsForExercise.reduce((max, s) => {
                   const currentEst = computeEpley1RM(
-                    s.actual_weight!,
-                    s.actual_reps!
+                    s.actual_primary_value!,
+                    s.actual_secondary_value!
                   );
                   const maxEst = computeEpley1RM(
-                    max.actual_weight!,
-                    max.actual_reps!
+                    max.actual_primary_value!,
+                    max.actual_secondary_value!
                   );
                   return currentEst > maxEst ? s : max;
                 });
 
                 const newBestEst = computeEpley1RM(
-                  newBestSet.actual_weight!,
-                  newBestSet.actual_reps!
+                  newBestSet.actual_primary_value!,
+                  newBestSet.actual_secondary_value!
                 );
 
                 // Check if this new best is still a PR compared to historical PR
@@ -1404,8 +1417,8 @@ const useActiveWorkoutStore = create<Store>()(
                   state.activeWorkout.sessionBestPRs[exerciseId] = {
                     tempSetId: newBestSet.tempId,
                     exercise_id: exerciseId,
-                    weight: newBestSet.actual_weight!,
-                    reps: newBestSet.actual_reps!,
+                    weight: newBestSet.actual_primary_value!,
+                    reps: newBestSet.actual_secondary_value!,
                     estimated_1rm: newBestEst,
                     created_at:
                       newBestSet.completed_at || new Date().toISOString(),
@@ -1421,8 +1434,8 @@ const useActiveWorkoutStore = create<Store>()(
 
           set.completed = false;
           set.completed_at = null;
-          set.actual_weight = null;
-          set.actual_reps = null;
+          set.actual_primary_value = null;
+          set.actual_secondary_value = null;
           set.actual_rpe = null;
 
           state.stats.totalSetsCompleted -= 1;

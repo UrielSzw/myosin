@@ -181,6 +181,8 @@ export const routinesRepository = {
           name: data.routine.name,
           folder_id: data.routine.folder_id,
           training_days: data.routine.training_days,
+          show_rpe: data.routine.show_rpe,
+          show_tempo: data.routine.show_tempo,
         })
         .where(eq(routines.id, routineId))
         .returning();

@@ -3,7 +3,7 @@ import { useRef } from "react";
 
 export type IToogleSheet =
   | "setType"
-  | "repsType"
+  | "measurementTemplate"
   | "restTime"
   | "blockOptions"
   | "exerciseOptions"
@@ -13,7 +13,7 @@ export type IToogleSheet =
 
 export const useFormRoutineSheets = () => {
   const setTypeBottomSheetRef = useRef<BottomSheetModal>(null);
-  const repsTypeBottomSheetRef = useRef<BottomSheetModal>(null);
+  const measurementTemplateBottomSheetRef = useRef<BottomSheetModal>(null);
   const restTimeBottomSheetRef = useRef<BottomSheetModal>(null);
   const blockOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
   const exerciseOptionsBottomSheetRef = useRef<BottomSheetModal>(null);
@@ -23,7 +23,7 @@ export const useFormRoutineSheets = () => {
 
   const handleCloseSheets = () => {
     setTypeBottomSheetRef.current?.close();
-    repsTypeBottomSheetRef.current?.close();
+    measurementTemplateBottomSheetRef.current?.close();
     restTimeBottomSheetRef.current?.close();
     blockOptionsBottomSheetRef.current?.close();
     exerciseOptionsBottomSheetRef.current?.close();
@@ -36,8 +36,8 @@ export const useFormRoutineSheets = () => {
       case "setType":
         setTypeBottomSheetRef.current?.present();
         break;
-      case "repsType":
-        repsTypeBottomSheetRef.current?.present();
+      case "measurementTemplate":
+        measurementTemplateBottomSheetRef.current?.present();
         break;
       case "restTime":
         restTimeBottomSheetRef.current?.present();
@@ -66,7 +66,7 @@ export const useFormRoutineSheets = () => {
   return {
     handleToggleSheet,
     setTypeBottomSheetRef,
-    repsTypeBottomSheetRef,
+    measurementTemplateBottomSheetRef,
     restTimeBottomSheetRef,
     blockOptionsBottomSheetRef,
     exerciseOptionsBottomSheetRef,

@@ -4,56 +4,67 @@ import {
   ExerciseInBlockInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import { IRepsType, ISetType } from "@/shared/types/workout";
+import {
+  MeasurementTemplateId,
+  getDefaultTemplate,
+} from "@/shared/types/measurement";
 
 const generateTempId = () => `temp_${Date.now()}_${Math.random()}`;
 
 const createDefaultSets = (
-  exerciseInBlockId: string
-): (SetInsert & { tempId: string })[] => [
-  {
-    tempId: generateTempId(),
-    user_id: "default-user",
-    id: "",
-    order_index: 0,
-    weight: null,
-    reps: null,
-    set_type: "normal",
-    reps_type: "reps",
-    exercise_in_block_id: exerciseInBlockId,
-    reps_range: null,
-    rpe: null,
-    tempo: null,
-  },
-  {
-    tempId: generateTempId(),
-    user_id: "default-user",
-    id: "",
-    order_index: 1,
-    weight: null,
-    reps: null,
-    set_type: "normal",
-    reps_type: "reps",
-    exercise_in_block_id: exerciseInBlockId,
-    reps_range: null,
-    rpe: null,
-    tempo: null,
-  },
-  {
-    tempId: generateTempId(),
-    user_id: "default-user",
-    id: "",
-    order_index: 2,
-    weight: null,
-    reps: null,
-    set_type: "normal",
-    reps_type: "reps",
-    exercise_in_block_id: exerciseInBlockId,
-    reps_range: null,
-    rpe: null,
-    tempo: null,
-  },
-];
+  exerciseInBlockId: string,
+  measurementTemplate?: MeasurementTemplateId
+): (SetInsert & { tempId: string })[] => {
+  const template = measurementTemplate || getDefaultTemplate();
+
+  return [
+    {
+      tempId: generateTempId(),
+      user_id: "default-user",
+      id: "",
+      order_index: 0,
+      measurement_template: template,
+      primary_value: null,
+      secondary_value: null,
+      primary_range: null,
+      secondary_range: null,
+      set_type: "normal",
+      exercise_in_block_id: exerciseInBlockId,
+      rpe: null,
+      tempo: null,
+    },
+    {
+      tempId: generateTempId(),
+      user_id: "default-user",
+      id: "",
+      order_index: 1,
+      measurement_template: template,
+      primary_value: null,
+      secondary_value: null,
+      primary_range: null,
+      secondary_range: null,
+      set_type: "normal",
+      exercise_in_block_id: exerciseInBlockId,
+      rpe: null,
+      tempo: null,
+    },
+    {
+      tempId: generateTempId(),
+      user_id: "default-user",
+      id: "",
+      order_index: 2,
+      measurement_template: template,
+      primary_value: null,
+      secondary_value: null,
+      primary_range: null,
+      secondary_range: null,
+      set_type: "normal",
+      exercise_in_block_id: exerciseInBlockId,
+      rpe: null,
+      tempo: null,
+    },
+  ];
+};
 
 type CreateIndividualBlocksParams = {
   newBlocks: (BlockInsert & { tempId: string })[];
@@ -113,7 +124,10 @@ export const createIndividualBlocks = (
       exercise,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockTempId);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockTempId,
+      exercise.default_measurement_template
+    );
 
     newBlocks.push(newBlock);
     newExercisesInBlock.push(newExerciseInBlock);
@@ -191,7 +205,10 @@ export const createMultiBlock = (
 
     newExercisesInBlock.push(newExerciseInBlock);
 
-    const defaultSets = createDefaultSets(exerciseInBlockTempId);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockTempId,
+      exercise.default_measurement_template
+    );
     newSets.push(...defaultSets);
 
     // Inicializar sets vacíos para cada ejercicio
@@ -210,35 +227,6 @@ export const createMultiBlock = (
     exercisesByBlock,
     setsByExercise,
   };
-};
-
-export const createNewSetForExercise = (
-  exerciseInBlockId: string, // ← Agregar este parámetro
-  currentSetsCount: number,
-  lastSetWeight: number | null,
-  lastSetReps: number | null,
-  lastSetRepsRange: {
-    min: number | null;
-    max: number | null;
-  } | null,
-  repsType: IRepsType
-) => {
-  const newSet: SetInsert & { tempId: string } = {
-    tempId: generateTempId(),
-    user_id: "default-user",
-    exercise_in_block_id: exerciseInBlockId, // ← Usar el parámetro
-    id: "",
-    order_index: currentSetsCount,
-    reps: lastSetReps || null,
-    weight: lastSetWeight || null,
-    reps_range: lastSetRepsRange || null,
-    reps_type: repsType,
-    set_type: "normal" as ISetType,
-    rpe: null,
-    tempo: null,
-  };
-
-  return newSet;
 };
 
 export const convertBlockToIndividualBlocks = (
@@ -371,7 +359,10 @@ export const createExercises = (
     newExercisesInBlock.push(newExerciseInBlock);
 
     // Crear sets por defecto para cada ejercicio
-    const defaultSets = createDefaultSets(exerciseInBlockTempId);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockTempId,
+      exercise.default_measurement_template
+    );
     newSets.push(...defaultSets);
     setsByExercise[exerciseInBlockTempId] = defaultSets.map((s) => s.tempId);
   });

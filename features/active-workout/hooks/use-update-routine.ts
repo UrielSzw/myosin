@@ -105,14 +105,15 @@ export const useUpdateRoutine = () => {
               id: generateUUID(),
               user_id: "default-user",
               exercise_in_block_id: realExerciseId,
-              reps: set.planned_reps,
-              weight: set.planned_weight,
+              measurement_template: set.measurement_template,
+              primary_value: set.planned_primary_value,
+              secondary_value: set.planned_secondary_value,
+              primary_range: set.planned_primary_range,
+              secondary_range: set.planned_secondary_range,
               rpe: set.planned_rpe,
+              tempo: set.planned_tempo,
               order_index: set.order_index,
               set_type: set.set_type,
-              reps_type: set.reps_type,
-              reps_range: set.reps_range,
-              tempo: set.planned_tempo,
             });
           });
         }

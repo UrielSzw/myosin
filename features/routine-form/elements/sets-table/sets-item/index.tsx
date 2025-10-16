@@ -6,11 +6,15 @@ import {
 } from "@/features/routine-form/hooks/use-routine-form-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { IRepsType } from "@/shared/types/workout";
+import {
+  getDefaultTemplate,
+  getMeasurementTemplate,
+} from "@/shared/types/measurement";
+import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
 import { Timer } from "lucide-react-native";
 import React, { useCallback } from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   setId: string;
@@ -28,7 +32,9 @@ export const SetsItem = React.memo<Props>(
     const { show_rpe, show_tempo } = routine;
 
     const set = sets[setId];
-    const repsType: IRepsType = set?.reps_type || "reps";
+    const template = getMeasurementTemplate(
+      set.measurement_template || getDefaultTemplate()
+    );
 
     const handleSetType = useCallback(() => {
       setCurrentState({
@@ -46,46 +52,24 @@ export const SetsItem = React.memo<Props>(
       setCurrentState,
     ]);
 
-    const handleWeightChange = useCallback(
-      (value: string) => {
-        // Permitir valores vacíos y números válidos
-        const weight = value === "" ? null : Number(value);
-
-        updateSet(set.tempId, { weight });
+    const handlePrimaryValueChange = useCallback(
+      (value: number | null, range?: { min: number; max: number } | null) => {
+        updateSet(set.tempId, {
+          primary_value: value,
+          primary_range: range,
+        });
       },
       [set.tempId, updateSet]
     );
 
-    const handleRepsChange = useCallback(
-      (value: string) => {
-        // Permitir valores vacíos y números válidos
-        const reps = value === "" ? null : Number(value);
-
-        updateSet(set.tempId, { reps });
+    const handleSecondaryValueChange = useCallback(
+      (value: number | null, range?: { min: number; max: number } | null) => {
+        updateSet(set.tempId, {
+          secondary_value: value,
+          secondary_range: range,
+        });
       },
       [set.tempId, updateSet]
-    );
-
-    const handleRepsMinChange = useCallback(
-      (value: string) => {
-        const min = value === "" ? null : Number(value);
-
-        updateSet(set.tempId, {
-          reps_range: { min, max: set.reps_range?.max || null },
-        });
-      },
-      [set.reps_range?.max, set.tempId, updateSet]
-    );
-
-    const handleRepsMaxChange = useCallback(
-      (value: string) => {
-        const max = value === "" ? null : Number(value);
-
-        updateSet(set.tempId, {
-          reps_range: { min: set.reps_range?.min || null, max },
-        });
-      },
-      [set.reps_range?.min, set.tempId, updateSet]
     );
 
     const handleShowRPESelector = useCallback(() => {
@@ -177,206 +161,56 @@ export const SetsItem = React.memo<Props>(
           </TouchableOpacity>
         </View>
 
-        {/* Weight Input */}
-        <View style={{ flex: 1, paddingHorizontal: 8 }}>
-          {/* Contenedor clickeable para accesibilidad */}
-          <TouchableOpacity
-            activeOpacity={1}
-            style={{
-              // Área clickeable mínima para WCAG
-              minHeight: 44,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <TextInput
-              value={`${set.weight || ""}`}
-              onChangeText={handleWeightChange}
-              placeholder="0"
-              placeholderTextColor={colors.textMuted}
-              keyboardType="numeric"
-              style={{
-                // Input visual más compacto
-                backgroundColor: "transparent",
-                borderWidth: 0,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.border,
-                paddingHorizontal: 8,
-                paddingVertical: 6,
-                textAlign: "center",
-                color: colors.text,
-                fontSize: 16,
-                fontWeight: "500",
-                // Ancho completo del contenedor
-                width: "100%",
-                minHeight: 32,
-              }}
-              accessible={true}
-              accessibilityLabel={`Peso para set ${setNumber}`}
-              accessibilityHint="Ingresa el peso en kilogramos"
-              accessibilityValue={{
-                text: set.weight
-                  ? `${set.weight} kilogramos`
-                  : "Sin peso asignado",
-              }}
+        {/* Dynamic Measurement Inputs */}
+        {template.fields.length === 1 ? (
+          // Single column: use fixed width to match header
+          <View style={{ width: "50%", paddingHorizontal: 8 }}>
+            <MeasurementInput
+              field={template.fields[0]}
+              value={
+                template.fields[0].id === "primary"
+                  ? set.primary_value
+                  : set.secondary_value
+              }
+              range={
+                template.fields[0].id === "primary"
+                  ? set.primary_range
+                  : set.secondary_range
+              }
+              onChange={
+                template.fields[0].id === "primary"
+                  ? handlePrimaryValueChange
+                  : handleSecondaryValueChange
+              }
+              setNumber={setNumber}
             />
-          </TouchableOpacity>
-        </View>
-
-        {/* Reps Input */}
-        <View style={{ flex: 1, paddingHorizontal: 8 }}>
-          {repsType === "range" ? (
-            // Rango: Dos inputs lado a lado con wrapper clickeable
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-                minHeight: 44,
-                justifyContent: "center",
-              }}
-            >
-              <TouchableOpacity
-                activeOpacity={1}
-                style={{
-                  flex: 1,
-                  minHeight: 44,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <TextInput
-                  value={`${set.reps_range?.min || ""}`}
-                  onChangeText={handleRepsMinChange}
-                  placeholder="0"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="numeric"
-                  style={{
-                    backgroundColor: "transparent",
-                    borderWidth: 0,
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.border,
-                    paddingHorizontal: 4,
-                    paddingVertical: 4,
-                    textAlign: "center",
-                    color: colors.text,
-                    fontSize: 14,
-                    fontWeight: "500",
-                    width: "100%",
-                    minHeight: 28,
-                  }}
-                  accessible={true}
-                  accessibilityLabel={`Repeticiones mínimas para set ${setNumber}`}
-                  accessibilityHint="Ingresa el número mínimo de repeticiones"
-                />
-              </TouchableOpacity>
-
-              <Typography
-                variant="caption"
-                color="textMuted"
-                style={{ fontSize: 12, paddingHorizontal: 2 }}
-              >
-                -
-              </Typography>
-
-              <TouchableOpacity
-                activeOpacity={1}
-                style={{
-                  flex: 1,
-                  minHeight: 44,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <TextInput
-                  value={`${set.reps_range?.max || ""}`}
-                  onChangeText={handleRepsMaxChange}
-                  placeholder="0"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="numeric"
-                  style={{
-                    backgroundColor: "transparent",
-                    borderWidth: 0,
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.border,
-                    paddingHorizontal: 4,
-                    paddingVertical: 4,
-                    textAlign: "center",
-                    color: colors.text,
-                    fontSize: 14,
-                    fontWeight: "500",
-                    width: "100%",
-                    minHeight: 28,
-                  }}
-                  accessible={true}
-                  accessibilityLabel={`Repeticiones máximas para set ${setNumber}`}
-                  accessibilityHint="Ingresa el número máximo de repeticiones"
-                />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            // Input normal para reps, time, distance
-            <TouchableOpacity
-              activeOpacity={1}
-              style={{
-                // Área clickeable mínima para WCAG
-                minHeight: 44,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <TextInput
-                value={`${set.reps || ""}`}
-                onChangeText={handleRepsChange}
-                placeholder="0"
-                placeholderTextColor={colors.textMuted}
-                keyboardType="numeric"
-                style={{
-                  // Input visual más compacto
-                  backgroundColor: "transparent",
-                  borderWidth: 0,
-                  borderBottomWidth: 1,
-                  borderBottomColor: colors.border,
-                  paddingHorizontal: 8,
-                  paddingVertical: 6,
-                  textAlign: "center",
-                  color: colors.text,
-                  fontSize: 16,
-                  fontWeight: "500",
-                  // Ancho completo del contenedor
-                  width: "100%",
-                  minHeight: 32,
-                }}
-                accessible={true}
-                accessibilityLabel={`${
-                  repsType === "reps"
-                    ? "Repeticiones"
-                    : repsType === "time"
-                    ? "Tiempo"
-                    : "Distancia"
-                } para set ${setNumber}`}
-                accessibilityHint={`Ingresa ${
-                  repsType === "reps"
-                    ? "el número de repeticiones"
-                    : repsType === "time"
-                    ? "el tiempo en segundos"
-                    : "la distancia"
-                }`}
-                accessibilityValue={{
-                  text: set.reps
-                    ? `${set.reps} ${
-                        repsType === "reps"
-                          ? "repeticiones"
-                          : repsType === "time"
-                          ? "segundos"
-                          : "metros"
-                      }`
-                    : "Sin valor asignado",
-                }}
+          </View>
+        ) : (
+          // Multiple columns: use flex as before
+          template.fields.map((field, index) => (
+            <View key={field.id} style={{ flex: 1, paddingHorizontal: 8 }}>
+              <MeasurementInput
+                field={field}
+                value={
+                  field.id === "primary"
+                    ? set.primary_value
+                    : set.secondary_value
+                }
+                range={
+                  field.id === "primary"
+                    ? set.primary_range
+                    : set.secondary_range
+                }
+                onChange={
+                  field.id === "primary"
+                    ? handlePrimaryValueChange
+                    : handleSecondaryValueChange
+                }
+                setNumber={setNumber}
               />
-            </TouchableOpacity>
-          )}
-        </View>
+            </View>
+          ))
+        )}
 
         {/* RPE Input - Ultra Compact */}
         {show_rpe && (

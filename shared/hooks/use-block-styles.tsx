@@ -1,6 +1,9 @@
 import { Link2, RotateCcw, Target } from "lucide-react-native";
-import { BaseSet } from "../db/schema";
-import { IBlockType, IRepsType } from "../types/workout";
+import {
+  MeasurementTemplateId,
+  getMeasurementTemplate,
+} from "../types/measurement";
+import { IBlockType } from "../types/workout";
 import { useColorScheme } from "./use-color-scheme";
 
 export const useBlockStyles = () => {
@@ -103,21 +106,6 @@ export const useBlockStyles = () => {
     }
   };
 
-  const getRepsColumnTitle = (repsType: IRepsType) => {
-    switch (repsType) {
-      case "reps":
-        return "REPS";
-      case "range":
-        return "RANGO";
-      case "time":
-        return "TIEMPO";
-      case "distance":
-        return "DIST";
-      default:
-        return "REPS";
-    }
-  };
-
   const formatRestTime = (seconds: number) => {
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
@@ -127,20 +115,58 @@ export const useBlockStyles = () => {
       : `${mins} min`;
   };
 
-  const formatRepsValue = (set: BaseSet) => {
-    if (set.reps_type === "range") {
-      const min = set.reps_range?.min || "";
-      const max = set.reps_range?.max || "";
+  const formatMeasurementValue = (
+    value: number | null,
+    range: { min: number; max: number } | null,
+    templateId: MeasurementTemplateId,
+    fieldId: "primary" | "secondary"
+  ) => {
+    const template = getMeasurementTemplate(templateId);
+    const field = template.fields.find((f) => f.id === fieldId);
+
+    if (!field) return "";
+
+    // Handle range values
+    if (range) {
+      const min = range.min || "";
+      const max = range.max || "";
       if (min && max) {
         return `${min}-${max}`;
       } else if (min) {
-        return min;
+        return min.toString();
       } else if (max) {
-        return max;
+        return max.toString();
       }
       return "";
     }
-    return set.reps || "";
+
+    // Handle single values
+    if (value === null || value === undefined) return "";
+
+    // Format based on field type
+    switch (field.type) {
+      case "time":
+        if (field.unit === "min") {
+          // Convert seconds to minutes for display
+          const mins = Math.floor(value / 60);
+          const secs = value % 60;
+          if (secs === 0) return `${mins}min`;
+          return `${mins}:${secs.toString().padStart(2, "0")}`;
+        } else {
+          // Display as seconds
+          return `${value}s`;
+        }
+      case "distance":
+        if (field.unit === "km") {
+          return value % 1 === 0 ? `${value}` : `${value.toFixed(1)}`;
+        } else {
+          return `${value}`;
+        }
+      case "weight":
+      case "reps":
+      default:
+        return `${value}`;
+    }
   };
 
   return {
@@ -149,8 +175,7 @@ export const useBlockStyles = () => {
     getSetTypeLabel,
     getSetTypeColor,
     getBlockTypeIcon,
-    getRepsColumnTitle,
     formatRestTime,
-    formatRepsValue,
+    formatMeasurementValue,
   };
 };

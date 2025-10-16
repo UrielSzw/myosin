@@ -1,5 +1,6 @@
 import { BaseExercise } from "@/shared/db/schema";
-import { IRepsType, ISetType } from "@/shared/types/workout";
+import { MeasurementTemplateId } from "@/shared/types/measurement";
+import { ISetType } from "@/shared/types/workout";
 import {
   ActiveWorkoutBlock,
   ActiveWorkoutExercise,
@@ -10,7 +11,8 @@ export const generateTempId = () => `temp_${Date.now()}_${Math.random()}`;
 
 const createDefaultSets = (
   exerciseInBlockId: string,
-  exerciseId: string
+  exerciseId: string,
+  measurementTemplate: MeasurementTemplateId = "weight_reps"
 ): ActiveWorkoutSet[] => [
   {
     tempId: generateTempId(),
@@ -18,15 +20,16 @@ const createDefaultSets = (
     exercise_id: exerciseId,
     id: "",
     order_index: 0,
-    planned_weight: null,
-    planned_reps: null,
+    measurement_template: measurementTemplate,
+    planned_primary_value: null,
+    planned_secondary_value: null,
+    planned_primary_range: null,
+    planned_secondary_range: null,
     set_type: "normal",
-    reps_type: "reps",
     workout_exercise_id: exerciseInBlockId,
-    reps_range: null,
     planned_rpe: null,
-    actual_reps: null,
-    actual_weight: null,
+    actual_primary_value: null,
+    actual_secondary_value: null,
     actual_rpe: null,
     completed: false,
     completed_at: null,
@@ -39,15 +42,16 @@ const createDefaultSets = (
     exercise_id: exerciseId,
     id: "",
     order_index: 1,
-    planned_weight: null,
-    planned_reps: null,
+    measurement_template: measurementTemplate,
+    planned_primary_value: null,
+    planned_secondary_value: null,
+    planned_primary_range: null,
+    planned_secondary_range: null,
     set_type: "normal",
-    reps_type: "reps",
     workout_exercise_id: exerciseInBlockId,
-    reps_range: null,
     planned_rpe: null,
-    actual_reps: null,
-    actual_weight: null,
+    actual_primary_value: null,
+    actual_secondary_value: null,
     actual_rpe: null,
     completed: false,
     completed_at: null,
@@ -60,15 +64,16 @@ const createDefaultSets = (
     exercise_id: exerciseId,
     id: "",
     order_index: 2,
-    planned_weight: null,
-    planned_reps: null,
+    measurement_template: measurementTemplate,
+    planned_primary_value: null,
+    planned_secondary_value: null,
+    planned_primary_range: null,
+    planned_secondary_range: null,
     set_type: "normal",
-    reps_type: "reps",
     workout_exercise_id: exerciseInBlockId,
-    reps_range: null,
     planned_rpe: null,
-    actual_reps: null,
-    actual_weight: null,
+    actual_primary_value: null,
+    actual_secondary_value: null,
     actual_rpe: null,
     completed: false,
     completed_at: null,
@@ -79,13 +84,13 @@ const createDefaultSets = (
 
 export const createNewSetForExercise = (
   currentSetsCount: number,
-  lastSetWeight: number | null,
-  lastSetReps: number | null,
-  lastSetRepsRange: {
-    min: number | null;
-    max: number | null;
+  lastSetPrimaryValue: number | null,
+  lastSetSecondaryValue: number | null,
+  lastSetPrimaryRange: {
+    min: number;
+    max: number;
   } | null,
-  repsType: IRepsType,
+  measurementTemplate: MeasurementTemplateId,
   exerciseInBlockId: string,
   exerciseId: string
 ) => {
@@ -95,14 +100,15 @@ export const createNewSetForExercise = (
     exercise_id: exerciseId,
     id: "",
     order_index: currentSetsCount,
-    planned_reps: lastSetReps || null,
-    planned_weight: lastSetWeight || null,
+    measurement_template: measurementTemplate,
+    planned_primary_value: lastSetPrimaryValue || null,
+    planned_secondary_value: lastSetSecondaryValue || null,
+    planned_primary_range: lastSetPrimaryRange || null,
+    planned_secondary_range: null,
     planned_rpe: null,
-    reps_range: lastSetRepsRange || null,
-    reps_type: repsType,
     set_type: "normal" as ISetType,
-    actual_reps: null,
-    actual_weight: null,
+    actual_primary_value: null,
+    actual_secondary_value: null,
     actual_rpe: null,
     completed: false,
     completed_at: null,
@@ -196,7 +202,11 @@ export const createIndividualBlocks = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockId,
+      exercise.id,
+      exercise.default_measurement_template
+    );
 
     newBlocks.push(newBlock);
     newExercisesInBlock.push(newExerciseInBlock);
@@ -270,7 +280,11 @@ export const createMultiBlock = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockId,
+      exercise.id,
+      exercise.default_measurement_template
+    );
 
     newExercisesInBlock.push(newExerciseInBlock);
     newSets.push(...defaultSets);
@@ -325,7 +339,11 @@ export const createExercises = (
       was_added_during_workout: true,
     };
 
-    const defaultSets = createDefaultSets(exerciseInBlockId, exercise.id);
+    const defaultSets = createDefaultSets(
+      exerciseInBlockId,
+      exercise.id,
+      exercise.default_measurement_template
+    );
 
     newExercisesInBlock.push(newExerciseInBlock);
     newSets.push(...defaultSets);

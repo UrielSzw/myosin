@@ -45,6 +45,26 @@ interface RoutineConfig {
 
 **IMPORTANTE**: Usa únicamente estos valores exactos en tus respuestas.
 
+### 🏗️ SISTEMA DE MEDICIÓN - NUEVO ARCHITECTURE
+
+El sistema utiliza **measurement templates** que definen qué métricas usar para cada ejercicio:
+
+#### TEMPLATES DISPONIBLES:
+
+1. **"weight_reps"** - Tradicional peso + repeticiones
+   - `primary_value`: peso en kg
+   - `secondary_value`: repeticiones
+2. **"time_only"** - Solo tiempo (ej: plancha, wall sit)
+   - `primary_value`: tiempo en segundos
+3. **"distance_time"** - Distancia + tiempo (cardio)
+   - `primary_value`: distancia en km
+   - `secondary_value`: tiempo en minutos
+4. **"weight_time"** - Peso + tiempo (ej: farmer's walk)
+   - `primary_value`: peso en kg
+   - `secondary_value`: tiempo en segundos
+
+**REGLA CRÍTICA**: Todos los ejercicios en la base de datos YA TIENEN asignado un `default_measurement_template`. Usa ese template para todos los sets del ejercicio.
+
 ### 📚 INSTRUCCIONES DETALLADAS
 
 1. **Investigación**: Busca en internet las mejores prácticas para este tipo de programa. Considera estudios científicos, recomendaciones de expertos y principios de periodización.
@@ -56,7 +76,7 @@ interface RoutineConfig {
    - Incluye ejercicios compuestos y de aislamiento según corresponda
    - Respeta los principios de recuperación y adaptación
 
-3. **Selección de ejercicios**: Usa ÚNICAMENTE ejercicios de la lista que te proporcionaré abajo. No inventes nombres ni uses ejercicios que no estén en la lista. Para los exercise id deja el nombre del ejercicio tambien.
+3. **Selección de ejercicios**: Usa ÚNICAMENTE ejercicios de la lista que te proporcionaré abajo. No inventes nombres ni uses ejercicios que no estén en la lista.
 
 ### 🏗️ ESTRUCTURA DE RESPUESTA REQUERIDA
 
@@ -83,8 +103,6 @@ Debes responder con un JSON válido que siga exactamente esta estructura:
    - Descanso breve entre ejercicios del circuito
    - name: DEBE ser "Circuito"
 
-**Usa el tipo que mejor se adapte a los objetivos del programa. No hay restricciones por nivel de dificultad.**
-
 ```typescript
 interface RoutineTemplateData {
   id: string; // Ejemplo: "push-day-intermediate-v1"
@@ -102,7 +120,7 @@ interface RoutineTemplateData {
     name: string; // Nombre descriptivo del bloque
     order_index: number; // 0, 1, 2...
     rest_time_seconds: number; // 60-240 según intensidad
-    rest_between_exercises_seconds: number; // Ver reglas de tipos de bloques abajo
+    rest_between_exercises_seconds: number; // Ver reglas de tipos de bloques
   }[];
 
   exercisesInBlock: {
@@ -117,14 +135,83 @@ interface RoutineTemplateData {
     exercise_block_index: number; // Índice del bloque
     exercise_order_index: number; // Orden del ejercicio en el bloque
     order_index: number; // Número del set (0, 1, 2...)
-    reps: number | null; // Para reps fijas, sino null (reps, time, distance)
-    weight: number | null; // Siempre null (usuario lo completa)
+
+    // ⚠️ NUEVO SISTEMA DE MEDICIÓN ⚠️
+    measurement_template:
+      | "weight_reps"
+      | "time_only"
+      | "distance_time"
+      | "weight_time";
+
+    // Valores según el template:
+    primary_value: number | null; // peso, tiempo, distancia - null si es progresivo
+    secondary_value: number | null; // reps, tiempo, etc - null si es progresivo
+
+    // Rangos opcionales (ej: 8-12 reps):
+    primary_range: { min: number; max: number } | null;
+    secondary_range: { min: number; max: number } | null;
+
+    // Campos tradicionales:
     rpe: number | null; // 6-10 para intermediate/advanced, null para beginner
-    tempo: string | null; // Generalmente null, formato "3-1-2-1" si es específico
-    set_type: "normal" | "warmup" | "drop" | "failure"; // "normal" en la mayoría
-    reps_type: "reps" | "range" | "time" | "distance";
-    reps_range: { min: number; max: number } | null; // Para rangos como 8-12 (range)
+    tempo: string | null; // Generalmente null, formato "3-1-2-1" si específico
+    set_type: "normal" | "warmup" | "drop" | "failure"; // "normal" en mayoría
   }[];
+}
+```
+
+### 📊 EJEMPLOS DE SETS CON NUEVO SISTEMA:
+
+#### Weight + Reps Traditional:
+
+```typescript
+{
+  exercise_block_index: 0,
+  exercise_order_index: 0,
+  order_index: 0,
+  measurement_template: "weight_reps",
+  primary_value: null,        // Usuario define peso
+  secondary_value: 8,         // 8 reps fijas
+  primary_range: null,
+  secondary_range: null,
+  rpe: 8.0,
+  tempo: null,
+  set_type: "normal"
+}
+```
+
+#### Weight + Reps Range:
+
+```typescript
+{
+  exercise_block_index: 0,
+  exercise_order_index: 0,
+  order_index: 0,
+  measurement_template: "weight_reps",
+  primary_value: null,        // Usuario define peso
+  secondary_value: null,      // Range de reps
+  primary_range: null,
+  secondary_range: { min: 8, max: 12 },  // 8-12 reps
+  rpe: 8.0,
+  tempo: null,
+  set_type: "normal"
+}
+```
+
+#### Time Only (Plancha):
+
+```typescript
+{
+  exercise_block_index: 1,
+  exercise_order_index: 0,
+  order_index: 0,
+  measurement_template: "time_only",
+  primary_value: 30,          // 30 segundos
+  secondary_value: null,
+  primary_range: null,
+  secondary_range: null,
+  rpe: null,
+  tempo: null,
+  set_type: "normal"
 }
 ```
 
@@ -133,21 +220,21 @@ interface RoutineTemplateData {
 #### Para HYPERTROPHY:
 
 - Sets: 3-5 por ejercicio
-- Reps: 6-20 según el ejercicio
+- Reps: 6-20 según el ejercicio (usar rangos como 8-12)
 - RPE: 6-9
 - Rest: 60-120 segundos
 
 #### Para STRENGTH:
 
 - Sets: 3-6 por ejercicio
-- Reps: 1-6 principalmente
+- Reps: 1-6 principalmente (valores fijos)
 - RPE: 7-10
 - Rest: 120-300 segundos
 
 #### Para ENDURANCE:
 
 - Sets: 2-4 por ejercicio
-- Reps: 12-25+
+- Reps: 12-25+ (usar rangos amplios)
 - RPE: 5-8
 - Rest: 30-90 segundos
 
@@ -164,52 +251,23 @@ interface RoutineTemplateData {
 #### INTERMEDIATE:
 
 - Mayor variedad de ejercicios
-- show_rpe: false
+- show_rpe: true
 - Mayor volumen
+- Algunos supersets
 
 #### ADVANCED:
 
 - Técnicas avanzadas
 - show_rpe: true
 - Mayor volumen y especialización
-
-### 📊 CRITERIOS POR EQUIPAMIENTO
-
-#### BODYWEIGHT:
-
-- Solo ejercicios de peso corporal
-- Enfoque en progresiones
-
-#### DUMBBELLS:
-
-- Solo mancuernas y peso corporal
-- Ejercicios unilaterales
-
-#### BARBELL-DUMBBELLS:
-
-- Barras, mancuernas y peso corporal
-- Ejercicios compuestos principales
-
-#### FULL-GYM:
-
-- Todo el equipamiento disponible
-- Máxima variedad
-
-#### MACHINES-ONLY:
-
-- Solo máquinas y peso corporal
-- Enfoque en seguridad
-
-#### HOME-GYM:
-
-- Equipamiento básico de casa
-- Adaptaciones creativas
+- Circuitos y supersets complejos
 
 ### 📝 FORMATO DE RESPUESTA
 
 Responde con el código TypeScript completo listo para usar en un archivo de template. Estructura tu respuesta así:
 
 ```typescript
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import {
   ProgramTemplate,
   RoutineTemplate,
@@ -223,7 +281,7 @@ export const {DISTRIBUTION}_{DIFFICULTY}_PROGRAM: ProgramTemplate = {
   description: "Descripción completa del programa...",
   category: "{category}",
   difficulty: "{difficulty}",
-  duration: "8-12 semanas", // Ajustar según el programa
+  duration: "8-12 semanas",
   frequency: "Xx semana",
   equipment: ["barbell", "dumbbell", "etc"],
   routines: [
@@ -271,270 +329,29 @@ export const {DISTRIBUTION}_{DIFFICULTY}_DATA: Record<string, RoutineTemplateDat
       // ... ejercicios
     ],
     sets: [
-      // ... sets detallados
+      // ⚠️ RECUERDA: usar measurement_template correcto para cada ejercicio
     ],
   },
-  // ... más rutinas data
 };
 ```
-
-**NOMENCLATURA PARA LAS CONSTANTES:**
-
-- `{DISTRIBUTION}`: PPL, UPPER_LOWER, FULL_BODY, BRO_SPLIT, etc. (en mayúsculas)
-- `{DIFFICULTY}`: BEGINNER, INTERMEDIATE, ADVANCED (en mayúsculas)
-
-**Ejemplos:**
-
-- `PPL_INTERMEDIATE_PROGRAM`
-- `UPPER_LOWER_BEGINNER_ROUTINES`
-- `FULL_BODY_ADVANCED_DATA`
 
 ---
 
 ## 🗂️ LISTA DE EJERCICIOS DISPONIBLES
 
+**IMPORTANTE: Todos estos ejercicios YA TIENEN su default_measurement_template asignado. La mayoría usa "weight_reps".**
+
 **[PEGAR AQUÍ LA LISTA COMPLETA DE EJERCICIOS]**
-
-Press de banca con barra
-
-Press de banca con mancuernas
-
-Press inclinado con barra
-
-Press inclinado con mancuernas
-
-Press declinado con barra
-
-Aperturas con mancuernas en banco plano
-
-Aperturas con mancuernas en banco inclinado
-
-Aperturas en máquina o contractor
-
-Cruce de poleas (cable crossover)
-
-Fondos en paralelas (enfocado en pecho)
-
-Flexiones de brazos (push-ups)
-
-Flexiones declinadas
-
-Press en máquina de pecho
-
-Press en máquina Smith
-
-Press con banda elástica
-Press militar con barra
-
-Press militar con mancuernas
-
-Press Arnold
-
-Elevaciones laterales con mancuernas
-
-Elevaciones frontales con mancuernas
-
-Elevaciones laterales con polea
-
-Remo al mentón con barra
-
-Remo al mentón con polea
-
-Elevaciones posteriores (pájaros) con mancuernas
-
-Elevaciones posteriores en máquina o cable
-
-Face Pull con polea
-
-Press de hombros en máquina
-
-Plancha con empuje escapular (para serrato/anterior)
-
-Fondos en paralelas (tríceps)
-
-Extensión de tríceps en polea (barra o cuerda)
-
-Press francés con barra EZ
-
-Press francés con mancuernas
-
-Extensión de tríceps por encima de la cabeza con mancuerna
-
-Extensión de tríceps con cuerda en polea alta
-
-Patada de tríceps con mancuerna (kickback)
-
-Flexiones cerradas (manos juntas)
-
-Extensión de tríceps en máquina
-
-Extensión de tríceps con banda elástica
-
-Dominadas
-
-Jalón al pecho en polea
-
-Jalón tras nuca (opcional, avanzado)
-
-Remo con barra
-
-Remo con mancuernas
-
-Remo en máquina
-
-Remo con polea baja
-
-Peso muerto convencional
-
-Peso muerto con piernas rígidas
-
-Pull-over con mancuerna o cable
-
-Remo en T (T-Bar Row)
-
-Face Pull (para trapecios y deltoide posterior)
-
-Encogimientos de hombros con mancuernas (trapecio superior)
-
-Remo con banda elástica
-
-Superman (para lumbar)
-
-Buenos días con barra (erectores espinales)
-
-Curl de bíceps con barra
-
-Curl de bíceps con mancuernas
-
-Curl alternado con supinación
-
-Curl tipo martillo
-
-Curl en banco predicador (Scott)
-
-Curl en polea baja
-
-Curl con banda elástica
-
-Curl concentrado
-
-Curl en máquina
-
-Curl inverso (para antebrazos)
-
-Curl de muñeca con barra (flexión de antebrazos)
-
-Curl de muñeca inverso (extensión)
-
-Crunch abdominal clásico
-
-Crunch en máquina
-
-Crunch en polea alta
-
-Crunch inverso
-
-Plancha frontal
-
-Plancha lateral
-
-Giros rusos (Russian twist)
-
-Elevaciones de piernas colgado
-
-Elevaciones de rodillas colgado
-
-Ab wheel (rueda abdominal)
-
-Extensión lumbar en banco romano
-
-Superman
-
-Peso muerto rumano (también para lumbar e isquios)
-
-Bird-Dog
-
-Dead Bug
-
-Sentadilla con barra
-
-Sentadilla frontal
-
-Sentadilla goblet
-
-Sentadilla en máquina Smith
-
-Prensa de piernas
-
-Zancadas (lunges)
-
-Zancadas búlgaras
-
-Step-up (subida al banco)
-
-Peso muerto rumano
-
-Curl de piernas acostado en máquina
-
-Curl de piernas sentado
-
-Extensión de piernas en máquina
-
-Hip Thrust (empuje de cadera con barra)
-
-Puente de glúteos (glute bridge)
-
-Abducción de cadera en máquina
-
-Abducción de cadera con banda
-
-Adducción de cadera en máquina
-
-Peso muerto a una pierna
-
-Elevaciones de talones de pie (pantorrillas)
-
-Elevaciones de talones sentado
-
-Burpees
-
-Swing con kettlebell
-
-Thruster (sentadilla + press de hombros)
-
-Clean con barra
-
-Snatch con barra
-
-Remo renegado con mancuernas
-
-Clean & Press con mancuernas
-
-Power Clean
-
-Step-up con press
-
-Turkish Get-Up
-
-Battle Ropes
-
-Mountain Climbers
-
-Saltos al cajón (Box Jump)
-
-Bear Crawl
-
-Sentadilla con press de hombros (full-body compound)
 
 ---
 
-## ⚠️ RECORDATORIOS IMPORTANTES
+## ⚠️ RECORDATORIOS CRÍTICOS
 
-1. **USA ÚNICAMENTE** ejercicios de la lista proporcionada
-2. **IDs EXACTOS**: Los exercise_id deben coincidir perfectamente
-3. **JSON VÁLIDO**: Verifica que la sintaxis sea correcta
-4. **BALANCEADO**: Asegúrate de que las rutinas estén balanceadas
-5. **PROGRESIVO**: Considera la progresión entre ejercicios
-6. **REALISTA**: Los tiempos y volúmenes deben ser factibles
+1. **MEASUREMENT TEMPLATES**: Usa el template correcto para cada tipo de ejercicio
+2. **PRIMARY/SECONDARY VALUES**: Respeta la estructura según el template
+3. **RANGES**: Usa rangos para principiantes/hipertrofia, valores fijos para fuerza
+4. **USA ÚNICAMENTE** ejercicios de la lista proporcionada
+5. **JSON VÁLIDO**: Verifica que la sintaxis sea correcta
+6. **BALANCEADO**: Asegúrate de que las rutinas estén balanceadas
 
-¿Estás listo para crear el mejor programa de {distribution} de nivel {difficulty} para {category}?
+¿Estás listo para crear el mejor programa de {distribution} de nivel {difficulty} para {category} usando el NUEVO sistema de medición?

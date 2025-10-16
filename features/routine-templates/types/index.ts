@@ -2,6 +2,8 @@
 // ROUTINE TEMPLATES - TYPES
 // ================================================================================
 
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
+
 /**
  * RoutineTemplate - Para mostrar en la UI, información ligera
  */
@@ -77,8 +79,11 @@ export interface RoutineTemplateData {
     exercise_block_index: number; // Índice del ejercicio en exercisesInBlock
     exercise_order_index: number; // Para identificar el ejercicio específico
     order_index: number; // Orden del set
-    reps: number | null;
-    weight: number | null;
+    measurement_template: MeasurementTemplateId;
+    primary_value: number | null;
+    secondary_value: number | null;
+    primary_range: { min: number; max: number } | null;
+    secondary_range: { min: number; max: number } | null;
     rpe: number | null;
     tempo: string | null;
     set_type:
@@ -92,11 +97,6 @@ export interface RoutineTemplateData {
       | "eccentric"
       | "partial"
       | "isometric";
-    reps_type: "reps" | "range" | "time" | "distance";
-    reps_range: {
-      min: number;
-      max: number;
-    } | null;
   }[];
 }
 

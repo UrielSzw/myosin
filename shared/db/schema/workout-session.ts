@@ -1,16 +1,15 @@
 import { InferSelectModel, relations } from "drizzle-orm";
 import {
-  blob,
   index,
   integer,
   real,
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
+import { MeasurementTemplateId } from "../../types/measurement";
 import {
   IExerciseEquipment,
   IExerciseMuscle,
-  IRepsType,
   ISetType,
 } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
@@ -157,30 +156,40 @@ export const workout_sets = sqliteTable(
 
     // Referencia original (NULL si se agregó durante workout)
     original_set_id: text("original_set_id").references(() => routine_sets.id),
-
     order_index: integer("order_index").notNull(), // Orden dentro del ejercicio
 
-    // Datos planificados (de la rutina original)
-    planned_weight: real("planned_weight"),
-    planned_reps: integer("planned_reps"),
-    planned_rpe: real("planned_rpe"),
+    // Measurement system
+    measurement_template: text("measurement_template")
+      .$type<MeasurementTemplateId>()
+      .notNull(),
 
+    // Planned values (from routine)
+    planned_primary_value: real("planned_primary_value"),
+    planned_secondary_value: real("planned_secondary_value"),
+    planned_primary_range: text("planned_primary_range", {
+      mode: "json",
+    }).$type<{
+      min: number;
+      max: number;
+    }>(),
+    planned_secondary_range: text("planned_secondary_range", {
+      mode: "json",
+    }).$type<{
+      min: number;
+      max: number;
+    }>(),
+    planned_rpe: real("planned_rpe"),
     planned_tempo: text("planned_tempo"), // "3-1-2-1" o NULL
 
-    // Datos reales ejecutados
-    actual_weight: real("actual_weight"),
-    actual_reps: integer("actual_reps"),
+    // Actual values (executed during workout)
+    actual_primary_value: real("actual_primary_value"),
+    actual_secondary_value: real("actual_secondary_value"),
     actual_rpe: real("actual_rpe"),
 
-    // Config del set
+    // Set configuration
     set_type: text("set_type").$type<ISetType>().notNull(),
-    reps_type: text("reps_type").$type<IRepsType>().notNull(),
-    reps_range: blob("reps_range", { mode: "json" }).$type<{
-      min: number | null;
-      max: number | null;
-    }>(),
 
-    // Estado simple
+    // Simple status
     completed: integer("completed", { mode: "boolean" })
       .default(false)
       .notNull(),

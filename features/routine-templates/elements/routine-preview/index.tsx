@@ -4,6 +4,7 @@ import {
 } from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useExercises } from "@/shared/hooks/use-exercises";
+import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { Camera, Dumbbell } from "lucide-react-native";
 import React from "react";
@@ -47,6 +48,44 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
         exercise.primary_equipment,
       type: exercise.exercise_type === "compound" ? "Compuesto" : "Aislamiento",
     };
+  };
+
+  // Helper function to format sets info dynamically based on measurement template
+  const formatSetsInfo = (sets: any[]) => {
+    if (!sets || sets.length === 0) return "8-10 reps";
+
+    const firstSet = sets[0];
+    if (!firstSet.measurement_template) return "8-10 reps";
+
+    const template = getMeasurementTemplate(firstSet.measurement_template);
+
+    // Handle different measurement templates
+    switch (firstSet.measurement_template) {
+      case "weight_reps":
+        return `${firstSet.secondary_value || "8-10"} reps`;
+      case "time_only":
+        return `${firstSet.primary_value || "30"} seg`;
+      case "distance_time":
+        return `${firstSet.primary_value || "5"}km × ${
+          firstSet.secondary_value || "30"
+        }min`;
+      case "weight_time":
+        return `${firstSet.primary_value || "20"}kg × ${
+          firstSet.secondary_value || "30"
+        }seg`;
+      default:
+        // For other templates, show based on template fields
+        if (template.fields.length === 1) {
+          const field = template.fields[0];
+          return `${firstSet.primary_value || "8-10"} ${field.unit}`;
+        } else {
+          const primaryField = template.fields[0];
+          const secondaryField = template.fields[1];
+          return `${firstSet.primary_value || "8"}${primaryField.unit} × ${
+            firstSet.secondary_value || "10"
+          }${secondaryField.unit}`;
+        }
+    }
   };
 
   return (
@@ -179,9 +218,7 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
                         color="primary"
                         weight="medium"
                       >
-                        {exerciseSets.length} ×{" "}
-                        {exerciseSets[0]?.reps || "8-10"}{" "}
-                        {exerciseSets[0]?.reps_type === "time" ? "seg" : "reps"}
+                        {exerciseSets.length} × {formatSetsInfo(exerciseSets)}
                       </Typography>
                     </View>
                   </View>

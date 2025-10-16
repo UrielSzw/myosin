@@ -1,8 +1,9 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { Check, ChevronDown, Plus } from "lucide-react-native";
+import { Check, Plus } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import {
   useActiveSetActions,
@@ -22,7 +23,7 @@ export const ActiveSetsTable: React.FC<Props> = ({
 }) => {
   const { sets, setsByExercise, session } = useActiveWorkout();
   const { colors } = useColorScheme();
-  const { getRepsColumnTitle, getBlockColors } = useBlockStyles();
+  const { getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();
 
   const handleAddSet = () => {
@@ -31,7 +32,25 @@ export const ActiveSetsTable: React.FC<Props> = ({
 
   const blockColors = getBlockColors(blockType);
   const setId = setsByExercise[exerciseInBlockId]?.[0];
-  const repsType = sets[setId]?.reps_type || "reps";
+  const measurementTemplate =
+    sets[setId]?.measurement_template || "weight_reps";
+
+  // Obtener información del template para headers dinámicos
+  const template = getMeasurementTemplate(measurementTemplate);
+
+  // Función para obtener los títulos de las columnas basado en el template
+  const getTemplateHeaders = () => {
+    if (!template) return { primary: "PRIMARY", secondary: "SECONDARY" };
+
+    const primaryLabel = template.fields[0]?.label.toUpperCase() || "PRIMARY";
+    const secondaryLabel =
+      template.fields[1]?.label.toUpperCase() || "SECONDARY";
+
+    return { primary: primaryLabel, secondary: secondaryLabel };
+  };
+
+  const { primary, secondary } = getTemplateHeaders();
+  const hasSecondaryField = template?.fields && template.fields.length > 1;
 
   return (
     <View style={{ marginTop: 12 }}>
@@ -55,41 +74,20 @@ export const ActiveSetsTable: React.FC<Props> = ({
             PREV
           </Typography>
         </View>
-        <View style={{ flex: 0.9, paddingHorizontal: 8, alignItems: "center" }}>
+        <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
           <Typography variant="caption" weight="medium" color="textMuted">
-            KG
+            {primary}
           </Typography>
         </View>
-        <View style={{ flex: 0.9, paddingHorizontal: 8, alignItems: "center" }}>
-          <TouchableOpacity
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 4,
-              // Área clickeable mínima para accesibilidad
-              minHeight: 44,
-              paddingVertical: 12,
-              paddingHorizontal: 8,
-              // Margin negativo para mantener alineación visual
-              marginHorizontal: -8,
-              marginVertical: -12,
-            }}
-            accessible={true}
-            accessibilityRole="button"
-            accessibilityLabel="Cambiar tipo de repeticiones"
-            accessibilityHint={`Actualmente configurado para ${getRepsColumnTitle(
-              repsType
-            )}. Toca para cambiar`}
-            accessibilityValue={{ text: getRepsColumnTitle(repsType) }}
-          >
+        {hasSecondaryField && (
+          <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
             <Typography variant="caption" weight="medium" color="textMuted">
-              {getRepsColumnTitle(repsType)}
+              {secondary}
             </Typography>
-            <ChevronDown size={12} color={colors.textMuted} />
-          </TouchableOpacity>
-        </View>
+          </View>
+        )}
 
-        {session?.routine?.show_tempo && (
+        {session?.routine?.show_rpe && (
           <View
             style={{ flex: 0.8, paddingHorizontal: 8, alignItems: "center" }}
           >

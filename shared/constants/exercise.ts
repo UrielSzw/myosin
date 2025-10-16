@@ -93,4 +93,5 @@ export const EXERCISE_EQUIPMENT_LABELS: Record<IExerciseEquipment, string> = {
   incline_bench: "Banco inclinado",
   decline_bench: "Banco declinado",
   preacher_bench: "Banco predicador",
+  other: "Otro",
 };

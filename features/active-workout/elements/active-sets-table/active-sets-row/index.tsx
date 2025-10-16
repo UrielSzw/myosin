@@ -7,11 +7,13 @@ import {
 import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
+import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
 import { Check, Timer, Trophy } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
 import { usePRCelebration } from "../../../hooks/use-pr-celebration";
@@ -32,7 +34,12 @@ export const ActiveSetRow: React.FC<Props> = ({
   blockId,
 }) => {
   const { colors } = useColorScheme();
-  const { getSetTypeColor, getSetTypeLabel, getBlockColors } = useBlockStyles();
+  const {
+    getSetTypeColor,
+    getSetTypeLabel,
+    getBlockColors,
+    formatMeasurementValue,
+  } = useBlockStyles();
   const { completeSet, uncompleteSet } = useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
   const { sets, exercisePreviousSets, session } = useActiveWorkout();
@@ -51,8 +58,8 @@ export const ActiveSetRow: React.FC<Props> = ({
   } = usePRCelebration();
 
   const [setData, setSetData] = useState({
-    weight: "",
-    reps: "",
+    primaryValue: null as number | null,
+    secondaryValue: null as number | null,
   });
 
   const blockColors = getBlockColors(blockType);
@@ -73,24 +80,52 @@ export const ActiveSetRow: React.FC<Props> = ({
       uncompleteSet(setId);
       resetCelebration();
     } else {
-      const userWeightInput = setData.weight ? Number(setData.weight) : null;
-      const userRepsInput = setData.reps ? Number(setData.reps) : null;
+      const userPrimaryInput = setData.primaryValue || null;
+      const userSecondaryInput = setData.secondaryValue || null;
       const userRpeInput = set.actual_rpe || null;
 
-      // Use centralized PR validation logic
-      const prValidation = validatePR(
-        userWeightInput || set.planned_weight || 0,
-        userRepsInput || set?.reps_range?.min || set.planned_reps || 0
+      // Helper para obtener valor efectivo con auto-completion
+      const getEffectiveValue = (
+        userInput: number | null,
+        plannedRange: { min: number; max: number } | null,
+        plannedValue: number | null,
+        fallback: number = 0
+      ): number => {
+        if (userInput !== null) return userInput;
+        if (plannedRange) return plannedRange.min; // Usar min del range como default
+        if (plannedValue) return plannedValue;
+        return fallback;
+      };
+
+      const effectivePrimaryValue = getEffectiveValue(
+        userPrimaryInput,
+        set.planned_primary_range,
+        set.planned_primary_value,
+        0
       );
+
+      const effectiveSecondaryValue = getEffectiveValue(
+        userSecondaryInput,
+        set.planned_secondary_range,
+        set.planned_secondary_value,
+        0
+      );
+
+      // Para PR validation, soportar weight_reps y weight_reps_range templates
+      const supportsPRTemplate =
+        set.measurement_template === "weight_reps" ||
+        set.measurement_template === "weight_reps_range";
+      const prValidation = supportsPRTemplate
+        ? validatePR(effectivePrimaryValue, effectiveSecondaryValue)
+        : { isPR: false, estimatedOneRM: 0 };
 
       const shouldStartTimer = completeSet(
         exerciseInBlock.tempId,
         setId,
         blockId,
         {
-          actualWeight: userWeightInput || set.planned_weight || 0,
-          actualReps:
-            userRepsInput || set?.reps_range?.min || set.planned_reps || 0,
+          primaryValue: effectivePrimaryValue,
+          secondaryValue: effectiveSecondaryValue,
           actualRpe: userRpeInput || set.planned_rpe || 0,
           estimated1RM: prValidation.estimatedOneRM,
           isPR: prValidation.isPR,
@@ -105,14 +140,6 @@ export const ActiveSetRow: React.FC<Props> = ({
         onToggleSheet("restTimer");
       }
     }
-  };
-
-  const getRepsPlaceholder = () => {
-    if (set.reps_type === "range") {
-      return `${set.reps_range?.min || 0}-${set.reps_range?.max || 0}`;
-    }
-
-    return set.planned_reps?.toString();
   };
 
   const handleSetType = useCallback(() => {
@@ -130,8 +157,46 @@ export const ActiveSetRow: React.FC<Props> = ({
     setCurrentState,
   ]);
 
-  const renderWeight = setData.weight || set.actual_weight || "";
-  const renderReps = setData.reps || set.actual_reps || "";
+  const renderPrimaryValue =
+    setData.primaryValue || set.actual_primary_value || null;
+  const renderSecondaryValue =
+    setData.secondaryValue || set.actual_secondary_value || null;
+
+  // Obtener información del template para renderizado condicional
+  const template = getMeasurementTemplate(set.measurement_template);
+  const hasSecondaryField = template?.fields && template.fields.length > 1;
+
+  // Helper para obtener placeholders basado en el template - CORREGIDO
+  const getPlaceholderValue = (fieldType: "primary" | "secondary") => {
+    const isSecondary = fieldType === "secondary";
+    const plannedValue = isSecondary
+      ? set.planned_secondary_value
+      : set.planned_primary_value;
+    const plannedRange = isSecondary
+      ? set.planned_secondary_range
+      : set.planned_primary_range;
+    const prevValue = isSecondary
+      ? prevSet?.actual_secondary_value
+      : prevSet?.actual_primary_value;
+
+    // PRIORIDAD 1: Si hay un range planificado, mostrarlo como string (ej: "8-12")
+    if (plannedRange) {
+      return `${plannedRange.min || 0}-${plannedRange.max || 0}`;
+    }
+
+    // PRIORIDAD 2: Valor planificado de la rutina
+    if (plannedValue) {
+      return plannedValue.toString();
+    }
+
+    // PRIORIDAD 3: Si hay valor previo y la sesión fue realizada antes, usarlo
+    if (session?.hasBeenPerformed && prevValue) {
+      return prevValue.toString();
+    }
+
+    // Fallback
+    return "0";
+  };
 
   const isSetCompleted = !!set.completed_at;
 
@@ -260,60 +325,59 @@ export const ActiveSetRow: React.FC<Props> = ({
             color="textMuted"
           >
             {prevSet
-              ? `${prevSet.actual_weight}kg x ${prevSet.actual_reps}`
-              : "-"}
+              ? formatMeasurementValue(
+                  prevSet.actual_primary_value,
+                  null,
+                  prevSet.measurement_template,
+                  "primary"
+                ) +
+                (prevSet.actual_secondary_value
+                  ? ` x ${formatMeasurementValue(
+                      prevSet.actual_secondary_value,
+                      null,
+                      prevSet.measurement_template,
+                      "secondary"
+                    )}`
+                  : "")
+              : "--"}
           </Typography>
         </View>
 
-        {/* Weight Input */}
-        <View style={{ flex: 0.9, paddingHorizontal: 8 }}>
-          <TextInput
-            value={renderWeight?.toString()}
-            onChangeText={(value) =>
-              setSetData((prev) => ({ ...prev, weight: value }))
+        {/* Primary Value Input */}
+        <View style={{ flex: 1, paddingHorizontal: 8 }}>
+          <MeasurementInput
+            field={template?.fields[0]!}
+            value={renderPrimaryValue}
+            onChange={(value) =>
+              setSetData((prev) => ({
+                ...prev,
+                primaryValue: value,
+              }))
             }
-            placeholder={
-              session?.hasBeenPerformed
-                ? prevSet?.actual_weight?.toString() ||
-                  set.planned_weight?.toString() ||
-                  "0"
-                : set.planned_weight?.toString() || "0"
-            }
-            keyboardType="numeric"
-            placeholderTextColor={colors.textMuted}
-            style={{
-              backgroundColor: "transparent",
-              borderWidth: 0,
-              paddingHorizontal: 8,
-              paddingVertical: 6,
-              textAlign: "center",
-              color: colors.text,
-              fontSize: 18,
-            }}
+            placeholder={getPlaceholderValue("primary")}
+            setNumber={set.order_index + 1}
+            activeWorkout={true}
           />
         </View>
 
-        {/* Reps Input */}
-        <View style={{ flex: 0.9, paddingHorizontal: 8 }}>
-          <TextInput
-            value={renderReps?.toString()}
-            onChangeText={(value) =>
-              setSetData((prev) => ({ ...prev, reps: value }))
-            }
-            placeholder={getRepsPlaceholder() || "0"}
-            keyboardType="numeric"
-            placeholderTextColor={colors.textMuted}
-            style={{
-              backgroundColor: "transparent",
-              borderWidth: 0,
-              paddingHorizontal: 8,
-              paddingVertical: 6,
-              textAlign: "center",
-              color: colors.text,
-              fontSize: 18,
-            }}
-          />
-        </View>
+        {/* Secondary Value Input - Conditional */}
+        {hasSecondaryField && template?.fields[1] && (
+          <View style={{ flex: 1, paddingHorizontal: 8 }}>
+            <MeasurementInput
+              field={template.fields[1]}
+              value={renderSecondaryValue}
+              onChange={(value) =>
+                setSetData((prev) => ({
+                  ...prev,
+                  secondaryValue: value,
+                }))
+              }
+              placeholder={getPlaceholderValue("secondary")}
+              setNumber={set.order_index + 1}
+              activeWorkout={true}
+            />
+          </View>
+        )}
 
         {/* RPE Input */}
         {session?.routine?.show_rpe && (

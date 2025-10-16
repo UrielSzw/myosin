@@ -44,8 +44,8 @@ export const useSaveRoutine = () => {
           ? formState.routine.created_by_user_id
           : "default-user",
         training_days: formState.routine.training_days || null,
-        show_rpe: formState.routine.show_rpe || show_rpe || false,
-        show_tempo: formState.routine.show_tempo || show_tempo || false,
+        show_rpe: formState.routine.show_rpe ?? show_rpe ?? false,
+        show_tempo: formState.routine.show_tempo ?? show_tempo ?? false,
       };
 
       // 2. Preparar bloques (eliminar tempId y asignar IDs reales)
@@ -110,13 +110,14 @@ export const useSaveRoutine = () => {
               id: generateUUID(),
               user_id: "default-user",
               exercise_in_block_id: realExerciseId,
-              reps: set.reps,
-              weight: set.weight,
+              measurement_template: set.measurement_template,
+              primary_value: set.primary_value,
+              secondary_value: set.secondary_value,
+              primary_range: set.primary_range,
+              secondary_range: set.secondary_range,
               rpe: set.rpe,
               order_index: set.order_index,
               set_type: set.set_type,
-              reps_type: set.reps_type,
-              reps_range: set.reps_range,
               tempo: set.tempo,
             });
           });

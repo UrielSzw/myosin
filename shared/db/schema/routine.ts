@@ -1,18 +1,17 @@
 import { InferSelectModel, relations } from "drizzle-orm";
 import {
-  blob,
   index,
   integer,
   real,
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
+import { MeasurementTemplateId } from "../../types/measurement";
 import {
   IExerciseEquipment,
   IExerciseMuscle,
   IExerciseSource,
   IExerciseType,
-  IRepsType,
   ISetType,
 } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
@@ -50,6 +49,12 @@ export const exercises = sqliteTable(
     similar_exercises: text("similar_exercises", { mode: "json" }).$type<
       string[]
     >(),
+
+    // New measurement system
+    default_measurement_template: text("default_measurement_template")
+      .$type<MeasurementTemplateId>()
+      .notNull()
+      .default("weight_reps"),
 
     ...timestamps,
   },
@@ -156,21 +161,30 @@ export const routine_sets = sqliteTable("routine_sets", {
     .references(() => exercise_in_block.id)
     .notNull(),
 
-  reps: integer("reps"),
-  weight: real("weight"),
+  // New measurement system
+  measurement_template: text("measurement_template")
+    .$type<MeasurementTemplateId>()
+    .notNull(),
+
+  // Measurement values (max 2)
+  primary_value: real("primary_value"),
+  secondary_value: real("secondary_value"),
+
+  // Range support for both fields
+  primary_range: text("primary_range", { mode: "json" }).$type<{
+    min: number;
+    max: number;
+  }>(),
+  secondary_range: text("secondary_range", { mode: "json" }).$type<{
+    min: number;
+    max: number;
+  }>(),
+
+  // Existing metadata
   rpe: real("rpe"),
   tempo: text("tempo"), // "3-1-2-1" o NULL
-
   order_index: integer("order_index").notNull(),
-
   set_type: text("set_type").$type<ISetType>().notNull(),
-
-  reps_type: text("reps_type").$type<IRepsType>().notNull(),
-
-  reps_range: blob("reps_range", { mode: "json" }).$type<{
-    min: number | null;
-    max: number | null;
-  }>(),
 
   ...timestamps,
 });

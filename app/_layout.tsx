@@ -55,7 +55,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="routines/create"
             options={{
-              presentation: "modal",
+              presentation: "fullScreenModal",
               headerShown: false,
               gestureEnabled: false,
             }}
@@ -63,7 +63,7 @@ export default function RootLayout() {
           <Stack.Screen
             name="routines/edit/[id]"
             options={{
-              presentation: "modal",
+              presentation: "fullScreenModal",
               headerShown: false,
               gestureEnabled: false,
             }}

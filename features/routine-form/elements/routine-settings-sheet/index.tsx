@@ -20,8 +20,6 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
     const { setRoutineFlags } = useMainActions();
     const { routine } = useRoutineFormState();
 
-    console.log("🐛 RENDER RoutineSettingsBottomSheet:", routine?.show_rpe);
-
     const [showRpe, setShowRpe] = useState<boolean | null>(null);
     const [showTempo, setShowTempo] = useState<boolean | null>(null);
 

@@ -1,4 +1,5 @@
 import { BaseExercise } from "@/shared/db/schema";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useExerciseFilters } from "@/shared/hooks/use-exercise-filters";
 import { useExercises } from "@/shared/hooks/use-exercises";
 import React, { useCallback, useEffect, useState } from "react";
@@ -36,6 +37,7 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
   exerciseIdToExclude = null,
 }) => {
   const { exercises, loading, error } = useExercises();
+  const { colors } = useColorScheme();
 
   const idToExclude =
     exerciseModalMode === "replace" ? exerciseIdToExclude : null;
@@ -140,6 +142,7 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      backdropColor={colors.background}
     >
       {infoExercise ? (
         <Animated.View

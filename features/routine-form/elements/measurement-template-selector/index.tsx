@@ -5,9 +5,14 @@ import {
   MeasurementTemplateId,
 } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
-import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import { Check } from "lucide-react-native";
-import React, { forwardRef } from "react";
+import React, { forwardRef, useCallback } from "react";
 import { TouchableOpacity, View } from "react-native";
 import {
   useExerciseActions,
@@ -92,6 +97,18 @@ export const MeasurementTemplateSelector = forwardRef<BottomSheetModal>(
       );
     };
 
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
     // Get all templates as a simple array
     const allTemplates = Object.values(MEASUREMENT_TEMPLATES);
     return (
@@ -101,6 +118,8 @@ export const MeasurementTemplateSelector = forwardRef<BottomSheetModal>(
         snapPoints={["65%"]}
         backgroundStyle={{ backgroundColor: colors.surface }}
         handleIndicatorStyle={{ backgroundColor: colors.border }}
+        enablePanDownToClose
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetScrollView
           style={{ flex: 1 }}

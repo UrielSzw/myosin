@@ -1,8 +1,11 @@
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { BlockItem } from "./elements/block-item";
 import { BlocksList } from "./elements/blocks-list";
+import { ExerciseListTop } from "./elements/blocks-list/exercise-list-top";
+import { ListHint } from "./elements/blocks-list/list-hint";
 import { BottomSheets } from "./elements/bottom-sheets";
 import { CreateRoutineHeader } from "./elements/create-routine-header";
 import { ExerciseModal } from "./elements/exercise-modal";
@@ -14,6 +17,8 @@ import { useRoutineFormState } from "./hooks/use-routine-form-store";
 export const RoutineFormFeature = () => {
   const { blocksByRoutine, exercisesInBlock, sets, exercisesByBlock, routine } =
     useRoutineFormState();
+
+  const { colors } = useColorScheme();
 
   const {
     handleToggleSheet,
@@ -29,6 +34,11 @@ export const RoutineFormFeature = () => {
 
   const blockCount = blocksByRoutine.length;
 
+  const exercisesInBlockCount = Object.values(exercisesByBlock).reduce(
+    (total, exercises) => total + exercises.length,
+    0
+  );
+
   return (
     <ScreenWrapper withSheets fullscreen>
       <CreateRoutineHeader />
@@ -40,25 +50,53 @@ export const RoutineFormFeature = () => {
         contentInsetAdjustmentBehavior="automatic"
       >
         <View
-          style={{ flex: 1, padding: 20 }}
+          style={{ flex: 1 }}
           accessible={true}
           accessibilityLabel={`Rutina con ${blockCount} ${
             blockCount === 1 ? "bloque" : "bloques"
           }`}
         >
-          <RoutineInfo
-            onOpenSettings={() => handleToggleSheet("routineSettings")}
-          />
+          <View
+            style={{
+              paddingHorizontal: 16,
+              position: "relative",
+              paddingTop: 20,
+            }}
+          >
+            {/* Decorative vertical rail limited to the top content (RoutineInfo + VolumePreview)
+                so it doesn't overlap the BlocksList below. Non-interactive. */}
+            <View
+              accessible={false}
+              importantForAccessibility="no"
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 4,
+                backgroundColor: colors.border,
+                opacity: 0.2,
+                borderRadius: 2,
+              }}
+            />
+            <RoutineInfo
+              onOpenSettings={() => handleToggleSheet("routineSettings")}
+            />
 
-          <VolumePreview
-            exercisesInBlock={exercisesInBlock}
-            sets={sets}
-            trainingDays={routine.training_days || []}
-            blocksByRoutine={blocksByRoutine}
-            exercisesByBlock={exercisesByBlock}
-          />
+            <VolumePreview
+              exercisesInBlock={exercisesInBlock}
+              sets={sets}
+              trainingDays={routine.training_days || []}
+              blocksByRoutine={blocksByRoutine}
+              exercisesByBlock={exercisesByBlock}
+            />
 
-          <BlocksList>
+            <ExerciseListTop exercisesInBlockCount={exercisesInBlockCount} />
+
+            <ListHint />
+          </View>
+
+          <BlocksList exercisesInBlockCount={exercisesInBlockCount}>
             {blocksByRoutine.map((blockId) => (
               <BlockItem
                 key={blockId}

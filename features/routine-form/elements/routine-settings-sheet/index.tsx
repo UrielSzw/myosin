@@ -88,7 +88,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
             <View style={styles.rowLeft}>
               <Typography variant="body1">Mostrar RPE</Typography>
               <Typography variant="caption" color="textMuted">
-                Mostrar RPE en esta rutina
+                Escala de esfuerzo del 1-10
               </Typography>
             </View>
             <Switch
@@ -107,7 +107,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
             <View style={styles.rowLeft}>
               <Typography variant="body1">Mostrar Tempo</Typography>
               <Typography variant="caption" color="textMuted">
-                Mostrar tempo en esta rutina
+                Controla la velocidad de las repeticiones
               </Typography>
             </View>
             <Switch

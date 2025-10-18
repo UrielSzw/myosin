@@ -286,8 +286,6 @@ export class VolumeCalculator {
       other: 0,
     };
 
-    console.log("Exercises for Volume Calculation:", exercises);
-
     exercises.forEach((exercise) => {
       // Músculo principal
       const primaryCategory = MuscleCategoryUtils.getCategoryForMuscle(
@@ -295,8 +293,6 @@ export class VolumeCalculator {
       );
       categoryVolume[primaryCategory] +=
         exercise.setsCount * MUSCLE_CONTRIBUTION.primary;
-
-      console.log(" exercise.secondaryMuscles", exercise.secondaryMuscles);
 
       // Músculos secundarios
       exercise.secondaryMuscles.forEach((secondaryMuscle) => {

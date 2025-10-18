@@ -13,7 +13,7 @@ export const EmptyList = () => {
   };
 
   return (
-    <Card variant="outlined" padding="lg">
+    <Card variant="outlined" padding="lg" style={{ marginHorizontal: 16 }}>
       <View style={{ alignItems: "center", padding: 32 }}>
         <Typography
           variant="body2"

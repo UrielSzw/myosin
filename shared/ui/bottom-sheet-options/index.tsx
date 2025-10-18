@@ -13,8 +13,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   title: string;
   subtitle?: string;
-  options: { type: string; label: string; method: () => void }[];
-  warningOption?: { label: string; method: () => void };
+  options: {
+    type: string;
+    label: string;
+    method: () => void;
+    icon?: React.ReactNode;
+  }[];
+  warningOption?: { label: string; method: () => void; icon?: React.ReactNode };
   addBottomInset?: boolean;
 };
 
@@ -92,8 +97,12 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
                 paddingHorizontal: 16,
                 borderBottomWidth: 1,
                 borderBottomColor: colors.border,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
               }}
             >
+              {option.icon && option.icon}
               <Typography variant="body1">{option.label}</Typography>
             </TouchableOpacity>
           ))}
@@ -101,8 +110,15 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
           {warningOption && (
             <TouchableOpacity
               onPress={warningOption.method}
-              style={{ paddingVertical: 16, paddingHorizontal: 16 }}
+              style={{
+                paddingVertical: 16,
+                paddingHorizontal: 16,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 8,
+              }}
             >
+              {warningOption.icon && warningOption.icon}
               <Typography variant="body1" style={{ color: colors.error[500] }}>
                 {warningOption.label}
               </Typography>

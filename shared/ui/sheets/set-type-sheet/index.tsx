@@ -1,8 +1,13 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { ISetType } from "@/shared/types/workout";
-import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import {
+  BottomSheetBackdrop,
+  BottomSheetBackdropProps,
+  BottomSheetModal,
+  BottomSheetScrollView,
+} from "@gorhom/bottom-sheet";
 import { InfoIcon } from "lucide-react-native";
-import React, { forwardRef, useState } from "react";
+import React, { forwardRef, useCallback, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Animated, {
   Easing,
@@ -75,6 +80,18 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
       Easing.bezier(0.25, 0.1, 0.25, 1)
     );
 
+    const renderBackdrop = useCallback(
+      (props: BottomSheetBackdropProps) => (
+        <BottomSheetBackdrop
+          {...props}
+          appearsOnIndex={0}
+          disappearsOnIndex={-1}
+          pressBehavior="close"
+        />
+      ),
+      []
+    );
+
     return (
       <BottomSheetModal
         ref={ref}
@@ -93,6 +110,7 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
           elevation: 8,
         }}
         handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        backdropComponent={renderBackdrop}
       >
         <BottomSheetScrollView
           style={{ padding: 16, paddingBottom: 60, flex: 1 }}

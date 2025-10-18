@@ -12,7 +12,7 @@ export const ListHint: React.FC = () => {
         borderLeftWidth: 3,
         borderLeftColor: colors.primary[500],
         padding: 12,
-        marginBottom: 8,
+        marginBottom: 36,
         borderRadius: 8,
       }}
     >

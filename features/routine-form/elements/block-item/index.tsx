@@ -1,4 +1,5 @@
-import { Card } from "@/shared/ui/card";
+import { useBlockStyles } from "@/shared/hooks/use-block-styles";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { router } from "expo-router";
 import React from "react";
 import { TouchableOpacity, Vibration, View } from "react-native";
@@ -21,9 +22,13 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
   const { blocks, exercisesByBlock, exercisesInBlock } = useRoutineFormState();
   const { setCurrentState } = useMainActions();
   const { initializeReorder } = useReorderBlocks();
+  const { getBlockColors } = useBlockStyles();
+  const { colors } = useColorScheme();
 
   const block = blocks[blockId];
   const exercisesInBlockIds = exercisesByBlock[blockId] || [];
+
+  const blockColors = getBlockColors(block.type);
 
   const handleLongPress = () => {
     Vibration.vibrate(50);
@@ -68,7 +73,6 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
       onLongPress={handleLongPress}
       delayLongPress={500}
       activeOpacity={1}
-      onPress={handlePress}
       accessible={true}
       accessibilityRole="button"
       accessibilityLabel={`Bloque ${blockTypeText}: ${block.name}`}
@@ -80,31 +84,24 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
         { name: "activate", label: "Configurar bloque" },
       ]}
     >
-      <Card variant="outlined" padding="none">
+      <View
+        style={{
+          borderLeftWidth: 4,
+          borderLeftColor: blockColors.light,
+        }}
+      >
         {/* Block Header with Continuous Line */}
         <BlockHeader
           block={block}
           exercises={exercisesInBlockIds}
           onToggleSheet={onToggleSheet}
+          onPress={handlePress}
         />
 
         {/* Exercises List with Continuous Visual Line */}
-        <View style={{ position: "relative" }}>
-          {/* {exercisesInBlockIds.length > 1 && (
-            <View
-              style={{
-                position: "absolute",
-                left: 32,
-                top: 0,
-                bottom: 0,
-                width: 3,
-                backgroundColor: blockColors.primary,
-                borderRadius: 1.5,
-                zIndex: 1,
-              }}
-            />
-          )} */}
-
+        <View
+          style={{ position: "relative", backgroundColor: colors.background }}
+        >
           {exercisesInBlockIds.map((exerciseInBlockId) => (
             <ExerciseInBlockItem
               key={exerciseInBlockId}
@@ -123,7 +120,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
             </ExerciseInBlockItem>
           ))}
         </View>
-      </Card>
+      </View>
     </TouchableOpacity>
   );
 };

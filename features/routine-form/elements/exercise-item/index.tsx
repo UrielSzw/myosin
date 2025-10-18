@@ -1,6 +1,6 @@
 import { IBlockType } from "@/shared/types/workout";
 import { router } from "expo-router";
-import { TouchableOpacity } from "react-native";
+import { Pressable } from "react-native";
 import { IToogleSheet } from "../../hooks/use-form-routine-sheets";
 import {
   useMainActions,
@@ -60,16 +60,15 @@ export const ExerciseItem: React.FC<Props> = ({
   if (!exerciseInBlock) return null;
 
   return (
-    <TouchableOpacity
+    <Pressable
       style={{ flex: 1 }}
       onLongPress={exerciseCount > 1 ? handleLongPressExercise : undefined}
       delayLongPress={500}
-      onPress={handlePress}
-      activeOpacity={exerciseCount > 1 ? 0.8 : 1}
     >
       <ExerciseHeader
         exerciseName={exerciseInBlock.exercise.name}
         exerciseMainMuscle={exerciseInBlock.exercise.main_muscle_group}
+        onPress={handlePress}
       />
 
       <SetsTable
@@ -86,6 +85,6 @@ export const ExerciseItem: React.FC<Props> = ({
           />
         ))}
       </SetsTable>
-    </TouchableOpacity>
+    </Pressable>
   );
 };

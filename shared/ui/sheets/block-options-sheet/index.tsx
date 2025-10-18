@@ -1,5 +1,13 @@
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { BottomSheetOptions } from "@/shared/ui/bottom-sheet-options";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
+import {
+  PlusCircle,
+  RotateCcw,
+  Shuffle,
+  Split,
+  Trash,
+} from "lucide-react-native";
 import React, { forwardRef } from "react";
 
 type Props = {
@@ -27,13 +35,16 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     },
     ref
   ) => {
+    const { colors } = useColorScheme();
+
     let options = [
       {
         type: "add-exercise",
         label: isMultiBlock
-          ? "Agregar ejercicio al bloque"
+          ? "Agregar ejercicio"
           : "Agregar ejercicio (superserie)",
         method: onShowAddExerciseModal,
+        icon: <PlusCircle color={colors.text} size={20} />,
       },
     ];
 
@@ -42,12 +53,14 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         type: "convert",
         label: "Separar ejercicios",
         method: onConvertToIndividual,
+        icon: <Split color={colors.text} size={20} />,
       });
     } else {
       options.push({
         type: "replace",
         label: "Remplazar ejercicio",
         method: onShowReplace,
+        icon: <RotateCcw color={colors.text} size={20} />,
       });
     }
 
@@ -56,6 +69,7 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         type: "reorder",
         label: "Reordenar ejercicios del bloque",
         method: onReorderExercises,
+        icon: <Shuffle color={colors.text} size={20} />,
       });
     }
 
@@ -64,6 +78,7 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         type: "reorder-blocks",
         label: "Reordenar bloques",
         method: onReorderBlocks,
+        icon: <Shuffle color={colors.text} size={20} />,
       });
     }
 
@@ -74,10 +89,9 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
         subtitle={isMultiBlock ? "" : exerciseName || ""}
         options={options}
         warningOption={{
-          label: isMultiBlock
-            ? "Eliminar bloque (todos los ejercicios)"
-            : "Eliminar ejercicio",
+          label: isMultiBlock ? "Eliminar bloque" : "Eliminar ejercicio",
           method: onDelete,
+          icon: <Trash color={colors.error[500]} size={20} />,
         }}
       />
     );

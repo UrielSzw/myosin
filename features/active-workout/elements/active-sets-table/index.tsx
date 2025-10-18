@@ -3,7 +3,13 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { Check, Plus } from "lucide-react-native";
+import {
+  Check,
+  Dumbbell,
+  Footprints,
+  Hourglass,
+  Plus,
+} from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import {
   useActiveSetActions,
@@ -75,9 +81,22 @@ export const ActiveSetsTable: React.FC<Props> = ({
           </Typography>
         </View>
         <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
-          <Typography variant="caption" weight="medium" color="textMuted">
-            {primary}
-          </Typography>
+          <View style={{ alignItems: "center", flexDirection: "row", gap: 4 }}>
+            {primary === "KG" && (
+              <Dumbbell size={12} color={colors.textMuted} />
+            )}
+
+            {primary === "SEG" && (
+              <Hourglass size={12} color={colors.textMuted} />
+            )}
+
+            {primary === "KM" && (
+              <Footprints size={12} color={colors.textMuted} />
+            )}
+            <Typography variant="caption" weight="medium" color="textMuted">
+              {primary}
+            </Typography>
+          </View>
         </View>
         {hasSecondaryField && (
           <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>

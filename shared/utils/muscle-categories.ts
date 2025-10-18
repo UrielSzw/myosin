@@ -70,7 +70,7 @@ export type MuscleCategoryKey = keyof typeof MUSCLE_CATEGORIES;
 // Configuración de contribución muscular
 export const MUSCLE_CONTRIBUTION = {
   primary: 1.0, // Músculo principal cuenta como 1 serie completa
-  secondary: 0.5, // Músculos secundarios cuentan como 0.5 series
+  secondary: 0, // Músculos secundarios cuentan como 0 series
 } as const;
 
 // Utilidades para trabajar con categorías

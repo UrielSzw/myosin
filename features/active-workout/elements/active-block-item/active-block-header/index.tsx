@@ -5,8 +5,8 @@ import {
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import { Timer, Zap } from "lucide-react-native";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import { EllipsisVertical, Timer, Zap } from "lucide-react-native";
+import { TouchableOpacity, View } from "react-native";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
 
 type Props = {
@@ -51,36 +51,31 @@ export const BlockHeader: React.FC<Props> = ({
   };
 
   const getBlockTitle = () => {
-    const blockLetter = String.fromCharCode(65 + block.order_index); // A, B, C...
+    const blockOrder = block.order_index + 1;
     const blockTypeLabel = getBlockTypeLabel(block.type);
 
     if (block.type === "individual") {
-      return `Bloque ${blockLetter}`;
+      return `Ejercicio ${blockOrder}`;
     }
 
-    return `${blockTypeLabel} ${blockLetter}`;
+    return `${blockTypeLabel} ${blockOrder}`;
   };
 
   return (
-    <Pressable
-      onPress={onPress}
+    <View
       style={{
         paddingHorizontal: 16,
         paddingVertical: 12,
         backgroundColor: blockColors.light,
         borderBottomWidth: 1,
         borderBottomColor: colors.border,
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
       {/* First Row - Block Title and Timer */}
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          marginBottom: 8,
-        }}
-      >
+      <View>
         {/* Left - Block Title */}
         <View
           style={{
@@ -88,6 +83,7 @@ export const BlockHeader: React.FC<Props> = ({
             alignItems: "center",
             gap: 8,
             flex: 1,
+            marginBottom: 14,
           }}
         >
           {getBlockTypeIcon(block.type)}
@@ -168,14 +164,19 @@ export const BlockHeader: React.FC<Props> = ({
         </View>
       </View>
 
-      {/* Second Row - Exercise Count Only */}
-      <View>
-        <Typography variant="caption" color="textMuted">
-          {exercisesIds.length > 1
-            ? `${exercisesIds.length} ejercicios`
-            : "Individual"}
-        </Typography>
-      </View>
-    </Pressable>
+      {block.type !== "individual" && (
+        <TouchableOpacity
+          onPress={onPress}
+          style={{
+            width: 40,
+            height: 40,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <EllipsisVertical size={28} color={blockColors.primary} />
+        </TouchableOpacity>
+      )}
+    </View>
   );
 };

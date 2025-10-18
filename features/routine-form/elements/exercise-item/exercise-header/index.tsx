@@ -2,18 +2,20 @@ import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { Dumbbell } from "lucide-react-native";
+import { Dumbbell, EllipsisVertical } from "lucide-react-native";
 import React from "react";
-import { View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   exerciseName: string;
   exerciseMainMuscle: string;
+  onPress: () => void;
 };
 
 const ExerciseHeaderComponent: React.FC<Props> = ({
   exerciseName,
   exerciseMainMuscle,
+  onPress,
 }) => {
   const { colors } = useColorScheme();
 
@@ -22,6 +24,7 @@ const ExerciseHeaderComponent: React.FC<Props> = ({
       style={{
         flexDirection: "row",
         gap: 8,
+        alignItems: "center",
       }}
     >
       <View
@@ -44,7 +47,7 @@ const ExerciseHeaderComponent: React.FC<Props> = ({
             gap: 4,
           }}
         >
-          <Typography variant="body1" weight="semibold">
+          <Typography variant="body1" weight="semibold" numberOfLines={2}>
             {exerciseName}
           </Typography>
         </View>
@@ -52,6 +55,17 @@ const ExerciseHeaderComponent: React.FC<Props> = ({
           {EXERCISE_CATEGORY_LABELS[exerciseMainMuscle as IExerciseMuscle]}
         </Typography>
       </View>
+      <TouchableOpacity
+        onPress={onPress}
+        style={{
+          width: 40,
+          height: 40,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <EllipsisVertical size={28} color={colors.textMuted} />
+      </TouchableOpacity>
     </View>
   );
 };

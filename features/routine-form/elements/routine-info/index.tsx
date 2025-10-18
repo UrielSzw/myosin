@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { Card } from "@/shared/ui/card";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
 import { WeekDaySelector } from "@/shared/ui/week-day-selector";
@@ -87,9 +86,7 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
   }, [hasInteracted]);
 
   return (
-    <Card
-      variant="outlined"
-      padding="lg"
+    <View
       style={{ marginBottom: 24 }}
       accessible={true}
       accessibilityLabel="Información de la rutina"
@@ -141,6 +138,6 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
         selectedDays={training_days || []}
         onDaysChange={setTrainingDays}
       />
-    </Card>
+    </View>
   );
 };

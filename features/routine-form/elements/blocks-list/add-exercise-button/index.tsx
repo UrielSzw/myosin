@@ -27,6 +27,7 @@ export const AddExerciseButton = () => {
         borderStyle: "dashed",
         borderRadius: 8,
         backgroundColor: colors.primary[500] + "10",
+        marginHorizontal: 16,
       }}
     >
       <Plus size={20} color={colors.primary[500]} />

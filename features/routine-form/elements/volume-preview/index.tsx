@@ -101,34 +101,14 @@ export const VolumePreview: React.FC<Props> = ({
         exercisesForCalculation
       );
 
-      // Convertir a formato para display
-      const categoryDisplayNames: Record<string, string> = {
-        chest: "Pecho",
-        back: "Espalda",
-        shoulders: "Hombros",
-        arms: "Brazos",
-        legs: "Piernas",
-        core: "Core",
-        other: "Otro",
-      };
-
-      const volumeByCategory = Object.entries(categoryVolume)
-        .filter(([_, volume]) => volume > 0)
-        .map(([category, volume]) => ({
-          category: categoryDisplayNames[category] || category,
-          sets: volume,
-          percentage: 0, // Se calculará después
-        }));
+      // Usar el formateador compartido para traducción y cálculos
+      const volumeByCategory =
+        VolumeCalculator.formatVolumeForDisplay(categoryVolume);
 
       const totalSets = Object.values(categoryVolume).reduce(
         (sum, volume) => sum + volume,
         0
       );
-
-      // Calcular porcentajes
-      volumeByCategory.forEach((item) => {
-        item.percentage = totalSets > 0 ? (item.sets / totalSets) * 100 : 0;
-      });
 
       return { volumeByCategory, totalSets };
     } catch (error) {

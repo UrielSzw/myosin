@@ -1,10 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { useRouter } from "expo-router";
 import {
   ChevronDown,
+  ChevronRight,
   ChevronUp,
-  TrendingUp,
   Trophy,
 } from "lucide-react-native";
 import React, { useState } from "react";
@@ -16,17 +17,20 @@ type Props = {
   data: PRData[];
   loading?: boolean;
   showTop?: number;
-  onPRPress?: (exerciseId: string, exerciseName?: string) => void;
 };
 
 export const SmartPRDisplayComponent: React.FC<Props> = ({
   data,
   loading,
   showTop = 4,
-  onPRPress,
 }) => {
   const { colors } = useColorScheme();
+  const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const handleSeeAllPress = () => {
+    router.push("/pr-list" as any);
+  };
 
   if (loading) {
     return (
@@ -91,21 +95,19 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
         <Typography variant="h5" weight="semibold">
           Records Personales
         </Typography>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <Pressable
+          style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+          onPress={handleSeeAllPress}
+        >
           <Typography variant="caption" color="textMuted">
             {sortedPRs.length} total
           </Typography>
-          <TrendingUp size={14} color={colors.textMuted} />
-        </View>
+          <ChevronRight size={14} color={colors.textMuted} />
+        </Pressable>
       </View>
 
       {displayData.map((pr) => (
-        <PRItem
-          key={pr.id}
-          pr={pr}
-          onPress={() => onPRPress?.(pr.exercise_id, pr.exercise_name)}
-          colors={colors}
-        />
+        <PRItem key={pr.id} pr={pr} colors={colors} />
       ))}
 
       {/* Estadística rápida */}

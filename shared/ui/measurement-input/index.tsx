@@ -1,7 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { MeasurementField } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleProp,
   TextInput,
@@ -42,6 +42,14 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
 }) => {
   const { colors } = useColorScheme();
 
+  // Estado local para el texto del input
+  const [inputText, setInputText] = useState<string>("");
+
+  // Sincronizar inputText con el valor del prop cuando cambia externamente
+  useEffect(() => {
+    setInputText(value?.toString() || "");
+  }, [value]);
+
   // Format time for display (convert seconds to readable format)
   const formatTimeDisplay = (seconds: number): string => {
     if (seconds < 60) {
@@ -62,6 +70,9 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   const getKeyboardType = (): "numeric" | "decimal-pad" => {
     if (field.type === "distance" && field.unit === "km") {
       return "decimal-pad"; // For decimal values like 5.5 km
+    }
+    if (field.type === "weight") {
+      return "decimal-pad"; // For decimal values like 32.5 kg
     }
     return "numeric";
   };
@@ -97,12 +108,17 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
 
   // Handle text input change
   const handleTextChange = (text: string) => {
+    // Actualizar el estado local inmediatamente (preserva comas y puntos)
+    setInputText(text);
+
     if (text === "") {
       onChange(null);
       return;
     }
 
-    const numValue = parseFloat(text);
+    // Convertir coma a punto para parseFloat
+    const normalizedText = text.replace(",", ".");
+    const numValue = parseFloat(normalizedText);
     if (!isNaN(numValue) && numValue >= 0) {
       onChange(numValue);
     }
@@ -261,7 +277,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
         }}
       >
         <TextInput
-          value={`${value || ""}`}
+          value={inputText}
           onChangeText={handleTextChange}
           placeholder={getPlaceholder()}
           placeholderTextColor={colors.textMuted}
@@ -293,7 +309,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       }}
     >
       <TextInput
-        value={`${value || ""}`}
+        value={inputText}
         onChangeText={handleTextChange}
         placeholder={getPlaceholder()}
         placeholderTextColor={colors.textMuted}

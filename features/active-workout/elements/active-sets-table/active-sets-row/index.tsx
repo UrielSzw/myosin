@@ -4,6 +4,7 @@ import {
   useActiveSetActions,
   useActiveWorkout,
 } from "@/features/active-workout/hooks/use-active-workout-store";
+import { useNextSetIndicator } from "@/features/active-workout/hooks/use-next-set-indicator";
 import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -17,6 +18,7 @@ import { TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { IActiveToggleSheet } from "../../../hooks/use-active-workout-sheets";
 import { usePRCelebration } from "../../../hooks/use-pr-celebration";
+import { NextSetArrow } from "../../next-set-indicator";
 
 type Props = {
   setId: string;
@@ -43,6 +45,9 @@ export const ActiveSetRow: React.FC<Props> = ({
   const { completeSet, uncompleteSet } = useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
   const { sets, exercisePreviousSets, session } = useActiveWorkout();
+
+  // Hook para indicador de próximo set (solo para superseries y circuitos)
+  const nextSetIndicator = useNextSetIndicator(blockId);
 
   // Centralized PR logic hook
   const { validatePR } = usePRLogic(exerciseInBlock.exercise_id, setId);
@@ -221,6 +226,11 @@ export const ActiveSetRow: React.FC<Props> = ({
     });
   };
 
+  // Calcular si este set es el próximo a completar
+  const isNextSet =
+    (blockType === "superset" || blockType === "circuit") &&
+    nextSetIndicator?.isNextSet(exerciseInBlock.tempId, set.order_index);
+
   return (
     <View
       key={set.tempId}
@@ -258,6 +268,17 @@ export const ActiveSetRow: React.FC<Props> = ({
           ]}
         />
       )}
+
+      {/* Next Set Arrow Indicator */}
+      <NextSetArrow
+        blockType={
+          blockType === "superset" || blockType === "circuit"
+            ? blockType
+            : "circuit"
+        }
+        isVisible={isNextSet}
+      />
+
       {/* Main Set Row */}
       <View
         style={{

@@ -1,22 +1,28 @@
 import { PRData } from "@/features/analytics/types/pr";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { useRouter } from "expo-router";
 import { Calendar } from "lucide-react-native";
 import { Pressable, View } from "react-native";
 
 export const PRItem: React.FC<{
   pr: PRData;
-  onPress?: () => void;
   colors: any;
-}> = ({ pr, onPress, colors }) => {
+}> = ({ pr, colors }) => {
+  const router = useRouter();
+
   const achievedDate = new Date(pr.achieved_at);
   const isRecent =
     Date.now() - achievedDate.getTime() < 7 * 24 * 60 * 60 * 1000; // Último 7 días
 
+  const handlePress = () => {
+    router.push(`/pr-detail/${pr.exercise_id}` as any);
+  };
+
   return (
     <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
       <Pressable
-        onPress={onPress}
+        onPress={handlePress}
         style={({ pressed }) => [
           {
             opacity: pressed ? 0.7 : 1,
@@ -122,7 +128,7 @@ export const PRItem: React.FC<{
               weight="bold"
               style={{ color: colors.primary[500] }}
             >
-              {pr.estimated_1rm.toFixed(0)}
+              {pr.estimated_1rm.toFixed(0)}kg
             </Typography>
           </View>
         </View>

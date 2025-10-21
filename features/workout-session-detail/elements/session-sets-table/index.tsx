@@ -12,10 +12,10 @@ import { View } from "react-native";
 
 type Props = {
   sets: BaseWorkoutSet[];
-  exerciseName: string;
+  showRpe: boolean;
 };
 
-export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
+export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
   const { colors } = useColorScheme();
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
 
@@ -79,9 +79,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
           flexDirection: "row",
           alignItems: "center",
           paddingVertical: 8,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
-          marginBottom: 8,
+          paddingHorizontal: 4,
         }}
       >
         <View style={{ width: 40, alignItems: "center" }}>
@@ -97,18 +95,20 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
                 "Realizado"}
           </Typography>
         </View>
-        <View style={{ width: 50, alignItems: "center" }}>
-          <Typography variant="caption" weight="medium" color="textMuted">
-            RPE
-          </Typography>
-        </View>
+        {showRpe && (
+          <View style={{ width: 50, alignItems: "center" }}>
+            <Typography variant="caption" weight="medium" color="textMuted">
+              RPE
+            </Typography>
+          </View>
+        )}
         <View style={{ width: 40, alignItems: "center" }}>
           <Check size={14} color={colors.textMuted} />
         </View>
       </View>
 
       {/* Table Rows */}
-      {sets.map((set, index) => (
+      {sets.map((set) => (
         <View
           key={set.id}
           style={{
@@ -118,6 +118,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
             backgroundColor: "transparent",
             borderRadius: 4,
             marginBottom: 4,
+            paddingHorizontal: 4,
           }}
         >
           {/* Set Number */}
@@ -130,8 +131,6 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
                 backgroundColor:
                   set.set_type !== "normal"
                     ? getSetTypeColor(set.set_type)
-                    : set.completed
-                    ? colors.primary[500]
                     : colors.border,
                 alignItems: "center",
                 justifyContent: "center",
@@ -180,40 +179,42 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
           </View>
 
           {/* RPE */}
-          <View
-            style={{
-              width: 50,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {set.actual_rpe ? (
-              <View style={{ alignItems: "center" }}>
-                <Typography
-                  variant="body2"
-                  weight="semibold"
-                  style={{
-                    color: getRPEColor(set.actual_rpe, set.planned_rpe),
-                  }}
-                >
-                  {formatValue(set.actual_rpe)}
-                </Typography>
-                {set.planned_rpe && (
+          {showRpe && (
+            <View
+              style={{
+                width: 50,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {set.actual_rpe ? (
+                <View style={{ alignItems: "center" }}>
                   <Typography
-                    variant="caption"
-                    color="textMuted"
-                    style={{ fontSize: 9 }}
+                    variant="body2"
+                    weight="semibold"
+                    style={{
+                      color: getRPEColor(set.actual_rpe, set.planned_rpe),
+                    }}
                   >
-                    ({formatValue(set.planned_rpe)})
+                    {formatValue(set.actual_rpe)}
                   </Typography>
-                )}
-              </View>
-            ) : (
-              <Typography variant="body2" color="textMuted">
-                -
-              </Typography>
-            )}
-          </View>
+                  {set.planned_rpe && (
+                    <Typography
+                      variant="caption"
+                      color="textMuted"
+                      style={{ fontSize: 9 }}
+                    >
+                      ({formatValue(set.planned_rpe)})
+                    </Typography>
+                  )}
+                </View>
+              ) : (
+                <Typography variant="body2" color="textMuted">
+                  -
+                </Typography>
+              )}
+            </View>
+          )}
 
           {/* Completion Status */}
           <View
@@ -231,42 +232,6 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, exerciseName }) => {
           </View>
         </View>
       ))}
-
-      {/* Summary Row - only show for weight-based exercises */}
-      {sets.length > 0 &&
-        hasWeightMeasurement(sets[0].measurement_template) && (
-          <View
-            style={{
-              flexDirection: "row",
-              paddingVertical: 8,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              marginTop: 8,
-            }}
-          >
-            <View style={{ width: 40 }} />
-            <View style={{ flex: 1, paddingHorizontal: 8 }}>
-              <Typography variant="caption" color="textMuted">
-                Total Realizado
-              </Typography>
-              <Typography variant="body2" weight="semibold">
-                {sets
-                  .filter((set) => set.completed)
-                  .reduce(
-                    (sum, set) =>
-                      sum +
-                      (set.actual_primary_value || 0) *
-                        (set.actual_secondary_value || 0),
-                    0
-                  )
-                  .toLocaleString()}
-                kg
-              </Typography>
-            </View>
-            <View style={{ width: 50 }} />
-            <View style={{ width: 40 }} />
-          </View>
-        )}
     </View>
   );
 };

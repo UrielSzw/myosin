@@ -95,7 +95,7 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
         >
           <Calendar size={18} color={colors.primary[500]} />
           <Typography variant="body2" color="textMuted">
-            Vista semanal de entrenamientos programados
+            Entrenamientos programados
           </Typography>
         </View>
 

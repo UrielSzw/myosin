@@ -11,9 +11,14 @@ import { SessionExerciseItem } from "../session-exercise-item";
 type Props = {
   block: WorkoutBlockWithExercises;
   isLast: boolean;
+  showRpe: boolean;
 };
 
-export const SessionBlockItem: React.FC<Props> = ({ block, isLast }) => {
+export const SessionBlockItem: React.FC<Props> = ({
+  block,
+  isLast,
+  showRpe,
+}) => {
   const { colors } = useColorScheme();
   const { getBlockColors } = useBlockStyles();
   const [isExpanded, setIsExpanded] = useState(true);
@@ -93,25 +98,10 @@ export const SessionBlockItem: React.FC<Props> = ({ block, isLast }) => {
                 style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
               >
                 <Typography variant="body1" weight="semibold">
-                  {block.name}
+                  {block.type === "individual"
+                    ? "Ejercicio Individual"
+                    : block.name}
                 </Typography>
-                {block.type !== "individual" && (
-                  <View
-                    style={{
-                      backgroundColor: blockColors.primary + "20",
-                      paddingHorizontal: 6,
-                      paddingVertical: 2,
-                      borderRadius: 4,
-                    }}
-                  >
-                    <Typography
-                      variant="caption"
-                      style={{ color: blockColors.primary, fontSize: 10 }}
-                    >
-                      {getBlockTypeLabel(block.type)}
-                    </Typography>
-                  </View>
-                )}
               </View>
 
               <Typography
@@ -142,8 +132,8 @@ export const SessionBlockItem: React.FC<Props> = ({ block, isLast }) => {
                 <SessionExerciseItem
                   key={exercise.id}
                   exercise={exercise}
-                  blockType={block.type}
                   isLast={index === block.exercises.length - 1}
+                  showRpe={showRpe}
                 />
               ))}
             </View>

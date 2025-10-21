@@ -163,6 +163,7 @@ export const useBlockStyles = () => {
           return `${value}`;
         }
       case "weight":
+        return `${value}kg`;
       case "reps":
       default:
         return `${value}`;

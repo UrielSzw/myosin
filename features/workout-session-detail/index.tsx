@@ -76,20 +76,22 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
       <SessionHeader session={sessionData} analytics={analytics} />
 
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: colors.background,
           padding: 20,
         }}
         showsVerticalScrollIndicator={false}
       >
         <View>
           <SessionAnalytics analytics={analytics} />
-          <SessionBlocksList blocks={sessionData.blocks} />
+          <SessionBlocksList
+            blocks={sessionData.blocks}
+            showRpe={sessionData.average_rpe !== null}
+          />
         </View>
 
         {/* Bottom spacing */}

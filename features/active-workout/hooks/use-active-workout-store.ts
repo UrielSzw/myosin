@@ -21,6 +21,7 @@ import {
   createMultiBlock,
   createNewSetForExercise,
   generateTempId,
+  getCircuitRestType,
   shouldShowRestTimer,
 } from "../utils/store-helpers";
 
@@ -35,6 +36,7 @@ export type ActiveWorkoutSession = WorkoutSessionInsert & {
 export type ActiveWorkoutBlock = WorkoutBlockInsert & {
   tempId: string;
   workout_session_id: string; // tempId de la sesión
+  was_modified_during_workout?: boolean; // NUEVO: para detectar modificaciones
 };
 
 export type ActiveWorkoutExercise = WorkoutExerciseInsert & {
@@ -50,6 +52,7 @@ export type ActiveWorkoutSet = Omit<
   tempId: string;
   completed_at: string | null; // Timestamp cuando se completa (no está en DB)
   was_pr?: boolean;
+  was_modified_during_workout?: boolean; // NUEVO: para detectar modificaciones
 };
 
 // Tipo para previous sets history
@@ -344,6 +347,7 @@ const useActiveWorkoutStore = create<Store>()(
                 rest_between_exercises_seconds:
                   block.rest_between_exercises_seconds,
                 was_added_during_workout: false,
+                was_modified_during_workout: false, // NUEVO: inicializar en false
               };
 
               activeBlocks[blockTempId] = activeBlock;
@@ -434,6 +438,7 @@ const useActiveWorkoutStore = create<Store>()(
                 actual_rpe: null,
                 completed: false,
                 completed_at: null, // Campo extra para el timestamp
+                was_modified_during_workout: false, // NUEVO: inicializar en false
               };
 
               activeSets[setTempId] = activeSet;
@@ -614,6 +619,16 @@ const useActiveWorkoutStore = create<Store>()(
         const originalSetsCount = activeWorkout.session.original_sets_count;
 
         if (currentSetsCount !== originalSetsCount) return true;
+
+        // 5. Check sets modificados (NUEVO)
+        for (const set of Object.values(activeWorkout.sets)) {
+          if (set.was_modified_during_workout) return true;
+        }
+
+        // 6. Check bloques modificados (NUEVO)
+        for (const block of Object.values(activeWorkout.blocks)) {
+          if (block.was_modified_during_workout) return true;
+        }
 
         return false; // Sin cambios
       },
@@ -805,8 +820,6 @@ const useActiveWorkoutStore = create<Store>()(
               currentExercisesCount
             );
 
-          console.log("newExercisesInBlock", newExercisesInBlock);
-
           // Agregar nuevos ejercicios
           newExercisesInBlock.forEach((exercise) => {
             state.activeWorkout.exercises[exercise.tempId] = exercise;
@@ -917,6 +930,11 @@ const useActiveWorkoutStore = create<Store>()(
             }
           } else {
             currentBlock.rest_time_seconds = restTime;
+          }
+
+          // Marcar como modificado si no es un bloque nuevo
+          if (!currentBlock.was_added_during_workout) {
+            currentBlock.was_modified_during_workout = true;
           }
         });
       },
@@ -1209,14 +1227,24 @@ const useActiveWorkoutStore = create<Store>()(
           const lastSet =
             state.activeWorkout.sets[currentSets[currentSets.length - 1]];
 
+          // Obtener lastPrevSet para herencia
+          const exercisePrevSets =
+            state.activeWorkout.exercisePreviousSets[
+              exerciseInBlock.exercise_id
+            ] || [];
+          const lastPrevSet =
+            exercisePrevSets[exercisePrevSets.length - 1] || null;
+
           const newSet: ActiveWorkoutSet = createNewSetForExercise(
             currentSets.length,
             lastSet?.planned_primary_value || null,
             lastSet?.planned_secondary_value || null,
             lastSet?.planned_primary_range || null,
+            lastSet?.planned_secondary_range || null,
             lastSet?.measurement_template || "weight_reps",
             exerciseInBlockId,
-            exerciseInBlock.exercise_id
+            exerciseInBlock.exercise_id,
+            lastPrevSet // Pasar como fallback
           );
 
           // Agregar el nuevo set al estado
@@ -1328,21 +1356,47 @@ const useActiveWorkoutStore = create<Store>()(
           if (
             shouldShowRestTimer(currentBlock, currentNextSet, isLastExercise)
           ) {
-            const restTimeResult =
-              currentBlock.type === "individual"
-                ? currentBlock.rest_time_seconds
-                : currentBlock.type === "superset"
-                ? currentBlock.rest_time_seconds
-                : currentBlock.rest_between_exercises_seconds;
+            let restTimeResult = 0;
 
-            state.restTimer = {
-              totalTime: restTimeResult,
-              timeRemaining: restTimeResult,
-              isActive: true,
-              startedAt: Date.now(),
-            };
+            if (currentBlock.type === "individual") {
+              restTimeResult = currentBlock.rest_time_seconds;
+            } else if (currentBlock.type === "superset") {
+              restTimeResult = currentBlock.rest_time_seconds;
+            } else if (currentBlock.type === "circuit") {
+              // Para circuitos, determinar si es entre ejercicios o entre rounds
+              const exercisesInBlock = currentBlockExercises
+                .map((exId) => state.activeWorkout.exercises[exId])
+                .filter(Boolean)
+                .sort((a, b) => a.order_index - b.order_index);
 
-            shouldStartTimer = true;
+              const circuitRestType = getCircuitRestType(
+                currentBlock,
+                set.order_index, // El set que acabamos de completar
+                exercisesInBlock,
+                state.activeWorkout.sets,
+                state.activeWorkout.setsByExercise
+              );
+
+              if (circuitRestType === "between-rounds") {
+                restTimeResult = currentBlock.rest_time_seconds;
+              } else if (circuitRestType === "between-exercises") {
+                restTimeResult = currentBlock.rest_between_exercises_seconds;
+              } else {
+                // circuitRestType es null, no mostrar timer
+                return;
+              }
+            }
+
+            if (restTimeResult > 0) {
+              state.restTimer = {
+                totalTime: restTimeResult,
+                timeRemaining: restTimeResult,
+                isActive: true,
+                startedAt: Date.now(),
+              };
+
+              shouldStartTimer = true;
+            }
           }
         });
 
@@ -1483,6 +1537,10 @@ const useActiveWorkoutStore = create<Store>()(
           if (!set) return;
 
           set.set_type = setType;
+          // Marcar como modificado si no es un set nuevo
+          if (set.original_set_id !== null) {
+            set.was_modified_during_workout = true;
+          }
         });
       },
 
@@ -1494,7 +1552,15 @@ const useActiveWorkoutStore = create<Store>()(
           const set = state.activeWorkout.sets[setId];
 
           if (set) {
-            state.activeWorkout.sets[setId] = { ...set, actual_rpe: rpe };
+            state.activeWorkout.sets[setId] = {
+              ...set,
+              actual_rpe: rpe,
+              // Marcar como modificado si no es un set nuevo
+              was_modified_during_workout:
+                set.original_set_id !== null
+                  ? true
+                  : set.was_modified_during_workout,
+            };
           }
         });
       },

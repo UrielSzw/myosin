@@ -17,8 +17,8 @@ export const analyticsService = {
         await Promise.all([
           VolumeCalculator.getActiveRoutines(userId),
           VolumeCalculator.calculateWeeklyVolume(userId),
-          prRepository.getTopPRs(userId, 10),
-          workoutSessionsRepository.getRecentSessions(8),
+          prRepository.getTopPRs(userId, 4),
+          workoutSessionsRepository.getRecentSessions(4),
         ]);
 
       // Procesar PRs para incluir nombres de ejercicios

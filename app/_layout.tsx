@@ -147,6 +147,28 @@ export default function RootLayout() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="workout-session/workout-session-list"
+            options={{
+              headerShown: false,
+              title: "Sesiones de Entrenamiento",
+            }}
+          />
+          <Stack.Screen
+            name="pr-list/index"
+            options={{
+              headerShown: false,
+              title: "Records Personales",
+            }}
+          />
+          <Stack.Screen
+            name="pr-detail/[exerciseId]"
+            options={{
+              presentation: "modal",
+              headerShown: false,
+              title: "Historial de PR",
+            }}
+          />
         </Stack>
         <StatusBar style="auto" />
       </GestureHandlerRootView>

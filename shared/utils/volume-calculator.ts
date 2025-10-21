@@ -10,12 +10,14 @@ import {
   type RoutineFull,
 } from "../db/schema/routine";
 import { IExerciseMuscle } from "../types/workout";
+import { MuscleVolumeData } from "../ui/volume-display";
 import {
   MUSCLE_CONTRIBUTION,
   MuscleCategoryKey,
   MuscleCategoryUtils,
   WeekDay,
 } from "./muscle-categories";
+import { MuscleVolumeFormatter } from "./muscle-volume-formatter";
 
 // Tipos para el análisis de volumen
 export type CategoryVolumeMap = Record<MuscleCategoryKey, number>;
@@ -35,6 +37,13 @@ export type RoutineVolumeData = {
   trainingDays: WeekDay[];
   frequency: number;
   volumeByCategory: CategoryVolumeMap;
+};
+
+// Tipo para datos de sesión (músculos específicos)
+export type SessionMuscleData = {
+  group: string; // e.g. "chest_middle", "lats", "quads"
+  sets: number;
+  percentage: number;
 };
 
 export class VolumeCalculator {
@@ -310,5 +319,64 @@ export class VolumeCalculator {
     console.log("Calculated Category Volume:", categoryVolume);
 
     return categoryVolume;
+  }
+
+  /**
+   * Convierte datos de sesión (músculos específicos) a categorías agrupadas
+   * @param sessionData - Array de datos de músculos específicos de una sesión
+   * @returns CategoryVolumeMap con músculos agrupados por categorías
+   */
+  static convertSessionToCategories(
+    sessionData: SessionMuscleData[]
+  ): CategoryVolumeMap {
+    const categoryVolume: CategoryVolumeMap = {
+      chest: 0,
+      back: 0,
+      shoulders: 0,
+      arms: 0,
+      legs: 0,
+      core: 0,
+      other: 0,
+    };
+
+    sessionData.forEach((muscleData) => {
+      try {
+        // Convertir string a IExerciseMuscle y obtener categoría
+        const muscle = muscleData.group?.toLocaleLowerCase() as IExerciseMuscle;
+        const category = MuscleCategoryUtils.getCategoryForMuscle(muscle);
+
+        console.log("Muscle:", muscle, "Category:", category);
+        categoryVolume[category] += muscleData.sets;
+      } catch {
+        // Si no se puede categorizar, agregarlo como "other"
+        console.warn(`Could not categorize muscle: ${muscleData.group}`);
+        categoryVolume.other += muscleData.sets;
+      }
+    });
+
+    return categoryVolume;
+  }
+
+  /**
+   * Formatea CategoryVolumeMap a formato display con traducciones
+   * @param categoryVolume - Volumen agrupado por categorías
+   * @returns Array de MuscleVolumeData formateado para UI
+   */
+  static formatVolumeForDisplay(
+    categoryVolume: CategoryVolumeMap
+  ): MuscleVolumeData[] {
+    return MuscleVolumeFormatter.formatVolumeData(categoryVolume);
+  }
+
+  /**
+   * Método de conveniencia: convierte session data directamente a formato display
+   * @param sessionData - Datos de músculos específicos de una sesión
+   * @returns Array de MuscleVolumeData formateado para UI
+   */
+  static formatSessionVolumeForDisplay(
+    sessionData: SessionMuscleData[]
+  ): MuscleVolumeData[] {
+    const categoryVolume = this.convertSessionToCategories(sessionData);
+    return this.formatVolumeForDisplay(categoryVolume);
   }
 }

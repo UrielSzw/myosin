@@ -1,9 +1,10 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { useRouter } from "expo-router";
 import { ChevronRight, Clock } from "lucide-react-native";
 import React from "react";
-import { View } from "react-native";
+import { Pressable, View } from "react-native";
 import { SessionData } from "../../types/session";
 import { SessionItem } from "./session-item";
 
@@ -17,6 +18,11 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
   loading,
 }) => {
   const { colors } = useColorScheme();
+  const router = useRouter();
+
+  const handleHeaderPress = () => {
+    router.push("workout-session/workout-session-list" as any);
+  };
 
   if (loading) {
     return (
@@ -87,12 +93,20 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
         <Typography variant="h5" weight="semibold">
           Sesiones Recientes
         </Typography>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+        <Pressable
+          onPress={handleHeaderPress}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.6 : 1,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+          })}
+        >
           <Typography variant="caption" color="textMuted">
             {data.length} sesiones
           </Typography>
           <ChevronRight size={14} color={colors.textMuted} />
-        </View>
+        </Pressable>
       </View>
 
       {data.map((session) => (

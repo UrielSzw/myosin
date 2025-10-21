@@ -1,6 +1,8 @@
+import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { WorkoutExerciseWithSets } from "@/shared/db/schema/workout-session";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { supportsPRCalculation } from "@/shared/types/measurement";
+import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell, Trophy } from "lucide-react-native";
 import React from "react";
@@ -9,14 +11,14 @@ import { SessionSetsTable } from "../session-sets-table";
 
 type Props = {
   exercise: WorkoutExerciseWithSets;
-  blockType: "individual" | "superset" | "circuit";
   isLast: boolean;
+  showRpe: boolean;
 };
 
 export const SessionExerciseItem: React.FC<Props> = ({
   exercise,
-  blockType,
   isLast,
+  showRpe,
 }) => {
   const { colors } = useColorScheme();
 
@@ -36,16 +38,20 @@ export const SessionExerciseItem: React.FC<Props> = ({
   const totalSets = exercise.sets.length;
 
   return (
-    <View style={{ marginBottom: isLast ? 0 : 24 }}>
+    <View
+      style={{
+        marginBottom: isLast ? 0 : 12,
+        borderBottomWidth: isLast ? 0 : 1,
+        borderBottomColor: colors.border,
+        paddingBottom: isLast ? 0 : 8,
+        paddingHorizontal: 10,
+      }}
+    >
       {/* Exercise Header */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginBottom: 12,
-          paddingBottom: 8,
-          borderBottomWidth: 1,
-          borderBottomColor: colors.border,
           padding: 8,
         }}
       >
@@ -103,7 +109,11 @@ export const SessionExerciseItem: React.FC<Props> = ({
             }}
           >
             <Typography variant="caption" color="textMuted">
-              {exercise.exercise.main_muscle_group}
+              {
+                EXERCISE_CATEGORY_LABELS[
+                  exercise.exercise.main_muscle_group as IExerciseMuscle
+                ]
+              }
             </Typography>
             <Typography variant="caption" color="textMuted">
               {completedSets}/{totalSets} sets
@@ -118,10 +128,7 @@ export const SessionExerciseItem: React.FC<Props> = ({
       </View>
 
       {/* Sets Table */}
-      <SessionSetsTable
-        sets={exercise.sets}
-        exerciseName={exercise.exercise.name}
-      />
+      <SessionSetsTable sets={exercise.sets} showRpe={showRpe} />
     </View>
   );
 };

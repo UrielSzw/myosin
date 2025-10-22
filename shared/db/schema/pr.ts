@@ -70,12 +70,6 @@ export const pr_history = sqliteTable(
 export type BasePRCurrent = InferSelectModel<typeof pr_current>;
 export type BasePRHistory = InferSelectModel<typeof pr_history>;
 
-export type PRCurrentInsert = Omit<
-  BasePRCurrent,
-  "id" | "created_at" | "updated_at"
->;
+export type PRCurrentInsert = Omit<BasePRCurrent, "id">;
 
-export type PRHistoryInsert = Omit<
-  BasePRHistory,
-  "id" | "created_at" | "updated_at"
->;
+export type PRHistoryInsert = Omit<BasePRHistory, "id">;

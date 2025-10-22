@@ -9,16 +9,15 @@ import { PRProgressChart } from "../pr-progress-chart";
 
 type Props = {
   history: PRHistoryItem[];
-  exerciseName: string;
 };
 
-export const PRChartSection: React.FC<Props> = ({ history, exerciseName }) => {
+export const PRChartSection: React.FC<Props> = ({ history }) => {
   const { colors } = useColorScheme();
 
   // Si hay pocos datos, mostrar estado reducido
   if (history.length < 2) {
     return (
-      <Card variant="outlined" padding="lg" style={{ margin: 16 }}>
+      <Card variant="outlined" padding="lg" style={{ marginHorizontal: 16 }}>
         <View style={{ alignItems: "center", paddingVertical: 20 }}>
           <View
             style={{
@@ -47,7 +46,7 @@ export const PRChartSection: React.FC<Props> = ({ history, exerciseName }) => {
   }
 
   return (
-    <Card variant="outlined" padding="lg" style={{ margin: 16 }}>
+    <Card variant="outlined" padding="lg" style={{ marginHorizontal: 16 }}>
       {/* Header */}
       <View
         style={{

@@ -94,19 +94,30 @@ Basándote en la lista que creamos anteriormente, necesito que generes la estruc
   exercise_type: "compound" | "isolation",   // Tipo de ejercicio
   instructions: string[],        // 3-7 pasos SÚPER claros
   similar_exercises: string[],   // IDs de ejercicios similares (déjalo vacío por ahora)
-  images: string[]               // SIEMPRE array vacío []
+  images: string[],              // SIEMPRE array vacío []
+  default_measurement_template: "time_only" | "distance_only" | "weight_reps" | "weight_reps_range" | "distance_time" | "weight_distance" | "weight_time"  // Template de medición
 }
 ````
 
 ## TYPES DISPONIBLES:
 
-### IExerciseMuscle:
+### IExerciseMuscle (USA EXACTAMENTE ESTOS VALORES - core no existe):
 
 chest_upper, chest_middle, chest_lower, front_delts, side_delts, rear_delts, triceps, lats, rhomboids, mid_traps, lower_traps, upper_traps, biceps, forearms, rectus_abdominis, obliques, transverse_abdominis, erector_spinae, lower_back, quads, hamstrings, glutes, calves, hip_flexors, hip_adductors, hip_abductors, serratus_anterior, rotator_cuff, full_body
 
-### IExerciseEquipment:
+### IExerciseEquipment (USA EXACTAMENTE ESTOS VALORES):
 
 barbell, ez_curl_bar, dumbbell, kettlebell, weight_plate, cable_machine, smith_machine, leg_press, lat_pulldown, chest_press_machine, leg_curl_machine, leg_extension_machine, seated_row_machine, shoulder_press_machine, bodyweight, pull_up_bar, dip_station, parallel_bars, resistance_band, suspension_trainer, medicine_ball, stability_ball, foam_roller, ab_wheel, flat_bench, incline_bench, decline_bench, preacher_bench
+
+### default_measurement_template (USA EXACTAMENTE ESTOS VALORES):
+
+- **"time_only"**: Para ejercicios isométricos como plancha, wall sit (solo tiempo)
+- **"distance_only"**: Para ejercicios de distancia sin tiempo
+- **"weight_reps"**: Para ejercicios con peso y repeticiones (bench press, squats, etc.)
+- **"weight_reps_range"**: Para peso fijo con rango de repeticiones (ej: 8-12 reps)
+- **"distance_time"**: Para cardio - correr, remar, ciclismo (distancia + tiempo)
+- **"weight_distance"**: Para farmer's walk, sled push/pull (peso + distancia)
+- **"weight_time"**: Para ejercicios isométricos con peso (peso + tiempo)
 
 ## EJEMPLO COMPLETO:
 
@@ -130,7 +141,8 @@ barbell, ez_curl_bar, dumbbell, kettlebell, weight_plate, cable_machine, smith_m
     "Mantén la espalda arqueada naturalmente y los omóplatos retraídos durante todo el movimiento"
   ],
   similar_exercises: [],
-  images: []
+  images: [],
+  default_measurement_template: "weight_reps"
 }
 ```
 

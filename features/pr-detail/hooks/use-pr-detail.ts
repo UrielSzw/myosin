@@ -89,6 +89,7 @@ export const usePRDetail = (
         // Calcular tiempo transcurrido
         const firstDate = new Date(firstPR.created_at || new Date());
         const currentDate = new Date(currentPR.achieved_at);
+
         const diffTime = Math.abs(currentDate.getTime() - firstDate.getTime());
         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const diffMonths = Math.floor(diffDays / 30);

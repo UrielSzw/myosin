@@ -28,8 +28,6 @@ export const WorkoutSessionListFeature: React.FC = () => {
       <SessionListHeader
         totalSessions={stats.totalSessions}
         recentSessions={stats.recentSessions}
-        avgCompletionRate={stats.avgCompletionRate}
-        totalDurationHours={stats.totalDurationHours}
       />
 
       <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
@@ -65,7 +63,7 @@ export const WorkoutSessionListFeature: React.FC = () => {
               onAction={clearAllFilters}
             />
           ) : (
-            <View style={{ gap: 12 }}>
+            <View style={{ gap: 0 }}>
               {filteredSessions.map((session) => (
                 <SessionItem
                   key={session.id}

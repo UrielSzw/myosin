@@ -19,6 +19,7 @@ import m0014 from './0014_oval_tomas.sql';
 import m0015 from './0015_wakeful_nightshade.sql';
 import m0016 from './0016_nervous_sharon_ventura.sql';
 import m0017 from './0017_careful_rumiko_fujikawa.sql';
+import m0018 from './0018_lumpy_wrecking_crew.sql';
 
   export default {
     journal,
@@ -40,7 +41,8 @@ m0013,
 m0014,
 m0015,
 m0016,
-m0017
+m0017,
+m0018
     }
   }
   

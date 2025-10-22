@@ -245,6 +245,8 @@ export const useSaveWorkoutSession = () => {
           workout_session_id: savedSession.id,
           workout_set_id: null,
           source: "auto",
+          created_at: new Date(),
+          updated_at: new Date(),
         }));
 
         const prCurrentArray: PRCurrentInsert[] = sessionPRs.map((pr) => ({
@@ -255,6 +257,8 @@ export const useSaveWorkoutSession = () => {
           estimated_1rm: pr.estimated_1rm,
           achieved_at: pr.created_at,
           source: "auto",
+          created_at: new Date(),
+          updated_at: new Date(),
         }));
 
         // Insert each history row

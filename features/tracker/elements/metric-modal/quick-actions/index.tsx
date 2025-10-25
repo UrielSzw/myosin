@@ -1,5 +1,5 @@
+import { PREDEFINED_QUICK_ACTION_TEMPLATES } from "@/features/tracker/constants/templates";
 import { useAddEntryFromQuickAction } from "@/features/tracker/hooks/use-tracker-data";
-import { PREDEFINED_QUICK_ACTIONS } from "@/features/tracker/mock";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -34,7 +34,7 @@ export const QuickActions: React.FC<Props> = ({
       return selectedMetric.quick_actions;
     }
 
-    return PREDEFINED_QUICK_ACTIONS[selectedMetric.slug || ""] || [];
+    return PREDEFINED_QUICK_ACTION_TEMPLATES[selectedMetric.slug || ""] || [];
   };
 
   const quickActions = getQuickActions();

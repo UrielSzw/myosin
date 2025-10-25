@@ -1,8 +1,6 @@
-import {
-  useDayData,
-  useDeleteEntry,
-} from "@/features/tracker/hooks/use-tracker-data";
+import { useDeleteEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatTime, formatValue } from "@/features/tracker/utils/helpers";
+import { TrackerDayData } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { Clock, Trash2 } from "lucide-react-native";
@@ -10,19 +8,18 @@ import React, { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 
 type Props = {
-  selectedDate: string;
   selectedMetricId: string | null;
   unit: string | null;
+  dayData?: TrackerDayData;
 };
 
 export const DailyHistory: React.FC<Props> = ({
-  selectedDate,
   selectedMetricId,
   unit,
+  dayData,
 }) => {
   const { colors } = useColorScheme();
   const deleteEntryMutation = useDeleteEntry();
-  const { data: dayData } = useDayData(selectedDate);
 
   const todayEntries = useMemo(() => {
     if (!dayData || !selectedMetricId) return [];
@@ -39,8 +36,6 @@ export const DailyHistory: React.FC<Props> = ({
       console.error("Error removing entry:", error);
     }
   };
-
-  console.log("todayEntries", todayEntries);
 
   if (!todayEntries.length) return null;
 

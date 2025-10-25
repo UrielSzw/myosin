@@ -1,12 +1,14 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
-import { Plus, X } from "lucide-react-native";
-import React from "react";
+import { Plus, RotateCcw, X } from "lucide-react-native";
+import React, { useState } from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
 import {
   useAddMetricFromTemplate,
   useAvailableTemplates,
+  useDeletedMetrics,
+  useRestoreMetric,
 } from "../../hooks/use-tracker-data";
 
 type Props = {
@@ -17,11 +19,14 @@ type Props = {
 export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
   const { colors } = useColorScheme();
   const userId = "default-user"; // TODO: obtener del contexto de usuario
+  const [showDeleted, setShowDeleted] = useState(false);
 
-  // Obtener templates disponibles
+  // Obtener templates disponibles y métricas eliminadas
   const { data: availableTemplates = [], isLoading } =
     useAvailableTemplates(userId);
+  const { data: deletedMetrics = [] } = useDeletedMetrics(userId);
   const addMetricMutation = useAddMetricFromTemplate();
+  const restoreMetricMutation = useRestoreMetric();
 
   if (isLoading) {
     return (
@@ -181,15 +186,118 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
             </View>
           )}
 
+          {/* Deleted Metrics Section */}
+          {deletedMetrics.length > 0 && (
+            <View style={{ marginTop: 32 }}>
+              <TouchableOpacity
+                onPress={() => setShowDeleted(!showDeleted)}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  marginBottom: 16,
+                }}
+              >
+                <Typography variant="h6" weight="semibold">
+                  Métricas Eliminadas ({deletedMetrics.length})
+                </Typography>
+                <View
+                  style={{
+                    transform: [{ rotate: showDeleted ? "90deg" : "0deg" }],
+                  }}
+                >
+                  <Icons.ChevronRight size={20} color={colors.textMuted} />
+                </View>
+              </TouchableOpacity>
+
+              {showDeleted && (
+                <View style={{ gap: 12 }}>
+                  {deletedMetrics.map((metric) => {
+                    const IconComponent = (Icons as any)[metric.icon];
+
+                    return (
+                      <TouchableOpacity
+                        key={metric.id}
+                        onPress={async () => {
+                          try {
+                            await restoreMetricMutation.mutateAsync(metric.id);
+                          } catch (error) {
+                            console.error("Error restoring metric:", error);
+                          }
+                        }}
+                        disabled={restoreMetricMutation.isPending}
+                        style={{
+                          backgroundColor: colors.surface,
+                          borderRadius: 12,
+                          padding: 16,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 12,
+                          opacity: restoreMetricMutation.isPending ? 0.6 : 0.8,
+                        }}
+                        activeOpacity={0.7}
+                      >
+                        <View
+                          style={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: 20,
+                            backgroundColor: metric.color + "20",
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          {IconComponent && (
+                            <IconComponent size={20} color={metric.color} />
+                          )}
+                        </View>
+
+                        <View style={{ flex: 1 }}>
+                          <Typography
+                            variant="body1"
+                            weight="medium"
+                            style={{ marginBottom: 2, opacity: 0.7 }}
+                          >
+                            {metric.name}
+                          </Typography>
+                          <Typography variant="caption" color="textMuted">
+                            {metric.default_target
+                              ? `Meta: ${metric.default_target} ${metric.unit}`
+                              : `Unidad: ${metric.unit}`}
+                          </Typography>
+                        </View>
+
+                        <View
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 16,
+                            backgroundColor: colors.primary[100],
+                            alignItems: "center",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <RotateCcw size={16} color={colors.primary[600]} />
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              )}
+            </View>
+          )}
+
           {/* Create Custom Metric Button */}
           <View style={{ marginTop: 32, marginBottom: 32 }}>
-            <Typography
+            {/* <Typography
               variant="h6"
               weight="semibold"
               style={{ marginBottom: 16 }}
             >
               Métrica Personalizada
-            </Typography>
+            </Typography> */}
 
             {/* <Button
               variant="outline"

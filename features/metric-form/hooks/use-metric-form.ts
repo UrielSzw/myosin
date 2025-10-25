@@ -28,7 +28,13 @@ export const useMetricForm = ({
   // Basic info state
   const [metricName, setMetricName] = useState("");
   const [metricSlug, setMetricSlug] = useState("");
-  const [metricType, setMetricType] = useState<"counter" | "value">("counter");
+  const [inputType, setInputType] = useState<
+    | "numeric_accumulative"
+    | "numeric_single"
+    | "scale_discrete"
+    | "boolean_toggle"
+  >("numeric_single");
+  const [behavior, setBehavior] = useState<"accumulate" | "replace">("replace");
   const [unit, setUnit] = useState("");
   const [defaultTarget, setDefaultTarget] = useState<number | undefined>();
 
@@ -97,7 +103,8 @@ export const useMetricForm = ({
       const metricData = {
         name: metricName.trim(),
         slug: metricSlug.trim(),
-        type: metricType,
+        input_type: inputType,
+        behavior: behavior,
         unit: unit.trim(),
         canonical_unit: unit.trim(), // Default to same as unit
         conversion_factor: 1,
@@ -181,12 +188,14 @@ export const useMetricForm = ({
     // Basic info
     metricName,
     metricSlug,
-    metricType,
+    inputType,
+    behavior,
     unit,
     defaultTarget,
     setMetricName,
     setMetricSlug,
-    setMetricType,
+    setInputType,
+    setBehavior,
     setUnit,
     setDefaultTarget,
 

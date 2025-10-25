@@ -2,7 +2,7 @@ import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
-import { icons, X } from "lucide-react-native";
+import { icons, Settings, X } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
@@ -10,16 +10,24 @@ type Props = {
   selectedMetric: TrackerMetricWithQuickActions;
   currentValue?: number;
   onClose: () => void;
+  onOpenSettings?: () => void;
 };
 
 export const ModalHeader: React.FC<Props> = ({
   selectedMetric,
   currentValue,
   onClose,
+  onOpenSettings,
 }) => {
-  const { colors } = useColorScheme();
+  const { colors, isDarkMode } = useColorScheme();
 
   const IconComponent = (icons as any)[selectedMetric.icon];
+
+  // Solo mostrar settings para métricas que tienen target o son eliminables
+  const showSettings =
+    selectedMetric.default_target !== null ||
+    selectedMetric.input_type === "numeric_accumulative" ||
+    selectedMetric.input_type === "numeric_single";
 
   return (
     <View
@@ -59,9 +67,27 @@ export const ModalHeader: React.FC<Props> = ({
           )}
         </View>
       </View>
-      <TouchableOpacity onPress={onClose} style={{ padding: 8 }}>
-        <X size={24} color={colors.textMuted} />
-      </TouchableOpacity>
+
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        {/* Settings Button */}
+        {showSettings && onOpenSettings && (
+          <TouchableOpacity
+            onPress={onOpenSettings}
+            style={{
+              padding: 8,
+              borderRadius: 8,
+              backgroundColor: isDarkMode ? colors.gray[800] : colors.gray[100],
+            }}
+          >
+            <Settings size={20} color={colors.textMuted} />
+          </TouchableOpacity>
+        )}
+
+        {/* Close Button */}
+        <TouchableOpacity onPress={onClose} style={{ padding: 8 }}>
+          <X size={24} color={colors.textMuted} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };

@@ -26,11 +26,9 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
   const {
     // Basic info
     metricName,
-    metricType,
     unit,
     defaultTarget,
     setMetricName,
-    setMetricType,
     setUnit,
     setDefaultTarget,
 
@@ -130,12 +128,12 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
         {/* 1. Basic Info Form */}
         <MetricInfoForm
           metricName={metricName}
-          metricType={metricType}
+          metricType="counter"
           unit={unit}
           defaultTarget={defaultTarget}
           nameValidation={nameValidation}
           onNameChange={setMetricName}
-          onTypeChange={setMetricType}
+          onTypeChange={() => {}}
           onUnitChange={setUnit}
           onTargetChange={setDefaultTarget}
         />

@@ -30,8 +30,6 @@ export const TrackerFeature = () => {
     error: dayDataError,
   } = useDayData(selectedDate);
 
-  console.log("Day Data:", JSON.stringify(dayData, null, 2));
-
   const handleAddMetric = () => {
     setMetricSelectorVisible(true);
   };

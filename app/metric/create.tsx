@@ -1,5 +1,5 @@
-import { MetricFormFeature } from "@/features/metric-form";
+import { View } from "react-native";
 
 export default function CreateMetricScreen() {
-  return <MetricFormFeature />;
+  return <View />;
 }

@@ -1,5 +1,5 @@
 import { db } from "../client";
-import { exerciseImages, exercises } from "../schema";
+import { exercise_images, exercises } from "../schema";
 import { exercisesSeed } from "./seed.exercises";
 
 export const loadExercisesSeed = async () => {
@@ -29,7 +29,7 @@ export const loadExercisesSeed = async () => {
 
       // Insert images (vacías por ahora)
       for (const [index, url] of ex.images.entries()) {
-        await db.insert(exerciseImages).values({
+        await db.insert(exercise_images).values({
           exercise_id: ex.id,
           url,
           order: index, // ojo, en tu tabla la columna se llama "order"

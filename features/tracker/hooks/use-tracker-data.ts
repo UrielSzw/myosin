@@ -267,13 +267,23 @@ export const useAddEntry = () => {
       userId = "default-user",
       notes,
       recordedAt,
+      displayValue,
     }: {
       metricId: string;
       value: number;
       userId?: string;
       notes?: string;
       recordedAt?: string;
-    }) => trackerService.addEntry(metricId, value, userId, notes, recordedAt),
+      displayValue?: string;
+    }) =>
+      trackerService.addEntry(
+        metricId,
+        value,
+        userId,
+        notes,
+        recordedAt,
+        displayValue
+      ),
     onSuccess: (newEntry) => {
       // Invalidar day data del día de la entrada
       queryClient.invalidateQueries({
@@ -588,6 +598,8 @@ export const useOptimisticEntry = () => {
           meta: null,
           created_at: new Date(),
           updated_at: new Date(),
+          display_value: tempEntry.display_value || null,
+          raw_input: tempEntry.raw_input || null,
           ...tempEntry,
         };
 

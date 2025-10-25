@@ -1,9 +1,10 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import {
   PREDEFINED_METRIC_TEMPLATES,
+  PREDEFINED_QUICK_ACTION_TEMPLATES,
   getQuickActionTemplates,
 } from "../../../features/tracker/constants/templates";
-import { PREDEFINED_QUICK_ACTIONS } from "../../../features/tracker/mock";
+
 import { getDayKey, getFullTimestamp } from "../../utils/date-utils";
 import { db } from "../client";
 import {
@@ -150,7 +151,7 @@ export const trackerRepository = {
   },
 
   /**
-   * Obtiene métricas activas con sus quick actions
+   * Obtiene métricas activas con sus quick actions (solo para métricas numéricas)
    */
   getActiveMetricsWithQuickActions: async (
     userId: string = "default-user"
@@ -335,10 +336,101 @@ export const trackerRepository = {
   // ==================== ENTRIES ====================
 
   /**
+   * Crear entrada con display value generado automáticamente
+   */
+  createEntryWithDisplay: async (data: {
+    metricId: string;
+    value: number;
+    userId?: string;
+    notes?: string;
+    recordedAt?: string;
+    rawInput?: any;
+  }): Promise<BaseTrackerEntry> => {
+    // Get metric to determine input type and generate display value
+    const metric = await trackerRepository.getMetricById(data.metricId);
+    if (!metric) {
+      throw new Error(`Metric not found: ${data.metricId}`);
+    }
+
+    // Generate display value based on input type
+    let displayValue = "";
+    const normalizedValue = normalizeValue(
+      data.value,
+      metric.conversion_factor || 1
+    );
+
+    switch (metric.input_type) {
+      case "scale_discrete":
+        // For scale metrics, display value comes from inputConfig (hardcoded in PREDEFINED_METRICS)
+        if (metric.slug === "mood") {
+          const labels = [
+            "Frown Terrible",
+            "Meh Malo",
+            "Minus Normal",
+            "Smile Bueno",
+            "Laugh Excelente",
+          ];
+          displayValue = labels[data.value - 1] || `${data.value}`;
+        } else if (metric.slug === "energy") {
+          const labels = [
+            "BatteryLow Agotado",
+            "BatteryLow Muy bajo",
+            "BatteryLow Bajo",
+            "Battery Regular",
+            "Battery Normal",
+            "Battery Bueno",
+            "BatteryMedium Muy bueno",
+            "BatteryHigh Alto",
+            "BatteryFull Muy alto",
+            "Zap Máximo",
+          ];
+          displayValue = labels[data.value - 1] || `${data.value}`;
+        }
+        break;
+
+      case "boolean_toggle":
+        if (metric.slug === "supplements") {
+          displayValue =
+            data.value === 1 ? "✅ Tomé suplementos" : "❌ No tomé";
+        } else {
+          displayValue = data.value === 1 ? "✅ Completado" : "❌ Pendiente";
+        }
+        break;
+
+      default:
+        // Numeric types
+        displayValue = `${data.value}${metric.unit}`;
+    }
+
+    const dayKey = getDayKey(
+      data.recordedAt ? new Date(getFullTimestamp(data.recordedAt)) : undefined
+    );
+
+    return trackerRepository.createEntry({
+      user_id: data.userId || "default-user",
+      metric_id: data.metricId,
+      value: data.value,
+      value_normalized: normalizedValue,
+      unit: metric.unit,
+      notes: data.notes || null,
+      source: "manual",
+      day_key: dayKey,
+      recorded_at: getFullTimestamp(data.recordedAt),
+      display_value: displayValue,
+      raw_input: data.rawInput,
+      meta: null,
+    });
+  },
+
+  /**
    * Crear una entrada (registro de valor)
    */
   createEntry: async (data: TrackerEntryInsert): Promise<BaseTrackerEntry> => {
-    const id = generateUUID();
+    // Obtener métrica para verificar behavior
+    const metric = await trackerRepository.getMetricById(data.metric_id);
+    if (!metric) {
+      throw new Error(`Metric not found: ${data.metric_id}`);
+    }
 
     // Asegurar que recorded_at sea un timestamp ISO completo
     const entryData = {
@@ -346,6 +438,41 @@ export const trackerRepository = {
       recorded_at: getFullTimestamp(data.recorded_at),
     };
 
+    // Si la métrica tiene behavior "replace", buscar entrada existente del mismo día
+    if (metric.behavior === "replace") {
+      const existingEntry = await db
+        .select()
+        .from(tracker_entries)
+        .where(
+          and(
+            eq(tracker_entries.user_id, data.user_id || "default-user"),
+            eq(tracker_entries.metric_id, data.metric_id),
+            eq(tracker_entries.day_key, data.day_key)
+          )
+        )
+        .limit(1);
+
+      if (existingEntry[0]) {
+        // Reemplazar entrada existente
+        const [updated] = await db
+          .update(tracker_entries)
+          .set({ ...entryData, updated_at: new Date() })
+          .where(eq(tracker_entries.id, existingEntry[0].id))
+          .returning();
+
+        // Recalcular agregado del día
+        await trackerRepository.recalculateDailyAggregate(
+          data.user_id || "default-user",
+          data.metric_id,
+          data.day_key
+        );
+
+        return updated;
+      }
+    }
+
+    // Comportamiento normal (accumulate o primera entrada de replace)
+    const id = generateUUID();
     const [inserted] = await db
       .insert(tracker_entries)
       .values({ id, ...entryData })
@@ -376,7 +503,7 @@ export const trackerRepository = {
 
     // Si viene slug, intentar buscar en quick actions predefinidas primero
     if (slug) {
-      const predefinedActions = PREDEFINED_QUICK_ACTIONS[slug] || [];
+      const predefinedActions = PREDEFINED_QUICK_ACTION_TEMPLATES[slug] || [];
       const predefinedQA = predefinedActions.find(
         (action) => action.id === quickActionId
       );
@@ -438,6 +565,8 @@ export const trackerRepository = {
       source: "quick_action",
       notes: notes || null,
       meta: null,
+      display_value: null, // Can be enhanced later
+      raw_input: null,
     };
 
     return await trackerRepository.createEntry(entryData);
@@ -598,7 +727,13 @@ export const trackerRepository = {
     metricId: string,
     dayKey: string
   ): Promise<BaseTrackerDailyAggregate> => {
-    // Obtener todas las entradas del día
+    // Obtener métrica para verificar behavior
+    const metric = await trackerRepository.getMetricById(metricId);
+    if (!metric) {
+      throw new Error(`Metric not found: ${metricId}`);
+    }
+
+    // Obtener todas las entradas del día ordenadas por fecha de creación
     const entries = await db
       .select()
       .from(tracker_entries)
@@ -608,18 +743,40 @@ export const trackerRepository = {
           eq(tracker_entries.metric_id, metricId),
           eq(tracker_entries.day_key, dayKey)
         )
-      );
+      )
+      .orderBy(desc(tracker_entries.recorded_at));
 
-    // Calcular estadísticas
-    const count = entries.length;
-    const sumNormalized = entries.reduce(
-      (sum, entry) => sum + entry.value_normalized,
-      0
-    );
-    const values = entries.map((e) => e.value_normalized);
-    const minNormalized = count > 0 ? Math.min(...values) : null;
-    const maxNormalized = count > 0 ? Math.max(...values) : null;
-    const avgNormalized = count > 0 ? sumNormalized / count : null;
+    // Calcular estadísticas según el behavior de la métrica
+    let count, sumNormalized, minNormalized, maxNormalized, avgNormalized;
+
+    if (metric.behavior === "replace") {
+      // Para métricas "replace": solo importa el último valor
+      if (entries.length > 0) {
+        const latestEntry = entries[0]; // Ya ordenado por recorded_at desc
+        count = 1;
+        sumNormalized = latestEntry.value_normalized;
+        minNormalized = latestEntry.value_normalized;
+        maxNormalized = latestEntry.value_normalized;
+        avgNormalized = latestEntry.value_normalized;
+      } else {
+        count = 0;
+        sumNormalized = 0;
+        minNormalized = null;
+        maxNormalized = null;
+        avgNormalized = null;
+      }
+    } else {
+      // Para métricas "accumulate": comportamiento original (suma)
+      count = entries.length;
+      sumNormalized = entries.reduce(
+        (sum, entry) => sum + entry.value_normalized,
+        0
+      );
+      const values = entries.map((e) => e.value_normalized);
+      minNormalized = count > 0 ? Math.min(...values) : null;
+      maxNormalized = count > 0 ? Math.max(...values) : null;
+      avgNormalized = count > 0 ? sumNormalized / count : null;
+    }
 
     // Obtener suma del día anterior para tendencia
     const previousDay = new Date(dayKey);

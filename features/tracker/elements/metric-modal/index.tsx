@@ -1,6 +1,12 @@
+import {
+  useAddEntry,
+  useDayData,
+  useDeleteMetric,
+  useUpdateMetric,
+} from "@/features/tracker/hooks/use-tracker-data";
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import React from "react";
+import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
   Modal,
@@ -8,6 +14,9 @@ import {
   ScrollView,
   View,
 } from "react-native";
+import { BooleanToggleInput } from "../inputs/boolean-toggle-input/index";
+import { DiscreteScaleInput } from "../inputs/discrete-scale-input";
+import { TargetEditorModal } from "../target-editor-modal";
 import { DailyHistory } from "./daily-history";
 import { DailySummary } from "./daily-summary";
 import { ManualInput } from "./manual-input";
@@ -26,10 +35,37 @@ export const MetricModal: React.FC<Props> = ({
   selectedDate,
 }) => {
   const { colors } = useColorScheme();
+  const addEntryMutation = useAddEntry();
+  const { data: dayData } = useDayData(selectedDate);
+  const updateMetricMutation = useUpdateMetric();
+  const deleteMetricMutation = useDeleteMetric();
+
+  // Estado para el modal de configuración
+  const [targetEditorVisible, setTargetEditorVisible] = useState(false);
 
   const currentValue = selectedMetric?.aggregate?.sum_normalized || 0;
 
   const handleCloseModal = () => {
+    setSelectedMetric(null);
+  };
+
+  const handleOpenSettings = () => {
+    setTargetEditorVisible(true);
+  };
+
+  const handleSaveTarget = async (target: number | null) => {
+    if (!selectedMetric) return;
+
+    await updateMetricMutation.mutateAsync({
+      metricId: selectedMetric.id,
+      data: { default_target: target },
+    });
+  };
+
+  const handleDeleteMetric = async () => {
+    if (!selectedMetric) return;
+
+    await deleteMetricMutation.mutateAsync(selectedMetric.id);
     setSelectedMetric(null);
   };
 
@@ -51,6 +87,7 @@ export const MetricModal: React.FC<Props> = ({
             selectedMetric={selectedMetric}
             currentValue={currentValue}
             onClose={handleCloseModal}
+            onOpenSettings={handleOpenSettings}
           />
 
           <ScrollView
@@ -59,27 +96,71 @@ export const MetricModal: React.FC<Props> = ({
               paddingBottom: 120,
             }}
           >
-            {/* Quick Actions */}
-            <QuickActions
-              selectedMetric={selectedMetric}
-              selectedDate={selectedDate}
-              onCloseModal={handleCloseModal}
-            />
+            {/* Input System - Smart Selection */}
+            {selectedMetric.input_type === "numeric_accumulative" ||
+            selectedMetric.input_type === "numeric_single" ||
+            !selectedMetric.input_type ? (
+              <>
+                {/* Original components for numeric types */}
+                <QuickActions
+                  selectedMetric={selectedMetric}
+                  selectedDate={selectedDate}
+                  onCloseModal={handleCloseModal}
+                />
 
-            {/* Manual Input */}
-            <ManualInput
-              selectedMetric={selectedMetric}
-              selectedDate={selectedDate}
-              onCloseModal={handleCloseModal}
-            />
-
+                <ManualInput
+                  selectedMetric={selectedMetric}
+                  selectedDate={selectedDate}
+                  onCloseModal={handleCloseModal}
+                />
+              </>
+            ) : selectedMetric.input_type === "scale_discrete" ? (
+              <DiscreteScaleInput
+                metric={selectedMetric}
+                defaultValue={
+                  dayData?.metrics.find((m) => m.id === selectedMetric.id)
+                    ?.entries[0]?.value
+                }
+                onValueSelect={async (value, displayValue) => {
+                  try {
+                    await addEntryMutation.mutateAsync({
+                      metricId: selectedMetric.id,
+                      value,
+                      displayValue,
+                      recordedAt: selectedDate,
+                      notes: "Scale input entry",
+                    });
+                    handleCloseModal();
+                  } catch (error) {
+                    console.error("Error adding scale entry:", error);
+                  }
+                }}
+              />
+            ) : selectedMetric.input_type === "boolean_toggle" ? (
+              <BooleanToggleInput
+                metric={selectedMetric}
+                onValueSelect={async (value, displayValue) => {
+                  try {
+                    await addEntryMutation.mutateAsync({
+                      metricId: selectedMetric.id,
+                      value,
+                      displayValue,
+                      recordedAt: selectedDate,
+                      notes: "Boolean input entry",
+                    });
+                    handleCloseModal();
+                  } catch (error) {
+                    console.error("Error adding boolean entry:", error);
+                  }
+                }}
+              />
+            ) : null}
             {/* Historial del Día */}
             <DailyHistory
-              selectedDate={selectedDate}
               selectedMetricId={selectedMetric.id}
               unit={selectedMetric.unit}
+              dayData={dayData}
             />
-
             {/* Daily Summary */}
             <DailySummary
               currentValue={currentValue}
@@ -90,6 +171,17 @@ export const MetricModal: React.FC<Props> = ({
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Target Editor Modal */}
+      {selectedMetric && (
+        <TargetEditorModal
+          visible={targetEditorVisible}
+          onClose={() => setTargetEditorVisible(false)}
+          selectedMetric={selectedMetric}
+          onSaveTarget={handleSaveTarget}
+          onDeleteMetric={handleDeleteMetric}
+        />
+      )}
     </Modal>
   );
 };

@@ -1,8 +1,5 @@
-import { MetricFormFeature } from "@/features/metric-form";
-import { useLocalSearchParams } from "expo-router";
+import { View } from "react-native";
 
 export default function EditMetricScreen() {
-  const { id } = useLocalSearchParams();
-
-  return <MetricFormFeature isEditMode existingMetricId={id as string} />;
+  return <View />;
 }

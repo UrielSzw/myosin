@@ -23,7 +23,21 @@ export const tracker_metrics = sqliteTable(
     // Identificadores y metadata
     slug: text("slug").notNull(), // 'water', 'protein', 'weight'
     name: text("name").notNull(), // 'Agua', 'Proteína', 'Peso'
-    type: text("type").$type<"value" | "counter">().notNull(),
+
+    // INPUT SYSTEM
+    input_type: text("input_type")
+      .$type<
+        | "numeric_accumulative"
+        | "numeric_single"
+        | "scale_discrete"
+        | "boolean_toggle"
+      >()
+      .notNull()
+      .default("numeric_single"),
+    behavior: text("behavior")
+      .$type<"accumulate" | "replace">()
+      .notNull()
+      .default("replace"),
 
     // Unidades y conversión
     unit: text("unit").notNull(), // 'ml', 'g', 'kg'
@@ -48,7 +62,7 @@ export const tracker_metrics = sqliteTable(
   (t) => [
     index("idx_tracker_metrics_user_id").on(t.user_id),
     index("idx_tracker_metrics_slug").on(t.slug),
-    index("idx_tracker_metrics_type").on(t.type),
+    index("idx_tracker_metrics_input_type").on(t.input_type),
     index("idx_tracker_metrics_deleted_at").on(t.deleted_at),
   ]
 );
@@ -108,6 +122,10 @@ export const tracker_entries = sqliteTable(
     // Temporal
     day_key: text("day_key").notNull(), // 'YYYY-MM-DD' calculado al insertar
     recorded_at: text("recorded_at").notNull(), // ISO timestamp cuando se registró
+
+    // NEW DISPLAY FIELDS
+    display_value: text("display_value"), // '😃 Excelente', '✅ Completado'
+    raw_input: blob("raw_input", { mode: "json" }).$type<any>(), // Original input
 
     // Extensibilidad
     meta: blob("meta", { mode: "json" }).$type<Record<string, any>>(), // datos adicionales

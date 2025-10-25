@@ -12,19 +12,14 @@ import type {
 import { getDayKey, getFullTimestamp } from "@/shared/utils/date-utils";
 
 // Validaciones de negocio
-const validateMetricValue = (
-  value: number,
-  type: "value" | "counter"
-): void => {
+const validateMetricValue = (value: number): void => {
   if (value < 0) {
     throw new Error("El valor no puede ser negativo");
   }
 
-  if (type === "counter" && !Number.isInteger(value * 100)) {
-    // Permitir hasta 2 decimales para counters
-    throw new Error(
-      "Los valores de contador no pueden tener más de 2 decimales"
-    );
+  if (!Number.isInteger(value * 100)) {
+    // Permitir hasta 2 decimales
+    throw new Error("El valor no puede tener más de 2 decimales");
   }
 };
 
@@ -213,7 +208,8 @@ export const trackerService = {
     value: number,
     userId: string = "default-user",
     notes?: string,
-    recordedAt?: string
+    recordedAt?: string,
+    displayValue?: string
   ): Promise<BaseTrackerEntry> => {
     // Obtener métrica para validaciones (solo métricas activas)
     const metric = await trackerRepository.getMetricById(metricId);
@@ -222,7 +218,7 @@ export const trackerService = {
       throw new Error("Métrica no encontrada o está eliminada");
     }
 
-    validateMetricValue(value, metric.type);
+    validateMetricValue(value);
 
     const recordedAtISO = getFullTimestamp(recordedAt);
     const dayKey = getDayKey(new Date(recordedAtISO));
@@ -241,6 +237,8 @@ export const trackerService = {
       source: "manual",
       notes: notes || null,
       meta: null,
+      display_value: displayValue || null,
+      raw_input: null,
     };
 
     return await trackerRepository.createEntry(entryData);
@@ -292,7 +290,7 @@ export const trackerService = {
       throw new Error("Métrica asociada no encontrada");
     }
 
-    validateMetricValue(value, metric.type);
+    validateMetricValue(value);
 
     const valueNormalized = value * (metric.conversion_factor || 1);
 

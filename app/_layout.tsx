@@ -15,8 +15,12 @@ import "react-native-reanimated";
 const queryClient = new QueryClient();
 
 export default function RootLayout() {
+  console.log("🚀 RootLayout starting...");
+
   const loadUserPreferences = useUserPreferencesLoad();
   const { success, error } = useMigrations(db, migrations);
+
+  console.log("📊 Migration status:", { success, error });
 
   useDrizzleStudio(sqlite);
 

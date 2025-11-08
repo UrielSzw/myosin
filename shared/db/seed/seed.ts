@@ -1,6 +1,8 @@
+import { SupabaseExercisesRepository } from "../../sync/repositories/supabase-exercises-repository";
 import { db } from "../client";
-import { exercise_images, exercises } from "../schema";
-import { exercisesSeed } from "./seed.exercises";
+import { exercises } from "../schema";
+
+const supabaseExercisesRepo = new SupabaseExercisesRepository();
 
 export const loadExercisesSeed = async () => {
   try {
@@ -11,8 +13,18 @@ export const loadExercisesSeed = async () => {
       return;
     }
 
-    for (const ex of exercisesSeed) {
-      // Insert exercise
+    console.log("🌐 Cargando ejercicios desde Supabase...");
+
+    // Obtener ejercicios desde Supabase
+    const exercisesFromSupabase =
+      await supabaseExercisesRepo.getAllSystemExercises();
+
+    console.log(
+      `📦 ${exercisesFromSupabase.length} ejercicios obtenidos de Supabase`
+    );
+
+    // Insertar en SQLite local
+    for (const ex of exercisesFromSupabase) {
       await db.insert(exercises).values({
         id: ex.id,
         name: ex.name,
@@ -25,20 +37,14 @@ export const loadExercisesSeed = async () => {
         instructions: ex.instructions,
         equipment: ex.equipment,
         similar_exercises: ex.similar_exercises,
+        default_measurement_template: ex.default_measurement_template,
       });
-
-      // Insert images (vacías por ahora)
-      for (const [index, url] of ex.images.entries()) {
-        await db.insert(exercise_images).values({
-          exercise_id: ex.id,
-          url,
-          order: index, // ojo, en tu tabla la columna se llama "order"
-        });
-      }
     }
-    console.log("✅ Seed completado");
+
+    console.log(
+      `✅ ${exercisesFromSupabase.length} ejercicios sincronizados desde Supabase a SQLite local`
+    );
   } catch (error) {
     console.error("❌ Error en seed:", error);
-    process.exit(1);
   }
 };

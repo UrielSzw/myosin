@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "react-native";
 
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { ValidationState } from "@/shared/ui/enhanced-input";
 import { useQueryClient } from "@tanstack/react-query";
 import { folderService } from "../service/folder";
@@ -18,6 +19,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
     (state) => state.setSelectedFolder
   );
   const queryClient = useQueryClient();
+  const { sync } = useSyncEngine();
 
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -203,6 +205,10 @@ export const useFolderForm = ({ isEditMode }: Props) => {
             setIsDeleting(true);
             try {
               await folderService.deleteFolder(editingId);
+
+              // Sync to Supabase after deletion
+              sync("FOLDER_DELETE", { id: editingId });
+
               queryClient.invalidateQueries({
                 queryKey: ["workouts", "folders"],
               });

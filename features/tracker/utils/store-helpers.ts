@@ -1,18 +1,14 @@
-import { IMetricDefinition, IEntry, IDailyAggregate, UUID } from '../types';
-
-export const generateUUID = (): UUID =>
-  typeof crypto !== 'undefined' && 'randomUUID' in crypto
-    ? crypto.randomUUID()
-    : Math.random().toString(36).substring(2, 15);
+import { generateUUID } from "@/shared/db/utils/uuid";
+import { IDailyAggregate, IEntry, IMetricDefinition, UUID } from "../types";
 
 export const getTodayKey = (): string => {
-  return new Date().toISOString().split('T')[0];
+  return new Date().toISOString().split("T")[0];
 };
 
 const isoForDayWithNowTime = (dayKey: string): string => {
   const now = new Date();
   const parts = String(dayKey)
-    .split('-')
+    .split("-")
     .map((p) => Number(p));
 
   if (parts.length === 3 && parts.every((n) => Number.isFinite(n))) {
@@ -25,7 +21,7 @@ const isoForDayWithNowTime = (dayKey: string): string => {
       now.getHours(),
       now.getMinutes(),
       now.getSeconds(),
-      now.getMilliseconds(),
+      now.getMilliseconds()
     );
     return date.toISOString();
   }
@@ -38,7 +34,7 @@ export const createEntry = (
   value: number,
   unit: string,
   dayKey: string,
-  notes?: string,
+  notes?: string
 ): IEntry => {
   const id = generateUUID();
   const now = isoForDayWithNowTime(dayKey);
@@ -57,13 +53,13 @@ export const createEntry = (
     createdAt: now,
     updatedAt: now,
     dayKey,
-    source: 'manual',
+    source: "manual",
   };
 };
 
 export const updateAggregateWithEntry = (
   agg: IDailyAggregate | undefined,
-  entry: IEntry,
+  entry: IEntry
 ): IDailyAggregate => {
   if (!agg) {
     return {
@@ -91,12 +87,12 @@ export const updateAggregateWithEntry = (
 };
 
 export const recalcAggregateFromEntries = (
-  entries: IEntry[],
+  entries: IEntry[]
 ): IDailyAggregate => {
   if (entries.length === 0) {
     return {
-      metricId: '' as UUID,
-      dayKey: '',
+      metricId: "" as UUID,
+      dayKey: "",
       sumNormalized: 0,
       count: 0,
     };

@@ -1,4 +1,6 @@
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useAuth } from "@/shared/providers/auth-provider";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { useCallback } from "react";
 import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
@@ -8,8 +10,14 @@ export const useSaveFolder = () => {
   const { selectedFolder, setSelectedFolder } = useSelectedFolderStore(
     (state) => state
   );
+  const { sync } = useSyncEngine();
+  const { user } = useAuth();
 
   const saveFolder = useCallback(async () => {
+    if (!user) {
+      return { success: false, error: "Usuario no autenticado" };
+    }
+
     if (!name.trim()) {
       return { success: false, error: "El nombre es requerido" };
     }
@@ -23,6 +31,12 @@ export const useSaveFolder = () => {
           icon,
         });
 
+        // Sync to Supabase after update
+        sync("FOLDER_UPDATE", {
+          id: editingId,
+          data: { name: name.trim(), color, icon },
+        });
+
         if (selectedFolder) {
           setSelectedFolder({
             ...selectedFolder,
@@ -34,12 +48,23 @@ export const useSaveFolder = () => {
       } else {
         // Create new folder
         const orderIndex = await folderService.getNextOrderIndex();
-        await folderService.createFolder({
+
+        const newFolder = await folderService.createFolder({
           name: name.trim(),
           color,
           icon,
           order_index: orderIndex,
-          created_by_user_id: "default", // TODO: Replace with actual user ID
+          created_by_user_id: user.id,
+        });
+
+        // Sync to Supabase after creation - include the ID from SQLite
+        sync("FOLDER_CREATE", {
+          id: newFolder.id,
+          name: name.trim(),
+          color,
+          icon,
+          order_index: orderIndex,
+          created_by_user_id: user.id,
         });
       }
 
@@ -53,6 +78,7 @@ export const useSaveFolder = () => {
         } la carpeta`,
       };
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, color, icon, mode, editingId]);
 
   return { saveFolder };

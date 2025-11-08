@@ -76,7 +76,7 @@ export const exerciseImages = sqliteTable(
       .notNull()
       .references(() => exercises.id, { onDelete: "cascade" }),
     url: text("url").notNull(), // puede ser require('./...') o remote URL
-    order: integer("order").notNull(), // para saber en qué secuencia mostrarlas
+    order_index: integer("order_index").notNull(), // para saber en qué secuencia mostrarlas
   },
   (t) => [index("idx_exercise_images_exercise_id").on(t.exercise_id)]
 );

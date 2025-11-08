@@ -1,11 +1,7 @@
-import { sql } from "drizzle-orm";
-import { integer } from "drizzle-orm/sqlite-core";
+﻿import { sql } from "drizzle-orm";
+import { text } from "drizzle-orm/sqlite-core";
 
 export const timestamps = {
-  updated_at: integer("updated_at", { mode: "timestamp" }).default(
-    sql`(strftime('%s', 'now') * 1000)`
-  ),
-  created_at: integer("created_at", { mode: "timestamp" }).default(
-    sql`(strftime('%s', 'now') * 1000)`
-  ),
+  created_at: text("created_at").default(sql`(datetime('now'))`),
+  updated_at: text("updated_at").default(sql`(datetime('now'))`),
 };

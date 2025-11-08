@@ -12,6 +12,8 @@ import type {
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useAuth } from "@/shared/providers/auth-provider";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
@@ -23,8 +25,15 @@ export const useSaveWorkoutSession = () => {
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
   const queryClient = useQueryClient();
+  const { sync } = useSyncEngine();
+  const { user } = useAuth();
 
   const saveWorkoutSession = async (): Promise<string | null> => {
+    if (!user) {
+      setError("Usuario no autenticado");
+      return null;
+    }
+
     if (!activeWorkout?.session) {
       setError("No hay workout activo para guardar");
       return null;
@@ -74,7 +83,7 @@ export const useSaveWorkoutSession = () => {
       const realSessionId = generateUUID();
       const sessionData: WorkoutSessionInsert = {
         id: realSessionId,
-        user_id: "default-user",
+        user_id: user.id,
         routine_id: session.routine_id,
         started_at: session.started_at,
         finished_at: currentTime,
@@ -97,7 +106,7 @@ export const useSaveWorkoutSession = () => {
 
         blocksData.push({
           id: realBlockId,
-          user_id: "default-user",
+          user_id: user.id,
           workout_session_id: realSessionId,
           original_block_id: block.original_block_id,
           type: block.type,
@@ -170,7 +179,7 @@ export const useSaveWorkoutSession = () => {
 
         exercisesData.push({
           id: realExerciseId,
-          user_id: "default-user",
+          user_id: user.id,
           workout_block_id: blockIdMapping[execData.blockId],
           exercise_id: exercise.exercise_id,
           original_exercise_in_block_id: exercise.original_exercise_in_block_id,
@@ -196,7 +205,7 @@ export const useSaveWorkoutSession = () => {
             if (set.completed) {
               setsData.push({
                 id: generateUUID(),
-                user_id: "default-user",
+                user_id: user.id,
                 workout_exercise_id: realExerciseId,
                 exercise_id: exercise.exercise_id,
                 original_set_id: set.original_set_id,
@@ -232,12 +241,18 @@ export const useSaveWorkoutSession = () => {
           createData
         );
 
+      // Sync to Supabase after saving workout session
+      await sync("WORKOUT_COMPLETE", {
+        ...createData,
+        id: savedSession.id,
+      });
+
       // Persistir PRs buffer: usar sessionBestPRs (solo 1 PR por ejercicio máximo)
       try {
         const sessionPRs = Object.values(activeWorkout.sessionBestPRs || {});
 
         const prHistoryArray: PRHistoryInsert[] = sessionPRs.map((pr) => ({
-          user_id: "default-user",
+          user_id: user.id,
           exercise_id: pr.exercise_id,
           weight: pr.weight,
           reps: pr.reps,
@@ -245,26 +260,28 @@ export const useSaveWorkoutSession = () => {
           workout_session_id: savedSession.id,
           workout_set_id: null,
           source: "auto",
-          created_at: new Date(),
-          updated_at: new Date(),
+          created_at: new Date()?.toISOString(),
+          updated_at: new Date()?.toISOString(),
         }));
 
         const prCurrentArray: PRCurrentInsert[] = sessionPRs.map((pr) => ({
-          user_id: "default-user",
+          user_id: user.id,
           exercise_id: pr.exercise_id,
           best_weight: pr.weight,
           best_reps: pr.reps,
           estimated_1rm: pr.estimated_1rm,
           achieved_at: pr.created_at,
           source: "auto",
-          created_at: new Date(),
-          updated_at: new Date(),
+          created_at: new Date()?.toISOString(),
+          updated_at: new Date()?.toISOString(),
         }));
 
         // Insert each history row
         for (const h of prHistoryArray) {
           try {
             await prRepository.insertPRHistory(h);
+            // Sync PR history to Supabase
+            await sync("PR_UPDATE", h);
           } catch (e) {
             console.warn("Failed to insert PR history", h.exercise_id, e);
           }
@@ -274,6 +291,8 @@ export const useSaveWorkoutSession = () => {
         for (const c of prCurrentArray) {
           try {
             await prRepository.upsertCurrentPR(c);
+            // Sync current PR to Supabase
+            await sync("PR_CREATE", c);
           } catch (e) {
             console.warn("Failed to upsert current PR", c.exercise_id, e);
           }

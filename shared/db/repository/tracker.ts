@@ -210,7 +210,7 @@ export const trackerRepository = {
   ): Promise<BaseTrackerMetric> => {
     const [updated] = await db
       .update(tracker_metrics)
-      .set({ ...data, updated_at: new Date() })
+      .set({ ...data, updated_at: new Date()?.toISOString() })
       .where(eq(tracker_metrics.id, id))
       .returning();
 
@@ -227,7 +227,7 @@ export const trackerRepository = {
     for (const { id, order_index } of metricOrders) {
       await db
         .update(tracker_metrics)
-        .set({ order_index, updated_at: new Date() })
+        .set({ order_index, updated_at: new Date()?.toISOString() })
         .where(eq(tracker_metrics.id, id));
     }
   },
@@ -239,8 +239,8 @@ export const trackerRepository = {
     const [updated] = await db
       .update(tracker_metrics)
       .set({
-        deleted_at: new Date().toISOString(),
-        updated_at: new Date(),
+        deleted_at: new Date()?.toISOString(),
+        updated_at: new Date()?.toISOString(),
       })
       .where(eq(tracker_metrics.id, id))
       .returning();
@@ -256,7 +256,7 @@ export const trackerRepository = {
       .update(tracker_metrics)
       .set({
         deleted_at: null,
-        updated_at: new Date(),
+        updated_at: new Date()?.toISOString(),
       })
       .where(eq(tracker_metrics.id, id))
       .returning();
@@ -456,7 +456,7 @@ export const trackerRepository = {
         // Reemplazar entrada existente
         const [updated] = await db
           .update(tracker_entries)
-          .set({ ...entryData, updated_at: new Date() })
+          .set({ ...entryData, updated_at: new Date()?.toISOString() })
           .where(eq(tracker_entries.id, existingEntry[0].id))
           .returning();
 
@@ -631,7 +631,7 @@ export const trackerRepository = {
     // Normalizar recorded_at si viene en los datos
     const normalizedData = {
       ...data,
-      updated_at: new Date(),
+      updated_at: new Date()?.toISOString(),
       ...(data.recorded_at && {
         recorded_at: getFullTimestamp(data.recorded_at),
       }),
@@ -811,7 +811,7 @@ export const trackerRepository = {
     if (existing) {
       const [updated] = await db
         .update(tracker_daily_aggregates)
-        .set({ ...aggregateData, updated_at: new Date() })
+        .set({ ...aggregateData, updated_at: new Date()?.toISOString() })
         .where(eq(tracker_daily_aggregates.id, existing.id))
         .returning();
       return updated;

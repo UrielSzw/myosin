@@ -1,5 +1,6 @@
-import uuid from "react-native-uuid";
+﻿import 'react-native-get-random-values'; // Polyfill para crypto.getRandomValues
+import { randomUUID } from 'expo-crypto';
 
 export const generateUUID = (): string => {
-  return uuid.v4() as string;
+  return randomUUID();
 };

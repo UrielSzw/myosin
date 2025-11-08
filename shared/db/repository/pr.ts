@@ -73,7 +73,7 @@ export const prRepository = {
           estimated_1rm: data.estimated_1rm,
           achieved_at: data.achieved_at,
           source: data.source,
-          updated_at: new Date(),
+          updated_at: new Date()?.toISOString(),
         })
         .where(eq(pr_current.id, existing.id))
         .returning();
@@ -192,7 +192,7 @@ export const prRepository = {
       .orderBy(desc(pr_current.estimated_1rm));
 
     // Filter by name in JavaScript since SQLite LIKE case sensitivity can vary
-    return rows.filter(row => 
+    return rows.filter((row) =>
       row.exercise_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   },
@@ -232,7 +232,11 @@ export const prRepository = {
     return rows;
   },
 
-  getPRHistoryDetailed: async (userId: string, exerciseId: string, limit = 100) => {
+  getPRHistoryDetailed: async (
+    userId: string,
+    exerciseId: string,
+    limit = 100
+  ) => {
     const [currentPR] = await db
       .select({
         // Campos de pr_current
@@ -274,10 +278,12 @@ export const prRepository = {
     return {
       currentPR,
       history,
-      exerciseInfo: currentPR ? {
-        name: currentPR.exercise_name,
-        muscleGroup: currentPR.exercise_muscle,
-      } : null,
+      exerciseInfo: currentPR
+        ? {
+            name: currentPR.exercise_name,
+            muscleGroup: currentPR.exercise_muscle,
+          }
+        : null,
     };
   },
 };

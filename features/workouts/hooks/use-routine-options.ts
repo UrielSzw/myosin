@@ -1,5 +1,6 @@
 import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -8,6 +9,7 @@ import { routinesService } from "../service/routines";
 
 export const useRoutineOptions = () => {
   const queryClient = useQueryClient();
+  const { sync } = useSyncEngine();
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -27,6 +29,10 @@ export const useRoutineOptions = () => {
             setIsDeleting(true);
             try {
               await routinesService.deleteRoutine(routine.id);
+
+              // Sync to Supabase after deletion
+              sync("ROUTINE_DELETE", { id: routine.id });
+
               queryClient.invalidateQueries({ queryKey: ["workouts"] });
 
               queryClient.invalidateQueries({
@@ -67,6 +73,11 @@ export const useRoutineOptions = () => {
             setIsDeleting(true);
             try {
               await routinesService.clearRoutineTrainingDays(routine.id);
+
+              // Sync to Supabase after clearing training days
+              sync("ROUTINE_CLEAR_TRAINING_DAYS", {
+                routineId: routine.id,
+              });
 
               queryClient.invalidateQueries({ queryKey: ["workouts"] });
 

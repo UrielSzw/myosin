@@ -1,8 +1,12 @@
 import { PREDEFINED_QUICK_ACTION_TEMPLATES } from "@/features/tracker/constants/templates";
-import { useAddEntryFromQuickAction } from "@/features/tracker/hooks/use-tracker-data";
+import {
+  useAddEntry,
+  useAddEntryFromQuickAction,
+} from "@/features/tracker/hooks/use-tracker-data";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
@@ -25,7 +29,9 @@ export const QuickActions: React.FC<Props> = ({
   }>({});
 
   const addQuickActionMutation = useAddEntryFromQuickAction();
+  const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
+  const { user } = useAuth();
 
   const getQuickActions = () => {
     if (!selectedMetric) return [];
@@ -64,20 +70,57 @@ export const QuickActions: React.FC<Props> = ({
         if (action && count > 0) {
           // Add each count as a separate entry
           for (let i = 0; i < count; i++) {
-            await addQuickActionMutation.mutateAsync({
-              quickActionId: action.id,
-              notes: `Quick: ${action.label}`,
-              recordedAt: selectedDate,
-              slug: selectedMetric.slug,
-            });
+            // Verificar si es un quick action real (UUID) o un template (slug)
+            const isRealQuickAction = action.id && action.id.includes("-"); // UUIDs tienen guiones
+
+            if (isRealQuickAction) {
+              // Quick action real de la DB
+              if (!user?.id) {
+                throw new Error("Usuario no autenticado");
+              }
+
+              await addQuickActionMutation.mutateAsync({
+                quickActionId: action.id,
+                userId: user.id,
+                notes: `Quick: ${action.label}`,
+                recordedAt: selectedDate,
+                slug: selectedMetric.slug,
+              });
+            } else {
+              // Template - crear entry directo con addEntryMutation
+              if (!user?.id) {
+                throw new Error("Usuario no autenticado");
+              }
+
+              await addEntryMutation.mutateAsync({
+                metricId: selectedMetric.id,
+                value: action.value,
+                userId: user.id,
+                notes: `Quick: ${action.label}`,
+                recordedAt: selectedDate,
+                displayValue:
+                  (action as any).display_value || `${action.value}`,
+              });
+            }
           }
         }
       }
 
       setQuickActionCounts({});
       onCloseModal();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding quick actions:", error);
+
+      // Mejor manejo de errores
+      if (error.message?.includes("foreign key constraint")) {
+        alert(
+          "Error: La métrica no está sincronizada con el servidor. Es posible que la función RPC no se haya ejecutado en Supabase."
+        );
+      } else {
+        alert(
+          `Error al agregar entradas: ${error.message || "Error desconocido"}`
+        );
+      }
     }
   };
 

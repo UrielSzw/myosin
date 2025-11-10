@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { Zap } from "lucide-react-native";
@@ -12,9 +13,10 @@ type Props = {
 
 export const TrackerHeader: React.FC<Props> = ({ selectedDate }) => {
   const { colors } = useColorScheme();
+  const { user } = useAuth();
 
   // Obtener resumen del día seleccionado usando React Query
-  const { data: daySummary } = useDayDataSummary(selectedDate);
+  const { data: daySummary } = useDayDataSummary(selectedDate, user?.id || "");
 
   // Helper para calcular progreso ponderado
   const calculateOverallProgress = (summary: typeof daySummary) => {

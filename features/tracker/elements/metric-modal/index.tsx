@@ -6,6 +6,7 @@ import {
 } from "@/features/tracker/hooks/use-tracker-data";
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -35,8 +36,9 @@ export const MetricModal: React.FC<Props> = ({
   selectedDate,
 }) => {
   const { colors } = useColorScheme();
+  const { user } = useAuth();
   const addEntryMutation = useAddEntry();
-  const { data: dayData } = useDayData(selectedDate);
+  const { data: dayData } = useDayData(selectedDate, user?.id || "");
   const updateMetricMutation = useUpdateMetric();
   const deleteMetricMutation = useDeleteMetric();
 
@@ -126,6 +128,7 @@ export const MetricModal: React.FC<Props> = ({
                     await addEntryMutation.mutateAsync({
                       metricId: selectedMetric.id,
                       value,
+                      userId: user?.id || "",
                       displayValue,
                       recordedAt: selectedDate,
                       notes: "Scale input entry",
@@ -144,6 +147,7 @@ export const MetricModal: React.FC<Props> = ({
                     await addEntryMutation.mutateAsync({
                       metricId: selectedMetric.id,
                       value,
+                      userId: user?.id || "",
                       displayValue,
                       recordedAt: selectedDate,
                       notes: "Boolean input entry",

@@ -605,6 +605,87 @@ END;
 $$ LANGUAGE plpgsql SECURITY INVOKER;
 
 -- =============================================
+-- 6. CREATE TRACKER METRIC FROM TEMPLATE (TRANSACTIONAL)
+-- =============================================
+CREATE OR REPLACE FUNCTION create_tracker_metric_from_template(
+  metric_data jsonb,
+  quick_actions_data jsonb DEFAULT '[]'::jsonb
+) RETURNS jsonb AS $$
+DECLARE
+  created_metric tracker_metrics%ROWTYPE;
+  qa_item jsonb;
+  created_qa tracker_quick_actions%ROWTYPE;
+  result jsonb;
+BEGIN
+  -- 1. Insertar métrica principal (solo campos que existen en Supabase)
+  INSERT INTO tracker_metrics (
+    id,
+    user_id,
+    slug,
+    name,
+    unit,
+    canonical_unit,
+    icon,
+    color,
+    input_type,
+    behavior,
+    conversion_factor,
+    default_target,
+    order_index
+  )
+  VALUES (
+    COALESCE((metric_data->>'id')::uuid, gen_random_uuid()),
+    (metric_data->>'user_id')::uuid,
+    metric_data->>'slug',
+    metric_data->>'name',
+    metric_data->>'unit',
+    metric_data->>'unit', -- usar unit como canonical_unit por defecto
+    metric_data->>'icon',
+    metric_data->>'color',
+    metric_data->>'input_type',
+    COALESCE(metric_data->>'behavior', 'replace'), -- valor por defecto
+    COALESCE((metric_data->>'conversion_factor')::decimal, 1.0),
+    (metric_data->>'target_value')::decimal, -- mapear target_value a default_target
+    (metric_data->>'order_index')::integer
+  )
+  RETURNING * INTO created_metric;
+
+  -- 2. Insertar quick actions si existen
+  IF jsonb_array_length(quick_actions_data) > 0 THEN
+    FOR qa_item IN SELECT * FROM jsonb_array_elements(quick_actions_data)
+    LOOP
+      INSERT INTO tracker_quick_actions (
+        id,
+        metric_id,
+        label,
+        value,
+        value_normalized,
+        icon,
+        position
+      )
+      VALUES (
+        gen_random_uuid(),
+        created_metric.id,
+        qa_item->>'label', 
+        (qa_item->>'value')::decimal,
+        (qa_item->>'value')::decimal, -- usar el mismo valor para normalized
+        qa_item->>'icon',
+        COALESCE((qa_item->>'order_index')::integer, 0) -- mapear order_index a position
+      );
+    END LOOP;
+  END IF;
+
+  -- 3. Retornar resultado
+  SELECT to_jsonb(created_metric) INTO result;
+  RETURN result;
+
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE EXCEPTION 'Failed to create tracker metric from template: %', SQLERRM;
+END;
+$$ LANGUAGE plpgsql SECURITY INVOKER;
+
+-- =============================================
 -- GRANT PERMISSIONS 
 -- =============================================
 -- Permitir que usuarios autenticados ejecuten las funciones
@@ -613,6 +694,7 @@ GRANT EXECUTE ON FUNCTION update_routine_with_data TO authenticated;
 GRANT EXECUTE ON FUNCTION create_workout_session_with_data TO authenticated;
 GRANT EXECUTE ON FUNCTION delete_routine_by_id TO authenticated;
 GRANT EXECUTE ON FUNCTION delete_workout_session TO authenticated;
+GRANT EXECUTE ON FUNCTION create_tracker_metric_from_template TO authenticated;
 
 -- =============================================
 -- COMENTARIOS PARA DEBUGGING
@@ -622,3 +704,4 @@ COMMENT ON FUNCTION update_routine_with_data IS 'Updates a routine by replacing 
 COMMENT ON FUNCTION create_workout_session_with_data IS 'Creates a complete workout session with blocks, exercises, and sets in a single transaction - Schema: workout-session.ts';
 COMMENT ON FUNCTION delete_routine_by_id IS 'Deletes a routine and all related data via cascade';
 COMMENT ON FUNCTION delete_workout_session IS 'Deletes a workout session and all related data via cascade';
+COMMENT ON FUNCTION create_tracker_metric_from_template IS 'Creates a tracker metric with quick actions in a single atomic transaction - Schema: tracker.ts';

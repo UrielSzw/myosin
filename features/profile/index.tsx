@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -19,8 +20,8 @@ import { ProfileSection } from "../../shared/ui/profile-section";
 import { SettingItem } from "../../shared/ui/setting-item";
 
 export const ProfileFeature = () => {
+  const { user, signOut } = useAuth();
   const { setColorScheme, colors, isDarkMode } = useColorScheme();
-  const userId = "default-user";
 
   const handleLogout = () => {
     Alert.alert("Cerrar Sesión", "¿Estás seguro que quieres cerrar sesión?", [
@@ -31,13 +32,15 @@ export const ProfileFeature = () => {
       {
         text: "Cerrar Sesión",
         style: "destructive",
-        onPress: () => {},
+        onPress: signOut,
       },
     ]);
   };
 
   const handleModeChange = (value: boolean) => {
-    setColorScheme(userId, value ? "dark" : "light");
+    if (user?.id) {
+      setColorScheme(user.id, value ? "dark" : "light");
+    }
   };
 
   const handleNavigateWorkoutConfig = () => {

@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
@@ -17,6 +18,7 @@ import { useDayData } from "./hooks/use-tracker-data";
 
 export const TrackerFeature = () => {
   const { colors } = useColorScheme();
+  const { user } = useAuth();
 
   // UI State
   const [metricSelectorVisible, setMetricSelectorVisible] = useState(false);
@@ -28,11 +30,36 @@ export const TrackerFeature = () => {
     data: dayData,
     isLoading: dayDataLoading,
     error: dayDataError,
-  } = useDayData(selectedDate);
+  } = useDayData(selectedDate, user?.id || "");
 
   const handleAddMetric = () => {
     setMetricSelectorVisible(true);
   };
+
+  // Authentication check
+  if (!user) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 20,
+            gap: 16,
+          }}
+        >
+          <AlertCircle size={48} color={colors.primary[500]} />
+          <Typography variant="h6" weight="semibold" align="center">
+            Autenticación requerida
+          </Typography>
+          <Typography variant="body2" color="textMuted" align="center">
+            Necesitas iniciar sesión para acceder al tracker
+          </Typography>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   // Loading state durante inicialización
   if (dayDataLoading) {

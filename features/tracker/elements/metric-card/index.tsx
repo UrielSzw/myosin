@@ -1,5 +1,6 @@
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import React, { useMemo } from "react";
 import { useDayData } from "../../hooks/use-tracker-data";
 import { getMetricDisplayData } from "../../types/visual-states";
@@ -15,9 +16,10 @@ type Props = {
 
 export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
   const { colors } = useColorScheme();
+  const { user } = useAuth();
 
   // Obtener datos del día usando React Query
-  const { data: dayData } = useDayData(date);
+  const { data: dayData } = useDayData(date, user?.id || "");
 
   // Encontrar la métrica específica en los datos del día
   const metricData = dayData?.metrics.find((m) => m.id === metric.id);

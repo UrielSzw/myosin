@@ -2,6 +2,7 @@ import { useAddEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { Plus } from "lucide-react-native";
@@ -21,6 +22,7 @@ export const ManualInput: React.FC<Props> = ({
 }) => {
   const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
+  const { user } = useAuth();
 
   const [inputValue, setInputValue] = useState("");
 
@@ -28,9 +30,14 @@ export const ManualInput: React.FC<Props> = ({
     const numValue = parseFloat(inputValue);
     if (!isNaN(numValue) && numValue > 0 && selectedMetric) {
       try {
+        if (!user?.id) {
+          throw new Error("Usuario no autenticado");
+        }
+
         await addEntryMutation.mutateAsync({
           metricId: selectedMetric.id,
           value: numValue,
+          userId: user.id,
           recordedAt: selectedDate,
           notes: "Manual entry",
         });

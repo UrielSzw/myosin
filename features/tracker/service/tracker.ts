@@ -9,6 +9,7 @@ import type {
   TrackerMetricWithQuickActions,
   TrackerQuickActionInsert,
 } from "@/shared/db/schema/tracker";
+import { syncToSupabase } from "@/shared/sync/sync-engine";
 import { getDayKey, getFullTimestamp } from "@/shared/utils/date-utils";
 
 // Validaciones de negocio
@@ -68,26 +69,25 @@ export const trackerService = {
    * Obtiene todas las métricas activas (no eliminadas)
    */
   getActiveMetrics: async (
-    userId: string = "default-user"
+    userId: string
   ): Promise<TrackerMetricWithQuickActions[]> => {
+    if (!userId) throw new Error("User ID is required");
     return await trackerRepository.getActiveMetricsWithQuickActions(userId);
   },
 
   /**
    * Obtiene todas las métricas activas sin quick actions
    */
-  getMetrics: async (
-    userId: string = "default-user"
-  ): Promise<BaseTrackerMetric[]> => {
+  getMetrics: async (userId: string): Promise<BaseTrackerMetric[]> => {
+    if (!userId) throw new Error("User ID is required");
     return await trackerRepository.getMetrics(userId);
   },
 
   /**
    * Obtiene métricas eliminadas que pueden ser restauradas
    */
-  getDeletedMetrics: async (
-    userId: string = "default-user"
-  ): Promise<BaseTrackerMetric[]> => {
+  getDeletedMetrics: async (userId: string): Promise<BaseTrackerMetric[]> => {
+    if (!userId) throw new Error("User ID is required");
     return await trackerRepository.getDeletedMetrics(userId);
   },
 
@@ -96,8 +96,9 @@ export const trackerService = {
    */
   createCustomMetric: async (
     data: Omit<TrackerMetricInsert, "user_id" | "order_index">,
-    userId: string = "default-user"
+    userId: string
   ): Promise<BaseTrackerMetric> => {
+    if (!userId) throw new Error("User ID is required");
     validateMetricData(data);
 
     // Verificar que el slug sea único para el usuario (solo métricas activas)
@@ -122,21 +123,45 @@ export const trackerService = {
       order_index: nextOrderIndex,
     };
 
-    return await trackerRepository.createMetric(metricData);
+    // Local first: crear en SQLite
+    const result = await trackerRepository.createMetric(metricData);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_METRIC_CREATE", metricData).catch((error) => {
+      console.error("Failed to sync metric creation:", error);
+    });
+
+    return result;
   },
 
   /**
    * Elimina una métrica (soft delete)
    */
   deleteMetric: async (metricId: string): Promise<BaseTrackerMetric> => {
-    return await trackerRepository.deleteMetric(metricId);
+    // Local first: soft delete en SQLite
+    const result = await trackerRepository.deleteMetric(metricId);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_METRIC_DELETE", { metricId }).catch((error) => {
+      console.error("Failed to sync metric deletion:", error);
+    });
+
+    return result;
   },
 
   /**
    * Restaura una métrica eliminada
    */
   restoreMetric: async (metricId: string): Promise<BaseTrackerMetric> => {
-    return await trackerRepository.restoreMetric(metricId);
+    // Local first: restaurar en SQLite
+    const result = await trackerRepository.restoreMetric(metricId);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_METRIC_RESTORE", { metricId }).catch((error) => {
+      console.error("Failed to sync metric restoration:", error);
+    });
+
+    return result;
   },
 
   /**
@@ -147,7 +172,18 @@ export const trackerService = {
     data: Partial<TrackerMetricInsert>
   ): Promise<BaseTrackerMetric> => {
     validateMetricData(data);
-    return await trackerRepository.updateMetric(metricId, data);
+
+    // Local first: actualizar en SQLite
+    const result = await trackerRepository.updateMetric(metricId, data);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_METRIC_UPDATE", { metricId, data }).catch(
+      (error) => {
+        console.error("Failed to sync metric update:", error);
+      }
+    );
+
+    return result;
   },
 
   /**
@@ -158,8 +194,9 @@ export const trackerService = {
    */
   reorderMetrics: async (
     metricIds: string[],
-    userId: string = "default-user"
+    userId: string
   ): Promise<void> => {
+    if (!userId) throw new Error("User ID is required");
     // Validar que todas las métricas sean activas del usuario
     const activeMetrics = await trackerService.getMetrics(userId);
     const activeMetricIds = activeMetrics.map((m) => m.id);
@@ -178,7 +215,15 @@ export const trackerService = {
       order_index: index + 1,
     }));
 
+    // Local first: reordenar en SQLite
     await trackerRepository.reorderMetrics(metricOrders);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_METRIC_REORDER", { metricOrders }).catch(
+      (error) => {
+        console.error("Failed to sync metric reorder:", error);
+      }
+    );
   },
 
   // ==================== QUICK ACTIONS ====================
@@ -188,14 +233,29 @@ export const trackerService = {
    */
   createQuickAction: async (data: TrackerQuickActionInsert): Promise<void> => {
     validateQuickActionData(data);
+
+    // Local first: crear en SQLite
     await trackerRepository.createQuickAction(data);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_QUICK_ACTION_CREATE", data).catch((error) => {
+      console.error("Failed to sync quick action creation:", error);
+    });
   },
 
   /**
    * Elimina una quick action
    */
   deleteQuickAction: async (quickActionId: string): Promise<void> => {
+    // Local first: eliminar de SQLite
     await trackerRepository.deleteQuickAction(quickActionId);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_QUICK_ACTION_DELETE", { quickActionId }).catch(
+      (error) => {
+        console.error("Failed to sync quick action deletion:", error);
+      }
+    );
   },
 
   // ==================== ENTRIES MANAGEMENT ====================
@@ -206,11 +266,12 @@ export const trackerService = {
   addEntry: async (
     metricId: string,
     value: number,
-    userId: string = "default-user",
+    userId: string,
     notes?: string,
     recordedAt?: string,
     displayValue?: string
   ): Promise<BaseTrackerEntry> => {
+    if (!userId) throw new Error("User ID is required");
     // Obtener métrica para validaciones (solo métricas activas)
     const metric = await trackerRepository.getMetricById(metricId);
 
@@ -241,7 +302,25 @@ export const trackerService = {
       raw_input: null,
     };
 
-    return await trackerRepository.createEntry(entryData);
+    // Local first: crear en SQLite
+    const result = await trackerRepository.createEntry(entryData);
+
+    // Obtener el daily aggregate que se generó/actualizó
+    const dailyAggregate = await trackerRepository.getDailyAggregate(
+      userId,
+      result.metric_id,
+      dayKey
+    );
+
+    // Background sync: enviar entry + daily aggregate atomicamente
+    syncToSupabase("TRACKER_ENTRY_WITH_AGGREGATE", {
+      entry: result,
+      dailyAggregate: dailyAggregate,
+    }).catch((error) => {
+      console.error("Failed to sync entry with aggregate:", error);
+    });
+
+    return result;
   },
 
   /**
@@ -249,18 +328,40 @@ export const trackerService = {
    */
   addEntryFromQuickAction: async (
     quickActionId: string,
-    userId: string = "default-user",
+    userId: string,
     notes?: string,
     recordedAt?: string,
     slug?: string
   ): Promise<BaseTrackerEntry> => {
-    return await trackerRepository.createEntryFromQuickAction(
+    if (!userId) throw new Error("User ID is required");
+    const recordedAtISO = getFullTimestamp(recordedAt);
+    const dayKey = getDayKey(new Date(recordedAtISO));
+
+    // Local first: crear en SQLite
+    const result = await trackerRepository.createEntryFromQuickAction(
       quickActionId,
       userId,
       notes,
       recordedAt,
       slug
     );
+
+    // Obtener el daily aggregate que se generó/actualizó
+    const dailyAggregate = await trackerRepository.getDailyAggregate(
+      userId,
+      result.metric_id,
+      dayKey
+    );
+
+    // Background sync: enviar entry + daily aggregate atomicamente
+    syncToSupabase("TRACKER_ENTRY_WITH_AGGREGATE", {
+      entry: result,
+      dailyAggregate: dailyAggregate,
+    }).catch((error) => {
+      console.error("Failed to sync entry with aggregate:", error);
+    });
+
+    return result;
   },
 
   /**
@@ -269,15 +370,14 @@ export const trackerService = {
   updateEntry: async (
     entryId: string,
     value: number,
+    userId: string,
     notes?: string
   ): Promise<BaseTrackerEntry> => {
+    if (!userId) throw new Error("User ID is required");
     validateEntryValue(value);
 
     // Obtener entry actual para validar con su métrica
-    const entries = await trackerRepository.getRecentEntries(
-      "default-user",
-      1000
-    );
+    const entries = await trackerRepository.getRecentEntries(userId, 1000);
     const entry = entries.find((e) => e.id === entryId);
 
     if (!entry) {
@@ -294,18 +394,55 @@ export const trackerService = {
 
     const valueNormalized = value * (metric.conversion_factor || 1);
 
-    return await trackerRepository.updateEntry(entryId, {
+    const updateData = {
       value,
       value_normalized: valueNormalized,
       notes: notes || null,
-    });
+    };
+
+    // Local first: actualizar en SQLite
+    const result = await trackerRepository.updateEntry(entryId, updateData);
+
+    // Background sync: enviar a Supabase
+    syncToSupabase("TRACKER_ENTRY_UPDATE", { entryId, data: updateData }).catch(
+      (error) => {
+        console.error("Failed to sync entry update:", error);
+      }
+    );
+
+    return result;
   },
 
   /**
    * Elimina una entrada
    */
   deleteEntry: async (entryId: string): Promise<void> => {
+    // Obtener info de la entry antes del delete para recalcular aggregate
+    const entryToDelete = await trackerRepository.getEntryById(entryId);
+
+    if (!entryToDelete) {
+      throw new Error("Entrada no encontrada");
+    }
+
+    const { user_id, metric_id, day_key } = entryToDelete;
+
+    // Local first: eliminar de SQLite (esto recalcula automáticamente el aggregate)
     await trackerRepository.deleteEntry(entryId);
+
+    // Obtener el daily aggregate actualizado después del delete
+    const updatedAggregate = await trackerRepository.getDailyAggregate(
+      user_id,
+      metric_id,
+      day_key
+    );
+
+    // Background sync: enviar delete + aggregate actualizado atomicamente
+    syncToSupabase("TRACKER_DELETE_ENTRY_WITH_AGGREGATE", {
+      entryId,
+      dailyAggregate: updatedAggregate,
+    }).catch((error) => {
+      console.error("Failed to sync entry deletion with aggregate:", error);
+    });
   },
 
   // ==================== DAY DATA & AGGREGATES ====================
@@ -315,17 +452,17 @@ export const trackerService = {
    */
   getDayData: async (
     dayKey: string,
-    userId: string = "default-user"
+    userId: string
   ): Promise<TrackerDayData> => {
+    if (!userId) throw new Error("User ID is required");
     return await trackerRepository.getDayData(userId, dayKey);
   },
 
   /**
    * Obtiene datos del día actual
    */
-  getTodayData: async (
-    userId: string = "default-user"
-  ): Promise<TrackerDayData> => {
+  getTodayData: async (userId: string): Promise<TrackerDayData> => {
+    if (!userId) throw new Error("User ID is required");
     const today = getDayKey();
     return await trackerService.getDayData(today, userId);
   },
@@ -336,7 +473,7 @@ export const trackerService = {
   getDailyAggregate: async (
     metricId: string,
     dayKey: string,
-    userId: string = "default-user"
+    userId: string
   ): Promise<BaseTrackerDailyAggregate | null> => {
     return await trackerRepository.getDailyAggregate(userId, metricId, dayKey);
   },
@@ -347,7 +484,7 @@ export const trackerService = {
   getMetricHistory: async (
     metricId: string,
     days: number = 30,
-    userId: string = "default-user"
+    userId: string
   ): Promise<BaseTrackerDailyAggregate[]> => {
     const endDate = getDayKey();
     const startDate = new Date();
@@ -370,7 +507,7 @@ export const trackerService = {
   getMetricProgress: async (
     metricId: string,
     days: number = 7,
-    userId: string = "default-user"
+    userId: string
   ) => {
     // Obtener métrica
     const metric = await trackerRepository.getMetricById(metricId);
@@ -475,7 +612,8 @@ export const trackerService = {
   /**
    * Obtiene resumen de todas las métricas activas para hoy
    */
-  getTodaySummary: async (userId: string = "default-user") => {
+  getTodaySummary: async (userId: string) => {
+    if (!userId) throw new Error("User ID is required");
     const todayData = await trackerService.getTodayData(userId);
 
     const summary = todayData.metrics.map((metric) => {
@@ -521,10 +659,7 @@ export const trackerService = {
   /**
    * Obtiene resumen de cualquier día específico (similar a getTodaySummary pero para cualquier fecha)
    */
-  getDayDataSummary: async (
-    dayKey: string,
-    userId: string = "default-user"
-  ) => {
+  getDayDataSummary: async (dayKey: string, userId: string) => {
     const dayData = await trackerService.getDayData(dayKey, userId);
 
     const summary = dayData.metrics.map((metric) => {
@@ -574,9 +709,7 @@ export const trackerService = {
   /**
    * Obtiene templates disponibles que el usuario aún no ha agregado
    */
-  getAvailableTemplates: async (
-    userId: string = "default-user"
-  ): Promise<any[]> => {
+  getAvailableTemplates: async (userId: string): Promise<any[]> => {
     return await trackerRepository.getAvailableTemplates(userId);
   },
 
@@ -585,8 +718,9 @@ export const trackerService = {
    */
   addMetricFromTemplate: async (
     templateSlug: string,
-    userId: string = "default-user"
+    userId: string
   ): Promise<BaseTrackerMetric> => {
+    if (!userId) throw new Error("User ID is required");
     const templates = await trackerRepository.getPredefinedTemplates();
     const template = templates.find((t) => t.slug === templateSlug);
 
@@ -616,17 +750,33 @@ export const trackerService = {
       order_index: nextOrderIndex,
     };
 
-    return await trackerRepository.createMetricFromTemplate(
+    // Local first: crear desde template en SQLite
+    const result = await trackerRepository.createMetricFromTemplate(
       userId,
       templateSlug,
       templateData
     );
+
+    // Obtener las quick actions que se crearon realmente (con IDs reales)
+    const createdQuickActions = await trackerRepository.getQuickActions(
+      result.id
+    );
+
+    syncToSupabase("TRACKER_METRIC_FROM_TEMPLATE", {
+      metric: result, // ← Métrica creada con ID real
+      quickActions: createdQuickActions, // ← Quick actions creadas con IDs reales
+    }).catch((error) => {
+      console.error("Failed to sync metric from template:", error);
+    });
+
+    return result;
   },
 
   /**
    * Obtiene estadísticas generales del tracker
    */
-  getTrackerStats: async (userId: string = "default-user") => {
+  getTrackerStats: async (userId: string) => {
+    if (!userId) throw new Error("User ID is required");
     const [metrics, recentEntries] = await Promise.all([
       trackerService.getMetrics(userId), // Solo métricas activas
       trackerRepository.getRecentEntries(userId, 100),

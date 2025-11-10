@@ -2,7 +2,6 @@ import { db, sqlite } from "@/shared/db/client";
 import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
-import { useUserPreferencesLoad } from "@/shared/hooks/use-user-preferences-store";
 import { AuthProvider, useAuth } from "@/shared/providers/auth-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
@@ -27,6 +26,14 @@ function LoadingScreen() {
 
 function AppContent() {
   const { user, loading } = useAuth();
+  // const loadUserPreferences = useUserPreferencesLoad();
+
+  // Cargar preferences cuando el usuario esté disponible
+  // useEffect(() => {
+  //   if (user?.id) {
+  //     loadUserPreferences(user.id);
+  //   }
+  // }, [user?.id, loadUserPreferences]);
 
   if (loading) {
     return <LoadingScreen />;
@@ -47,7 +54,6 @@ function AppContent() {
 }
 
 export default function RootLayout() {
-  const loadUserPreferences = useUserPreferencesLoad();
   const { success, error } = useMigrations(db, migrations);
   const isConnected = useNetwork();
 
@@ -56,12 +62,6 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-
-  useEffect(() => {
-    if (loaded) {
-      loadUserPreferences("default-user");
-    }
-  }, [loaded, loadUserPreferences]);
 
   useEffect(() => {
     if (success && isConnected) {

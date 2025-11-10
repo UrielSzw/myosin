@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
 import { Plus, RotateCcw, X } from "lucide-react-native";
@@ -18,13 +19,14 @@ type Props = {
 
 export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
   const { colors } = useColorScheme();
-  const userId = "default-user"; // TODO: obtener del contexto de usuario
+  const { user } = useAuth();
   const [showDeleted, setShowDeleted] = useState(false);
 
   // Obtener templates disponibles y métricas eliminadas
-  const { data: availableTemplates = [], isLoading } =
-    useAvailableTemplates(userId);
-  const { data: deletedMetrics = [] } = useDeletedMetrics(userId);
+  const { data: availableTemplates = [], isLoading } = useAvailableTemplates(
+    user?.id || ""
+  );
+  const { data: deletedMetrics = [] } = useDeletedMetrics(user?.id || "");
   const addMetricMutation = useAddMetricFromTemplate();
   const restoreMetricMutation = useRestoreMetric();
 
@@ -51,10 +53,12 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
   }
 
   const handleAddMetric = async (templateSlug: string) => {
+    if (!user) return;
+
     try {
       await addMetricMutation.mutateAsync({
         templateSlug,
-        userId,
+        userId: user.id,
       });
       onClose(); // Cerrar modal después de agregar
     } catch (error) {

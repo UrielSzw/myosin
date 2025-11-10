@@ -39,9 +39,7 @@ export const trackerRepository = {
   /**
    * Obtiene todas las métricas de un usuario (incluyendo eliminadas)
    */
-  getAllMetrics: async (
-    userId: string = "default-user"
-  ): Promise<BaseTrackerMetric[]> => {
+  getAllMetrics: async (userId: string): Promise<BaseTrackerMetric[]> => {
     const rows = await db
       .select()
       .from(tracker_metrics)
@@ -54,9 +52,7 @@ export const trackerRepository = {
   /**
    * Obtiene todas las métricas activas de un usuario (no eliminadas)
    */
-  getMetrics: async (
-    userId: string = "default-user"
-  ): Promise<BaseTrackerMetric[]> => {
+  getMetrics: async (userId: string): Promise<BaseTrackerMetric[]> => {
     const rows = await db
       .select()
       .from(tracker_metrics)
@@ -74,9 +70,7 @@ export const trackerRepository = {
   /**
    * Obtiene métricas eliminadas que pueden ser restauradas
    */
-  getDeletedMetrics: async (
-    userId: string = "default-user"
-  ): Promise<BaseTrackerMetric[]> => {
+  getDeletedMetrics: async (userId: string): Promise<BaseTrackerMetric[]> => {
     const rows = await db
       .select()
       .from(tracker_metrics)
@@ -118,7 +112,7 @@ export const trackerRepository = {
    */
   getMetricBySlug: async (
     slug: string,
-    userId: string = "default-user",
+    userId: string,
     includeDeleted: boolean = false
   ): Promise<BaseTrackerMetric | null> => {
     const whereConditions = [
@@ -144,7 +138,7 @@ export const trackerRepository = {
    */
   metricExistsBySlug: async (
     slug: string,
-    userId: string = "default-user"
+    userId: string
   ): Promise<boolean> => {
     const metric = await trackerRepository.getMetricBySlug(slug, userId, false);
     return metric !== null;
@@ -154,7 +148,7 @@ export const trackerRepository = {
    * Obtiene métricas activas con sus quick actions (solo para métricas numéricas)
    */
   getActiveMetricsWithQuickActions: async (
-    userId: string = "default-user"
+    userId: string
   ): Promise<TrackerMetricWithQuickActions[]> => {
     const metrics = await db
       .select()
@@ -341,7 +335,7 @@ export const trackerRepository = {
   createEntryWithDisplay: async (data: {
     metricId: string;
     value: number;
-    userId?: string;
+    userId: string;
     notes?: string;
     recordedAt?: string;
     rawInput?: any;
@@ -407,7 +401,7 @@ export const trackerRepository = {
     );
 
     return trackerRepository.createEntry({
-      user_id: data.userId || "default-user",
+      user_id: data.userId,
       metric_id: data.metricId,
       value: data.value,
       value_normalized: normalizedValue,
@@ -445,7 +439,7 @@ export const trackerRepository = {
         .from(tracker_entries)
         .where(
           and(
-            eq(tracker_entries.user_id, data.user_id || "default-user"),
+            eq(tracker_entries.user_id, data.user_id),
             eq(tracker_entries.metric_id, data.metric_id),
             eq(tracker_entries.day_key, data.day_key)
           )
@@ -462,7 +456,7 @@ export const trackerRepository = {
 
         // Recalcular agregado del día
         await trackerRepository.recalculateDailyAggregate(
-          data.user_id || "default-user",
+          data.user_id,
           data.metric_id,
           data.day_key
         );
@@ -480,7 +474,7 @@ export const trackerRepository = {
 
     // Recalcular agregado del día
     await trackerRepository.recalculateDailyAggregate(
-      data.user_id || "default-user",
+      data.user_id,
       data.metric_id,
       data.day_key
     );
@@ -493,7 +487,7 @@ export const trackerRepository = {
    */
   createEntryFromQuickAction: async (
     quickActionId: string,
-    userId: string = "default-user",
+    userId: string,
     notes?: string,
     recordedAt?: string,
     slug?: string
@@ -610,7 +604,7 @@ export const trackerRepository = {
    * Obtiene entradas recientes (útil para historial)
    */
   getRecentEntries: async (
-    userId: string = "default-user",
+    userId: string,
     limit: number = 50
   ): Promise<BaseTrackerEntry[]> => {
     return await db
@@ -665,6 +659,19 @@ export const trackerRepository = {
     }
 
     return updated;
+  },
+
+  /**
+   * Obtiene una entrada por ID
+   */
+  getEntryById: async (id: string): Promise<BaseTrackerEntry | null> => {
+    const entries = await db
+      .select()
+      .from(tracker_entries)
+      .where(eq(tracker_entries.id, id))
+      .limit(1);
+
+    return entries[0] || null;
   },
 
   /**
@@ -941,7 +948,7 @@ export const trackerRepository = {
   /**
    * Obtiene templates que el usuario aún no ha agregado (solo considera métricas activas)
    */
-  getAvailableTemplates: async (userId: string = "default-user") => {
+  getAvailableTemplates: async (userId: string) => {
     // Solo considerar métricas que no estén eliminadas
     const activeUserMetrics = await db
       .select({ slug: tracker_metrics.slug })
@@ -978,8 +985,10 @@ export const trackerRepository = {
     // Crear quick actions asociadas
     const quickActionTemplates = getQuickActionTemplates(templateSlug);
     for (const qaTemplate of quickActionTemplates) {
+      // Remover el ID del template para que se genere un UUID real
+      const { id, ...qaTemplateWithoutId } = qaTemplate;
       const quickActionData: TrackerQuickActionInsert = {
-        ...qaTemplate,
+        ...qaTemplateWithoutId,
         metric_id: newMetric.id,
       };
       await trackerRepository.createQuickAction(quickActionData);

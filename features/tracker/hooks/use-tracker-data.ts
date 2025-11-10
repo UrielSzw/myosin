@@ -40,7 +40,7 @@ export const trackerQueryKeys = {
 /**
  * Hook para obtener todas las métricas activas con quick actions
  */
-export const useActiveMetrics = (userId: string = "default-user") => {
+export const useActiveMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.activeMetrics(userId),
     queryFn: () => trackerService.getActiveMetrics(userId),
@@ -52,7 +52,7 @@ export const useActiveMetrics = (userId: string = "default-user") => {
 /**
  * Hook para obtener todas las métricas activas (no eliminadas)
  */
-export const useAllMetrics = (userId: string = "default-user") => {
+export const useAllMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.metrics(userId),
     queryFn: () => trackerService.getMetrics(userId),
@@ -64,7 +64,7 @@ export const useAllMetrics = (userId: string = "default-user") => {
 /**
  * Hook para obtener métricas eliminadas
  */
-export const useDeletedMetrics = (userId: string = "default-user") => {
+export const useDeletedMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.deletedMetrics(userId),
     queryFn: () => trackerService.getDeletedMetrics(userId),
@@ -82,12 +82,12 @@ export const useCreateMetric = () => {
   return useMutation({
     mutationFn: ({
       data,
-      userId = "default-user",
+      userId,
     }: {
       data: Omit<TrackerMetricInsert, "user_id" | "order_index">;
-      userId?: string;
+      userId: string;
     }) => trackerService.createCustomMetric(data, userId),
-    onSuccess: (_, { userId = "default-user" }) => {
+    onSuccess: (_, { userId }) => {
       // Invalidar métricas para refrescar la lista
       queryClient.invalidateQueries({
         queryKey: trackerQueryKeys.metrics(userId),
@@ -122,12 +122,12 @@ export const useAddMetricFromTemplate = () => {
   return useMutation({
     mutationFn: ({
       templateSlug,
-      userId = "default-user",
+      userId,
     }: {
       templateSlug: string;
-      userId?: string;
+      userId: string;
     }) => trackerService.addMetricFromTemplate(templateSlug, userId),
-    onSuccess: (_, { userId = "default-user" }) => {
+    onSuccess: (_, { userId }) => {
       // Invalidar todas las queries de métricas
       queryClient.invalidateQueries({
         queryKey: trackerQueryKeys.metrics(userId),
@@ -159,7 +159,7 @@ export const useAddMetricFromTemplate = () => {
 /**
  * Hook para obtener templates disponibles
  */
-export const useAvailableTemplates = (userId: string = "default-user") => {
+export const useAvailableTemplates = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.availableTemplates(userId),
     queryFn: () => trackerService.getAvailableTemplates(userId),
@@ -264,14 +264,14 @@ export const useAddEntry = () => {
     mutationFn: ({
       metricId,
       value,
-      userId = "default-user",
+      userId,
       notes,
       recordedAt,
       displayValue,
     }: {
       metricId: string;
       value: number;
-      userId?: string;
+      userId: string;
       notes?: string;
       recordedAt?: string;
       displayValue?: string;
@@ -331,13 +331,13 @@ export const useAddEntryFromQuickAction = () => {
   return useMutation({
     mutationFn: ({
       quickActionId,
-      userId = "default-user",
+      userId,
       notes,
       recordedAt,
       slug,
     }: {
       quickActionId: string;
-      userId?: string;
+      userId: string;
       notes?: string;
       recordedAt?: string;
       slug?: string;
@@ -395,12 +395,14 @@ export const useUpdateEntry = () => {
     mutationFn: ({
       entryId,
       value,
+      userId,
       notes,
     }: {
       entryId: string;
       value: number;
+      userId: string;
       notes?: string;
-    }) => trackerService.updateEntry(entryId, value, notes),
+    }) => trackerService.updateEntry(entryId, value, userId, notes),
     onSuccess: (updatedEntry) => {
       // Invalidar day data del día de la entrada
       queryClient.invalidateQueries({
@@ -452,7 +454,7 @@ export const useDeleteEntry = () => {
 /**
  * Hook para obtener datos de un día específico
  */
-export const useDayData = (dayKey: string, userId: string = "default-user") => {
+export const useDayData = (dayKey: string, userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.dayData(userId, dayKey),
     queryFn: () => trackerService.getDayData(dayKey, userId),
@@ -464,7 +466,7 @@ export const useDayData = (dayKey: string, userId: string = "default-user") => {
 /**
  * Hook para obtener datos de hoy
  */
-export const useTodayData = (userId: string = "default-user") => {
+export const useTodayData = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.todayData(userId),
     queryFn: () => trackerService.getTodayData(userId),
@@ -477,7 +479,7 @@ export const useTodayData = (userId: string = "default-user") => {
 /**
  * Hook para obtener resumen del día de hoy
  */
-export const useTodaySummary = (userId: string = "default-user") => {
+export const useTodaySummary = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.todaySummary(userId),
     queryFn: () => trackerService.getTodaySummary(userId),
@@ -490,10 +492,7 @@ export const useTodaySummary = (userId: string = "default-user") => {
 /**
  * Hook para obtener resumen de cualquier día específico
  */
-export const useDayDataSummary = (
-  dayKey: string,
-  userId: string = "default-user"
-) => {
+export const useDayDataSummary = (dayKey: string, userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.daySummary(userId, dayKey),
     queryFn: () => trackerService.getDayDataSummary(dayKey, userId),
@@ -511,7 +510,7 @@ export const useDayDataSummary = (
 export const useMetricProgress = (
   metricId: string,
   days: number = 7,
-  userId: string = "default-user"
+  userId: string
 ) => {
   return useQuery({
     queryKey: trackerQueryKeys.metricProgress(userId, metricId, days),
@@ -528,7 +527,7 @@ export const useMetricProgress = (
 export const useMetricHistory = (
   metricId: string,
   days: number = 30,
-  userId: string = "default-user"
+  userId: string
 ) => {
   return useQuery({
     queryKey: trackerQueryKeys.metricHistory(userId, metricId, days),
@@ -542,7 +541,7 @@ export const useMetricHistory = (
 /**
  * Hook para estadísticas generales del tracker
  */
-export const useTrackerStats = (userId: string = "default-user") => {
+export const useTrackerStats = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.stats(userId),
     queryFn: () => trackerService.getTrackerStats(userId),
@@ -596,8 +595,8 @@ export const useOptimisticEntry = () => {
           source: "manual",
           notes: null,
           meta: null,
-          created_at: new Date(),
-          updated_at: new Date(),
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           display_value: tempEntry.display_value || null,
           raw_input: tempEntry.raw_input || null,
           ...tempEntry,

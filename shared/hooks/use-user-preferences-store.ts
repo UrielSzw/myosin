@@ -1,4 +1,5 @@
 import { BaseUserPreferences } from "@/shared/db/schema/user";
+import { syncToSupabase } from "@/shared/sync/sync-engine";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
@@ -27,13 +28,25 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
     persistTimer = setTimeout(async () => {
       const prefs = get().prefs;
       if (!prefs) return;
+
+      const updateData = {
+        weight_unit: prefs.weight_unit,
+        show_rpe: prefs.show_rpe,
+        show_tempo: prefs.show_tempo,
+        theme: prefs.theme,
+      } as Partial<BaseUserPreferences>;
+
       try {
-        await usersRepository.updateUserPreferences(userId, {
-          weight_unit: prefs.weight_unit,
-          show_rpe: prefs.show_rpe,
-          show_tempo: prefs.show_tempo,
-          theme: prefs.theme,
-        } as Partial<BaseUserPreferences>);
+        // 1. Actualizar local primero (local-first)
+        await usersRepository.updateUserPreferences(userId, updateData);
+
+        // 2. Sync a Supabase en background
+        syncToSupabase("USER_PREFERENCES_UPDATE", {
+          userId,
+          data: updateData,
+        }).catch((syncError) => {
+          console.warn("User preferences sync failed:", syncError);
+        });
       } catch (e) {
         console.error("Error persisting user preferences", e);
       } finally {
@@ -67,6 +80,13 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
               userId,
               defaults as Partial<BaseUserPreferences>
             );
+
+            // Sync crear preferences a Supabase
+            syncToSupabase("USER_PREFERENCES_CREATE", {
+              userId,
+              data: defaults,
+            });
+
             set({ prefs: defaults });
           }
         } catch (e) {

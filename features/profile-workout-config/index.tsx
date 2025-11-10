@@ -3,6 +3,7 @@ import {
   useUserPreferences,
   useUserPreferencesActions,
 } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ProfileSection } from "@/shared/ui/profile-section";
@@ -15,9 +16,8 @@ import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const ProfileWorkoutConfigFeature: React.FC = () => {
+  const { user } = useAuth();
   const { colors } = useColorScheme();
-
-  const userId = "default-user";
 
   const prefs = useUserPreferences();
   const { setUnit, setShowRpe, setShowTempo } = useUserPreferencesActions();
@@ -83,7 +83,9 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Seleccionar kilogramos"
-                    onPress={() => setUnit(userId, "kg")}
+                    onPress={() => {
+                      if (user?.id) setUnit(user.id, "kg");
+                    }}
                     style={({ pressed }) => ({
                       flex: 1,
                       paddingVertical: 8,
@@ -105,7 +107,9 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel="Seleccionar libras"
-                    onPress={() => setUnit(userId, "lbs")}
+                    onPress={() => {
+                      if (user?.id) setUnit(user.id, "lbs");
+                    }}
                     style={({ pressed }) => ({
                       flex: 1,
                       paddingVertical: 8,
@@ -146,7 +150,9 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
             rightElement={
               <Switch
                 value={rpeEnabled}
-                onValueChange={(v) => setShowRpe(userId, v)}
+                onValueChange={(v) => {
+                  if (user?.id) setShowRpe(user.id, v);
+                }}
                 trackColor={{
                   false: colors.gray[300],
                   true: colors.primary[500],
@@ -168,7 +174,9 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
             rightElement={
               <Switch
                 value={tempoEnabled}
-                onValueChange={(v) => setShowTempo(userId, v)}
+                onValueChange={(v) => {
+                  if (user?.id) setShowTempo(user.id, v);
+                }}
                 trackColor={{
                   false: colors.gray[300],
                   true: colors.primary[500],

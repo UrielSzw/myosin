@@ -726,7 +726,7 @@ const useRoutineFormStore = create<Store>()(
 
           const blockId = currentState.currentBlockId;
           const currentBlock = formState.blocks[blockId];
-          console.log({ currentBlock, blockId });
+
           if (!currentBlock) return;
 
           // Calcular el order_index para los nuevos ejercicios

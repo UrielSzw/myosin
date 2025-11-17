@@ -1,6 +1,7 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { Button } from "@/shared/ui/button";
 import { HintBox } from "@/shared/ui/hint-box";
 import { Typography } from "@/shared/ui/typography";
@@ -29,6 +30,7 @@ export const MainView: React.FC<Props> = ({
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
+  const { sync } = useSyncEngine();
 
   const renderFolderItem = ({
     item,
@@ -52,7 +54,13 @@ export const MainView: React.FC<Props> = ({
   };
 
   const handleReorder = ({ data }: { data: FolderWithMetrics[] }) => {
-    routinesService.reorderFolders(data.map((folder) => folder.id));
+    const orderedIds = data.map((folder) => folder.id);
+
+    // Local first: actualizar orden en SQLite
+    routinesService.reorderFolders(orderedIds);
+
+    // Background sync: enviar a Supabase
+    sync("FOLDER_REORDER", { orderedIds });
   };
 
   const handleCreateFolder = () => {

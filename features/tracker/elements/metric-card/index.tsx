@@ -18,11 +18,19 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
 
+  // Debug logs
+  // console.log("Date being used:", date);
+  // console.log("User ID:", user?.id);
+
   // Obtener datos del día usando React Query
   const { data: dayData } = useDayData(date, user?.id || "");
 
+  // console.log("Day Data:", dayData);
+
   // Encontrar la métrica específica en los datos del día
   const metricData = dayData?.metrics.find((m) => m.id === metric.id);
+
+  // console.log("Metric Data:", metricData);
 
   // Calcular display data optimizado con memoización
   const displayData = useMemo(

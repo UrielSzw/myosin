@@ -1,8 +1,34 @@
 import { BaseUserPreferences } from "@/shared/db/schema/user";
+import { SyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
 import { syncToSupabase } from "@/shared/sync/sync-engine";
+import type { MutationCode } from "@/shared/sync/types/mutations";
+import NetInfo from "@react-native-community/netinfo";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
+
+// Helper para sync desde Zustand store (sin React hooks)
+const syncHelper = async (code: MutationCode, payload: any) => {
+  try {
+    const netInfo = await NetInfo.fetch();
+    const isOnline = netInfo.isConnected && netInfo.isInternetReachable;
+
+    if (isOnline) {
+      // Online: sync directo
+      await syncToSupabase(code, payload);
+    } else {
+      // Offline: agregar a queue
+      const queueRepo = new SyncQueueRepository();
+      await queueRepo.enqueue({
+        code,
+        payload,
+      });
+      console.log(`📴 Queued for later sync: ${code}`);
+    }
+  } catch (error) {
+    console.error(`Failed to sync ${code}:`, error);
+  }
+};
 
 type PrefsState = {
   prefs: BaseUserPreferences | null;
@@ -41,11 +67,9 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
         await usersRepository.updateUserPreferences(userId, updateData);
 
         // 2. Sync a Supabase en background
-        syncToSupabase("USER_PREFERENCES_UPDATE", {
+        syncHelper("USER_PREFERENCES_UPDATE", {
           userId,
           data: updateData,
-        }).catch((syncError) => {
-          console.warn("User preferences sync failed:", syncError);
         });
       } catch (e) {
         console.error("Error persisting user preferences", e);
@@ -82,7 +106,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
             );
 
             // Sync crear preferences a Supabase
-            syncToSupabase("USER_PREFERENCES_CREATE", {
+            syncHelper("USER_PREFERENCES_CREATE", {
               userId,
               data: defaults,
             });

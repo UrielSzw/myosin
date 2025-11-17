@@ -42,10 +42,13 @@ export const MetricModal: React.FC<Props> = ({
   const updateMetricMutation = useUpdateMetric();
   const deleteMetricMutation = useDeleteMetric();
 
+  const currentMetricData = dayData?.metrics.find(
+    (m) => m.id === selectedMetric?.id
+  );
+  const currentValue = currentMetricData?.aggregate?.sum_normalized || 0;
+
   // Estado para el modal de configuración
   const [targetEditorVisible, setTargetEditorVisible] = useState(false);
-
-  const currentValue = selectedMetric?.aggregate?.sum_normalized || 0;
 
   const handleCloseModal = () => {
     setSelectedMetric(null);

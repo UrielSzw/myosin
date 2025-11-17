@@ -50,6 +50,10 @@ export const supabaseSyncDictionary: Record<MutationCode, Function> = {
     entry: any;
     dailyAggregate: any;
   }) => trackerRepo.createEntryWithAggregate(payload),
+  TRACKER_REPLACE_ENTRY_WITH_AGGREGATE: (payload: {
+    entry: any;
+    dailyAggregate: any;
+  }) => trackerRepo.replaceEntryWithAggregate(payload),
   TRACKER_DELETE_ENTRY_WITH_AGGREGATE: (payload: {
     entryId: string;
     dailyAggregate: any;

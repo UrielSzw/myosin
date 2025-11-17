@@ -3,6 +3,7 @@ import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
 import { AuthProvider, useAuth } from "@/shared/providers/auth-provider";
+import { useSync } from "@/shared/sync/hooks/use-sync";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -26,6 +27,10 @@ function LoadingScreen() {
 
 function AppContent() {
   const { user, loading } = useAuth();
+
+  // Inicializar scheduler automático de sync cuando hay usuario
+  useSync();
+
   // const loadUserPreferences = useUserPreferencesLoad();
 
   // Cargar preferences cuando el usuario esté disponible

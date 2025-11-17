@@ -273,4 +273,24 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
       await this.handleError(error, "delete entry with aggregate");
     }
   }
+
+  async replaceEntryWithAggregate(data: {
+    entry: BaseTrackerEntry;
+    dailyAggregate: BaseTrackerDailyAggregate | null;
+  }): Promise<BaseTrackerEntry> {
+    try {
+      // Use RPC function for replace operation
+      const { error } = await this.supabase
+        .rpc("replace_tracker_entry_with_aggregate", {
+          entry_data: data.entry,
+          aggregate_data: data.dailyAggregate,
+        })
+        .single();
+
+      if (error) throw error;
+      return data.entry; // Return the original entry
+    } catch (error) {
+      return await this.handleError(error, "replace entry with aggregate");
+    }
+  }
 }

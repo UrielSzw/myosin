@@ -27,8 +27,8 @@ export const usePRList = (userId: string = "default-user") => {
         estimated_1rm: pr.estimated_1rm,
         achieved_at: pr.achieved_at,
         source: pr.source,
-        created_at: pr.created_at?.toISOString() || new Date().toISOString(),
-        updated_at: pr.updated_at?.toISOString() || new Date().toISOString(),
+        created_at: pr.created_at || new Date().toISOString(),
+        updated_at: pr.updated_at || new Date().toISOString(),
         // Calculated fields
         is_recent: new Date(pr.achieved_at).getTime() > oneWeekAgo,
         exercise_muscle_category: MUSCLE_CATEGORY_MAP[pr.exercise_muscle],
@@ -94,8 +94,8 @@ export const usePRSearch = (
         estimated_1rm: pr.estimated_1rm,
         achieved_at: pr.achieved_at,
         source: pr.source,
-        created_at: pr.created_at?.toISOString() || new Date().toISOString(),
-        updated_at: pr.updated_at?.toISOString() || new Date().toISOString(),
+        created_at: pr.created_at || new Date().toISOString(),
+        updated_at: pr.updated_at || new Date().toISOString(),
         is_recent: new Date(pr.achieved_at).getTime() > oneWeekAgo,
         exercise_muscle_category: MUSCLE_CATEGORY_MAP[pr.exercise_muscle],
       }));
@@ -141,8 +141,8 @@ export const usePRByMuscleGroups = (
         estimated_1rm: pr.estimated_1rm,
         achieved_at: pr.achieved_at,
         source: pr.source,
-        created_at: pr.created_at?.toISOString() || new Date().toISOString(),
-        updated_at: pr.updated_at?.toISOString() || new Date().toISOString(),
+        created_at: pr.created_at || new Date().toISOString(),
+        updated_at: pr.updated_at || new Date().toISOString(),
         is_recent: new Date(pr.achieved_at).getTime() > oneWeekAgo,
         exercise_muscle_category: MUSCLE_CATEGORY_MAP[pr.exercise_muscle],
       }));

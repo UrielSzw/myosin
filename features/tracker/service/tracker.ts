@@ -9,8 +9,38 @@ import type {
   TrackerMetricWithQuickActions,
   TrackerQuickActionInsert,
 } from "@/shared/db/schema/tracker";
+import { SyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
 import { syncToSupabase } from "@/shared/sync/sync-engine";
-import { getDayKey, getFullTimestamp } from "@/shared/utils/date-utils";
+import type { MutationCode } from "@/shared/sync/types/mutations";
+import {
+  combineSelectedDateWithCurrentTime,
+  getDayKeyUTC,
+  toUTCISOString,
+} from "@/shared/utils/timezone";
+import NetInfo from "@react-native-community/netinfo";
+
+// Helper function for sync without hooks
+const syncHelper = async (code: MutationCode, payload: any) => {
+  try {
+    const netInfo = await NetInfo.fetch();
+    const isOnline = netInfo.isConnected && netInfo.isInternetReachable;
+
+    if (isOnline) {
+      // Online: sync directo
+      await syncToSupabase(code, payload);
+    } else {
+      // Offline: agregar a queue
+      const queueRepo = new SyncQueueRepository();
+      await queueRepo.enqueue({
+        code,
+        payload,
+      });
+      console.log(`📴 Queued for later sync: ${code}`);
+    }
+  } catch (error) {
+    console.error(`Failed to sync ${code}:`, error);
+  }
+};
 
 // Validaciones de negocio
 const validateMetricValue = (value: number): void => {
@@ -127,9 +157,7 @@ export const trackerService = {
     const result = await trackerRepository.createMetric(metricData);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_METRIC_CREATE", metricData).catch((error) => {
-      console.error("Failed to sync metric creation:", error);
-    });
+    syncHelper("TRACKER_METRIC_CREATE", metricData);
 
     return result;
   },
@@ -142,9 +170,7 @@ export const trackerService = {
     const result = await trackerRepository.deleteMetric(metricId);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_METRIC_DELETE", { metricId }).catch((error) => {
-      console.error("Failed to sync metric deletion:", error);
-    });
+    syncHelper("TRACKER_METRIC_DELETE", { metricId });
 
     return result;
   },
@@ -157,9 +183,7 @@ export const trackerService = {
     const result = await trackerRepository.restoreMetric(metricId);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_METRIC_RESTORE", { metricId }).catch((error) => {
-      console.error("Failed to sync metric restoration:", error);
-    });
+    syncHelper("TRACKER_METRIC_RESTORE", { metricId });
 
     return result;
   },
@@ -177,11 +201,7 @@ export const trackerService = {
     const result = await trackerRepository.updateMetric(metricId, data);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_METRIC_UPDATE", { metricId, data }).catch(
-      (error) => {
-        console.error("Failed to sync metric update:", error);
-      }
-    );
+    syncHelper("TRACKER_METRIC_UPDATE", { metricId, data });
 
     return result;
   },
@@ -219,11 +239,7 @@ export const trackerService = {
     await trackerRepository.reorderMetrics(metricOrders);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_METRIC_REORDER", { metricOrders }).catch(
-      (error) => {
-        console.error("Failed to sync metric reorder:", error);
-      }
-    );
+    syncHelper("TRACKER_METRIC_REORDER", { metricOrders });
   },
 
   // ==================== QUICK ACTIONS ====================
@@ -238,9 +254,7 @@ export const trackerService = {
     await trackerRepository.createQuickAction(data);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_QUICK_ACTION_CREATE", data).catch((error) => {
-      console.error("Failed to sync quick action creation:", error);
-    });
+    syncHelper("TRACKER_QUICK_ACTION_CREATE", data);
   },
 
   /**
@@ -251,11 +265,7 @@ export const trackerService = {
     await trackerRepository.deleteQuickAction(quickActionId);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_QUICK_ACTION_DELETE", { quickActionId }).catch(
-      (error) => {
-        console.error("Failed to sync quick action deletion:", error);
-      }
-    );
+    syncHelper("TRACKER_QUICK_ACTION_DELETE", { quickActionId });
   },
 
   // ==================== ENTRIES MANAGEMENT ====================
@@ -281,8 +291,12 @@ export const trackerService = {
 
     validateMetricValue(value);
 
-    const recordedAtISO = getFullTimestamp(recordedAt);
-    const dayKey = getDayKey(new Date(recordedAtISO));
+    // UTC everywhere: combinar fecha seleccionada con hora actual
+    const recordedAtISO = recordedAt
+      ? combineSelectedDateWithCurrentTime(recordedAt)
+      : toUTCISOString();
+    // day_key debe basarse en la fecha seleccionada, no en el timestamp UTC
+    const dayKey = recordedAt ? recordedAt : getDayKeyUTC();
 
     // Calcular valor normalizado
     const valueNormalized = value * (metric.conversion_factor || 1);
@@ -312,12 +326,15 @@ export const trackerService = {
       dayKey
     );
 
-    // Background sync: enviar entry + daily aggregate atomicamente
-    syncToSupabase("TRACKER_ENTRY_WITH_AGGREGATE", {
+    // Background sync: usar mutation code apropiado según behavior de la métrica
+    const mutationCode =
+      metric.behavior === "replace"
+        ? "TRACKER_REPLACE_ENTRY_WITH_AGGREGATE"
+        : "TRACKER_ENTRY_WITH_AGGREGATE";
+
+    syncHelper(mutationCode, {
       entry: result,
       dailyAggregate: dailyAggregate,
-    }).catch((error) => {
-      console.error("Failed to sync entry with aggregate:", error);
     });
 
     return result;
@@ -334,15 +351,19 @@ export const trackerService = {
     slug?: string
   ): Promise<BaseTrackerEntry> => {
     if (!userId) throw new Error("User ID is required");
-    const recordedAtISO = getFullTimestamp(recordedAt);
-    const dayKey = getDayKey(new Date(recordedAtISO));
+    // UTC everywhere: combinar fecha seleccionada con hora actual
+    const recordedAtISO = recordedAt
+      ? combineSelectedDateWithCurrentTime(recordedAt)
+      : toUTCISOString();
+    // day_key debe basarse en la fecha seleccionada, no en el timestamp UTC
+    const dayKey = recordedAt ? recordedAt : getDayKeyUTC();
 
     // Local first: crear en SQLite
     const result = await trackerRepository.createEntryFromQuickAction(
       quickActionId,
       userId,
       notes,
-      recordedAt,
+      recordedAtISO,
       slug
     );
 
@@ -353,12 +374,18 @@ export const trackerService = {
       dayKey
     );
 
-    // Background sync: enviar entry + daily aggregate atomicamente
-    syncToSupabase("TRACKER_ENTRY_WITH_AGGREGATE", {
+    // Obtener métrica para determinar behavior
+    const metric = await trackerRepository.getMetricById(result.metric_id);
+
+    // Background sync: usar mutation code apropiado según behavior de la métrica
+    const mutationCode =
+      metric?.behavior === "replace"
+        ? "TRACKER_REPLACE_ENTRY_WITH_AGGREGATE"
+        : "TRACKER_ENTRY_WITH_AGGREGATE";
+
+    syncHelper(mutationCode, {
       entry: result,
       dailyAggregate: dailyAggregate,
-    }).catch((error) => {
-      console.error("Failed to sync entry with aggregate:", error);
     });
 
     return result;
@@ -404,11 +431,7 @@ export const trackerService = {
     const result = await trackerRepository.updateEntry(entryId, updateData);
 
     // Background sync: enviar a Supabase
-    syncToSupabase("TRACKER_ENTRY_UPDATE", { entryId, data: updateData }).catch(
-      (error) => {
-        console.error("Failed to sync entry update:", error);
-      }
-    );
+    syncHelper("TRACKER_ENTRY_UPDATE", { entryId, data: updateData });
 
     return result;
   },
@@ -437,11 +460,9 @@ export const trackerService = {
     );
 
     // Background sync: enviar delete + aggregate actualizado atomicamente
-    syncToSupabase("TRACKER_DELETE_ENTRY_WITH_AGGREGATE", {
+    syncHelper("TRACKER_DELETE_ENTRY_WITH_AGGREGATE", {
       entryId,
       dailyAggregate: updatedAggregate,
-    }).catch((error) => {
-      console.error("Failed to sync entry deletion with aggregate:", error);
     });
   },
 
@@ -455,7 +476,8 @@ export const trackerService = {
     userId: string
   ): Promise<TrackerDayData> => {
     if (!userId) throw new Error("User ID is required");
-    return await trackerRepository.getDayData(userId, dayKey);
+    const result = await trackerRepository.getDayData(userId, dayKey);
+    return result;
   },
 
   /**
@@ -463,7 +485,7 @@ export const trackerService = {
    */
   getTodayData: async (userId: string): Promise<TrackerDayData> => {
     if (!userId) throw new Error("User ID is required");
-    const today = getDayKey();
+    const today = getDayKeyUTC();
     return await trackerService.getDayData(today, userId);
   },
 
@@ -486,10 +508,10 @@ export const trackerService = {
     days: number = 30,
     userId: string
   ): Promise<BaseTrackerDailyAggregate[]> => {
-    const endDate = getDayKey();
+    const endDate = getDayKeyUTC();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days + 1);
-    const startDateKey = getDayKey(startDate);
+    const startDateKey = getDayKeyUTC(startDate);
 
     return await trackerRepository.getDailyAggregatesRange(
       userId,
@@ -516,10 +538,10 @@ export const trackerService = {
     }
 
     // Calcular rango de fechas
-    const endDate = getDayKey();
+    const endDate = getDayKeyUTC();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days + 1);
-    const startDateKey = getDayKey(startDate);
+    const startDateKey = getDayKeyUTC(startDate);
 
     // Obtener agregados del período
     const aggregates = await trackerRepository.getDailyAggregatesRange(
@@ -543,7 +565,7 @@ export const trackerService = {
     for (let i = 0; i < days; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() - i);
-      const checkDateKey = getDayKey(checkDate);
+      const checkDateKey = getDayKeyUTC(checkDate);
 
       const dayAggregate = aggregates.find(
         (agg) => agg.day_key === checkDateKey
@@ -562,7 +584,7 @@ export const trackerService = {
 
     if (hasTarget && aggregates.length > 0) {
       const todayAggregate = aggregates.find(
-        (agg) => agg.day_key === getDayKey()
+        (agg) => agg.day_key === getDayKeyUTC()
       );
 
       if (todayAggregate) {
@@ -762,11 +784,9 @@ export const trackerService = {
       result.id
     );
 
-    syncToSupabase("TRACKER_METRIC_FROM_TEMPLATE", {
+    syncHelper("TRACKER_METRIC_FROM_TEMPLATE", {
       metric: result, // ← Métrica creada con ID real
       quickActions: createdQuickActions, // ← Quick actions creadas con IDs reales
-    }).catch((error) => {
-      console.error("Failed to sync metric from template:", error);
     });
 
     return result;
@@ -789,7 +809,7 @@ export const trackerService = {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      return getDayKey(date);
+      return getDayKeyUTC(date);
     });
 
     const entriesByDay = last7Days.map((dayKey) => ({

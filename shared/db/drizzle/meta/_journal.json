@@ -141,6 +141,13 @@
       "when": 1761187294527,
       "tag": "0019_empty_maria_hill",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1763073534475,
+      "tag": "0020_solid_maginty",
+      "breakpoints": true
     }
   ]
 }

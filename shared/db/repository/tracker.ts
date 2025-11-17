@@ -6,6 +6,7 @@ import {
 } from "../../../features/tracker/constants/templates";
 
 import { getDayKey, getFullTimestamp } from "../../utils/date-utils";
+import { combineSelectedDateWithCurrentTime } from "../../utils/timezone";
 import { db } from "../client";
 import {
   BaseTrackerDailyAggregate,
@@ -409,7 +410,9 @@ export const trackerRepository = {
       notes: data.notes || null,
       source: "manual",
       day_key: dayKey,
-      recorded_at: getFullTimestamp(data.recordedAt),
+      recorded_at: data.recordedAt
+        ? combineSelectedDateWithCurrentTime(data.recordedAt)
+        : new Date().toISOString(),
       display_value: displayValue,
       raw_input: data.rawInput,
       meta: null,
@@ -426,10 +429,12 @@ export const trackerRepository = {
       throw new Error(`Metric not found: ${data.metric_id}`);
     }
 
-    // Asegurar que recorded_at sea un timestamp ISO completo
+    // Solo procesar recorded_at si no está ya en formato ISO correcto
     const entryData = {
       ...data,
-      recorded_at: getFullTimestamp(data.recorded_at),
+      recorded_at: data.recorded_at?.includes("T")
+        ? data.recorded_at
+        : combineSelectedDateWithCurrentTime(data.recorded_at),
     };
 
     // Si la métrica tiene behavior "replace", buscar entrada existente del mismo día
@@ -555,7 +560,11 @@ export const trackerRepository = {
         normalizeValue(qa.value, metric.conversion_factor || 1),
       unit: metric.unit,
       day_key: dayKey,
-      recorded_at: getFullTimestamp(recordedAt),
+      recorded_at: recordedAt?.includes("T")
+        ? recordedAt
+        : recordedAt
+        ? combineSelectedDateWithCurrentTime(recordedAt)
+        : new Date().toISOString(),
       source: "quick_action",
       notes: notes || null,
       meta: null,
@@ -627,7 +636,7 @@ export const trackerRepository = {
       ...data,
       updated_at: new Date()?.toISOString(),
       ...(data.recorded_at && {
-        recorded_at: getFullTimestamp(data.recorded_at),
+        recorded_at: combineSelectedDateWithCurrentTime(data.recorded_at),
       }),
     };
 

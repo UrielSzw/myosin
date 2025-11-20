@@ -38,6 +38,8 @@ export const loadExercisesSeed = async () => {
         equipment: ex.equipment,
         similar_exercises: ex.similar_exercises,
         default_measurement_template: ex.default_measurement_template,
+        primary_media_type: ex.primary_media_type,
+        primary_media_url: ex.primary_media_url,
       });
     }
 

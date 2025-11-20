@@ -22,6 +22,7 @@ import m0017 from './0017_careful_rumiko_fujikawa.sql';
 import m0018 from './0018_lumpy_wrecking_crew.sql';
 import m0019 from './0019_empty_maria_hill.sql';
 import m0020 from './0020_solid_maginty.sql';
+import m0021 from './0021_premium_firelord.sql';
 
   export default {
     journal,
@@ -46,7 +47,8 @@ m0016,
 m0017,
 m0018,
 m0019,
-m0020
+m0020,
+m0021
     }
   }
   

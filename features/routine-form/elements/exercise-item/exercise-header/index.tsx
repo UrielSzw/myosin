@@ -1,20 +1,25 @@
 import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { IExerciseMuscle } from "@/shared/types/workout";
+import { ExerciseMedia } from "@/shared/ui/exercise-media";
 import { Typography } from "@/shared/ui/typography";
-import { Dumbbell, EllipsisVertical } from "lucide-react-native";
+import { EllipsisVertical } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   exerciseName: string;
   exerciseMainMuscle: string;
+  exerciseImageUrl?: string;
+  exerciseImageType?: "gif" | "image";
   onPress: () => void;
 };
 
 const ExerciseHeaderComponent: React.FC<Props> = ({
   exerciseName,
   exerciseMainMuscle,
+  exerciseImageUrl,
+  exerciseImageType,
   onPress,
 }) => {
   const { colors } = useColorScheme();
@@ -27,18 +32,13 @@ const ExerciseHeaderComponent: React.FC<Props> = ({
         alignItems: "center",
       }}
     >
-      <View
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 8,
-          backgroundColor: colors.border,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        <Dumbbell size={24} color={colors.textMuted} />
-      </View>
+      <ExerciseMedia
+        primaryMediaUrl={exerciseImageUrl}
+        primaryMediaType={exerciseImageType}
+        variant="thumbnail"
+        exerciseName={exerciseName}
+      />
+
       <View style={{ flex: 1 }}>
         <View
           style={{

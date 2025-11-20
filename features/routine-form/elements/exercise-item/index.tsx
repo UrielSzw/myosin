@@ -59,6 +59,8 @@ export const ExerciseItem: React.FC<Props> = ({
 
   if (!exerciseInBlock) return null;
 
+  console.log("Rendering ExerciseCard for:", exerciseInBlock.exercise);
+
   return (
     <Pressable
       style={{ flex: 1 }}
@@ -68,6 +70,12 @@ export const ExerciseItem: React.FC<Props> = ({
       <ExerciseHeader
         exerciseName={exerciseInBlock.exercise.name}
         exerciseMainMuscle={exerciseInBlock.exercise.main_muscle_group}
+        exerciseImageUrl={
+          exerciseInBlock.exercise.primary_media_url || undefined
+        }
+        exerciseImageType={
+          exerciseInBlock.exercise.primary_media_type || undefined
+        }
         onPress={handlePress}
       />
 

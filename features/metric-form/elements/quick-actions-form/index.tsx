@@ -69,7 +69,8 @@ export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
             style={{ marginBottom: 16 }}
           >
             Crea atajos para registrar valores comunes rápidamente. Por ejemplo,
-            para agua podrías crear "Vaso chico (200ml)" con valor 0.2.
+            para agua podrías crear &quot;Vaso chico (200ml)&quot; con valor
+            0.2.
           </Typography>
 
           {quickActions.map((qa) => (

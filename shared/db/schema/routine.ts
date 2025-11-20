@@ -56,6 +56,10 @@ export const exercises = sqliteTable(
       .notNull()
       .default("weight_reps"),
 
+    // Media fields - OPTIONAL to avoid breaking existing exercises
+    primary_media_url: text("primary_media_url"),
+    primary_media_type: text("primary_media_type").$type<"gif" | "image">(),
+
     ...timestamps,
   },
   (t) => [

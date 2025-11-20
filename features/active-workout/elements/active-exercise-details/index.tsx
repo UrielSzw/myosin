@@ -50,6 +50,12 @@ export const ActiveExerciseDetails: React.FC<Props> = ({
         onPress={handlePress}
         exerciseName={exerciseInBlock.exercise.name}
         exerciseMainMuscle={exerciseInBlock.exercise.main_muscle_group}
+        exerciseImageUrl={
+          exerciseInBlock.exercise.primary_media_url || undefined
+        }
+        exerciseImageType={
+          exerciseInBlock.exercise.primary_media_type || undefined
+        }
       />
 
       <ActiveSetsTable

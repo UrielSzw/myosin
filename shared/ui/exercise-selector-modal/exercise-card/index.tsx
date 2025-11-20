@@ -3,12 +3,13 @@ import {
   EXERCISE_EQUIPMENT_LABELS,
 } from "@/shared/constants/exercise";
 import { BaseExercise } from "@/shared/db/schema";
-import { Check, Dumbbell, Info, Plus, Star } from "lucide-react-native";
+import { Check, Info, Plus, Star } from "lucide-react-native";
 import { memo, useCallback } from "react";
 import { View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { Button } from "../../button";
 import { Card } from "../../card";
+import { ExerciseMedia } from "../../exercise-media";
 import { Typography } from "../../typography";
 
 type Props = {
@@ -71,18 +72,12 @@ export const ExerciseCard: React.FC<Props> = memo(
             }}
           >
             {/* Exercise Image */}
-            <View
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 8,
-                backgroundColor: colors.border,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Dumbbell size={24} color={colors.textMuted} />
-            </View>
+            <ExerciseMedia
+              primaryMediaUrl={exercise.primary_media_url || undefined}
+              primaryMediaType={exercise.primary_media_type || undefined}
+              variant="thumbnail"
+              exerciseName={exercise.name}
+            />
 
             <View style={{ flex: 1 }}>
               <View

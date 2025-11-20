@@ -8,8 +8,8 @@ import { Dumbbell, Info } from "lucide-react-native";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { Card } from "../card";
+import { ExerciseMedia } from "../exercise-media";
 import { Typography } from "../typography";
-import { ExerciseImage } from "./exercise-image";
 import { InstructionsList } from "./instructions-list";
 
 type Props = {
@@ -19,8 +19,7 @@ type Props = {
 export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
   const { colors } = useColorScheme();
 
-  // Las imágenes vienen del schema - por ahora array vacío pero preparado para futuro
-  const images: string[] = []; // TODO: Cuando se implemente ejercicios con imágenes
+  console.log("Rendering ExerciseDetail for:", exercise);
 
   return (
     <ScrollView
@@ -28,8 +27,13 @@ export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
       contentContainerStyle={{ padding: 20 }}
       showsVerticalScrollIndicator={false}
     >
-      {/* Exercise Images Carousel */}
-      <ExerciseImage images={images} />
+      {/* Exercise Media */}
+      <ExerciseMedia
+        primaryMediaUrl={exercise.primary_media_url || undefined}
+        primaryMediaType={exercise.primary_media_type || undefined}
+        variant="detail"
+        exerciseName={exercise.name}
+      />
 
       {/* Exercise Header Info */}
       <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>

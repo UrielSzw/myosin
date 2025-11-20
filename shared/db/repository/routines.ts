@@ -137,6 +137,8 @@ export const routinesRepository = {
           equipment: exercises.equipment,
           created_at: exercises.created_at,
           updated_at: exercises.updated_at,
+          primary_media_url: exercises.primary_media_url,
+          primary_media_type: exercises.primary_media_type,
         },
       })
       .from(exercise_in_block)

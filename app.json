@@ -9,7 +9,12 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.myosin.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMicrophoneUsageDescription": "This app uses audio to provide workout timer sounds."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +41,9 @@
       ],
       "expo-sqlite",
       "expo-audio",
-      "expo-localization"
+      "expo-localization",
+      "expo-web-browser",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
@@ -44,9 +51,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "70cc16f7-1b78-4511-89b9-4dd167dfee99"
+        "projectId": "1bd69a74-dd33-4fc4-9fb0-2e270a77caa8"
       }
     },
-    "owner": "urielsz"
+    "owner": "myosinapp"
   }
 }

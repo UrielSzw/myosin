@@ -58,15 +58,23 @@ export default function SignInScreen() {
             showsVerticalScrollIndicator={false}
           >
             <View style={styles.topSection}>
-              <Logo size={60} animated />
+              <Logo size={64} animated />
+              <Typography
+                variant="h1"
+                weight="bold"
+                align="center"
+                style={styles.brandName}
+              >
+                MYOSIN
+              </Typography>
               <View style={styles.headerSpacing}>
                 <Typography
-                  variant="h1"
+                  variant="h2"
                   weight="bold"
                   align="center"
                   style={styles.title}
                 >
-                  ¡Listo para entrenar!
+                  Entrena con inteligencia
                 </Typography>
                 <Typography
                   variant="body1"
@@ -74,7 +82,7 @@ export default function SignInScreen() {
                   align="center"
                   style={styles.subtitle}
                 >
-                  Volvamos a romperla 💪
+                  Tu progreso, medido y optimizado
                 </Typography>
               </View>
             </View>
@@ -159,20 +167,27 @@ const styles = StyleSheet.create({
   },
   topSection: {
     alignItems: "center",
-    gap: 24,
+    gap: 16,
+  },
+  brandName: {
+    fontSize: 32,
+    lineHeight: 36,
+    letterSpacing: 4,
+    marginTop: 8,
   },
   headerSpacing: {
-    gap: 10,
+    gap: 8,
+    marginTop: 8,
   },
   title: {
-    fontSize: 44,
-    lineHeight: 50,
+    fontSize: 28,
+    lineHeight: 34,
     letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 17,
-    lineHeight: 24,
-    opacity: 0.7,
+    fontSize: 15,
+    lineHeight: 20,
+    opacity: 0.65,
   },
   card: {
     marginHorizontal: 0,

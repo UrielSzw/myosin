@@ -1,14 +1,6 @@
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { Stack } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
-
-function LoadingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
 
 /**
  * Auth Layout: Protege todas las rutas de autenticación

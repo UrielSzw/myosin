@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
+import { useUserProfileStore } from "../hooks/use-user-profile";
 import { supabase } from "../services/supabase";
 
 interface AuthContextType {
@@ -50,6 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const loadAvatarColor = useUserProfileStore((s) => s.loadAvatarColor);
 
   useEffect(() => {
     // Get initial session
@@ -74,6 +76,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
 
     getInitialSession();
+    // Cargar avatar color al iniciar la app
+    loadAvatarColor();
 
     // Listen for auth changes
     const {
@@ -98,7 +102,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [loadAvatarColor]);
 
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {

@@ -4,6 +4,7 @@ import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
 import { AuthProvider } from "@/shared/providers/auth-provider";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -11,19 +12,10 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 const queryClient = new QueryClient();
-
-function LoadingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
 
 /**
  * AppContent: Renderiza todas las rutas y maneja la navegación protegida
@@ -67,7 +59,7 @@ export default function RootLayout() {
   }, [success]);
 
   if (!loaded) {
-    return null;
+    return <LoadingScreen />;
   }
 
   if (error || !success) {

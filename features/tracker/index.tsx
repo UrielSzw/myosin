@@ -2,12 +2,13 @@ import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { AlertCircle, Plus } from "lucide-react-native";
 import React, { useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { DatePicker } from "./elements/date-picker";
 import { EmptyMetrics } from "./elements/empty-metrics";
@@ -66,19 +67,10 @@ export const TrackerFeature = () => {
   if (dayDataLoading) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.primary[500]} />
-          <Typography variant="body1" color="textMuted">
-            Cargando datos del día...
-          </Typography>
-        </View>
+        <LoadingScreen
+          withGradient={false}
+          message="Cargando datos del día..."
+        />
       </SafeAreaView>
     );
   }

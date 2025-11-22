@@ -1,15 +1,7 @@
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
 import { useSync } from "@/shared/sync/hooks/use-sync";
+import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { Stack } from "expo-router";
-import { ActivityIndicator, View } from "react-native";
-
-function LoadingScreen() {
-  return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <ActivityIndicator size="large" />
-    </View>
-  );
-}
 
 /**
  * Authenticated Layout: Protege todas las rutas autenticadas
@@ -108,6 +100,12 @@ export default function AuthenticatedLayout() {
       />
       <Stack.Screen
         name="profile/workout-config"
+        options={{
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="profile/edit"
         options={{
           presentation: "modal",
         }}

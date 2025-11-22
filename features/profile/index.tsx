@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserProfile } from "@/shared/hooks/use-user-profile";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
@@ -22,6 +24,7 @@ import { SettingItem } from "../../shared/ui/setting-item";
 export const ProfileFeature = () => {
   const { user, signOut } = useAuth();
   const { setColorScheme, colors, isDarkMode } = useColorScheme();
+  const { profile } = useUserProfile(user);
 
   const handleLogout = () => {
     Alert.alert("Cerrar Sesión", "¿Estás seguro que quieres cerrar sesión?", [
@@ -47,6 +50,30 @@ export const ProfileFeature = () => {
     router.push("/profile/workout-config");
   };
 
+  const handleEditProfile = () => {
+    router.push("/profile/edit");
+  };
+
+  const getMemberSince = () => {
+    if (!user?.created_at) return "Miembro desde 2025";
+    const date = new Date(user.created_at);
+    const monthNames = [
+      "Enero",
+      "Febrero",
+      "Marzo",
+      "Abril",
+      "Mayo",
+      "Junio",
+      "Julio",
+      "Agosto",
+      "Septiembre",
+      "Octubre",
+      "Noviembre",
+      "Diciembre",
+    ];
+    return `Miembro desde ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+  };
+
   return (
     <ScreenWrapper withGradient fullscreen>
       <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
@@ -60,40 +87,64 @@ export const ProfileFeature = () => {
         </View>
 
         <Card variant="elevated" padding="lg" style={{ marginBottom: 24 }}>
-          <View style={{ alignItems: "center", marginBottom: 20 }}>
+          <View style={{ alignItems: "center" }}>
+            {/* Avatar with subtle glow */}
             <View
               style={{
-                width: 80,
-                height: 80,
-                borderRadius: 40,
-                backgroundColor: colors.primary[500],
-                alignItems: "center",
-                justifyContent: "center",
-                marginBottom: 16,
+                shadowColor: profile.avatarColor,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+                elevation: 8,
+                marginBottom: 12,
               }}
             >
-              <User size={40} color="#ffffff" />
+              <Avatar
+                name={profile.displayName ?? undefined}
+                email={user?.email}
+                color={profile.avatarColor}
+                size={120}
+              />
             </View>
 
-            <Typography variant="h4" weight="bold" style={{ marginBottom: 4 }}>
-              {"Usuario"}
-            </Typography>
+            {/* Name - larger and closer */}
             <Typography
-              variant="body2"
-              color="textMuted"
-              style={{ marginBottom: 4 }}
+              variant="h3"
+              weight="bold"
+              style={{ marginBottom: 6, letterSpacing: 0.5 }}
             >
-              {"usuario@ejemplo.com"}
-            </Typography>
-            <Typography
-              variant="body2"
-              color="textMuted"
-              style={{ marginBottom: 16 }}
-            >
-              Miembro desde Enero 2025
+              {profile.displayName || user?.email?.split("@")[0] || "Usuario"}
             </Typography>
 
-            <Button variant="outline" size="sm">
+            {/* Email - smaller and more subtle */}
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={{ marginBottom: 12, opacity: 0.7 }}
+            >
+              {user?.email || "usuario@ejemplo.com"}
+            </Typography>
+
+            {/* Member since badge */}
+            <View
+              style={{
+                backgroundColor: colors.primary[500] + "20",
+                paddingHorizontal: 12,
+                paddingVertical: 6,
+                borderRadius: 12,
+                marginBottom: 20,
+              }}
+            >
+              <Typography
+                variant="caption"
+                style={{ color: colors.primary[400], fontSize: 11 }}
+              >
+                {getMemberSince()}
+              </Typography>
+            </View>
+
+            {/* Subtle edit button */}
+            <Button variant="ghost" size="sm" onPress={handleEditProfile}>
               Editar Perfil
             </Button>
           </View>

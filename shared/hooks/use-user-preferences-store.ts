@@ -40,8 +40,8 @@ type PrefsState = {
 
   updateActions: {
     setUnit: (userId: string, unit: "kg" | "lbs") => void;
-    setShowRpe: (userId: string, value: boolean) => void;
-    setShowTempo: (userId: string, value: boolean) => void;
+    setShowRpe: (userId: string, show: boolean) => void;
+    setShowTempo: (userId: string, show: boolean) => void;
     setColorScheme: (userId: string, scheme: ColorSchemeName) => void;
   };
 };
@@ -98,18 +98,14 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
               weight_unit: "kg",
               show_rpe: false,
               show_tempo: false,
+              display_name: null,
+              avatar_color: "#0ea5e9",
             } as BaseUserPreferences;
 
             await usersRepository.createUserPreferences(
               userId,
               defaults as Partial<BaseUserPreferences>
             );
-
-            // Sync crear preferences a Supabase
-            syncHelper("USER_PREFERENCES_CREATE", {
-              userId,
-              data: defaults,
-            });
 
             set({ prefs: defaults });
           }

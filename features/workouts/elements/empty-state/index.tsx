@@ -49,8 +49,8 @@ export const EmptyState = () => {
             Diseña rutinas personalizadas y lleva tu progreso al siguiente nivel
           </Typography>
 
-          <View style={{ flexDirection: "row", gap: 12 }}>
-            <Button variant="primary" onPress={handleCreateRoutine}>
+          <View style={{ flexDirection: "row", gap: 12, width: "100%" }}>
+            <Button variant="primary" size="lg" onPress={handleCreateRoutine}>
               Crear Primera Rutina
             </Button>
           </View>

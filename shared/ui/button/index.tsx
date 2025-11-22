@@ -1,7 +1,9 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
   ActivityIndicator,
+  StyleSheet,
   TouchableOpacity,
   TouchableOpacityProps,
   View,
@@ -140,13 +142,10 @@ export const Button: React.FC<ButtonProps> = ({
   const variantStyles = getVariantStyles();
   const textColor = getTextColor();
 
-  return (
-    <TouchableOpacity
-      style={[sizeStyles, variantStyles, fullWidth && { width: "100%" }, style]}
-      disabled={isDisabled}
-      activeOpacity={0.8}
-      {...props}
-    >
+  const isPrimaryVariant = variant === "primary" && !isDisabled;
+
+  const buttonContent = (
+    <>
       {loading ? (
         <ActivityIndicator
           size="small"
@@ -167,6 +166,42 @@ export const Button: React.FC<ButtonProps> = ({
           {icon && iconPosition === "right" && icon}
         </View>
       )}
+    </>
+  );
+
+  if (isPrimaryVariant) {
+    return (
+      <TouchableOpacity
+        style={[
+          sizeStyles,
+          variantStyles,
+          { backgroundColor: "transparent", borderWidth: 0 },
+          fullWidth && { width: "100%" },
+          style,
+        ]}
+        disabled={isDisabled}
+        activeOpacity={0.8}
+        {...props}
+      >
+        <LinearGradient
+          colors={[colors.primary[400], colors.primary[600]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[StyleSheet.absoluteFill, { borderRadius: 12 }]}
+        />
+        {buttonContent}
+      </TouchableOpacity>
+    );
+  }
+
+  return (
+    <TouchableOpacity
+      style={[sizeStyles, variantStyles, fullWidth && { width: "100%" }, style]}
+      disabled={isDisabled}
+      activeOpacity={0.8}
+      {...props}
+    >
+      {buttonContent}
     </TouchableOpacity>
   );
 };

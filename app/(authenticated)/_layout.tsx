@@ -1,6 +1,39 @@
+import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
+import { useSync } from "@/shared/sync/hooks/use-sync";
 import { Stack } from "expo-router";
+import { ActivityIndicator, View } from "react-native";
 
+function LoadingScreen() {
+  return (
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+}
+
+/**
+ * Authenticated Layout: Protege todas las rutas autenticadas
+ * - Verifica que el usuario esté autenticado
+ * - Inicializa el sistema de sync automático
+ * - Redirige a /auth/sign-in si no hay usuario
+ */
 export default function AuthenticatedLayout() {
+  const { user, loading } = useProtectedRoute();
+
+  // Inicializar sistema de sync solo cuando hay usuario autenticado
+  useSync();
+
+  // Mostrar loading mientras verifica auth
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  // Si no hay usuario, useProtectedRoute ya hizo el redirect
+  // Este return solo es por TypeScript, nunca se ejecutará
+  if (!user) {
+    return <LoadingScreen />;
+  }
+
   return (
     <Stack
       screenOptions={{

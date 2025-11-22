@@ -2,6 +2,7 @@ import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
+import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { AlertCircle, Plus } from "lucide-react-native";
@@ -108,7 +109,7 @@ export const TrackerFeature = () => {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScreenWrapper withGradient fullscreen>
       <TrackerHeader selectedDate={selectedDate} />
 
       <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
@@ -178,6 +179,6 @@ export const TrackerFeature = () => {
         visible={metricSelectorVisible}
         onClose={() => setMetricSelectorVisible(false)}
       />
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };

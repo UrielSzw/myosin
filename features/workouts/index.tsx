@@ -52,7 +52,7 @@ export const WorkoutsFeature = () => {
   );
 
   return (
-    <ScreenWrapper withSheets>
+    <ScreenWrapper withSheets withGradient>
       <Header selectedFolder={selectedFolder} />
 
       {selectedFolder ? (

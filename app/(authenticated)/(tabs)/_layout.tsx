@@ -1,33 +1,21 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { CustomTabBar } from "@/shared/ui/custom-tab-bar";
 import { HapticTab } from "@/shared/ui/haptic-tab";
 import { Tabs } from "expo-router";
 import { Activity, BarChart3, Dumbbell, User } from "lucide-react-native";
 import React from "react";
-import { Platform } from "react-native";
 
 export default function TabLayout() {
   const { colors } = useColorScheme();
 
   return (
     <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
       screenOptions={{
         tabBarActiveTintColor: colors.primary[500],
         tabBarInactiveTintColor: colors.textMuted,
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarStyle: Platform.select({
-          ios: {
-            position: "absolute",
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-          },
-          default: {
-            backgroundColor: colors.surface,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
-          },
-        }),
       }}
     >
       <Tabs.Screen

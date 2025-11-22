@@ -2,6 +2,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
+import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
 import {
@@ -15,7 +16,6 @@ import {
 } from "lucide-react-native";
 import React from "react";
 import { Alert, ScrollView, Switch, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { ProfileSection } from "../../shared/ui/profile-section";
 import { SettingItem } from "../../shared/ui/setting-item";
 
@@ -48,7 +48,7 @@ export const ProfileFeature = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+    <ScreenWrapper withGradient fullscreen>
       <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
         <View style={{ marginBottom: 32 }}>
           <Typography variant="h2" weight="bold" style={{ marginBottom: 4 }}>
@@ -167,6 +167,6 @@ export const ProfileFeature = () => {
 
         <View style={{ height: 100 }} />
       </ScrollView>
-    </SafeAreaView>
+    </ScreenWrapper>
   );
 };

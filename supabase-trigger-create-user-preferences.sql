@@ -13,12 +13,14 @@ BEGIN
         user_id,
         theme,
         weight_unit,
+        language,
         show_rpe,
         show_tempo
     ) VALUES (
         NEW.id,              -- user_id from auth.users
         'dark',              -- default theme
         'kg',                -- default weight unit
+        'es',                -- default language (Spanish)
         false,               -- default show_rpe
         false                -- default show_tempo
     );

@@ -3,8 +3,10 @@ import migrations from "@/shared/db/drizzle/migrations";
 import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
+import "@/shared/localization/i18n.config";
 import { AuthProvider } from "@/shared/providers/auth-provider";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useMigrations } from "drizzle-orm/expo-sqlite/migrator";
 import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
@@ -68,12 +70,14 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <AppContent />
-          <StatusBar style="auto" />
-        </GestureHandlerRootView>
-      </AuthProvider>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <BottomSheetModalProvider>
+          <AuthProvider>
+            <AppContent />
+            <StatusBar style="auto" />
+          </AuthProvider>
+        </BottomSheetModalProvider>
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

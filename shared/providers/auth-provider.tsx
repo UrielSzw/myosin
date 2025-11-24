@@ -10,6 +10,7 @@ import React, {
 import { Alert } from "react-native";
 import { useUserPreferencesStore } from "../hooks/use-user-preferences-store";
 import { useUserProfileStore } from "../hooks/use-user-profile";
+import i18n from "../localization/i18n.config";
 import { supabase } from "../services/supabase";
 
 interface AuthContextType {
@@ -79,6 +80,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
               session.user.email
             );
             await loadUserPreferences(session.user.id);
+
+            // Cargar idioma desde preferencias
+            const prefs = useUserPreferencesStore.getState().prefs;
+            if (prefs?.language) {
+              console.log("Setting language from preferences:", prefs.language);
+              i18n.changeLanguage(prefs.language);
+            }
           }
         }
       } catch (error) {
@@ -111,6 +119,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (session?.user?.id) {
           console.log("Loading user preferences for user:", session.user.email);
           await loadUserPreferences(session.user.id);
+
+          // Cargar idioma desde preferencias
+          const prefs = useUserPreferencesStore.getState().prefs;
+          if (prefs?.language) {
+            console.log("Setting language from preferences:", prefs.language);
+            i18n.changeLanguage(prefs.language);
+          }
         }
       }
 

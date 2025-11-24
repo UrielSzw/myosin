@@ -12,19 +12,21 @@ import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
 import { Activity, ArrowLeft, Clock } from "lucide-react-native";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const ProfileWorkoutConfigFeature: React.FC = () => {
   const { user } = useAuth();
   const { colors } = useColorScheme();
+  const { t } = useTranslation("profile");
 
   const prefs = useUserPreferences();
   const { setUnit, setShowRpe, setShowTempo } = useUserPreferencesActions();
 
   const unit = prefs?.weight_unit ?? "kg";
-  const rpeEnabled = !!prefs?.show_rpe;
-  const tempoEnabled = !!prefs?.show_tempo;
+  const rpeEnabled = prefs?.show_rpe ?? false;
+  const tempoEnabled = prefs?.show_tempo ?? false;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -57,15 +59,15 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
         showsVerticalScrollIndicator={false}
       >
-        <ProfileSection title="Unidades">
+        <ProfileSection title={t("sections.units")}>
           <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View style={{ flex: 1 }}>
                 <Typography variant="body1" weight="semibold">
-                  Unidad de Peso
+                  {t("weightUnit.title")}
                 </Typography>
                 <Typography variant="body2" color="textMuted">
-                  Elige tu unidad preferida para pesos
+                  {t("weightUnit.subtitle")}
                 </Typography>
               </View>
 
@@ -137,7 +139,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
           </Card>
         </ProfileSection>
 
-        <ProfileSection title="Preferencias de Entrenamiento">
+        <ProfileSection title={t("sections.workoutPreferences")}>
           <SettingItem
             icon={
               <Activity
@@ -145,8 +147,8 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 color={rpeEnabled ? colors.primary[500] : colors.textMuted}
               />
             }
-            title="Usar RPE"
-            subtitle="Mostrar RPE en las rutinas"
+            title={t("rpe.title")}
+            subtitle={t("rpe.subtitle")}
             rightElement={
               <Switch
                 value={rpeEnabled}
@@ -169,8 +171,8 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 color={tempoEnabled ? colors.primary[500] : colors.textMuted}
               />
             }
-            title="Usar Tempo"
-            subtitle="Mostrar tempo en las repeticiones"
+            title={t("tempo.title")}
+            subtitle={t("tempo.subtitle")}
             rightElement={
               <Switch
                 value={tempoEnabled}

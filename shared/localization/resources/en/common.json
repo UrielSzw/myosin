@@ -1,0 +1,33 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "finish": "Finish",
+    "close": "Close"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Connection error",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "validation": "Validation error"
+  },
+  "units": {
+    "kg": "kg",
+    "lbs": "lbs",
+    "reps": "reps",
+    "seconds": "sec",
+    "minutes": "min"
+  },
+  "common": {
+    "loading": "Loading...",
+    "noData": "No data available",
+    "search": "Search"
+  }
+}

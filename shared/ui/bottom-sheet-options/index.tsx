@@ -6,9 +6,8 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import React, { forwardRef, useCallback } from "react";
-import { Platform, TouchableOpacity } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { forwardRef, useCallback, useMemo } from "react";
+import { TouchableOpacity } from "react-native";
 
 type Props = {
   title: string;
@@ -20,17 +19,13 @@ type Props = {
     icon?: React.ReactNode;
   }[];
   warningOption?: { label: string; method: () => void; icon?: React.ReactNode };
-  addBottomInset?: boolean;
 };
 
 export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
-  ({ title, subtitle, options, warningOption, addBottomInset }, ref) => {
+  ({ title, subtitle, options, warningOption }, ref) => {
     const { colors } = useColorScheme();
-    const insets = useSafeAreaInsets();
 
-    // Calcular el bottomInset considerando el tab bar
-    const tabBarHeight = Platform.OS === "ios" ? 49 : 56;
-    const bottomInset = insets.bottom + tabBarHeight;
+    const snapPoints = useMemo(() => ["50%"], []);
 
     const handleOptionPress = (type: string) => {
       const option = options.find((opt) => opt.type === type);
@@ -52,9 +47,8 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={["50%"]}
+        snapPoints={snapPoints}
         enablePanDownToClose
-        bottomInset={addBottomInset ? bottomInset : 0}
         backgroundStyle={{
           backgroundColor: colors.surface,
           shadowColor: "#000",

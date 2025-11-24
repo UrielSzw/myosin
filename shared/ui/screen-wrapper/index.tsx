@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React from "react";
 import { View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -23,19 +22,17 @@ export const ScreenWrapper: React.FC<Props> = ({
   const { colors } = useColorScheme();
 
   const content = withSheets ? (
-    <BottomSheetModalProvider>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            paddingHorizontal: fullscreen ? 0 : 20,
-            paddingTop: 20,
-          }}
-        >
-          {children}
-        </View>
-      </SafeAreaView>
-    </BottomSheetModalProvider>
+    <SafeAreaView style={{ flex: 1 }}>
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: fullscreen ? 0 : 20,
+          paddingTop: 20,
+        }}
+      >
+        {children}
+      </View>
+    </SafeAreaView>
   ) : (
     <SafeAreaView style={{ flex: 1 }}>
       <View

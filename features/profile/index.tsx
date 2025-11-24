@@ -4,8 +4,10 @@ import { useAuth } from "@/shared/providers/auth-provider";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
+import { LanguageSelectorItem } from "@/shared/ui/language-selector-sheet";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import {
   HelpCircle,
@@ -16,15 +18,22 @@ import {
   Sun,
   User,
 } from "lucide-react-native";
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import { Alert, ScrollView, Switch, View } from "react-native";
 import { ProfileSection } from "../../shared/ui/profile-section";
 import { SettingItem } from "../../shared/ui/setting-item";
+import { LanguageSelectorSheet } from "./elements/language-selector-sheet";
 
 export const ProfileFeature = () => {
   const { user, signOut } = useAuth();
   const { setColorScheme, colors, isDarkMode } = useColorScheme();
   const { profile } = useUserProfile(user);
+
+  const languageSheetRef = useRef<BottomSheetModal>(null);
+
+  const handleOpenLanguageSheet = useCallback(() => {
+    languageSheetRef.current?.present();
+  }, []);
 
   const handleLogout = () => {
     Alert.alert("Cerrar Sesión", "¿Estás seguro que quieres cerrar sesión?", [
@@ -151,6 +160,8 @@ export const ProfileFeature = () => {
         </Card>
 
         <ProfileSection title="Preferencias">
+          <LanguageSelectorItem onPress={handleOpenLanguageSheet} />
+
           <SettingItem
             icon={
               isDarkMode ? (
@@ -218,6 +229,8 @@ export const ProfileFeature = () => {
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <LanguageSelectorSheet ref={languageSheetRef} />
     </ScreenWrapper>
   );
 };

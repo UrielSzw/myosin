@@ -1,4 +1,5 @@
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { ActiveBlockItem } from "./elements/active-block-item";
@@ -24,36 +25,38 @@ export const ActiveWorkoutFeature = () => {
   } = useActiveWorkoutSheets();
 
   return (
-    <ScreenWrapper withSheets fullscreen>
-      <ActiveWorkoutHeader />
+    <BottomSheetModalProvider>
+      <ScreenWrapper withSheets fullscreen>
+        <ActiveWorkoutHeader />
 
-      <ScrollView style={{ flex: 1 }}>
-        {blocksBySession?.map((blockId) => (
-          <ActiveBlockItem
-            key={blockId}
-            blockId={blockId}
-            onToggleSheet={handleToggleSheet}
-          />
-        ))}
+        <ScrollView style={{ flex: 1 }}>
+          {blocksBySession?.map((blockId) => (
+            <ActiveBlockItem
+              key={blockId}
+              blockId={blockId}
+              onToggleSheet={handleToggleSheet}
+            />
+          ))}
 
-        <AddExerciseButton />
+          <AddExerciseButton />
 
-        <View style={{ height: 200 }} />
-      </ScrollView>
+          <View style={{ height: 200 }} />
+        </ScrollView>
 
-      <ActiveExerciseModal
-        blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
-      />
+        <ActiveExerciseModal
+          blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
+        />
 
-      <ActiveBottomSheets
-        setTypeBottomSheetRef={setTypeBottomSheetRef}
-        restTimeBottomSheetRef={restTimeBottomSheetRef}
-        blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
-        exerciseOptionsBottomSheetRef={exerciseOptionsBottomSheetRef}
-        restTimerSheetRef={restTimerSheetRef}
-        rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
-        tempoMetronomeRef={tempoMetronomeRef}
-      />
-    </ScreenWrapper>
+        <ActiveBottomSheets
+          setTypeBottomSheetRef={setTypeBottomSheetRef}
+          restTimeBottomSheetRef={restTimeBottomSheetRef}
+          blockOptionsBottomSheetRef={blockOptionsBottomSheetRef}
+          exerciseOptionsBottomSheetRef={exerciseOptionsBottomSheetRef}
+          restTimerSheetRef={restTimerSheetRef}
+          rpeSelectorBottomSheetRef={rpeSelectorBottomSheetRef}
+          tempoMetronomeRef={tempoMetronomeRef}
+        />
+      </ScreenWrapper>
+    </BottomSheetModalProvider>
   );
 };

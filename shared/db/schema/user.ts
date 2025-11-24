@@ -20,6 +20,7 @@ export const user_preferences = sqliteTable(
       .$type<"kg" | "lbs">()
       .default("kg")
       .notNull(),
+    language: text("language").$type<"en" | "es">().default("es").notNull(),
 
     // Feature toggles
     show_rpe: integer("show_rpe", { mode: "boolean" }).default(true).notNull(),

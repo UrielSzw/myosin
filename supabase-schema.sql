@@ -305,6 +305,7 @@ CREATE TABLE user_preferences (
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     theme TEXT DEFAULT 'system' NOT NULL,
     weight_unit TEXT DEFAULT 'kg' NOT NULL,
+    language TEXT DEFAULT 'es' NOT NULL,
     show_rpe BOOLEAN DEFAULT true NOT NULL,
     show_tempo BOOLEAN DEFAULT true NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),

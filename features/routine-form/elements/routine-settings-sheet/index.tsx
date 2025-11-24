@@ -58,7 +58,6 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
     return (
       <BottomSheetModal
         ref={ref}
-        index={0}
         snapPoints={["50%", "90%"]}
         backgroundStyle={{
           backgroundColor: colors.surface,

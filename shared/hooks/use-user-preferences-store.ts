@@ -6,6 +6,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
+import i18n from "../localization/i18n.config";
 
 // Helper para sync desde Zustand store (sin React hooks)
 const syncHelper = async (code: MutationCode, payload: any) => {
@@ -43,6 +44,7 @@ type PrefsState = {
     setShowRpe: (userId: string, show: boolean) => void;
     setShowTempo: (userId: string, show: boolean) => void;
     setColorScheme: (userId: string, scheme: ColorSchemeName) => void;
+    setLanguage: (userId: string, language: "en" | "es") => void;
   };
 };
 
@@ -60,6 +62,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
         show_rpe: prefs.show_rpe,
         show_tempo: prefs.show_tempo,
         theme: prefs.theme,
+        language: prefs.language,
       } as Partial<BaseUserPreferences>;
 
       try {
@@ -96,6 +99,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
             const defaults: BaseUserPreferences = {
               theme: "dark" as BaseUserPreferences["theme"],
               weight_unit: "kg",
+              language: "es",
               show_rpe: false,
               show_tempo: false,
             } as BaseUserPreferences;
@@ -150,6 +154,19 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
             theme: scheme as BaseUserPreferences["theme"],
           },
         }));
+        schedulePersist(userId);
+      },
+      setLanguage: (userId: string, language: "en" | "es") => {
+        set((s) => ({
+          prefs: {
+            ...(s.prefs ?? ({} as BaseUserPreferences)),
+            language,
+          },
+        }));
+
+        // Change i18n language immediately
+        i18n.changeLanguage(language);
+
         schedulePersist(userId);
       },
     },

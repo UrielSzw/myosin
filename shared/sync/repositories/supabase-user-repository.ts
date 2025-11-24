@@ -13,6 +13,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           user_id: userId,
           theme: data.theme || "dark",
           weight_unit: data.weight_unit || "kg",
+          language: data.language || "es",
           show_rpe: data.show_rpe ?? false,
           show_tempo: data.show_tempo ?? false,
         })
@@ -36,6 +37,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
         .update({
           theme: data.theme,
           weight_unit: data.weight_unit,
+          language: data.language,
           show_rpe: data.show_rpe,
           show_tempo: data.show_tempo,
           updated_at: new Date().toISOString(),

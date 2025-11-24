@@ -114,7 +114,6 @@ export const MeasurementTemplateSelector = forwardRef<BottomSheetModal>(
     return (
       <BottomSheetModal
         ref={ref}
-        index={0}
         snapPoints={["65%"]}
         backgroundStyle={{ backgroundColor: colors.surface }}
         handleIndicatorStyle={{ backgroundColor: colors.border }}

@@ -71,6 +71,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
         } else {
           setSession(session);
           setUser(session?.user ?? null);
+
+          // Cargar preferencias si ya hay sesión activa
+          if (session?.user?.id) {
+            console.log(
+              "Loading user preferences for existing session:",
+              session.user.email
+            );
+            await loadUserPreferences(session.user.id);
+          }
         }
       } catch (error) {
         console.error("Error in getInitialSession:", error);

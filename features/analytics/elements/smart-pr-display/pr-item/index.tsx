@@ -1,6 +1,8 @@
 import { PRData } from "@/features/analytics/types/pr";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { useRouter } from "expo-router";
 import { Calendar } from "lucide-react-native";
 import { Pressable, View } from "react-native";
@@ -10,10 +12,15 @@ export const PRItem: React.FC<{
   colors: any;
 }> = ({ pr, colors }) => {
   const router = useRouter();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   const achievedDate = new Date(pr.achieved_at);
   const isRecent =
     Date.now() - achievedDate.getTime() < 7 * 24 * 60 * 60 * 1000; // Último 7 días
+
+  const displayWeight = fromKg(pr.best_weight, weightUnit, 1);
+  const display1RM = fromKg(pr.estimated_1rm, weightUnit, 1);
 
   const handlePress = () => {
     router.push(`/pr-detail/${pr.exercise_id}` as any);
@@ -75,13 +82,15 @@ export const PRItem: React.FC<{
               }}
             >
               <Typography variant="body2" color="textMuted">
-                {pr.best_weight}kg × {pr.best_reps} reps
+                {displayWeight}
+                {weightUnit} × {pr.best_reps} reps
               </Typography>
               <Typography variant="caption" color="textMuted">
                 •
               </Typography>
               <Typography variant="caption" color="textMuted">
-                1RM: {pr.estimated_1rm.toFixed(1)}kg
+                1RM: {display1RM}
+                {weightUnit}
               </Typography>
             </View>
 
@@ -128,7 +137,8 @@ export const PRItem: React.FC<{
               weight="bold"
               style={{ color: colors.primary[500] }}
             >
-              {pr.estimated_1rm.toFixed(0)}kg
+              {Math.round(display1RM)}
+              {weightUnit}
             </Typography>
           </View>
         </View>

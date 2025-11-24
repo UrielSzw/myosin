@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
@@ -30,10 +31,15 @@ export const TargetEditorModal: React.FC<Props> = ({
   onDeleteMetric,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
   const [targetValue, setTargetValue] = useState<string>(
     selectedMetric.default_target?.toString() || ""
   );
   const [isLoading, setIsLoading] = useState(false);
+
+  const displayUnit =
+    selectedMetric.slug === "weight" ? weightUnit : selectedMetric.unit;
 
   const handleSaveTarget = async () => {
     setIsLoading(true);
@@ -180,7 +186,7 @@ export const TargetEditorModal: React.FC<Props> = ({
                   placeholder="Ej: 8000"
                   keyboardType="numeric"
                   label="Valor objetivo"
-                  helpText={`Unidad: ${selectedMetric.unit}. Deja vacío para sin objetivo`}
+                  helpText={`Unidad: ${displayUnit}. Deja vacío para sin objetivo`}
                 />
               </View>
 

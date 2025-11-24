@@ -1,6 +1,8 @@
 import type { MetricDisplayData } from "@/features/tracker/types/visual-states";
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import React from "react";
 import { View } from "react-native";
 import { MetricCardContainer } from "../shared/MetricCardContainer";
@@ -17,11 +19,25 @@ export const NumericMetricCard: React.FC<NumericMetricCardProps> = React.memo(
   ({ metric, displayData, onPress }) => {
     const isCompleted = displayData.state === "completed";
 
+    // Get user's weight unit preference
+    const prefs = useUserPreferences();
+    const weightUnit = prefs?.weight_unit ?? "kg";
+
+    // Check if this is a weight metric (stored in kg)
+    const isWeightMetric = metric.slug === "weight";
+
     // Formatear valor numérico
     const formatValue = (value: number): string => {
-      const rounded = Math.round(value * 100) / 100;
+      // If it's weight metric, convert from kg to user's preferred unit
+      const displayValue = isWeightMetric
+        ? fromKg(value, weightUnit, 1)
+        : value;
+      const rounded = Math.round(displayValue * 100) / 100;
       return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(2);
     };
+
+    // Get display unit (dynamic for weight metric)
+    const displayUnit = isWeightMetric ? weightUnit : metric.unit;
 
     return (
       <MetricCardContainer
@@ -57,7 +73,7 @@ export const NumericMetricCard: React.FC<NumericMetricCardProps> = React.memo(
               {formatValue(displayData.currentValue)}
             </Typography>
             <Typography variant="body2" color="textMuted">
-              {metric.unit}
+              {displayUnit}
             </Typography>
           </View>
 

@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
@@ -20,6 +21,8 @@ type Props = {
 export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
   const [showDeleted, setShowDeleted] = useState(false);
 
   // Obtener templates disponibles y métricas eliminadas
@@ -107,6 +110,8 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
           <View style={{ gap: 12 }}>
             {availableTemplates.map((template) => {
               const IconComponent = (Icons as any)[template.icon];
+              const displayUnit =
+                template.slug === "weight" ? weightUnit : template.unit;
 
               return (
                 <TouchableOpacity
@@ -151,8 +156,8 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                     </Typography>
                     <Typography variant="caption" color="textMuted">
                       {template.default_target
-                        ? `Meta: ${template.default_target} ${template.unit}`
-                        : `Unidad: ${template.unit}`}
+                        ? `Meta: ${template.default_target} ${displayUnit}`
+                        : `Unidad: ${displayUnit}`}
                     </Typography>
                   </View>
 
@@ -218,6 +223,8 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                 <View style={{ gap: 12 }}>
                   {deletedMetrics.map((metric) => {
                     const IconComponent = (Icons as any)[metric.icon];
+                    const displayUnit =
+                      metric.slug === "weight" ? weightUnit : metric.unit;
 
                     return (
                       <TouchableOpacity
@@ -268,8 +275,8 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                           </Typography>
                           <Typography variant="caption" color="textMuted">
                             {metric.default_target
-                              ? `Meta: ${metric.default_target} ${metric.unit}`
-                              : `Unidad: ${metric.unit}`}
+                              ? `Meta: ${metric.default_target} ${displayUnit}`
+                              : `Unidad: ${displayUnit}`}
                           </Typography>
                         </View>
 

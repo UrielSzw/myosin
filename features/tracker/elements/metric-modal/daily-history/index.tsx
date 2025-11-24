@@ -2,7 +2,9 @@ import { useDeleteEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatTime, formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerDayData } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { Clock, Trash2 } from "lucide-react-native";
 import React, { useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -11,15 +13,22 @@ type Props = {
   selectedMetricId: string | null;
   unit: string | null;
   dayData?: TrackerDayData;
+  metricSlug?: string | null;
 };
 
 export const DailyHistory: React.FC<Props> = ({
   selectedMetricId,
   unit,
   dayData,
+  metricSlug,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
   const deleteEntryMutation = useDeleteEntry();
+
+  const isWeightMetric = metricSlug === "weight";
+  const displayUnit = isWeightMetric ? weightUnit : unit;
 
   const todayEntries = useMemo(() => {
     if (!dayData || !selectedMetricId) return [];
@@ -84,7 +93,13 @@ export const DailyHistory: React.FC<Props> = ({
                 weight="medium"
                 style={{ marginBottom: 2 }}
               >
-                +{formatValue(entry.value)} {unit}
+                +
+                {formatValue(
+                  isWeightMetric
+                    ? fromKg(entry.value, weightUnit, 1)
+                    : entry.value
+                )}{" "}
+                {displayUnit}
               </Typography>
               {entry.notes && (
                 <Typography variant="caption" color="textMuted">

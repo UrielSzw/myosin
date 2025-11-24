@@ -1,6 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { MeasurementField } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
+import {
+  fromKg,
+  toKg,
+  type WeightUnit,
+} from "@/shared/utils/weight-conversion";
 import React, { useEffect, useState } from "react";
 import {
   StyleProp,
@@ -27,6 +32,11 @@ type MeasurementInputProps = {
    * Range displays as placeholder string (e.g., "8-12") instead of dual inputs
    */
   activeWorkout?: boolean;
+  /**
+   * User's preferred weight unit (for conversion)
+   * Only used when field.type === "weight"
+   */
+  weightUnit?: WeightUnit;
 };
 
 export const MeasurementInput: React.FC<MeasurementInputProps> = ({
@@ -39,6 +49,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   accessibilityHint,
   setNumber = 1,
   activeWorkout = false,
+  weightUnit = "kg",
 }) => {
   const { colors } = useColorScheme();
 
@@ -47,8 +58,18 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
 
   // Sincronizar inputText con el valor del prop cuando cambia externamente
   useEffect(() => {
-    setInputText(value?.toString() || "");
-  }, [value]);
+    if (value !== null && value !== undefined) {
+      // Si es weight field, mostrar en la unidad del usuario
+      if (field.type === "weight" && weightUnit) {
+        const displayValue = fromKg(value, weightUnit, 1);
+        setInputText(displayValue.toString());
+      } else {
+        setInputText(value.toString());
+      }
+    } else {
+      setInputText("");
+    }
+  }, [value, field.type, weightUnit]);
 
   // Format time for display (convert seconds to readable format)
   const formatTimeDisplay = (seconds: number): string => {
@@ -119,8 +140,15 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
     // Convertir coma a punto para parseFloat
     const normalizedText = text.replace(",", ".");
     const numValue = parseFloat(normalizedText);
+
     if (!isNaN(numValue) && numValue >= 0) {
-      onChange(numValue);
+      // Si es weight field, convertir a kg antes de guardar
+      if (field.type === "weight" && weightUnit) {
+        const kgValue = toKg(numValue, weightUnit);
+        onChange(kgValue);
+      } else {
+        onChange(numValue);
+      }
     }
   };
 
@@ -134,14 +162,20 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       text === "" ||
       (minValue !== null && !isNaN(minValue) && minValue >= 0)
     ) {
+      let finalMin = minValue || 0;
+      let finalMax = currentMax || 0;
+
+      // Convert to kg if weight field
+      if (field.type === "weight" && weightUnit) {
+        finalMin = finalMin ? toKg(finalMin, weightUnit) : 0;
+        finalMax = finalMax ? toKg(finalMax, weightUnit) : 0;
+      }
+
       // Only create range object if we have at least one valid value
       if (minValue === null && currentMax === null) {
         onChange(null, null);
       } else {
-        onChange(null, {
-          min: minValue || 0,
-          max: currentMax || 0,
-        });
+        onChange(null, { min: finalMin, max: finalMax });
       }
     }
   };
@@ -155,14 +189,20 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       text === "" ||
       (maxValue !== null && !isNaN(maxValue) && maxValue >= 0)
     ) {
+      let finalMin = currentMin || 0;
+      let finalMax = maxValue || 0;
+
+      // Convert to kg if weight field
+      if (field.type === "weight" && weightUnit) {
+        finalMin = finalMin ? toKg(finalMin, weightUnit) : 0;
+        finalMax = finalMax ? toKg(finalMax, weightUnit) : 0;
+      }
+
       // Only create range object if we have at least one valid value
       if (currentMin === null && maxValue === null) {
         onChange(null, null);
       } else {
-        onChange(null, {
-          min: currentMin || 0,
-          max: maxValue || 0,
-        });
+        onChange(null, { min: finalMin, max: finalMax });
       }
     }
   };

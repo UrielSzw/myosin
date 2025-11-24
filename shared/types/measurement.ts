@@ -3,6 +3,8 @@
  * Supports up to 2 metrics per exercise
  */
 
+import type { WeightUnit } from "../utils/weight-conversion";
+
 export type MeasurementTemplateId =
   // Single metrics
   | "time_only"
@@ -131,9 +133,30 @@ export const MEASUREMENT_TEMPLATES: Record<
  */
 
 export const getMeasurementTemplate = (
-  templateId: MeasurementTemplateId
+  templateId: MeasurementTemplateId,
+  weightUnit?: WeightUnit
 ): MeasurementTemplate => {
-  return MEASUREMENT_TEMPLATES[templateId];
+  const template = MEASUREMENT_TEMPLATES[templateId];
+
+  // If no weightUnit provided or template has no weight fields, return as-is
+  if (!weightUnit || !hasWeightMeasurement(templateId)) {
+    return template;
+  }
+
+  // Clone template and update weight fields with user's preferred unit
+  return {
+    ...template,
+    fields: template.fields.map((field) => {
+      if (field.type === "weight") {
+        return {
+          ...field,
+          unit: weightUnit,
+          label: weightUnit.toUpperCase(),
+        };
+      }
+      return field;
+    }) as [MeasurementField] | [MeasurementField, MeasurementField],
+  };
 };
 
 export const getTemplatesByCategory = () => {

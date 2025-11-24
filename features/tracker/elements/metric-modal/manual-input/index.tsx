@@ -2,9 +2,11 @@ import { useAddEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
+import { toKg } from "@/shared/utils/weight-conversion";
 import { Plus } from "lucide-react-native";
 import React, { useState } from "react";
 import { TextInput, View } from "react-native";
@@ -24,6 +26,16 @@ export const ManualInput: React.FC<Props> = ({
   const { colors } = useColorScheme();
   const { user } = useAuth();
 
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
+  // Check if this is a weight metric
+  const isWeightMetric = selectedMetric.slug === "weight";
+
+  // Display unit (dynamic for weight)
+  const displayUnit = isWeightMetric ? weightUnit : selectedMetric.unit;
+
   const [inputValue, setInputValue] = useState("");
 
   const handleAddValue = async () => {
@@ -34,9 +46,14 @@ export const ManualInput: React.FC<Props> = ({
           throw new Error("Usuario no autenticado");
         }
 
+        // Convert to kg if weight metric
+        const valueToStore = isWeightMetric
+          ? toKg(numValue, weightUnit)
+          : numValue;
+
         await addEntryMutation.mutateAsync({
           metricId: selectedMetric.id,
-          value: numValue,
+          value: valueToStore,
           userId: user.id,
           recordedAt: selectedDate,
           notes: "Manual entry",
@@ -75,14 +92,14 @@ export const ManualInput: React.FC<Props> = ({
           }}
           value={inputValue}
           onChangeText={setInputValue}
-          placeholder={`Cantidad en ${selectedMetric.unit}`}
+          placeholder={`Cantidad en ${displayUnit}`}
           placeholderTextColor={colors.textMuted}
           keyboardType="numeric"
           returnKeyType="done"
           onSubmitEditing={handleAddValue}
         />
         <Typography variant="body2" color="textMuted" style={{ marginLeft: 8 }}>
-          {selectedMetric.unit}
+          {displayUnit}
         </Typography>
       </View>
 
@@ -101,7 +118,7 @@ export const ManualInput: React.FC<Props> = ({
         icon={<Plus size={20} color="#ffffff" />}
       >
         Agregar {inputValue ? formatValue(parseFloat(inputValue) || 0) : "0"}{" "}
-        {selectedMetric.unit}
+        {displayUnit}
       </Button>
     </View>
   );

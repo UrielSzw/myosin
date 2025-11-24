@@ -9,7 +9,7 @@ export const user_preferences = sqliteTable(
     id: text("id")
       .primaryKey()
       .$defaultFn(() => generateUUID()),
-    user_id: text("user_id").notNull().default("default-user"),
+    user_id: text("user_id").notNull().unique(),
 
     // Display preferences
     theme: text("theme")

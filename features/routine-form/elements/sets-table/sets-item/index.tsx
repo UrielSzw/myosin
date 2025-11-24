@@ -6,6 +6,7 @@ import {
 } from "@/features/routine-form/hooks/use-routine-form-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
   getDefaultTemplate,
   getMeasurementTemplate,
@@ -29,11 +30,17 @@ export const SetsItem = React.memo<Props>(
     const { colors } = useColorScheme();
     const { updateSet } = useSetActions();
     const { setCurrentState } = useMainActions();
+
+    // Get user's weight unit preference
+    const prefs = useUserPreferences();
+    const weightUnit = prefs?.weight_unit ?? "kg";
+
     const { show_rpe, show_tempo } = routine;
 
     const set = sets[setId];
     const template = getMeasurementTemplate(
-      set.measurement_template || getDefaultTemplate()
+      set.measurement_template || getDefaultTemplate(),
+      weightUnit
     );
 
     const handleSetType = useCallback(() => {
@@ -183,6 +190,7 @@ export const SetsItem = React.memo<Props>(
                   : handleSecondaryValueChange
               }
               setNumber={setNumber}
+              weightUnit={weightUnit}
             />
           </View>
         ) : (
@@ -207,6 +215,7 @@ export const SetsItem = React.memo<Props>(
                     : handleSecondaryValueChange
                 }
                 setNumber={setNumber}
+                weightUnit={weightUnit}
               />
             </View>
           ))

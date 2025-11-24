@@ -12,15 +12,25 @@ export const usersRepository = {
 
     return rows?.[0] ?? null;
   },
+
   updateUserPreferences: async (
     userId: string,
     preferences: Partial<BaseUserPreferences>
   ) => {
+    // UPSERT: Insert if doesn't exist, update if exists
+    // Now works because user_id has UNIQUE constraint
     await db
-      .update(user_preferences)
-      .set({ ...preferences })
-      .where(eq(user_preferences.user_id, userId));
+      .insert(user_preferences)
+      .values({
+        user_id: userId,
+        ...preferences,
+      })
+      .onConflictDoUpdate({
+        target: user_preferences.user_id,
+        set: { ...preferences, updated_at: new Date().toISOString() },
+      });
   },
+
   createUserPreferences: async (
     userId: string,
     preferences: Partial<BaseUserPreferences>

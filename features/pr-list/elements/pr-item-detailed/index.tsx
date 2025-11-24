@@ -1,10 +1,12 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { Calendar } from "lucide-react-native";
 import React from "react";
 import { Pressable, View } from "react-native";
-import { MUSCLE_CATEGORY_MAP, PRListItem } from "../../types/pr-list";
+import { PRListItem } from "../../types/pr-list";
 
 type Props = {
   pr: PRListItem;
@@ -14,12 +16,16 @@ type Props = {
 export const PRItemDetailed: React.FC<Props> = ({ pr, onPress }) => {
   const { colors } = useColorScheme();
 
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
   const achievedDate = new Date(pr.achieved_at);
   const isRecent = pr.is_recent;
 
-  const muscleCategory = MUSCLE_CATEGORY_MAP[pr.exercise_muscle];
-  const muscleCategoryLabel =
-    muscleCategory.charAt(0).toUpperCase() + muscleCategory.slice(1);
+  // Format weights in user's preferred unit
+  const bestWeightFormatted = fromKg(pr.best_weight, weightUnit, 1);
+  const estimated1RMFormatted = fromKg(pr.estimated_1rm, weightUnit, 1);
 
   return (
     <Card variant="outlined" padding="md">
@@ -104,13 +110,13 @@ export const PRItemDetailed: React.FC<Props> = ({ pr, onPress }) => {
               }}
             >
               <Typography variant="body2" color="textMuted">
-                {pr.best_weight}kg × {pr.best_reps} reps
+                {bestWeightFormatted} {weightUnit} × {pr.best_reps} reps
               </Typography>
               <Typography variant="caption" color="textMuted">
                 •
               </Typography>
               <Typography variant="caption" color="textMuted">
-                1RM: {pr.estimated_1rm.toFixed(1)}kg
+                1RM: {estimated1RMFormatted} {weightUnit}
               </Typography>
             </View>
 

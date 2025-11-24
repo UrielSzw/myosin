@@ -167,6 +167,7 @@ export const MetricModal: React.FC<Props> = ({
               selectedMetricId={selectedMetric.id}
               unit={selectedMetric.unit}
               dayData={dayData}
+              metricSlug={selectedMetric.slug}
             />
             {/* Daily Summary */}
             <DailySummary
@@ -174,6 +175,7 @@ export const MetricModal: React.FC<Props> = ({
               unit={selectedMetric.unit}
               defaultTarget={selectedMetric.default_target}
               color={selectedMetric.color}
+              metricSlug={selectedMetric.slug}
             />
           </ScrollView>
         </View>

@@ -6,9 +6,11 @@ import {
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import * as Icons from "lucide-react-native";
 import React, { useState } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -32,6 +34,11 @@ export const QuickActions: React.FC<Props> = ({
   const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
+  const isWeightMetric = selectedMetric.slug === "weight";
+  const displayUnit = isWeightMetric ? weightUnit : selectedMetric.unit;
 
   const getQuickActions = () => {
     if (!selectedMetric) return [];
@@ -193,11 +200,19 @@ export const QuickActions: React.FC<Props> = ({
                       {action.label}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
-                      +{formatValue(action.value)} {selectedMetric.unit}
+                      +
+                      {formatValue(
+                        isWeightMetric
+                          ? fromKg(action.value, weightUnit, 1)
+                          : action.value
+                      )}{" "}
+                      {displayUnit}
                       {count > 0 &&
-                        ` × ${count} = +${formatValue(action.value * count)} ${
-                          selectedMetric.unit
-                        }`}
+                        ` × ${count} = +${formatValue(
+                          isWeightMetric
+                            ? fromKg(action.value * count, weightUnit, 1)
+                            : action.value * count
+                        )} ${displayUnit}`}
                     </Typography>
                   </View>
                 </View>
@@ -294,7 +309,12 @@ export const QuickActions: React.FC<Props> = ({
             icon={<Icons.Plus size={20} color="#ffffff" />}
           >
             Agregar selección (+
-            {formatValue(getTotalQuickActionValue())} {selectedMetric.unit})
+            {formatValue(
+              isWeightMetric
+                ? fromKg(getTotalQuickActionValue(), weightUnit, 1)
+                : getTotalQuickActionValue()
+            )}{" "}
+            {displayUnit})
           </Button>
         )}
       </View>

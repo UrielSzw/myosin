@@ -23,6 +23,7 @@ import m0018 from './0018_lumpy_wrecking_crew.sql';
 import m0019 from './0019_empty_maria_hill.sql';
 import m0020 from './0020_solid_maginty.sql';
 import m0021 from './0021_premium_firelord.sql';
+import m0022 from './0022_bumpy_jackpot.sql';
 
   export default {
     journal,
@@ -48,7 +49,8 @@ m0017,
 m0018,
 m0019,
 m0020,
-m0021
+m0021,
+m0022
     }
   }
   

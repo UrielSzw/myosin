@@ -1,11 +1,13 @@
 import { BaseWorkoutSet } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
   getMeasurementTemplate,
   hasWeightMeasurement,
 } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { Check, X } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
@@ -18,11 +20,13 @@ type Props = {
 export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
   const { colors } = useColorScheme();
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   // Get measurement template for dynamic headers (assume all sets have same template)
   const measurementTemplate =
     sets.length > 0
-      ? getMeasurementTemplate(sets[0].measurement_template)
+      ? getMeasurementTemplate(sets[0].measurement_template, weightUnit)
       : null;
 
   const formatValue = (value: number | null): string => {
@@ -35,8 +39,16 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
 
     if (!measurementTemplate) return "-";
 
-    const primaryValue = set.actual_primary_value;
+    let primaryValue = set.actual_primary_value;
     const secondaryValue = set.actual_secondary_value;
+
+    // Convert weight values from kg to user's preferred unit
+    if (
+      hasWeightMeasurement(set.measurement_template) &&
+      primaryValue !== null
+    ) {
+      primaryValue = fromKg(primaryValue, weightUnit, 1);
+    }
 
     if (measurementTemplate.fields.length === 1) {
       // Single metric template
@@ -58,7 +70,9 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
 
     const weight = set.actual_primary_value || 0;
     const reps = set.actual_secondary_value || 0;
-    return `Vol: ${(weight * reps).toLocaleString()}kg`;
+    const volumeKg = weight * reps;
+    const displayVolume = fromKg(volumeKg, weightUnit, 0);
+    return `Vol: ${displayVolume.toLocaleString()}${weightUnit}`;
   };
 
   const getRPEColor = (rpe: number | null, planned: number | null) => {

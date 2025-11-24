@@ -1,5 +1,6 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
   getDefaultTemplate,
   getMeasurementTemplate,
@@ -35,6 +36,10 @@ export const SetsTable: React.FC<Props> = ({
   const { addSet } = useSetActions();
   const { setCurrentState } = useMainActions();
 
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
   const { show_rpe, show_tempo } = routine;
 
   const blockColors = getBlockColors(blockType);
@@ -42,7 +47,8 @@ export const SetsTable: React.FC<Props> = ({
   const setId = setsByExercise[exerciseInBlockId]?.[0];
   const currentSet = sets[setId];
   const template = getMeasurementTemplate(
-    currentSet?.measurement_template || getDefaultTemplate()
+    currentSet?.measurement_template || getDefaultTemplate(),
+    weightUnit
   );
 
   const handleMeasurementTemplate = () => {

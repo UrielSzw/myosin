@@ -4,10 +4,16 @@ import {
   getMeasurementTemplate,
 } from "../types/measurement";
 import { IBlockType } from "../types/workout";
+import { fromKg, type WeightUnit } from "../utils/weight-conversion";
 import { useColorScheme } from "./use-color-scheme";
+import { useUserPreferences } from "./use-user-preferences-store";
 
 export const useBlockStyles = () => {
   const { colors } = useColorScheme();
+
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   const getBlockColors = (blockType: IBlockType) => {
     switch (blockType) {
@@ -119,9 +125,11 @@ export const useBlockStyles = () => {
     value: number | null,
     range: { min: number; max: number } | null,
     templateId: MeasurementTemplateId,
-    fieldId: "primary" | "secondary"
+    fieldId: "primary" | "secondary",
+    userWeightUnit?: WeightUnit
   ) => {
-    const template = getMeasurementTemplate(templateId);
+    const unit = userWeightUnit || weightUnit;
+    const template = getMeasurementTemplate(templateId, unit);
     const field = template.fields.find((f) => f.id === fieldId);
 
     if (!field) return "";
@@ -130,6 +138,14 @@ export const useBlockStyles = () => {
     if (range) {
       const min = range.min || "";
       const max = range.max || "";
+
+      // Si es weight, formatear ambos valores
+      if (field.type === "weight" && min && max) {
+        const minFormatted = fromKg(Number(min), unit, 1);
+        const maxFormatted = fromKg(Number(max), unit, 1);
+        return `${minFormatted}-${maxFormatted}`;
+      }
+
       if (min && max) {
         return `${min}-${max}`;
       } else if (min) {
@@ -163,7 +179,9 @@ export const useBlockStyles = () => {
           return `${value}`;
         }
       case "weight":
-        return `${value}kg`;
+        // Convert from kg (stored) to user's preferred unit
+        const displayValue = fromKg(value, unit, 1);
+        return `${displayValue}${unit}`;
       case "reps":
       default:
         return `${value}`;

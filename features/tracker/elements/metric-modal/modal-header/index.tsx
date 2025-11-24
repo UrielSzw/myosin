@@ -1,7 +1,9 @@
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { icons, Settings, X } from "lucide-react-native";
 import React from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -20,8 +22,16 @@ export const ModalHeader: React.FC<Props> = ({
   onOpenSettings,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   const IconComponent = (icons as any)[selectedMetric.icon];
+  const isWeightMetric = selectedMetric.slug === "weight";
+  const displayUnit = isWeightMetric ? weightUnit : selectedMetric.unit;
+  const displayValue =
+    isWeightMetric && currentValue
+      ? fromKg(currentValue, weightUnit, 1)
+      : currentValue;
 
   // Solo mostrar settings para métricas que tienen target o son eliminables
   const showSettings =
@@ -60,9 +70,9 @@ export const ModalHeader: React.FC<Props> = ({
           <Typography variant="h6" weight="semibold">
             {selectedMetric.name}
           </Typography>
-          {currentValue !== undefined && (
+          {displayValue !== undefined && (
             <Typography variant="caption" color="textMuted">
-              Actual: {formatValue(currentValue)} {selectedMetric.unit}
+              Actual: {formatValue(displayValue)} {displayUnit}
             </Typography>
           )}
         </View>

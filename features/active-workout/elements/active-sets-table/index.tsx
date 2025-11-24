@@ -1,5 +1,6 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -32,6 +33,10 @@ export const ActiveSetsTable: React.FC<Props> = ({
   const { getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();
 
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
   const handleAddSet = () => {
     addSet(exerciseInBlockId);
   };
@@ -42,7 +47,7 @@ export const ActiveSetsTable: React.FC<Props> = ({
     sets[setId]?.measurement_template || "weight_reps";
 
   // Obtener información del template para headers dinámicos
-  const template = getMeasurementTemplate(measurementTemplate);
+  const template = getMeasurementTemplate(measurementTemplate, weightUnit);
 
   // Función para obtener los títulos de las columnas basado en el template
   const getTemplateHeaders = () => {

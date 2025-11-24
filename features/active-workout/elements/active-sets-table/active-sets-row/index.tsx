@@ -8,10 +8,12 @@ import { useNextSetIndicator } from "@/features/active-workout/hooks/use-next-se
 import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
 import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { Check, Timer, Trophy } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { TouchableOpacity, View } from "react-native";
@@ -45,6 +47,10 @@ export const ActiveSetRow: React.FC<Props> = ({
   const { completeSet, uncompleteSet } = useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
   const { sets, exercisePreviousSets, session } = useActiveWorkout();
+
+  // Get user's weight unit preference
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   // Hook para indicador de próximo set (solo para superseries y circuitos)
   const nextSetIndicator = useNextSetIndicator(blockId);
@@ -168,7 +174,7 @@ export const ActiveSetRow: React.FC<Props> = ({
     setData.secondaryValue || set.actual_secondary_value || null;
 
   // Obtener información del template para renderizado condicional
-  const template = getMeasurementTemplate(set.measurement_template);
+  const template = getMeasurementTemplate(set.measurement_template, weightUnit);
   const hasSecondaryField = template?.fields && template.fields.length > 1;
 
   // Helper para obtener placeholders basado en el template - CORREGIDO
@@ -184,18 +190,35 @@ export const ActiveSetRow: React.FC<Props> = ({
       ? prevSet?.actual_secondary_value
       : prevSet?.actual_primary_value;
 
+    // Check if this is a weight field
+    const isWeightField =
+      template.fields[isSecondary ? 1 : 0]?.type === "weight";
+
     // PRIORIDAD 1: Si hay un range planificado, mostrarlo como string (ej: "8-12")
     if (plannedRange) {
+      if (isWeightField && weightUnit) {
+        const minFormatted = fromKg(plannedRange.min || 0, weightUnit, 1);
+        const maxFormatted = fromKg(plannedRange.max || 0, weightUnit, 1);
+        return `${minFormatted}-${maxFormatted}`;
+      }
       return `${plannedRange.min || 0}-${plannedRange.max || 0}`;
     }
 
     // PRIORIDAD 2: Valor planificado de la rutina
     if (plannedValue) {
+      if (isWeightField && weightUnit) {
+        const formatted = fromKg(plannedValue, weightUnit, 1);
+        return formatted.toString();
+      }
       return plannedValue.toString();
     }
 
     // PRIORIDAD 3: Si hay valor previo y la sesión fue realizada antes, usarlo
     if (session?.hasBeenPerformed && prevValue) {
+      if (isWeightField && weightUnit) {
+        const formatted = fromKg(prevValue, weightUnit, 1);
+        return formatted.toString();
+      }
       return prevValue.toString();
     }
 
@@ -378,6 +401,7 @@ export const ActiveSetRow: React.FC<Props> = ({
             placeholder={getPlaceholderValue("primary")}
             setNumber={set.order_index + 1}
             activeWorkout={true}
+            weightUnit={weightUnit}
           />
         </View>
 
@@ -396,6 +420,7 @@ export const ActiveSetRow: React.FC<Props> = ({
               placeholder={getPlaceholderValue("secondary")}
               setNumber={set.order_index + 1}
               activeWorkout={true}
+              weightUnit={weightUnit}
             />
           </View>
         )}

@@ -1,8 +1,10 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { StatCard } from "@/shared/ui/stat-card";
 import { Typography } from "@/shared/ui/typography";
 import { VolumeDisplay } from "@/shared/ui/volume-display";
 import { VolumeCalculator } from "@/shared/utils/volume-calculator";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { Target, Zap } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
@@ -14,10 +16,19 @@ type Props = {
 
 export const SessionAnalytics: React.FC<Props> = ({ analytics }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
 
   if (!analytics) {
     return null;
   }
+
+  // Convert weights to user's preferred unit
+  const displayWeight =
+    analytics.bestSets.length > 0
+      ? fromKg(analytics.bestSets[0].weight, weightUnit, 1)
+      : 0;
+  const displayVolume = fromKg(analytics.totalVolume, weightUnit, 0);
 
   return (
     <View style={{ marginBottom: 24 }}>
@@ -41,7 +52,7 @@ export const SessionAnalytics: React.FC<Props> = ({ analytics }) => {
           <StatCard
             icon={<Target size={20} color={colors.success[500]} />}
             title="Mejor Set"
-            value={`${analytics.bestSets[0].weight}kg`}
+            value={`${displayWeight}${weightUnit}`}
             subtitle={`${analytics.bestSets[0].reps} reps - ${analytics.bestSets[0].exerciseName}`}
             color={colors.success[500]}
           />
@@ -60,7 +71,7 @@ export const SessionAnalytics: React.FC<Props> = ({ analytics }) => {
           )}
           showPercentages={true}
           title="Distribución por Grupo Muscular"
-          subtitle={`Volumen Total: ${analytics.totalVolume.toLocaleString()}kg`}
+          subtitle={`Volumen Total: ${displayVolume.toLocaleString()}${weightUnit}`}
         />
       )}
     </View>

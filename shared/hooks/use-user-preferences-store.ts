@@ -98,8 +98,6 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
               weight_unit: "kg",
               show_rpe: false,
               show_tempo: false,
-              display_name: null,
-              avatar_color: "#0ea5e9",
             } as BaseUserPreferences;
 
             await usersRepository.createUserPreferences(

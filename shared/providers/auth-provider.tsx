@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
+import { useUserPreferencesStore } from "../hooks/use-user-preferences-store";
 import { useUserProfileStore } from "../hooks/use-user-profile";
 import { supabase } from "../services/supabase";
 
@@ -52,6 +53,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const loadAvatarColor = useUserProfileStore((s) => s.loadAvatarColor);
+  const loadUserPreferences = useUserPreferencesStore(
+    (s) => s.mainActions.load
+  );
 
   useEffect(() => {
     // Get initial session
@@ -94,15 +98,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // Sync data or refresh app state here if needed
-        console.log("User signed in or token refreshed");
+        // Cargar user preferences desde SQLite local (o crear defaults si no existen)
+        if (session?.user?.id) {
+          console.log("Loading user preferences for user:", session.user.email);
+          await loadUserPreferences(session.user.id);
+        }
       }
 
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [loadAvatarColor]);
+  }, [loadAvatarColor, loadUserPreferences]);
 
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {

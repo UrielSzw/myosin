@@ -73,9 +73,9 @@ export const PREDEFINED_METRIC_TEMPLATES: Omit<
     input_type: "numeric_single",
     behavior: "replace",
     unit: "horas",
-    canonical_unit: "min",
-    conversion_factor: 60, // horas → minutos
-    default_target: 480, // 8 horas en minutos
+    canonical_unit: "horas",
+    conversion_factor: 1,
+    default_target: 8,
     color: "#6366F1",
     icon: "Moon",
     deleted_at: null,
@@ -324,8 +324,8 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     {
       id: "sleep_nap_30min",
       label: "Siesta (30min)",
-      value: 0.5, // en horas (unidad display)
-      value_normalized: 30, // en minutos (canonical_unit)
+      value: 0.5,
+      value_normalized: 0.5,
       icon: "Bed",
       position: 1,
     },
@@ -333,7 +333,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
       id: "sleep_full_night_8h",
       label: "Noche completa (8h)",
       value: 8.0,
-      value_normalized: 480, // 8 horas en minutos
+      value_normalized: 8.0,
       icon: "Bed",
       position: 2,
     },

@@ -6,7 +6,6 @@ import NetInfo from "@react-native-community/netinfo";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
-import i18n from "../localization/i18n.config";
 
 // Helper para sync desde Zustand store (sin React hooks)
 const syncHelper = async (code: MutationCode, payload: any) => {
@@ -163,9 +162,6 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
             language,
           },
         }));
-
-        // Change i18n language immediately
-        i18n.changeLanguage(language);
 
         schedulePersist(userId);
       },

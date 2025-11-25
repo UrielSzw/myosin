@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -5,6 +7,9 @@ import { View } from "react-native";
 import { useMainActions } from "../../../hooks/use-routine-form-store";
 
 export const EmptyList = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
   const { setIsExerciseModalOpen, setExerciseModalMode } = useMainActions();
 
   const handleOpenModal = () => {
@@ -20,7 +25,7 @@ export const EmptyList = () => {
           color="textMuted"
           style={{ textAlign: "center" }}
         >
-          Comienza agregando ejercicios a tu rutina
+          {t.emptyListMessage[lang]}
         </Typography>
         <Button
           variant="primary"
@@ -28,7 +33,7 @@ export const EmptyList = () => {
           onPress={handleOpenModal}
           style={{ marginTop: 16 }}
         >
-          Seleccionar Ejercicios
+          {t.selectExercises[lang]}
         </Button>
       </View>
     </Card>

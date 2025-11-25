@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { trackerUiTranslations } from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { Zap } from "lucide-react-native";
@@ -14,6 +16,9 @@ type Props = {
 export const TrackerHeader: React.FC<Props> = ({ selectedDate }) => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = trackerUiTranslations;
 
   // Obtener resumen del día seleccionado usando React Query
   const { data: daySummary } = useDayDataSummary(selectedDate, user?.id || "");
@@ -46,11 +51,13 @@ export const TrackerHeader: React.FC<Props> = ({ selectedDate }) => {
 
   // Determinar el texto descriptivo
   const getProgressLabel = () => {
-    if (totalMetrics === 0) return "Sin métricas";
-    if (metricsWithTargets === 0) return "Sin objetivos definidos";
+    if (totalMetrics === 0) return t.noMetrics[lang];
+    if (metricsWithTargets === 0) return t.noTargetsDefined[lang];
 
     const isToday = selectedDate === getDayKey();
-    return isToday ? "Progreso del día" : `Progreso del ${selectedDate}`;
+    return isToday
+      ? t.todayProgress[lang]
+      : `${t.progressOfDate[lang]} ${selectedDate}`;
   };
 
   return (

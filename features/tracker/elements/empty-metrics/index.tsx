@@ -1,3 +1,4 @@
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { Plus } from "lucide-react-native";
@@ -6,9 +7,12 @@ import { View } from "react-native";
 
 type Props = {
   onAddMetric: () => void;
+  lang: "es" | "en";
 };
 
-export const EmptyMetrics: React.FC<Props> = ({ onAddMetric }) => {
+export const EmptyMetrics: React.FC<Props> = ({ onAddMetric, lang }) => {
+  const t = trackerTranslations;
+
   return (
     <View
       style={{
@@ -19,7 +23,7 @@ export const EmptyMetrics: React.FC<Props> = ({ onAddMetric }) => {
       }}
     >
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 8 }}>
-        No hay métricas activas
+        {t.emptyState.noMetrics[lang]}
       </Typography>
       <Typography
         variant="body2"
@@ -27,14 +31,14 @@ export const EmptyMetrics: React.FC<Props> = ({ onAddMetric }) => {
         align="center"
         style={{ marginBottom: 16 }}
       >
-        Agrega métricas para comenzar a trackear tu progreso
+        {t.emptyState.addMetricsToTrack[lang]}
       </Typography>
       <Button
         variant="primary"
         onPress={onAddMetric}
         icon={<Plus size={20} color="#ffffff" />}
       >
-        Agregar Primera Métrica
+        {t.emptyState.addFirstMetric[lang]}
       </Button>
     </View>
   );

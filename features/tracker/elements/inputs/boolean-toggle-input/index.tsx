@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { Check, X } from "lucide-react-native";
@@ -10,13 +11,16 @@ import { getInputConfig } from "../../../constants/templates";
 interface BooleanToggleInputProps {
   metric: MainMetric;
   onValueSelect: (value: number, displayValue: string) => void;
+  lang?: "es" | "en";
 }
 
 export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
   metric,
   onValueSelect,
+  lang = "es",
 }) => {
   const { colors } = useColorScheme();
+  const t = trackerTranslations;
   const [selectedValue, setSelectedValue] = useState<boolean | null>(null);
 
   const inputConfig = getInputConfig(metric.slug);
@@ -27,6 +31,23 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
 
   const { booleanLabels } = inputConfig;
 
+  // Get translated labels if available
+  const getTrueLabel = (): string => {
+    const metricSlug = metric.slug;
+    if (metricSlug && (t.booleanLabels as any)[metricSlug]) {
+      return (t.booleanLabels as any)[metricSlug].true[lang];
+    }
+    return booleanLabels.true;
+  };
+
+  const getFalseLabel = (): string => {
+    const metricSlug = metric.slug;
+    if (metricSlug && (t.booleanLabels as any)[metricSlug]) {
+      return (t.booleanLabels as any)[metricSlug].false[lang];
+    }
+    return booleanLabels.false;
+  };
+
   const handleValueSelect = (value: boolean) => {
     setSelectedValue(value);
   };
@@ -35,8 +56,8 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
     if (selectedValue === null) return;
 
     const displayValue = selectedValue
-      ? `✓ ${booleanLabels.true}`
-      : `✗ ${booleanLabels.false}`;
+      ? `✓ ${getTrueLabel()}`
+      : `✗ ${getFalseLabel()}`;
     onValueSelect(selectedValue ? 1 : 0, displayValue);
   };
 
@@ -91,7 +112,7 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
                   color: selectedValue === true ? "#10B981" : colors.text,
                 }}
               >
-                {booleanLabels.true}
+                {getTrueLabel()}
               </Typography>
             </View>
             {selectedValue === true && (
@@ -155,7 +176,7 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
                   color: selectedValue === false ? "#EF4444" : colors.text,
                 }}
               >
-                {booleanLabels.false}
+                {getFalseLabel()}
               </Typography>
             </View>
             {selectedValue === false && (
@@ -190,7 +211,8 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
               )
             }
           >
-            Registrar: {booleanLabels[selectedValue ? "true" : "false"]}
+            {t.manualInput.addButton[lang]}:{" "}
+            {selectedValue ? getTrueLabel() : getFalseLabel()}
           </Button>
         )}
       </View>

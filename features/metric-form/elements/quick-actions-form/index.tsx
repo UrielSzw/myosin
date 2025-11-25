@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -20,6 +21,7 @@ interface QuickActionsFormProps {
     updates: Partial<QuickActionFormItem>
   ) => void;
   onRemoveQuickAction: (id: string) => void;
+  lang: "es" | "en";
 }
 
 export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
@@ -30,8 +32,10 @@ export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
   onAddQuickAction,
   onUpdateQuickAction,
   onRemoveQuickAction,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = metricFormTranslations;
 
   return (
     <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>
@@ -44,20 +48,20 @@ export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
         }}
       >
         <Typography variant="h6" weight="semibold">
-          Quick Actions
+          {t.quickActions[lang]}
         </Typography>
         <Button
           variant="ghost"
           size="sm"
           onPress={() => onToggleSection(!showSection)}
         >
-          {showSection ? "Ocultar" : "Agregar"}
+          {showSection ? t.hide[lang] : t.add[lang]}
         </Button>
       </View>
 
       {!showSection && (
         <Typography variant="body2" color="textMuted">
-          Crea atajos para registrar valores comunes rápidamente
+          {t.quickActionsDescription[lang]}
         </Typography>
       )}
 
@@ -68,9 +72,7 @@ export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
             color="textMuted"
             style={{ marginBottom: 16 }}
           >
-            Crea atajos para registrar valores comunes rápidamente. Por ejemplo,
-            para agua podrías crear &quot;Vaso chico (200ml)&quot; con valor
-            0.2.
+            {t.quickActionsExtendedDescription[lang]}
           </Typography>
 
           {quickActions.map((qa) => (
@@ -89,7 +91,7 @@ export const QuickActionsForm: React.FC<QuickActionsFormProps> = ({
             onPress={onAddQuickAction}
             icon={<Plus size={20} color={colors.primary[500]} />}
           >
-            Agregar Quick Action
+            {t.addQuickAction[lang]}
           </Button>
         </View>
       )}

@@ -1,6 +1,7 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -30,11 +31,13 @@ export const ActiveSetsTable: React.FC<Props> = ({
 }) => {
   const { sets, setsByExercise, session } = useActiveWorkout();
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = activeWorkoutTranslations;
   const { getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();
 
   // Get user's weight unit preference
-  const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
 
   const handleAddSet = () => {
@@ -77,12 +80,12 @@ export const ActiveSetsTable: React.FC<Props> = ({
       >
         <View style={{ width: 40, alignItems: "center" }}>
           <Typography variant="caption" weight="medium" color="textMuted">
-            SET
+            {t.set[lang]}
           </Typography>
         </View>
         <View style={{ width: 80, alignItems: "center" }}>
           <Typography variant="caption" weight="medium" color="textMuted">
-            PREV
+            {t.prev[lang]}
           </Typography>
         </View>
         <View style={{ flex: 1, paddingHorizontal: 8, alignItems: "center" }}>
@@ -116,7 +119,7 @@ export const ActiveSetsTable: React.FC<Props> = ({
             style={{ flex: 0.8, paddingHorizontal: 8, alignItems: "center" }}
           >
             <Typography variant="caption" weight="medium" color="textMuted">
-              RPE
+              {t.rpe[lang]}
             </Typography>
           </View>
         )}
@@ -150,8 +153,8 @@ export const ActiveSetsTable: React.FC<Props> = ({
         }}
         accessible={true}
         accessibilityRole="button"
-        accessibilityLabel="Agregar nueva serie"
-        accessibilityHint="Toca para añadir una serie adicional a este ejercicio"
+        accessibilityLabel={t.addNewSet[lang]}
+        accessibilityHint={t.addSetHint[lang]}
       >
         <Plus size={14} color={blockColors.primary} />
         <Typography
@@ -162,7 +165,7 @@ export const ActiveSetsTable: React.FC<Props> = ({
             marginLeft: 4,
           }}
         >
-          Agregar Serie
+          {t.addSet[lang]}
         </Typography>
       </TouchableOpacity>
     </View>

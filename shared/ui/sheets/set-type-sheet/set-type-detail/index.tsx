@@ -1,6 +1,8 @@
 import { getTrainingMethodInfo } from "@/shared/constants/training-methods";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { setTypeTranslations } from "@/shared/translations/set-type";
 import { ISetType } from "@/shared/types/workout";
 import {
   ArrowLeft,
@@ -25,6 +27,9 @@ export const SetTypeDetail: React.FC<Props> = ({
   onSelectMethod,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = setTypeTranslations;
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
   const methodInfo = getTrainingMethodInfo(setType);
 
@@ -57,7 +62,7 @@ export const SetTypeDetail: React.FC<Props> = ({
         </TouchableOpacity>
 
         <Typography variant="h3" weight="semibold" style={{ flex: 1 }}>
-          Información
+          {t.information[lang]}
         </Typography>
       </View>
 
@@ -118,7 +123,7 @@ export const SetTypeDetail: React.FC<Props> = ({
               weight="semibold"
               style={{ marginLeft: 8 }}
             >
-              ¿Qué es?
+              {t.whatIsIt[lang]}
             </Typography>
           </View>
           <Typography variant="body1" style={{ lineHeight: 24 }}>
@@ -141,7 +146,7 @@ export const SetTypeDetail: React.FC<Props> = ({
               weight="semibold"
               style={{ marginLeft: 8 }}
             >
-              Beneficios Principales
+              {t.mainBenefits[lang]}
             </Typography>
           </View>
           {methodInfo.primaryBenefits.map((benefit, index) => (
@@ -191,7 +196,7 @@ export const SetTypeDetail: React.FC<Props> = ({
               weight="semibold"
               style={{ marginLeft: 8 }}
             >
-              ¿Cuándo usarlo?
+              {t.whenToUse[lang]}
             </Typography>
           </View>
           <Typography
@@ -221,7 +226,7 @@ export const SetTypeDetail: React.FC<Props> = ({
             weight="semibold"
             style={{ color: "white" }}
           >
-            Usar {methodInfo.title}
+            {t.use[lang]} {methodInfo.title}
           </Typography>
         </TouchableOpacity>
       </ScrollView>

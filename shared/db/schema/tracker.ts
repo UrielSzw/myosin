@@ -78,8 +78,11 @@ export const tracker_quick_actions = sqliteTable(
       .references(() => tracker_metrics.id, { onDelete: "cascade" })
       .notNull(),
 
+    // Identificador para traducciones
+    slug: text("slug"), // 'protein_chicken_150g', 'water_glass_small_200ml' (null for user-created)
+
     // Contenido
-    label: text("label").notNull(), // "Vaso grande (300ml)"
+    label: text("label").notNull(), // "Vaso grande (300ml)" - fallback cuando no hay traducción
     value: real("value").notNull(), // valor en la unidad de la métrica
     value_normalized: real("value_normalized"), // pre-calculado en canonical_unit
 
@@ -92,6 +95,7 @@ export const tracker_quick_actions = sqliteTable(
   (t) => [
     index("idx_tracker_quick_actions_metric").on(t.metric_id),
     index("idx_tracker_quick_actions_position").on(t.position),
+    index("idx_tracker_quick_actions_slug").on(t.slug),
   ]
 );
 

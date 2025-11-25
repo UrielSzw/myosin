@@ -3,6 +3,8 @@ import {
   QuickFilterType,
 } from "@/shared/constants/exercise-filters";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { Search, X } from "lucide-react-native";
 import React from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
@@ -37,6 +39,9 @@ export const ExerciseSelectorSearch: React.FC<Props> = ({
   onClearAllFilters,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
 
   return (
     <>
@@ -54,7 +59,7 @@ export const ExerciseSelectorSearch: React.FC<Props> = ({
         >
           <Search size={20} color={colors.textMuted} />
           <TextInput
-            placeholder="Buscar ejercicios..."
+            placeholder={t.searchPlaceholder[lang]}
             value={searchQuery}
             onChangeText={onSearchQueryChange}
             placeholderTextColor={colors.textMuted}

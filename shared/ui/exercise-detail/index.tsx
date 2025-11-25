@@ -1,9 +1,12 @@
-import {
-  EXERCISE_CATEGORY_LABELS,
-  EXERCISE_EQUIPMENT_LABELS,
-} from "@/shared/constants/exercise";
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import {
+  exerciseEquipmentTranslations,
+  exerciseMuscleTranslations,
+} from "@/shared/translations/exercise-labels";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
+import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { Dumbbell, Info } from "lucide-react-native";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -18,6 +21,11 @@ type Props = {
 
 export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const muscleT = exerciseMuscleTranslations;
+  const equipmentT = exerciseEquipmentTranslations;
+  const t = exerciseSelectorTranslations;
 
   console.log("Rendering ExerciseDetail for:", exercise);
 
@@ -68,16 +76,11 @@ export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
               style={{ marginBottom: 8 }}
             >
               {
-                EXERCISE_EQUIPMENT_LABELS[
-                  exercise.primary_equipment as keyof typeof EXERCISE_EQUIPMENT_LABELS
+                equipmentT[exercise.primary_equipment as IExerciseEquipment]?.[
+                  lang
                 ]
               }{" "}
-              •{" "}
-              {
-                EXERCISE_CATEGORY_LABELS[
-                  exercise.main_muscle_group as keyof typeof EXERCISE_CATEGORY_LABELS
-                ]
-              }
+              • {muscleT[exercise.main_muscle_group as IExerciseMuscle]?.[lang]}
             </Typography>
 
             {/* Source badge */}
@@ -103,7 +106,7 @@ export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
                       : colors.secondary[600],
                 }}
               >
-                {exercise.source === "system" ? "Sistema" : "Personalizado"}
+                {exercise.source === "system" ? t.system[lang] : t.custom[lang]}
               </Typography>
             </View>
           </View>
@@ -125,7 +128,7 @@ export const ExerciseDetail: React.FC<Props> = ({ exercise }) => {
               color="textMuted"
               style={{ marginTop: 8, textAlign: "center" }}
             >
-              No hay instrucciones disponibles para este ejercicio
+              {t.noInstructionsAvailable[lang]}
             </Typography>
           </View>
         </Card>

@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { tempoMetronomeTranslations } from "@/shared/translations/tempo-metronome";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import * as Haptics from "expo-haptics";
@@ -236,6 +238,9 @@ const timerReducer = (state: State, action: Action): State => {
 export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
   ({ tempo }, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = tempoMetronomeTranslations;
 
     // State management
     const [state, dispatch] = useReducer(timerReducer, initialState);
@@ -594,7 +599,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                   weight="semibold"
                   style={{ color: "#ffffff" }}
                 >
-                  Iniciar
+                  {t.start[lang]}
                 </Typography>
               </Button>
             )}
@@ -610,7 +615,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                   weight="semibold"
                   style={{ color: "#ffffff" }}
                 >
-                  Pausar
+                  {t.pause[lang]}
                 </Typography>
               </Button>
             )}
@@ -626,7 +631,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                   weight="semibold"
                   style={{ color: "#ffffff" }}
                 >
-                  Continuar
+                  {t.resume[lang]}
                 </Typography>
               </Button>
             )}
@@ -641,7 +646,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                 variant="outline"
               >
                 <Typography variant="body1" weight="medium" color="textMuted">
-                  Reiniciar
+                  {t.restart[lang]}
                 </Typography>
               </Button>
             )}

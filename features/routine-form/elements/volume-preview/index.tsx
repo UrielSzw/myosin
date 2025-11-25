@@ -4,6 +4,7 @@ import {
   SetInsert,
 } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -35,6 +36,7 @@ type Props = {
   trainingDays: string[];
   blocksByRoutine: string[];
   exercisesByBlock: Record<string, string[]>;
+  lang: "es" | "en";
 };
 
 export const VolumePreview: React.FC<Props> = ({
@@ -43,8 +45,10 @@ export const VolumePreview: React.FC<Props> = ({
   trainingDays,
   blocksByRoutine,
   exercisesByBlock,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = routineFormTranslations;
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Calcular volumen en tiempo real
@@ -136,7 +140,7 @@ export const VolumePreview: React.FC<Props> = ({
             >
               <Calendar size={18} color={colors.gray[400]} />
               <Typography variant="body1" weight="medium" color="textMuted">
-                Análisis de Volumen
+                {t.volumeAnalysis[lang]}
               </Typography>
             </View>
             <View style={{ marginLeft: 8 }}>
@@ -150,8 +154,7 @@ export const VolumePreview: React.FC<Props> = ({
           {isExpanded && (
             <View style={{ marginTop: 12 }}>
               <Typography variant="body2" color="textMuted">
-                Agrega bloques y ejercicios para ver el análisis de volumen por
-                grupo muscular
+                {t.volumeEmpty[lang]}
               </Typography>
             </View>
           )}
@@ -186,14 +189,14 @@ export const VolumePreview: React.FC<Props> = ({
             >
               <TrendingUp size={18} color={colors.primary[500]} />
               <Typography variant="body1" weight="medium">
-                Volumen total
+                {t.totalVolume[lang]}
               </Typography>
               <Typography
                 variant="body1"
                 weight="semibold"
                 style={{ color: colors.primary[500] }}
               >
-                {Math.round(volumeData.totalSets)} sets
+                {Math.round(volumeData.totalSets)} {t.sets[lang]}
               </Typography>
             </View>
             <View style={{ marginLeft: 8 }}>
@@ -212,10 +215,13 @@ export const VolumePreview: React.FC<Props> = ({
           <VolumeDisplay
             volumeData={volumeDataForDisplay}
             totalSets={Math.round(volumeData.totalSets)}
-            title="Distribución por Grupo Muscular"
-            subtitle={`${trainingDays.length} día${
-              trainingDays.length !== 1 ? "s" : ""
-            } de entrenamiento por semana`}
+            title={t.distributionByMuscle[lang]}
+            subtitle={t.trainingDaysPerWeek[lang]
+              .replace("{count}", trainingDays.length.toString())
+              .replace(
+                "{plural}",
+                trainingDays.length !== 1 ? t.days[lang] : t.day[lang]
+              )}
           />
         </View>
       )}

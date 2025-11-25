@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { BottomSheetOptions } from "@/shared/ui/bottom-sheet-options";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import {
@@ -36,13 +38,19 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     ref
   ) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = sharedUiTranslations;
 
-    let options = [
+    let options: {
+      type: string;
+      label: string;
+      method: () => void;
+      icon: React.ReactNode;
+    }[] = [
       {
         type: "add-exercise",
-        label: isMultiBlock
-          ? "Agregar ejercicio"
-          : "Agregar ejercicio (superserie)",
+        label: isMultiBlock ? t.addExercise[lang] : t.addExerciseSuperset[lang],
         method: onShowAddExerciseModal,
         icon: <PlusCircle color={colors.text} size={20} />,
       },
@@ -51,14 +59,14 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     if (isMultiBlock) {
       options.push({
         type: "convert",
-        label: "Separar ejercicios",
+        label: t.separateExercises[lang],
         method: onConvertToIndividual,
         icon: <Split color={colors.text} size={20} />,
       });
     } else {
       options.push({
         type: "replace",
-        label: "Remplazar ejercicio",
+        label: t.replaceExercise[lang],
         method: onShowReplace,
         icon: <RotateCcw color={colors.text} size={20} />,
       });
@@ -67,7 +75,7 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     if (onReorderExercises) {
       options.push({
         type: "reorder",
-        label: "Reordenar ejercicios del bloque",
+        label: t.reorderBlockExercises[lang],
         method: onReorderExercises,
         icon: <Shuffle color={colors.text} size={20} />,
       });
@@ -76,7 +84,7 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     if (onReorderBlocks) {
       options.push({
         type: "reorder-blocks",
-        label: "Reordenar bloques",
+        label: t.reorderBlocks[lang],
         method: onReorderBlocks,
         icon: <Shuffle color={colors.text} size={20} />,
       });
@@ -85,11 +93,11 @@ export const BlockOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetOptions
         ref={ref}
-        title={isMultiBlock ? "Opciones de Bloque" : "Opciones de Ejercicio"}
+        title={isMultiBlock ? t.blockOptions[lang] : t.exerciseOptions[lang]}
         subtitle={isMultiBlock ? "" : exerciseName || ""}
         options={options}
         warningOption={{
-          label: isMultiBlock ? "Eliminar bloque" : "Eliminar ejercicio",
+          label: isMultiBlock ? t.deleteBlock[lang] : t.deleteExercise[lang],
           method: onDelete,
           icon: <Trash color={colors.error[500]} size={20} />,
         }}

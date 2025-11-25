@@ -4,6 +4,7 @@ import {
   useUserPreferencesActions,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations } from "@/shared/translations/profile";
 import { AVAILABLE_LANGUAGES } from "@/shared/ui/language-selector-sheet";
 import { Typography } from "@/shared/ui/typography";
 import {
@@ -21,6 +22,8 @@ export const LanguageSelectorSheet = forwardRef<BottomSheetModal>((_, ref) => {
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const { setLanguage } = useUserPreferencesActions();
+  const lang = prefs?.language ?? "es";
+  const t = profileTranslations;
 
   const snapPoints = useMemo(() => ["35%"], []);
   const currentLanguage = prefs?.language ?? "es";
@@ -65,10 +68,10 @@ export const LanguageSelectorSheet = forwardRef<BottomSheetModal>((_, ref) => {
       <BottomSheetView style={{ paddingHorizontal: 20 }}>
         <View style={{ marginBottom: 20 }}>
           <Typography variant="h5" weight="bold" style={{ marginBottom: 4 }}>
-            Seleccionar Idioma
+            {t.languageSelectorTitle[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted">
-            Elige tu idioma preferido
+            {t.languageSelectorSubtitle[lang]}
           </Typography>
         </View>
 

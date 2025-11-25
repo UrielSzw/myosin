@@ -1,6 +1,8 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useUserProfile } from "@/shared/hooks/use-user-profile";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations } from "@/shared/translations/profile";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -29,6 +31,10 @@ export const ProfileFeature = () => {
   const { setColorScheme, colors, isDarkMode } = useColorScheme();
   const { profile } = useUserProfile(user);
 
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = profileTranslations;
+
   const languageSheetRef = useRef<BottomSheetModal>(null);
 
   const handleOpenLanguageSheet = useCallback(() => {
@@ -36,13 +42,13 @@ export const ProfileFeature = () => {
   }, []);
 
   const handleLogout = () => {
-    Alert.alert("Cerrar Sesión", "¿Estás seguro que quieres cerrar sesión?", [
+    Alert.alert(t.logoutAlertTitle[lang], t.logoutAlertMessage[lang], [
       {
-        text: "Cancelar",
+        text: t.logoutAlertCancel[lang],
         style: "cancel",
       },
       {
-        text: "Cerrar Sesión",
+        text: t.logoutAlertConfirm[lang],
         style: "destructive",
         onPress: signOut,
       },
@@ -64,23 +70,12 @@ export const ProfileFeature = () => {
   };
 
   const getMemberSince = () => {
-    if (!user?.created_at) return "Miembro desde 2025";
+    if (!user?.created_at) return `${t.memberSince[lang]} 2025`;
     const date = new Date(user.created_at);
-    const monthNames = [
-      "Enero",
-      "Febrero",
-      "Marzo",
-      "Abril",
-      "Mayo",
-      "Junio",
-      "Julio",
-      "Agosto",
-      "Septiembre",
-      "Octubre",
-      "Noviembre",
-      "Diciembre",
-    ];
-    return `Miembro desde ${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    const monthNames = t.monthNames[lang];
+    return `${t.memberSince[lang]} ${
+      monthNames[date.getMonth()]
+    } ${date.getFullYear()}`;
   };
 
   return (
@@ -88,10 +83,10 @@ export const ProfileFeature = () => {
       <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
         <View style={{ marginBottom: 32 }}>
           <Typography variant="h2" weight="bold" style={{ marginBottom: 4 }}>
-            Mi Perfil
+            {t.title[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted">
-            Configuración y estadísticas personales
+            {t.subtitle[lang]}
           </Typography>
         </View>
 
@@ -122,7 +117,9 @@ export const ProfileFeature = () => {
               weight="bold"
               style={{ marginBottom: 6, letterSpacing: 0.5 }}
             >
-              {profile.displayName || user?.email?.split("@")[0] || "Usuario"}
+              {profile.displayName ||
+                user?.email?.split("@")[0] ||
+                t.defaultUserName[lang]}
             </Typography>
 
             {/* Email - smaller and more subtle */}
@@ -131,7 +128,7 @@ export const ProfileFeature = () => {
               color="textMuted"
               style={{ marginBottom: 12, opacity: 0.7 }}
             >
-              {user?.email || "usuario@ejemplo.com"}
+              {user?.email || t.defaultEmail[lang]}
             </Typography>
 
             {/* Member since badge */}
@@ -154,12 +151,12 @@ export const ProfileFeature = () => {
 
             {/* Subtle edit button */}
             <Button variant="ghost" size="sm" onPress={handleEditProfile}>
-              Editar Perfil
+              {t.editProfile[lang]}
             </Button>
           </View>
         </Card>
 
-        <ProfileSection title="Preferencias">
+        <ProfileSection title={t.preferencesSection[lang]}>
           <LanguageSelectorItem onPress={handleOpenLanguageSheet} />
 
           <SettingItem
@@ -170,8 +167,8 @@ export const ProfileFeature = () => {
                 <Sun size={20} color={colors.textMuted} />
               )
             }
-            title="Modo Oscuro"
-            subtitle="Cambia el tema de la aplicación"
+            title={t.darkMode[lang]}
+            subtitle={t.darkModeSubtitle[lang]}
             rightElement={
               <Switch
                 value={isDarkMode}
@@ -187,34 +184,34 @@ export const ProfileFeature = () => {
         </ProfileSection>
 
         {/* Training */}
-        <ProfileSection title="Entrenamiento">
+        <ProfileSection title={t.trainingSection[lang]}>
           <SettingItem
             icon={<Settings size={20} color={colors.textMuted} />}
-            title="Configuración de Entrenamiento"
-            subtitle="Unidades, RPE, Tempo"
+            title={t.workoutConfig[lang]}
+            subtitle={t.workoutConfigSubtitle[lang]}
             onPress={handleNavigateWorkoutConfig}
           />
 
           <SettingItem
             icon={<User size={20} color={colors.textMuted} />}
-            title="Datos Personales"
-            subtitle="Peso, altura, nivel de experiencia"
+            title={t.personalData[lang]}
+            subtitle={t.personalDataSubtitle[lang]}
             onPress={() => {}}
           />
         </ProfileSection>
 
-        <ProfileSection title="Soporte">
+        <ProfileSection title={t.supportSection[lang]}>
           <SettingItem
             icon={<HelpCircle size={20} color={colors.textMuted} />}
-            title="Ayuda y Preguntas Frecuentes"
-            subtitle="¿Necesitas ayuda? Encuentra respuestas aquí"
+            title={t.helpFaq[lang]}
+            subtitle={t.helpFaqSubtitle[lang]}
             onPress={() => {}}
           />
 
           <SettingItem
             icon={<Shield size={20} color={colors.textMuted} />}
-            title="Privacidad y Seguridad"
-            subtitle="Gestiona tu privacidad y datos"
+            title={t.privacy[lang]}
+            subtitle={t.privacySubtitle[lang]}
             onPress={() => {}}
           />
         </ProfileSection>
@@ -222,7 +219,7 @@ export const ProfileFeature = () => {
         <View style={{ marginBottom: 32 }}>
           <SettingItem
             icon={<LogOut size={20} color={colors.error[500]} />}
-            title="Cerrar Sesión"
+            title={t.logout[lang]}
             onPress={handleLogout}
           />
         </View>

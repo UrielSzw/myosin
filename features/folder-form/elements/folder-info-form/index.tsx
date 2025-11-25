@@ -1,3 +1,4 @@
+import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { ColorSelector, IconSelector } from "@/shared/ui/animated-selectors";
 import { Card } from "@/shared/ui/card";
 import { EnhancedInput, ValidationState } from "@/shared/ui/enhanced-input";
@@ -15,6 +16,7 @@ interface FolderInfoFormProps {
   onColorChange: (color: string) => void;
   onNameValidationChange?: (validation: ValidationState) => void;
   isEditMode?: boolean;
+  lang: "es" | "en";
 }
 
 export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
@@ -28,7 +30,10 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
     onColorChange,
     onNameValidationChange,
     isEditMode = false,
+    lang,
   }) => {
+    const t = folderFormTranslations;
+
     return (
       <View>
         {/* Folder Name */}
@@ -38,14 +43,14 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             weight="semibold"
             style={{ marginBottom: 12 }}
           >
-            Información de la Carpeta
+            {t.folderInformation[lang]}
           </Typography>
 
           <EnhancedInput
-            label="Nombre de la carpeta"
+            label={t.folderNameLabel[lang]}
             value={folderName}
             onChangeText={onNameChange}
-            placeholder="Ej: Rutinas de Fuerza"
+            placeholder={t.folderNamePlaceholder[lang]}
             maxLength={50}
             showCharacterCount
             required
@@ -55,9 +60,9 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             isValid={nameValidation?.isValid}
             isValidating={nameValidation?.isValidating}
             onValidationChange={onNameValidationChange}
-            helpText="Elige un nombre único e identificativo para tu carpeta"
-            accessibilityLabel="Nombre de la carpeta"
-            accessibilityHint="Introduce un nombre único para organizar tus rutinas"
+            helpText={t.folderNameHelp[lang]}
+            accessibilityLabel={t.folderNameAccessibilityLabel[lang]}
+            accessibilityHint={t.folderNameAccessibilityHint[lang]}
           />
         </Card>
 
@@ -68,7 +73,7 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             weight="semibold"
             style={{ marginBottom: 12 }}
           >
-            Icono
+            {t.icon[lang]}
           </Typography>
 
           <Typography
@@ -76,7 +81,7 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             color="textMuted"
             style={{ marginBottom: 16 }}
           >
-            Selecciona un icono que represente tu carpeta
+            {t.iconDescription[lang]}
           </Typography>
 
           <IconSelector
@@ -93,7 +98,7 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             weight="semibold"
             style={{ marginBottom: 12 }}
           >
-            Color
+            {t.color[lang]}
           </Typography>
 
           <Typography
@@ -101,7 +106,7 @@ export const FolderInfoForm: React.FC<FolderInfoFormProps> = memo(
             color="textMuted"
             style={{ marginBottom: 16 }}
           >
-            Elige un color para personalizar tu carpeta
+            {t.colorDescription[lang]}
           </Typography>
 
           <ColorSelector

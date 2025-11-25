@@ -1,4 +1,6 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { authTranslations } from "@/shared/translations/auth";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { GlassCard } from "@/shared/ui/glass-card";
@@ -22,6 +24,9 @@ export default function SignInScreen() {
   const [loading, setLoading] = useState(false);
 
   const { signIn } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = authTranslations.signIn;
 
   const handleSignIn = async () => {
     if (!email.trim() || !password.trim()) {
@@ -74,7 +79,7 @@ export default function SignInScreen() {
                   align="center"
                   style={styles.title}
                 >
-                  Entrena con inteligencia
+                  {t.title[lang]}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -82,7 +87,7 @@ export default function SignInScreen() {
                   align="center"
                   style={styles.subtitle}
                 >
-                  Tu progreso, medido y optimizado
+                  {t.subtitle[lang]}
                 </Typography>
               </View>
             </View>
@@ -90,8 +95,8 @@ export default function SignInScreen() {
             <GlassCard style={styles.card}>
               <View style={styles.form}>
                 <EnhancedInput
-                  label="Email"
-                  placeholder="tu@email.com"
+                  label={t.emailLabel[lang]}
+                  placeholder={t.emailPlaceholder[lang]}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -102,8 +107,8 @@ export default function SignInScreen() {
                 />
 
                 <EnhancedInput
-                  label="Contraseña"
-                  placeholder="••••••••"
+                  label={t.passwordLabel[lang]}
+                  placeholder={t.passwordPlaceholder[lang]}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -117,7 +122,7 @@ export default function SignInScreen() {
                   onPress={navigateToForgotPassword}
                   style={styles.forgotButton}
                 >
-                  ¿Olvidaste tu contraseña?
+                  {t.forgotPassword[lang]}
                 </Button>
 
                 <Button
@@ -126,14 +131,14 @@ export default function SignInScreen() {
                   size="lg"
                   style={styles.signInButton}
                 >
-                  {loading ? "Iniciando..." : "Iniciar Sesión"}
+                  {loading ? t.signingIn[lang] : t.signInButton[lang]}
                 </Button>
               </View>
             </GlassCard>
 
             <View style={styles.footer}>
               <Typography variant="body1" color="textMuted" align="center">
-                ¿Primera vez aquí?
+                {t.firstTimeHere[lang]}
               </Typography>
               <Button
                 variant="ghost"
@@ -141,7 +146,7 @@ export default function SignInScreen() {
                 size="lg"
                 style={styles.signUpButton}
               >
-                Empezar ahora
+                {t.startNow[lang]}
               </Button>
             </View>
           </ScrollView>

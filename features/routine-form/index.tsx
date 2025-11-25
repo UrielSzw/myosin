@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React from "react";
@@ -20,6 +22,9 @@ export const RoutineFormFeature = () => {
     useRoutineFormState();
 
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
 
   const {
     handleToggleSheet,
@@ -48,15 +53,18 @@ export const RoutineFormFeature = () => {
         <ScrollView
           style={{ flex: 1 }}
           accessible={true}
-          accessibilityLabel="Contenido de la rutina"
+          accessibilityLabel={t.routineContent[lang]}
           contentInsetAdjustmentBehavior="automatic"
         >
           <View
             style={{ flex: 1 }}
             accessible={true}
-            accessibilityLabel={`Rutina con ${blockCount} ${
-              blockCount === 1 ? "bloque" : "bloques"
-            }`}
+            accessibilityLabel={t.routineWithBlocks[lang]
+              .replace("{count}", blockCount.toString())
+              .replace(
+                "{plural}",
+                blockCount === 1 ? t.block[lang] : t.blocks[lang]
+              )}
           >
             <View
               style={{
@@ -91,9 +99,13 @@ export const RoutineFormFeature = () => {
                 trainingDays={routine.training_days || []}
                 blocksByRoutine={blocksByRoutine}
                 exercisesByBlock={exercisesByBlock}
+                lang={lang}
               />
 
-              <ExerciseListTop exercisesInBlockCount={exercisesInBlockCount} />
+              <ExerciseListTop
+                exercisesInBlockCount={exercisesInBlockCount}
+                lang={lang}
+              />
 
               <ListHint />
             </View>

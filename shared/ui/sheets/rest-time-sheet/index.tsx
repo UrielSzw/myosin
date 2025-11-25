@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -18,6 +20,9 @@ type Props = {
 export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ currentRestTime, onSelectRestTime }, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = routineFormTranslations;
 
     const [selectedTime, setSelectedTime] = useState<number | null>(null);
 
@@ -26,7 +31,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
 
     // Predefined rest time options (in seconds)
     const quickOptions = [
-      { label: "Sin descanso", value: 0 },
+      { label: t.noRest[lang], value: 0 },
       { label: "30 seg", value: 30 },
       { label: "45 seg", value: 45 },
       { label: "1 min", value: 60 },
@@ -113,7 +118,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
               weight="semibold"
               style={{ marginLeft: 8 }}
             >
-              Tiempo de Descanso
+              {t.restTime[lang]}
             </Typography>
           </View>
 
@@ -124,7 +129,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
               color="textMuted"
               style={{ marginBottom: 12 }}
             >
-              Tiempo personalizado
+              {t.customTime[lang]}
             </Typography>
             <View
               style={{

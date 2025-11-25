@@ -1,6 +1,7 @@
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import React from "react";
@@ -12,6 +13,7 @@ type Props = {
   defaultTarget?: number | null;
   color: string;
   metricSlug?: string | null;
+  lang: "es" | "en";
 };
 
 export const DailySummary: React.FC<Props> = ({
@@ -20,10 +22,12 @@ export const DailySummary: React.FC<Props> = ({
   defaultTarget,
   color,
   metricSlug,
+  lang,
 }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = trackerTranslations;
 
   const isWeightMetric = metricSlug === "weight";
   const displayUnit = isWeightMetric ? weightUnit : unit;
@@ -49,7 +53,7 @@ export const DailySummary: React.FC<Props> = ({
       }}
     >
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 12 }}>
-        Progreso del Día
+        {t.dailySummary.title[lang]}
       </Typography>
 
       <View
@@ -60,7 +64,7 @@ export const DailySummary: React.FC<Props> = ({
         }}
       >
         <Typography variant="body2" color="textMuted">
-          Actual
+          {t.dailySummary.current[lang]}
         </Typography>
         {displayCurrent && (
           <Typography variant="body2" weight="medium">
@@ -77,7 +81,7 @@ export const DailySummary: React.FC<Props> = ({
         }}
       >
         <Typography variant="body2" color="textMuted">
-          Meta
+          {t.dailySummary.goal[lang]}
         </Typography>
         {displayTarget && (
           <Typography variant="body2" weight="medium">
@@ -112,7 +116,8 @@ export const DailySummary: React.FC<Props> = ({
           color="textMuted"
           style={{ marginTop: 8, textAlign: "center" }}
         >
-          {Math.round((currentValue / defaultTarget) * 100)}% completado
+          {Math.round((currentValue / defaultTarget) * 100)}%{" "}
+          {t.dailySummary.completed[lang]}
         </Typography>
       )}
     </View>

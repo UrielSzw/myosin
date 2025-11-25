@@ -7,6 +7,7 @@ import {
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import {
   getDefaultTemplate,
   getMeasurementTemplate,
@@ -28,11 +29,13 @@ export const SetsItem = React.memo<Props>(
     const { sets, routine } = useRoutineFormState();
     const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = routineFormTranslations;
     const { updateSet } = useSetActions();
     const { setCurrentState } = useMainActions();
 
     // Get user's weight unit preference
-    const prefs = useUserPreferences();
     const weightUnit = prefs?.weight_unit ?? "kg";
 
     const { show_rpe, show_tempo } = routine;
@@ -239,7 +242,7 @@ export const SetsItem = React.memo<Props>(
               }}
               accessible={true}
               accessibilityLabel={`RPE para set ${setNumber}`}
-              accessibilityHint="Toca para configurar RPE"
+              accessibilityHint={t.tapToConfigureRPE[lang]}
               onPress={handleShowRPESelector}
             >
               <Typography
@@ -274,7 +277,7 @@ export const SetsItem = React.memo<Props>(
               }}
               accessible={true}
               accessibilityLabel={`Tempo para set ${setNumber}`}
-              accessibilityHint="Toca para configurar tempo"
+              accessibilityHint={t.tapToConfigureTempo[lang]}
               onPress={handleShowTempoSelector}
             >
               <Timer

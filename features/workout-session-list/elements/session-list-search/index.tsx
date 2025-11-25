@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { workoutSessionListTranslations } from "@/shared/translations/workout-session-list";
 import { Search, X } from "lucide-react-native";
 import React from "react";
 import { Pressable, TextInput, View } from "react-native";
@@ -7,14 +9,18 @@ type Props = {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   loading?: boolean;
+  lang: "es" | "en";
 };
 
 export const SessionListSearch: React.FC<Props> = ({
   searchQuery,
   onSearchChange,
   loading = false,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = workoutSessionListTranslations;
+  const tShared = sharedUiTranslations;
 
   const handleClear = () => {
     onSearchChange("");
@@ -40,7 +46,7 @@ export const SessionListSearch: React.FC<Props> = ({
         <TextInput
           value={searchQuery}
           onChangeText={onSearchChange}
-          placeholder="Buscar por rutina..."
+          placeholder={t.searchPlaceholder[lang]}
           placeholderTextColor={colors.textMuted}
           style={{
             flex: 1,
@@ -49,6 +55,7 @@ export const SessionListSearch: React.FC<Props> = ({
             paddingVertical: 4,
           }}
           editable={!loading}
+          accessibilityLabel={t.searchPlaceholder[lang]}
         />
 
         {searchQuery.length > 0 && (
@@ -58,6 +65,8 @@ export const SessionListSearch: React.FC<Props> = ({
               opacity: pressed ? 0.6 : 1,
               padding: 4,
             })}
+            accessibilityRole="button"
+            accessibilityLabel={tShared.clearSearch[lang]}
           >
             <X size={16} color={colors.textMuted} />
           </Pressable>

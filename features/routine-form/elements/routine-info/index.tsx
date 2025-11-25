@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
 import { WeekDaySelector } from "@/shared/ui/week-day-selector";
@@ -14,6 +16,10 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
   onOpenSettings,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
+
   const { name, training_days } = useRoutineInfoState();
   const { setRoutineName, setTrainingDays } = useMainActions();
 
@@ -22,38 +28,41 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
   const [isTouched, setIsTouched] = useState(false);
 
   // Validación del nombre de rutina
-  const validateRoutineName = useCallback((value: string) => {
-    const trimmedValue = value.trim();
+  const validateRoutineName = useCallback(
+    (value: string) => {
+      const trimmedValue = value.trim();
 
-    if (!trimmedValue) {
-      return { isValid: false, error: "El nombre de la rutina es requerido" };
-    }
+      if (!trimmedValue) {
+        return { isValid: false, error: t.nameRequired[lang] };
+      }
 
-    if (trimmedValue.length < 2) {
-      return {
-        isValid: false,
-        error: "El nombre debe tener al menos 2 caracteres",
-      };
-    }
+      if (trimmedValue.length < 2) {
+        return {
+          isValid: false,
+          error: t.nameTooShort[lang],
+        };
+      }
 
-    if (trimmedValue.length > 100) {
-      return {
-        isValid: false,
-        error: "El nombre no puede exceder 100 caracteres",
-      };
-    }
+      if (trimmedValue.length > 100) {
+        return {
+          isValid: false,
+          error: t.nameTooLong[lang],
+        };
+      }
 
-    // Verificar caracteres especiales problemáticos
-    const invalidCharsRegex = /[<>:"\/\\|?*]/;
-    if (invalidCharsRegex.test(trimmedValue)) {
-      return {
-        isValid: false,
-        error: "El nombre contiene caracteres no permitidos",
-      };
-    }
+      // Verificar caracteres especiales problemáticos
+      const invalidCharsRegex = /[<>:"\/\\|?*]/;
+      if (invalidCharsRegex.test(trimmedValue)) {
+        return {
+          isValid: false,
+          error: t.invalidCharacters[lang],
+        };
+      }
 
-    return { isValid: true, error: null };
-  }, []);
+      return { isValid: true, error: null };
+    },
+    [lang, t]
+  );
 
   const validation = useMemo(
     () => validateRoutineName(name || ""),
@@ -89,7 +98,7 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
     <View
       style={{ marginBottom: 24 }}
       accessible={true}
-      accessibilityLabel="Información de la rutina"
+      accessibilityLabel={t.routineInfo[lang]}
     >
       <View
         style={{
@@ -105,12 +114,12 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
           accessible={true}
           accessibilityRole="header"
         >
-          Información de la Rutina
+          {t.routineInformation[lang]}
         </Typography>
 
         <Pressable
           accessibilityRole="button"
-          accessibilityLabel="Ajustes de la rutina"
+          accessibilityLabel={t.routineSettings[lang]}
           onPress={() => onOpenSettings?.()}
           style={{ padding: 8 }}
         >
@@ -123,15 +132,15 @@ export const RoutineInfo: React.FC<{ onOpenSettings?: () => void }> = ({
         onChangeText={handleNameChange}
         onBlur={handleBlur}
         onFocus={handleFocus}
-        placeholder="Ej: Push Pull Legs"
-        label="Nombre de la rutina"
+        placeholder={t.routineNamePlaceholder[lang]}
+        label={t.routineName[lang]}
         error={displayError}
         isValid={displayIsValid}
         maxLength={100}
         autoCapitalize="words"
         required={true}
-        accessibilityLabel="Nombre de la rutina"
-        accessibilityHint="Ingresa un nombre descriptivo para tu rutina de ejercicios"
+        accessibilityLabel={t.routineName[lang]}
+        accessibilityHint={t.routineNameHint[lang]}
       />
 
       <WeekDaySelector

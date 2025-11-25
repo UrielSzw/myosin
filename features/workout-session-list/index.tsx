@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionListTranslations } from "@/shared/translations/workout-session-list";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
@@ -12,6 +14,9 @@ import { useSessionList } from "./hooks/use-session-list";
 
 export const WorkoutSessionListFeature: React.FC = () => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutSessionListTranslations;
 
   const { data: allSessions, isLoading, error, stats } = useSessionList();
 
@@ -28,6 +33,7 @@ export const WorkoutSessionListFeature: React.FC = () => {
       <SessionListHeader
         totalSessions={stats.totalSessions}
         recentSessions={stats.recentSessions}
+        lang={lang}
       />
 
       <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
@@ -35,6 +41,7 @@ export const WorkoutSessionListFeature: React.FC = () => {
           searchQuery={filters.searchQuery}
           onSearchChange={(query) => updateFilter("searchQuery", query)}
           loading={isLoading}
+          lang={lang}
         />
 
         <ScrollView
@@ -45,22 +52,24 @@ export const WorkoutSessionListFeature: React.FC = () => {
           {isLoading ? (
             <View style={{ paddingVertical: 40 }}>
               <Typography variant="body2" color="textMuted" align="center">
-                Cargando sesiones...
+                {t.loadingSessions[lang]}
               </Typography>
             </View>
           ) : filteredSessions.length === 0 && allSessions.length === 0 ? (
             <EmptyState
-              title="Sin Sesiones"
-              description="Completa tu primer entrenamiento para ver el historial"
+              title={t.noSessionsTitle[lang]}
+              description={t.noSessionsDescription[lang]}
               icon="trophy"
+              lang={lang}
             />
           ) : filteredSessions.length === 0 ? (
             <EmptyState
-              title="Sin resultados"
-              description="No se encontraron sesiones con los filtros aplicados"
+              title={t.noResultsTitle[lang]}
+              description={t.noResultsDescription[lang]}
               icon="search"
-              actionLabel="Limpiar filtros"
+              actionLabel={t.clearFilters[lang]}
               onAction={clearAllFilters}
+              lang={lang}
             />
           ) : (
             <View style={{ gap: 0 }}>

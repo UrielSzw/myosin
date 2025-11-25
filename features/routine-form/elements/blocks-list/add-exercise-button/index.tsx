@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Typography } from "@/shared/ui/typography";
 import { Plus } from "lucide-react-native";
 import { TouchableOpacity } from "react-native";
@@ -6,6 +8,9 @@ import { useMainActions } from "../../../hooks/use-routine-form-store";
 
 export const AddExerciseButton = () => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
   const { setIsExerciseModalOpen, setExerciseModalMode } = useMainActions();
 
   const handleOpenModal = () => {
@@ -36,7 +41,7 @@ export const AddExerciseButton = () => {
         weight="medium"
         style={{ color: colors.primary[500], marginLeft: 8 }}
       >
-        Agregar Ejercicio
+        {t.addExercise[lang]}
       </Typography>
     </TouchableOpacity>
   );

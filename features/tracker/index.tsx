@@ -1,6 +1,8 @@
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
@@ -21,6 +23,9 @@ import { useDayData } from "./hooks/use-tracker-data";
 export const TrackerFeature = () => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = trackerTranslations;
 
   // UI State
   const [metricSelectorVisible, setMetricSelectorVisible] = useState(false);
@@ -53,10 +58,10 @@ export const TrackerFeature = () => {
         >
           <AlertCircle size={48} color={colors.primary[500]} />
           <Typography variant="h6" weight="semibold" align="center">
-            Autenticación requerida
+            {t.authRequired[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted" align="center">
-            Necesitas iniciar sesión para acceder al tracker
+            {t.authDescription[lang]}
           </Typography>
         </View>
       </SafeAreaView>
@@ -67,10 +72,7 @@ export const TrackerFeature = () => {
   if (dayDataLoading) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-        <LoadingScreen
-          withGradient={false}
-          message="Cargando datos del día..."
-        />
+        <LoadingScreen withGradient={false} message={t.loading[lang]} />
       </SafeAreaView>
     );
   }
@@ -90,10 +92,10 @@ export const TrackerFeature = () => {
         >
           <AlertCircle size={48} color={colors.primary[500]} />
           <Typography variant="h6" weight="semibold" align="center">
-            Error al cargar los datos
+            {t.errorLoading[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted" align="center">
-            {dayDataError?.message || "Ha ocurrido un error inesperado"}
+            {dayDataError?.message || t.unexpectedError[lang]}
           </Typography>
         </View>
       </SafeAreaView>
@@ -108,6 +110,7 @@ export const TrackerFeature = () => {
         <DatePicker
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
+          lang={lang}
         />
 
         <View style={{ marginBottom: 32 }}>
@@ -120,7 +123,7 @@ export const TrackerFeature = () => {
             }}
           >
             <Typography variant="h5" weight="semibold">
-              Métricas Diarias
+              {t.dailyMetrics[lang]}
             </Typography>
             <Button
               variant="ghost"
@@ -128,7 +131,7 @@ export const TrackerFeature = () => {
               onPress={handleAddMetric}
               icon={<Plus size={16} color={colors.primary[500]} />}
             >
-              Agregar
+              {t.add[lang]}
             </Button>
           </View>
 
@@ -148,11 +151,12 @@ export const TrackerFeature = () => {
                   metric={metric}
                   date={selectedDate}
                   onPress={() => setSelectedMetric(metric)}
+                  lang={lang}
                 />
               ))}
             </View>
           ) : (
-            <EmptyMetrics onAddMetric={handleAddMetric} />
+            <EmptyMetrics onAddMetric={handleAddMetric} lang={lang} />
           )}
         </View>
 
@@ -164,12 +168,14 @@ export const TrackerFeature = () => {
         selectedDate={selectedDate}
         selectedMetric={selectedMetric}
         setSelectedMetric={setSelectedMetric}
+        lang={lang}
       />
 
       {/* Metric Selector Modal */}
       <MetricSelectorModal
         visible={metricSelectorVisible}
         onClose={() => setMetricSelectorVisible(false)}
+        lang={lang}
       />
     </ScreenWrapper>
   );

@@ -1,23 +1,34 @@
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { METRIC_VALIDATION_RULES } from "../types";
 
 /**
  * Validates metric name
  */
-export const validateMetricName = (name: string): string | null => {
+export const validateMetricName = (
+  name: string,
+  lang: "es" | "en" = "es"
+): string | null => {
+  const t = metricFormTranslations;
   if (!name.trim()) {
-    return "El nombre es requerido";
+    return t.nameRequired[lang];
   }
 
   if (name.length < METRIC_VALIDATION_RULES.name.minLength) {
-    return `El nombre debe tener al menos ${METRIC_VALIDATION_RULES.name.minLength} caracteres`;
+    return t.nameMinLength[lang].replace(
+      "{min}",
+      METRIC_VALIDATION_RULES.name.minLength.toString()
+    );
   }
 
   if (name.length > METRIC_VALIDATION_RULES.name.maxLength) {
-    return `El nombre no puede exceder ${METRIC_VALIDATION_RULES.name.maxLength} caracteres`;
+    return t.nameMaxLength[lang].replace(
+      "{max}",
+      METRIC_VALIDATION_RULES.name.maxLength.toString()
+    );
   }
 
   if (!METRIC_VALIDATION_RULES.name.pattern.test(name)) {
-    return "El nombre solo puede contener letras, números, espacios y guiones";
+    return t.nameInvalidCharacters[lang];
   }
 
   return null;
@@ -26,9 +37,13 @@ export const validateMetricName = (name: string): string | null => {
 /**
  * Validates metric slug
  */
-export const validateMetricSlug = (slug: string): string | null => {
+export const validateMetricSlug = (
+  slug: string,
+  lang: "es" | "en" = "es"
+): string | null => {
+  const t = metricFormTranslations;
   if (!slug.trim()) {
-    return "El identificador es requerido";
+    return t.slugRequired[lang];
   }
 
   if (slug.length < METRIC_VALIDATION_RULES.slug.minLength) {
@@ -49,21 +64,31 @@ export const validateMetricSlug = (slug: string): string | null => {
 /**
  * Validates metric unit
  */
-export const validateMetricUnit = (unit: string): string | null => {
+export const validateMetricUnit = (
+  unit: string,
+  lang: "es" | "en" = "es"
+): string | null => {
+  const t = metricFormTranslations;
   if (!unit.trim()) {
-    return "La unidad es requerida";
+    return t.unitRequired[lang];
   }
 
   if (unit.length < METRIC_VALIDATION_RULES.unit.minLength) {
-    return `La unidad debe tener al menos ${METRIC_VALIDATION_RULES.unit.minLength} caracter`;
+    return t.unitMinLength[lang].replace(
+      "{min}",
+      METRIC_VALIDATION_RULES.unit.minLength.toString()
+    );
   }
 
   if (unit.length > METRIC_VALIDATION_RULES.unit.maxLength) {
-    return `La unidad no puede exceder ${METRIC_VALIDATION_RULES.unit.maxLength} caracteres`;
+    return t.unitMaxLength[lang].replace(
+      "{max}",
+      METRIC_VALIDATION_RULES.unit.maxLength.toString()
+    );
   }
 
   if (!METRIC_VALIDATION_RULES.unit.pattern.test(unit)) {
-    return "La unidad contiene caracteres no válidos";
+    return t.unitInvalidCharacters[lang];
   }
 
   return null;
@@ -106,13 +131,17 @@ export const generateSlugFromName = (name: string): string => {
 /**
  * Validates quick action label
  */
-export const validateQuickActionLabel = (label: string): string | null => {
+export const validateQuickActionLabel = (
+  label: string,
+  lang: "es" | "en" = "es"
+): string | null => {
+  const t = metricFormTranslations;
   if (!label.trim()) {
-    return "La etiqueta es requerida";
+    return t.labelRequired[lang];
   }
 
   if (label.length > 50) {
-    return "La etiqueta no puede exceder 50 caracteres";
+    return t.labelMaxLength[lang];
   }
 
   return null;
@@ -121,13 +150,19 @@ export const validateQuickActionLabel = (label: string): string | null => {
 /**
  * Validates quick action value
  */
-export const validateQuickActionValue = (value: number): string | null => {
+export const validateQuickActionValue = (
+  value: number,
+  lang: "es" | "en" = "es"
+): string | null => {
+  const t = metricFormTranslations;
   if (value <= 0) {
-    return "El valor debe ser mayor a 0";
+    return lang === "es"
+      ? "El valor debe ser mayor a 0"
+      : "Value must be greater than 0";
   }
 
   if (value > 999999) {
-    return "El valor es demasiado grande";
+    return t.valueTooLarge[lang];
   }
 
   return null;

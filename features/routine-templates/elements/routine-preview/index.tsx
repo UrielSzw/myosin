@@ -1,9 +1,10 @@
-import {
-  EXERCISE_CATEGORY_LABELS,
-  EXERCISE_EQUIPMENT_LABELS,
-} from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useExercises } from "@/shared/hooks/use-exercises";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import {
+  exerciseEquipmentTranslations,
+  exerciseMuscleTranslations,
+} from "@/shared/translations/exercise-labels";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { Camera, Dumbbell } from "lucide-react-native";
@@ -19,6 +20,10 @@ type Props = {
 export const RoutinePreview: React.FC<Props> = ({ routine }) => {
   const { colors } = useColorScheme();
   const { exercises } = useExercises();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const muscleT = exerciseMuscleTranslations;
+  const equipmentT = exerciseEquipmentTranslations;
 
   // Get the actual routine data from constants
   const routineData = ROUTINE_TEMPLATES_DATA[routine.id];
@@ -41,10 +46,10 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
 
     return {
       muscle:
-        EXERCISE_CATEGORY_LABELS[exercise.main_muscle_group] ||
+        muscleT[exercise.main_muscle_group]?.[lang] ||
         exercise.main_muscle_group,
       equipment:
-        EXERCISE_EQUIPMENT_LABELS[exercise.primary_equipment] ||
+        equipmentT[exercise.primary_equipment]?.[lang] ||
         exercise.primary_equipment,
       type: exercise.exercise_type === "compound" ? "Compuesto" : "Aislamiento",
     };

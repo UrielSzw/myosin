@@ -1,5 +1,7 @@
 import { BlockInsert } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { reorderTranslations } from "@/shared/translations/reorder";
 import { ReorderExercise } from "@/shared/types/reorder";
 import { IBlockType } from "@/shared/types/workout";
 import { Button } from "@/shared/ui/button";
@@ -24,6 +26,9 @@ export const ReorderExercisesFeature: React.FC<Props> = ({
   onCancel,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = reorderTranslations;
 
   const [reorderedExercises, setReorderedExercises] =
     useState<ReorderExercise[]>(exercises);
@@ -31,11 +36,11 @@ export const ReorderExercisesFeature: React.FC<Props> = ({
   const getBlockTypeLabel = (type: IBlockType) => {
     switch (type) {
       case "superset":
-        return "Superserie";
+        return t.superset[lang];
       case "circuit":
-        return "Circuito";
+        return t.circuit[lang];
       default:
-        return "Individual";
+        return t.individual[lang];
     }
   };
 
@@ -78,7 +83,7 @@ export const ReorderExercisesFeature: React.FC<Props> = ({
 
         <View style={{ flex: 1, alignItems: "center" }}>
           <Typography variant="h6" weight="semibold">
-            Reordenar Ejercicios
+            {t.reorderExercises[lang]}
           </Typography>
           <Typography variant="caption" color="textMuted">
             {getBlockTypeLabel(block.type)}
@@ -100,7 +105,7 @@ export const ReorderExercisesFeature: React.FC<Props> = ({
             variant="button"
             style={{ color: "white", marginLeft: 4, fontSize: 14 }}
           >
-            Guardar
+            {t.save[lang]}
           </Typography>
         </Button>
       </View>
@@ -112,7 +117,7 @@ export const ReorderExercisesFeature: React.FC<Props> = ({
           color="textMuted"
           style={{ textAlign: "center" }}
         >
-          Mantén presionado un ejercicio por 300ms para arrastrarlo y reordenar
+          {t.reorderExercisesInstructions[lang]}
         </Typography>
       </View>
 

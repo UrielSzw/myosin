@@ -6,6 +6,7 @@ import {
 import { METRIC_COLORS } from "@/shared/constants/metric-colors";
 import { MetricIconKey } from "@/shared/constants/metric-icons";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -25,6 +26,8 @@ export const useMetricForm = ({
   isEditMode = false,
   existingMetricId,
 }: MetricFormFeatureProps) => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
   // Basic info state
   const [metricName, setMetricName] = useState("");
   const [metricSlug, setMetricSlug] = useState("");
@@ -61,13 +64,13 @@ export const useMetricForm = ({
   // Validation
   const nameValidation: MetricValidationResult = {
     isValid:
-      validateMetricName(metricName) === null &&
-      validateMetricSlug(metricSlug) === null,
+      validateMetricName(metricName, lang) === null &&
+      validateMetricSlug(metricSlug, lang) === null,
     isValidating: false,
     errors: {
-      name: validateMetricName(metricName) || undefined,
-      slug: validateMetricSlug(metricSlug) || undefined,
-      unit: validateMetricUnit(unit) || undefined,
+      name: validateMetricName(metricName, lang) || undefined,
+      slug: validateMetricSlug(metricSlug, lang) || undefined,
+      unit: validateMetricUnit(unit, lang) || undefined,
       target: validateMetricTarget(defaultTarget) || undefined,
     },
   };
@@ -85,6 +88,7 @@ export const useMetricForm = ({
     for (const action of actions) {
       await createQuickActionMutation.mutateAsync({
         metric_id: metricId,
+        slug: null,
         label: action.label,
         value: action.value,
         value_normalized: action.value, // Will be calculated by the repository
@@ -126,6 +130,7 @@ export const useMetricForm = ({
       } else {
         const newMetric = await createMetricMutation.mutateAsync({
           data: metricData,
+          userId: "default-user",
         });
         metricId = newMetric.id;
 

@@ -2,12 +2,13 @@ import {
   DEFAULT_FILTERS,
   EQUIPMENT_GROUPS,
   ExerciseFilters,
-  MAIN_CATEGORY_LABELS,
   MUSCLE_TO_CATEGORY,
   QUICK_FILTERS,
   QuickFilterType,
 } from "@/shared/constants/exercise-filters";
 import { BaseExercise } from "@/shared/db/schema";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { useCallback, useMemo, useState } from "react";
 
@@ -16,6 +17,20 @@ export const useExerciseFilters = (
   idToExclude: string | null
 ) => {
   const [filters, setFilters] = useState<ExerciseFilters>(DEFAULT_FILTERS);
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
+
+  // Helper para obtener label de categoría traducido
+  const getCategoryLabel = useCallback(
+    (category: string): string => {
+      const key = `category${
+        category.charAt(0).toUpperCase() + category.slice(1)
+      }` as keyof typeof t;
+      return (t[key] as any)?.[lang] || category;
+    },
+    [lang, t]
+  );
 
   // Obtener el ejercicio que se va a reemplazar
   const exerciseToReplace = useMemo(() => {
@@ -240,7 +255,7 @@ export const useExerciseFilters = (
     if (filters.mainCategory !== "all") {
       activeFilters.push({
         id: `category-${filters.mainCategory}`,
-        label: MAIN_CATEGORY_LABELS[filters.mainCategory],
+        label: getCategoryLabel(filters.mainCategory),
         type: "category",
         onRemove: () => updateFilter("mainCategory", "all"),
       });
@@ -278,6 +293,7 @@ export const useExerciseFilters = (
     });
 
     return activeFilters;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
 
   return {

@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
@@ -19,6 +21,9 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
   existingMetricId,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = metricFormTranslations;
 
   // Animation for preview card
   const previewScale = useSharedValue(1);
@@ -104,7 +109,7 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
 
         <View style={{ flex: 1, paddingHorizontal: 16 }}>
           <Typography variant="h5" weight="semibold">
-            {isEditMode ? "Editar Métrica" : "Nueva Métrica"}
+            {isEditMode ? t.editMetric[lang] : t.newMetric[lang]}
           </Typography>
         </View>
 
@@ -115,7 +120,11 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
           disabled={isSaveDisabled}
           loading={isSaving}
         >
-          {isSaving ? "Guardando..." : isEditMode ? "Guardar" : "Crear"}
+          {isSaving
+            ? t.saving[lang]
+            : isEditMode
+            ? t.save[lang]
+            : t.create[lang]}
         </Button>
       </View>
 
@@ -136,6 +145,7 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
           onTypeChange={() => {}}
           onUnitChange={setUnit}
           onTargetChange={setDefaultTarget}
+          lang={lang}
         />
 
         {/* 2. Style Form */}
@@ -144,6 +154,7 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
           metricColor={metricColor}
           onIconChange={handleIconChange}
           onColorChange={handleColorChange}
+          lang={lang}
         />
 
         {/* 3. Quick Actions Form (only for create mode) */}
@@ -151,12 +162,13 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
           <QuickActionsForm
             quickActions={quickActions}
             showSection={showQuickActionsSection}
-            metricUnit={unit || "unidad"}
+            metricUnit={unit || t.unit[lang]}
             onQuickActionsChange={() => {}} // Not used directly
             onToggleSection={setShowQuickActionsSection}
             onAddQuickAction={addQuickAction}
             onUpdateQuickAction={updateQuickAction}
             onRemoveQuickAction={removeQuickAction}
+            lang={lang}
           />
         )}
 
@@ -168,6 +180,7 @@ export const MetricFormFeature: React.FC<MetricFormFeatureProps> = ({
           unit={unit}
           currentValue={0} // Preview with 0 value
           defaultTarget={defaultTarget}
+          lang={lang}
         />
 
         {/* Spacer */}

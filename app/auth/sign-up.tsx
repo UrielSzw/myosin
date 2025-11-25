@@ -1,4 +1,6 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { authTranslations } from "@/shared/translations/auth";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { GlassCard } from "@/shared/ui/glass-card";
@@ -24,6 +26,9 @@ export default function SignUpScreen() {
   const [loading, setLoading] = useState(false);
 
   const { signUp } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = authTranslations.signUp;
 
   const handleSignUp = async () => {
     if (!email.trim() || !password.trim() || password !== confirmPassword) {
@@ -72,7 +77,7 @@ export default function SignUpScreen() {
                   align="center"
                   style={styles.title}
                 >
-                  ¡Es tu momento!
+                  {t.title[lang]}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -80,7 +85,7 @@ export default function SignUpScreen() {
                   align="center"
                   style={styles.subtitle}
                 >
-                  Tu mejor versión empieza hoy
+                  {t.subtitle[lang]}
                 </Typography>
               </View>
             </View>
@@ -88,8 +93,8 @@ export default function SignUpScreen() {
             <GlassCard style={styles.card}>
               <View style={styles.form}>
                 <EnhancedInput
-                  label="Nombre (Opcional)"
-                  placeholder="Tu nombre"
+                  label={t.nameLabel[lang]}
+                  placeholder={t.namePlaceholder[lang]}
                   value={displayName}
                   onChangeText={setDisplayName}
                   autoCapitalize="words"
@@ -99,8 +104,8 @@ export default function SignUpScreen() {
                 />
 
                 <EnhancedInput
-                  label="Email"
-                  placeholder="tu@email.com"
+                  label={t.emailLabel[lang]}
+                  placeholder={t.emailPlaceholder[lang]}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -111,8 +116,8 @@ export default function SignUpScreen() {
                 />
 
                 <EnhancedInput
-                  label="Contraseña"
-                  placeholder="••••••••"
+                  label={t.passwordLabel[lang]}
+                  placeholder={t.passwordPlaceholder[lang]}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry
@@ -122,8 +127,8 @@ export default function SignUpScreen() {
                 />
 
                 <EnhancedInput
-                  label="Confirmar Contraseña"
-                  placeholder="••••••••"
+                  label={t.confirmPasswordLabel[lang]}
+                  placeholder={t.confirmPasswordPlaceholder[lang]}
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry
@@ -132,7 +137,7 @@ export default function SignUpScreen() {
                   containerStyle={styles.input}
                   error={
                     confirmPassword && !passwordsMatch
-                      ? "Las contraseñas no coinciden"
+                      ? t.passwordMismatch[lang]
                       : undefined
                   }
                 />
@@ -143,14 +148,16 @@ export default function SignUpScreen() {
                   size="lg"
                   style={styles.signUpButton}
                 >
-                  {loading ? "Creando cuenta..." : "Crear Cuenta"}
+                  {loading
+                    ? t.creatingAccount[lang]
+                    : t.createAccountButton[lang]}
                 </Button>
               </View>
             </GlassCard>
 
             <View style={styles.footer}>
               <Typography variant="body1" color="textMuted" align="center">
-                ¿Ya tienes cuenta?
+                {t.alreadyHaveAccount[lang]}
               </Typography>
               <Button
                 variant="ghost"
@@ -158,7 +165,7 @@ export default function SignUpScreen() {
                 size="lg"
                 style={styles.signInButton}
               >
-                Entrar
+                {t.signIn[lang]}
               </Button>
             </View>
           </ScrollView>

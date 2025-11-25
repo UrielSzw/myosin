@@ -1,6 +1,8 @@
 import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -8,6 +10,9 @@ import { Alert } from "react-native";
 import { routinesService } from "../service/routines";
 
 export const useRoutineOptions = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const queryClient = useQueryClient();
   const { sync } = useSyncEngine();
 
@@ -15,15 +20,15 @@ export const useRoutineOptions = () => {
 
   const handleDeleteRoutine = async (routine: RoutineWithMetrics) => {
     Alert.alert(
-      "Eliminar Rutina",
-      `¿Estás seguro que deseas eliminar "${routine.name}"?\n\nEsta acción eliminará todos los bloques, ejercicios y sets asociados y no se puede deshacer.`,
+      t.deleteRoutine[lang],
+      t.deleteRoutineConfirmMessage[lang].replace("{name}", routine.name),
       [
         {
-          text: "Cancelar",
+          text: t.cancelButton[lang],
           style: "cancel",
         },
         {
-          text: "Eliminar",
+          text: t.deleteButton[lang],
           style: "destructive",
           onPress: async () => {
             setIsDeleting(true);
@@ -40,10 +45,7 @@ export const useRoutineOptions = () => {
               });
             } catch (error) {
               console.error("Error deleting routine:", error);
-              Alert.alert(
-                "Error",
-                "No se pudo eliminar la rutina. Intenta nuevamente."
-              );
+              Alert.alert(t.errorTitle[lang], t.errorDeletingRoutine[lang]);
             } finally {
               setIsDeleting(false);
             }
@@ -59,15 +61,15 @@ export const useRoutineOptions = () => {
 
   const handleRemoveTrainingDays = async (routine: RoutineWithMetrics) => {
     Alert.alert(
-      "Quitar Días de Entrenamiento",
-      `¿Estás seguro que deseas quitar los días de entrenamiento de "${routine.name}"?`,
+      t.removeTrainingDays[lang],
+      t.removeTrainingDaysConfirmMessage[lang].replace("{name}", routine.name),
       [
         {
-          text: "Cancelar",
+          text: t.cancelButton[lang],
           style: "cancel",
         },
         {
-          text: "Quitar",
+          text: t.removeButton[lang],
           style: "destructive",
           onPress: async () => {
             setIsDeleting(true);
@@ -86,8 +88,8 @@ export const useRoutineOptions = () => {
             } catch (error) {
               console.error("Error removing training days:", error);
               Alert.alert(
-                "Error",
-                "No se pudieron quitar los días de entrenamiento. Intenta nuevamente."
+                t.errorTitle[lang],
+                t.errorRemovingTrainingDays[lang]
               );
             } finally {
               setIsDeleting(false);

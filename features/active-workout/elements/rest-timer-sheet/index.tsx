@@ -1,5 +1,7 @@
 /* eslint-disable import/no-named-as-default */
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
@@ -15,6 +17,9 @@ import useTimer from "../../hooks/use-timer";
 export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
   (_props, ref) => {
     const { colors, isDarkMode } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = activeWorkoutTranslations;
     const { adjustRestTimer, skipRestTimer } = useActiveRestTimerActions();
     const restTimerStore = useActiveRestTimer();
     const { totalTime, startedAt } = restTimerStore || {};
@@ -83,11 +88,11 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
       if (startedAt && restTimeSeconds > 0) {
         startTimer(
           restTimeSeconds,
-          "Tiempo de descanso terminado",
+          t.restTimeFinished[lang],
           "Tu descanso ha terminado. ¡Continúa con tu entrenamiento!"
         );
       }
-    }, [startedAt, restTimeSeconds, startTimer]);
+    }, [startedAt, restTimeSeconds, startTimer, lang, t.restTimeFinished]);
 
     // Formatear tiempo
     const formatTime = useCallback((seconds: number) => {
@@ -181,7 +186,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
                 weight="semibold"
                 style={{ marginLeft: 8 }}
               >
-                Descanso
+                {t.rest[lang]}
               </Typography>
             </View>
             <TouchableOpacity
@@ -194,7 +199,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
               }}
             >
               <Typography variant="caption" weight="medium" color="textMuted">
-                Saltar
+                {t.skip[lang]}
               </Typography>
             </TouchableOpacity>
           </View>

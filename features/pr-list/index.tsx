@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prListTranslations } from "@/shared/translations/pr-list";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
@@ -13,6 +15,9 @@ import { usePRList } from "./hooks/use-pr-list";
 
 export const PRListFeature: React.FC = () => {
   const router = useRouter();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = prListTranslations;
 
   const { data: allPRs, isLoading, error, stats } = usePRList();
 
@@ -32,6 +37,7 @@ export const PRListFeature: React.FC = () => {
       <PRListHeader
         totalPRs={stats.totalPRs}
         recentPRsCount={stats.recentPRs}
+        lang={lang}
       />
 
       <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 12 }}>
@@ -39,6 +45,7 @@ export const PRListFeature: React.FC = () => {
           searchQuery={filters.searchQuery}
           onSearchChange={(query) => updateFilter("searchQuery", query)}
           loading={isLoading}
+          lang={lang}
         />
 
         <PRListFiltersComponent
@@ -48,6 +55,7 @@ export const PRListFeature: React.FC = () => {
           onShowRecentToggle={() =>
             updateFilter("showRecent", !filters.showRecent)
           }
+          lang={lang}
         />
 
         <ScrollView
@@ -58,22 +66,24 @@ export const PRListFeature: React.FC = () => {
           {isLoading ? (
             <View style={{ paddingVertical: 40 }}>
               <Typography variant="body2" color="textMuted" align="center">
-                Cargando PRs...
+                {t.loadingPRs[lang]}
               </Typography>
             </View>
           ) : filteredPRs.length === 0 && allPRs.length === 0 ? (
             <EmptyState
-              title="Sin Records Personales"
-              description="Completa entrenamientos para establecer tus primeros PRs"
+              title={t.noPRsTitle[lang]}
+              description={t.noPRsDescription[lang]}
               icon="trophy"
+              lang={lang}
             />
           ) : filteredPRs.length === 0 ? (
             <EmptyState
-              title="Sin resultados"
-              description="No se encontraron PRs con los filtros aplicados"
+              title={t.noResultsTitle[lang]}
+              description={t.noResultsDescription[lang]}
               icon="search"
-              actionLabel="Limpiar filtros"
+              actionLabel={t.clearFilters[lang]}
               onAction={clearAllFilters}
+              lang={lang}
             />
           ) : (
             <View style={{ gap: 12 }}>

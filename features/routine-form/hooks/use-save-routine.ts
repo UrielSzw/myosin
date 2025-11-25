@@ -9,6 +9,7 @@ import { generateUUID } from "@/shared/db/utils/uuid";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { useState } from "react";
 import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
@@ -24,10 +25,13 @@ export const useSaveRoutine = () => {
   const { show_rpe, show_tempo } = useUserPreferences() || {};
   const { sync } = useSyncEngine();
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
 
   const saveRoutine = async (): Promise<string | null> => {
     if (!user) {
-      setError("Usuario no autenticado");
+      setError(t.userNotAuthenticated[lang]);
       setSaveState("error");
       return null;
     }
@@ -35,7 +39,7 @@ export const useSaveRoutine = () => {
     // Usar la validación centralizada
     if (!validation.isValid) {
       const firstError = Object.values(validation.errors)[0];
-      setError(firstError || "La rutina tiene errores de validación");
+      setError(firstError || t.validationErrors[lang]);
       setSaveState("error");
       return null;
     }
@@ -182,7 +186,7 @@ export const useSaveRoutine = () => {
       return savedRoutine.id;
     } catch (err) {
       console.error("Error saving routine:", err);
-      setError("Error al guardar la rutina. Intenta nuevamente.");
+      setError(t.errorSavingRoutine[lang]);
       setSaveState("error");
       return null;
     }

@@ -1,5 +1,7 @@
 import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,6 +16,10 @@ import { useSaveRoutine } from "../../hooks/use-save-routine";
 
 export const CreateRoutineHeader = () => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
+
   const { saveRoutine, isLoading, error } = useSaveRoutine();
   const { clearForm } = useMainActions();
   const { mode } = useRoutineFormState();
@@ -31,7 +37,7 @@ export const CreateRoutineHeader = () => {
     if (!routineValidation.isValid) {
       // Mostrar primer error encontrado
       const firstError = Object.values(routineValidation.errors)[0];
-      Alert.alert("Error de validación", firstError);
+      Alert.alert(t.validationError[lang], firstError);
       return;
     }
 
@@ -50,15 +56,15 @@ export const CreateRoutineHeader = () => {
       clearForm();
       router.back();
     } else if (error) {
-      Alert.alert("Error", error);
+      Alert.alert(t.error[lang], error);
     }
   };
 
   const getButtonText = () => {
     if (isLoading) {
-      return isEditMode ? "Actualizando..." : "Guardando...";
+      return isEditMode ? t.updating[lang] : t.saving[lang];
     }
-    return isEditMode ? "Actualizar" : "Guardar";
+    return isEditMode ? t.update[lang] : t.save[lang];
   };
 
   return (
@@ -76,17 +82,17 @@ export const CreateRoutineHeader = () => {
       }}
       accessible={true}
       accessibilityRole="toolbar"
-      accessibilityLabel="Barra de navegación de rutina"
+      accessibilityLabel={t.routineNavBar[lang]}
     >
       <Button
         variant="ghost"
         size="sm"
         onPress={handleGoBack}
         accessible={true}
-        accessibilityLabel="Volver atrás"
-        accessibilityHint="Regresa a la pantalla anterior"
+        accessibilityLabel={t.backAccessibility[lang]}
+        accessibilityHint={t.backHint[lang]}
       >
-        ← Atrás
+        {t.back[lang]}
       </Button>
 
       <Typography
@@ -95,7 +101,7 @@ export const CreateRoutineHeader = () => {
         accessible={true}
         accessibilityRole="header"
       >
-        {isEditMode ? "Editar Rutina" : "Crear Rutina"}
+        {isEditMode ? t.editRoutine[lang] : t.createRoutine[lang]}
       </Typography>
 
       <Button
@@ -107,10 +113,11 @@ export const CreateRoutineHeader = () => {
         accessibilityLabel={getButtonText()}
         accessibilityHint={
           canSave
-            ? `${
-                isEditMode ? "Actualizar" : "Guardar"
-              } la rutina con los datos ingresados`
-            : "Botón deshabilitado. Completa todos los campos requeridos para guardar"
+            ? t.saveHintEnabled[lang].replace(
+                "{action}",
+                isEditMode ? t.update[lang] : t.save[lang]
+              )
+            : t.saveHintDisabled[lang]
         }
         accessibilityState={{ disabled: !canSave }}
       >

@@ -4,6 +4,8 @@ import {
 } from "@/features/active-workout/hooks/use-active-workout-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { Typography } from "@/shared/ui/typography";
 import { EllipsisVertical, Timer, Zap } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
@@ -23,6 +25,9 @@ export const BlockHeader: React.FC<Props> = ({
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = activeWorkoutTranslations;
   const {
     getBlockTypeIcon,
     getBlockTypeLabel,
@@ -55,7 +60,7 @@ export const BlockHeader: React.FC<Props> = ({
     const blockTypeLabel = getBlockTypeLabel(block.type);
 
     if (block.type === "individual") {
-      return `Ejercicio ${blockOrder}`;
+      return `${t.exercise[lang]} ${blockOrder}`;
     }
 
     return `${blockTypeLabel} ${blockOrder}`;
@@ -129,7 +134,7 @@ export const BlockHeader: React.FC<Props> = ({
             >
               {block.type === "individual"
                 ? formatRestTime(block.rest_time_seconds)
-                : `Sets: ${formatRestTime(block.rest_time_seconds)}`}
+                : `${t.sets[lang]} ${formatRestTime(block.rest_time_seconds)}`}
             </Typography>
           </TouchableOpacity>
 
@@ -157,7 +162,8 @@ export const BlockHeader: React.FC<Props> = ({
                   marginLeft: 4,
                 }}
               >
-                Entre: {formatRestTime(block.rest_between_exercises_seconds)}
+                {t.between[lang]}{" "}
+                {formatRestTime(block.rest_between_exercises_seconds)}
               </Typography>
             </TouchableOpacity>
           )}

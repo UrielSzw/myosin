@@ -1,6 +1,7 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import {
   getDefaultTemplate,
   getMeasurementTemplate,
@@ -32,6 +33,7 @@ export const SetsTable: React.FC<Props> = ({
 }) => {
   const { setsByExercise, sets, routine } = useRoutineFormState();
   const { colors } = useColorScheme();
+  const t = routineFormTranslations;
   const { getBlockColors } = useBlockStyles();
   const { addSet } = useSetActions();
   const { setCurrentState } = useMainActions();
@@ -39,6 +41,7 @@ export const SetsTable: React.FC<Props> = ({
   // Get user's weight unit preference
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const lang = prefs?.language ?? "es";
 
   const { show_rpe, show_tempo } = routine;
 
@@ -99,8 +102,8 @@ export const SetsTable: React.FC<Props> = ({
           }}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel="Cambiar template de medición"
-          accessibilityHint={`Actualmente: ${template.name}. Toca para cambiar`}
+          accessibilityLabel={t.changeMeasurementTemplate[lang]}
+          accessibilityHint={t.currentTemplate[lang].replace("{template}", template.name)}
           accessibilityValue={{ text: template.name }}
         >
           {template.fields.map((field, index) => (
@@ -165,8 +168,8 @@ export const SetsTable: React.FC<Props> = ({
         }}
         accessible={true}
         accessibilityRole="button"
-        accessibilityLabel="Agregar nueva serie"
-        accessibilityHint="Toca para añadir una serie adicional a este ejercicio"
+        accessibilityLabel={t.addSetAccessibility[lang]}
+        accessibilityHint={t.addSetHint[lang]}
       >
         <Plus size={14} color={blockColors.primary} />
         <Typography
@@ -177,7 +180,7 @@ export const SetsTable: React.FC<Props> = ({
             marginLeft: 4,
           }}
         >
-          Agregar Serie
+          {t.addSet[lang]}
         </Typography>
       </TouchableOpacity>
     </View>

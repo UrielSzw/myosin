@@ -1,4 +1,6 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
@@ -11,6 +13,9 @@ import { useAnalyticsData } from "./hooks/use-analytics-data";
 
 export const AnalyticsFeature: React.FC = () => {
   const { user } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = analyticsTranslations;
 
   const { data, isLoading, error } = useAnalyticsData(user?.id);
 
@@ -25,10 +30,10 @@ export const AnalyticsFeature: React.FC = () => {
       <ScrollView style={{ paddingHorizontal: 20, paddingTop: 20 }}>
         <View style={{ marginBottom: 20 }}>
           <Typography variant="h2" weight="bold" style={{ marginBottom: 6 }}>
-            Analíticas
+            {t.analytics[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted">
-            Insights útiles sobre tu entrenamiento
+            {t.insightsSubtitle[lang]}
           </Typography>
         </View>
 

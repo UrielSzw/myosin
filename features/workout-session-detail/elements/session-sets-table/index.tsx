@@ -2,6 +2,7 @@ import { BaseWorkoutSet } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import {
   getMeasurementTemplate,
   hasWeightMeasurement,
@@ -15,13 +16,15 @@ import { View } from "react-native";
 type Props = {
   sets: BaseWorkoutSet[];
   showRpe: boolean;
+  lang: "es" | "en";
 };
 
-export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
+export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe, lang }) => {
   const { colors } = useColorScheme();
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = workoutSessionDetailTranslations;
 
   // Get measurement template for dynamic headers (assume all sets have same template)
   const measurementTemplate =
@@ -35,7 +38,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
   };
 
   const formatActualValues = (set: BaseWorkoutSet): string => {
-    if (!set.completed) return "No completado";
+    if (!set.completed) return t.notCompleted[lang];
 
     if (!measurementTemplate) return "-";
 
@@ -72,7 +75,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
     const reps = set.actual_secondary_value || 0;
     const volumeKg = weight * reps;
     const displayVolume = fromKg(volumeKg, weightUnit, 0);
-    return `Vol: ${displayVolume.toLocaleString()}${weightUnit}`;
+    return `${t.volume[lang]}: ${displayVolume.toLocaleString()}${weightUnit}`;
   };
 
   const getRPEColor = (rpe: number | null, planned: number | null) => {
@@ -98,7 +101,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
       >
         <View style={{ width: 40, alignItems: "center" }}>
           <Typography variant="caption" weight="medium" color="textMuted">
-            SET
+            {t.set[lang]}
           </Typography>
         </View>
         <View style={{ flex: 1, paddingHorizontal: 8 }}>
@@ -106,7 +109,7 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe }) => {
             {measurementTemplate?.fields.length === 1
               ? measurementTemplate.fields[0].label
               : measurementTemplate?.fields.map((f) => f.label).join(" × ") ||
-                "Realizado"}
+                t.completed[lang]}
           </Typography>
         </View>
         {showRpe && (

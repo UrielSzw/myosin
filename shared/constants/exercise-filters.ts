@@ -118,33 +118,33 @@ export interface QuickFilter {
 export const QUICK_FILTERS: QuickFilter[] = [
   {
     id: "compound",
-    label: "Compuesto",
+    label: "compound",
     icon: "Layers",
-    description: "Ejercicios multiarticulares",
+    description: "compound",
   },
   {
     id: "isolation",
-    label: "Aislamiento",
+    label: "isolation",
     icon: "Target",
-    description: "Ejercicios de aislamiento",
+    description: "isolation",
   },
   {
     id: "bodyweight",
-    label: "Peso corporal",
+    label: "bodyweight",
     icon: "User",
-    description: "Solo peso corporal",
+    description: "bodyweight",
   },
   {
     id: "free_weights",
-    label: "Pesas libres",
+    label: "freeWeights",
     icon: "Dumbbell",
-    description: "Pesas libres",
+    description: "freeWeights",
   },
   {
     id: "machines",
-    label: "Máquinas",
+    label: "machines",
     icon: "Settings",
-    description: "Máquinas",
+    description: "machines",
   },
 ];
 

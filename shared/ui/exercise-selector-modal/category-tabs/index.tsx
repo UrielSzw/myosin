@@ -1,10 +1,11 @@
 import {
   MAIN_CATEGORIES,
   MAIN_CATEGORY_ICONS,
-  MAIN_CATEGORY_LABELS,
   MainCategory,
 } from "@/shared/constants/exercise-filters";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { Typography } from "@/shared/ui/typography";
 import { LayoutGrid, MoreHorizontal } from "lucide-react-native";
 import React from "react";
@@ -20,6 +21,17 @@ export const CategoryTabs: React.FC<Props> = ({
   onCategorySelect,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
+
+  // Helper para obtener el label traducido
+  const getCategoryLabel = (category: MainCategory): string => {
+    const key = `category${
+      category.charAt(0).toUpperCase() + category.slice(1)
+    }` as keyof typeof t;
+    return t[key]?.[lang] || category;
+  };
 
   // Helper para obtener el icono correcto
   const getIcon = (category: MainCategory) => {
@@ -46,7 +58,7 @@ export const CategoryTabs: React.FC<Props> = ({
       >
         {MAIN_CATEGORIES.map((category) => {
           const isSelected = selectedCategory === category;
-          const label = MAIN_CATEGORY_LABELS[category];
+          const label = getCategoryLabel(category);
           const icon = getIcon(category);
 
           return (

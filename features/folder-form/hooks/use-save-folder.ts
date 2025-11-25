@@ -1,11 +1,16 @@
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { useCallback } from "react";
 import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 
 export const useSaveFolder = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = folderFormTranslations;
   const { name, color, icon, mode, editingId } = useFolderFormStore();
   const { selectedFolder, setSelectedFolder } = useSelectedFolderStore(
     (state) => state
@@ -15,11 +20,11 @@ export const useSaveFolder = () => {
 
   const saveFolder = useCallback(async () => {
     if (!user) {
-      return { success: false, error: "Usuario no autenticado" };
+      return { success: false, error: t.userNotAuthenticated[lang] };
     }
 
     if (!name.trim()) {
-      return { success: false, error: "El nombre es requerido" };
+      return { success: false, error: t.nameRequired[lang] };
     }
 
     try {
@@ -73,9 +78,14 @@ export const useSaveFolder = () => {
       console.error("Error saving folder:", error);
       return {
         success: false,
-        error: `Error al ${
-          mode === "edit" ? "actualizar" : "crear"
-        } la carpeta`,
+        error:
+          mode === "edit"
+            ? lang === "es"
+              ? "Error al actualizar la carpeta"
+              : "Error updating folder"
+            : lang === "es"
+            ? "Error al crear la carpeta"
+            : "Error creating folder",
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

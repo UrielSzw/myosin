@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
@@ -7,11 +8,13 @@ import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   exerciseName: string;
+  lang: "es" | "en";
 };
 
-export const PRDetailHeader: React.FC<Props> = ({ exerciseName }) => {
+export const PRDetailHeader: React.FC<Props> = ({ exerciseName, lang }) => {
   const { colors } = useColorScheme();
   const router = useRouter();
+  const t = prDetailTranslations;
 
   const handleGoBack = () => {
     router.back();
@@ -44,7 +47,7 @@ export const PRDetailHeader: React.FC<Props> = ({ exerciseName }) => {
           {exerciseName}
         </Typography>
         <Typography variant="caption" color="textMuted">
-          Historial de Records Personales
+          {t.prHistory[lang]}
         </Typography>
       </View>
     </View>

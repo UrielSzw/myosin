@@ -1,5 +1,7 @@
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { X } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
@@ -15,6 +17,9 @@ type Props = {
 
 export const ExerciseDetailView: React.FC<Props> = ({ exercise, onClose }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
@@ -32,7 +37,7 @@ export const ExerciseDetailView: React.FC<Props> = ({ exercise, onClose }) => {
       >
         <View style={{ flex: 1 }}>
           <Typography variant="h5" weight="semibold">
-            Detalle del Ejercicio
+            {t.exerciseDetail[lang]}
           </Typography>
         </View>
 

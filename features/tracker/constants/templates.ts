@@ -229,20 +229,25 @@ export const PREDEFINED_METRIC_TEMPLATES: Omit<
  */
 export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   string,
-  (Omit<TrackerQuickActionInsert, "user_id" | "metric_id"> & { id: string })[]
+  (Omit<TrackerQuickActionInsert, "user_id" | "metric_id"> & {
+    id: string;
+    slug: string;
+  })[]
 > = {
   // Protein
   protein: [
     {
       id: "protein_chicken_150g",
+      slug: "protein_chicken_150g",
       label: "Pollo (150g)",
       value: 35,
-      value_normalized: 35, // ya está en gramos
+      value_normalized: 35,
       icon: "ChefHat",
       position: 1,
     },
     {
       id: "protein_eggs_2u",
+      slug: "protein_eggs_2u",
       label: "Huevos (2u)",
       value: 12,
       value_normalized: 12,
@@ -251,6 +256,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "protein_shake",
+      slug: "protein_shake",
       label: "Shake de proteína",
       value: 25,
       value_normalized: 25,
@@ -259,6 +265,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "protein_yogurt_greek",
+      slug: "protein_yogurt_greek",
       label: "Yogurt griego",
       value: 15,
       value_normalized: 15,
@@ -267,6 +274,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "protein_tuna_can",
+      slug: "protein_tuna_can",
       label: "Atún (lata)",
       value: 28,
       value_normalized: 28,
@@ -275,6 +283,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "protein_lentils_cup",
+      slug: "protein_lentils_cup",
       label: "Lentejas (1 taza)",
       value: 18,
       value_normalized: 18,
@@ -287,14 +296,16 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   water: [
     {
       id: "water_glass_small_200ml",
+      slug: "water_glass_small_200ml",
       label: "Vaso chico (200ml)",
-      value: 0.2, // en litros (unidad display)
-      value_normalized: 200, // en ml (canonical_unit)
+      value: 0.2,
+      value_normalized: 200,
       icon: "CupSoda",
       position: 1,
     },
     {
       id: "water_glass_large_300ml",
+      slug: "water_glass_large_300ml",
       label: "Vaso grande (300ml)",
       value: 0.3,
       value_normalized: 300,
@@ -303,6 +314,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "water_bottle_500ml",
+      slug: "water_bottle_500ml",
       label: "Botella (500ml)",
       value: 0.5,
       value_normalized: 500,
@@ -311,6 +323,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "water_bottle_large_1L",
+      slug: "water_bottle_large_1L",
       label: "Botella grande (1L)",
       value: 1.0,
       value_normalized: 1000,
@@ -323,6 +336,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   sleep: [
     {
       id: "sleep_nap_30min",
+      slug: "sleep_nap_30min",
       label: "Siesta (30min)",
       value: 0.5,
       value_normalized: 0.5,
@@ -331,6 +345,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "sleep_full_night_8h",
+      slug: "sleep_full_night_8h",
       label: "Noche completa (8h)",
       value: 8.0,
       value_normalized: 8.0,
@@ -343,6 +358,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   calories: [
     {
       id: "calories_breakfast_typical",
+      slug: "calories_breakfast_typical",
       label: "Desayuno típico",
       value: 400,
       value_normalized: 400,
@@ -351,6 +367,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "calories_lunch_complete",
+      slug: "calories_lunch_complete",
       label: "Almuerzo completo",
       value: 600,
       value_normalized: 600,
@@ -359,6 +376,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "calories_dinner_light",
+      slug: "calories_dinner_light",
       label: "Cena ligera",
       value: 350,
       value_normalized: 350,
@@ -367,6 +385,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "calories_snack_healthy",
+      slug: "calories_snack_healthy",
       label: "Snack saludable",
       value: 150,
       value_normalized: 150,
@@ -379,6 +398,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   steps: [
     {
       id: "steps_walk_short",
+      slug: "steps_walk_short",
       label: "Caminata corta",
       value: 2000,
       value_normalized: 2000,
@@ -387,6 +407,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "steps_walk_long",
+      slug: "steps_walk_long",
       label: "Caminata larga",
       value: 5000,
       value_normalized: 5000,
@@ -395,6 +416,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "steps_workout",
+      slug: "steps_workout",
       label: "Entrenamiento",
       value: 8000,
       value_normalized: 8000,
@@ -407,6 +429,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   focus_time: [
     {
       id: "focus_pomodoro",
+      slug: "focus_pomodoro",
       label: "Pomodoro (25min)",
       value: 25,
       value_normalized: 25,
@@ -415,6 +438,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "focus_deep_session",
+      slug: "focus_deep_session",
       label: "Sesión profunda (45min)",
       value: 45,
       value_normalized: 45,
@@ -423,6 +447,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "focus_flow_state",
+      slug: "focus_flow_state",
       label: "Estado de flow (90min)",
       value: 90,
       value_normalized: 90,
@@ -435,6 +460,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   meditation: [
     {
       id: "meditation_breathing",
+      slug: "meditation_breathing",
       label: "Respiración (5min)",
       value: 5,
       value_normalized: 5,
@@ -443,6 +469,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "meditation_guided",
+      slug: "meditation_guided",
       label: "Meditación guiada (10min)",
       value: 10,
       value_normalized: 10,
@@ -451,6 +478,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "meditation_deep",
+      slug: "meditation_deep",
       label: "Sesión profunda (20min)",
       value: 20,
       value_normalized: 20,
@@ -463,6 +491,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   reading_time: [
     {
       id: "reading_quick",
+      slug: "reading_quick",
       label: "Lectura rápida (10min)",
       value: 10,
       value_normalized: 10,
@@ -471,6 +500,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "reading_session",
+      slug: "reading_session",
       label: "Sesión de lectura (30min)",
       value: 30,
       value_normalized: 30,
@@ -479,6 +509,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "reading_deep",
+      slug: "reading_deep",
       label: "Lectura profunda (60min)",
       value: 60,
       value_normalized: 60,
@@ -491,6 +522,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   creatine: [
     {
       id: "creatine_scoop_small",
+      slug: "creatine_scoop_small",
       label: "1/2 scoop (2.5g)",
       value: 2.5,
       value_normalized: 2.5,
@@ -499,6 +531,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "creatine_scoop_full",
+      slug: "creatine_scoop_full",
       label: "1 scoop (5g)",
       value: 5,
       value_normalized: 5,
@@ -507,6 +540,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "creatine_loading",
+      slug: "creatine_loading",
       label: "Carga (10g)",
       value: 10,
       value_normalized: 10,
@@ -519,6 +553,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
   sunlight_exposure: [
     {
       id: "sun_brief",
+      slug: "sun_brief",
       label: "Breve (5min)",
       value: 5,
       value_normalized: 5,
@@ -527,6 +562,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "sun_walk",
+      slug: "sun_walk",
       label: "Caminata (15min)",
       value: 15,
       value_normalized: 15,
@@ -535,6 +571,7 @@ export const PREDEFINED_QUICK_ACTION_TEMPLATES: Record<
     },
     {
       id: "sun_outdoor",
+      slug: "sun_outdoor",
       label: "Actividad exterior (30min)",
       value: 30,
       value_normalized: 30,

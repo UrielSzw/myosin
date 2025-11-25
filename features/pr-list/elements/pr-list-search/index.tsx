@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prListTranslations } from "@/shared/translations/pr-list";
 import { Search, X } from "lucide-react-native";
 import React from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
@@ -7,14 +8,17 @@ type Props = {
   searchQuery: string;
   onSearchChange: (query: string) => void;
   loading?: boolean;
+  lang: "es" | "en";
 };
 
 export const PRListSearch: React.FC<Props> = ({
   searchQuery,
   onSearchChange,
   loading,
+  lang,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const t = prListTranslations;
 
   const handleClearSearch = () => {
     onSearchChange("");
@@ -34,7 +38,7 @@ export const PRListSearch: React.FC<Props> = ({
     >
       <Search size={20} color={colors.textMuted} />
       <TextInput
-        placeholder="Buscar ejercicios..."
+        placeholder={t.searchPlaceholder[lang]}
         value={searchQuery}
         onChangeText={onSearchChange}
         placeholderTextColor={colors.textMuted}

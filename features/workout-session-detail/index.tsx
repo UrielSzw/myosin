@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
@@ -22,6 +24,9 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
   } = useSessionDetail(sessionId);
 
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutSessionDetailTranslations;
 
   if (error) {
     return (
@@ -44,14 +49,14 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
                 weight="semibold"
                 style={{ marginBottom: 8 }}
               >
-                Error al cargar sesión
+                {t.errorLoadingSession[lang]}
               </Typography>
               <Typography
                 variant="body2"
                 color="textMuted"
                 style={{ textAlign: "center" }}
               >
-                No se pudo cargar la información de esta sesión de entrenamiento
+                {t.errorLoadingDescription[lang]}
               </Typography>
             </View>
           </View>
@@ -68,7 +73,7 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
         >
           {/* Loading spinner placeholder */}
           <Typography variant="body1" color="textMuted">
-            Cargando sesión...
+            {t.loadingSession[lang]}
           </Typography>
         </View>
       </ScreenWrapper>
@@ -77,7 +82,7 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
-      <SessionHeader session={sessionData} analytics={analytics} />
+      <SessionHeader session={sessionData} analytics={analytics} lang={lang} />
 
       <ScrollView
         style={{
@@ -87,10 +92,11 @@ export const WorkoutSessionDetailFeature: React.FC<Props> = ({ sessionId }) => {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <SessionAnalytics analytics={analytics} />
+          <SessionAnalytics analytics={analytics} lang={lang} />
           <SessionBlocksList
             blocks={sessionData.blocks}
             showRpe={sessionData.average_rpe !== null}
+            lang={lang}
           />
         </View>
 

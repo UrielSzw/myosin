@@ -1,5 +1,6 @@
 import { MetricIconKey } from "@/shared/constants/metric-icons";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
@@ -13,6 +14,7 @@ interface MetricPreviewCardProps {
   unit: string;
   currentValue?: number;
   defaultTarget?: number;
+  lang: "es" | "en";
 }
 
 export const MetricPreviewCard: React.FC<MetricPreviewCardProps> = ({
@@ -22,8 +24,10 @@ export const MetricPreviewCard: React.FC<MetricPreviewCardProps> = ({
   unit,
   currentValue = 0,
   defaultTarget,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = metricFormTranslations;
 
   // Dynamic icon rendering
   const IconComponent = (Icons as any)[metricIcon];
@@ -45,7 +49,7 @@ export const MetricPreviewCard: React.FC<MetricPreviewCardProps> = ({
   return (
     <View style={{ marginTop: 24 }}>
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 12 }}>
-        Vista Previa
+        {t.preview[lang]}
       </Typography>
 
       <Card variant="outlined" padding="md">
@@ -89,7 +93,7 @@ export const MetricPreviewCard: React.FC<MetricPreviewCardProps> = ({
             style={{ marginBottom: 8 }}
             numberOfLines={1}
           >
-            {metricName || "Nombre de la métrica"}
+            {metricName || t.metricNameDefault[lang]}
           </Typography>
 
           {/* Icon and Progress Ring */}
@@ -188,7 +192,7 @@ export const MetricPreviewCard: React.FC<MetricPreviewCardProps> = ({
                 {formatValue(currentValue)}
               </Typography>
               <Typography variant="body2" color="textMuted">
-                {unit || "unidad"}
+                {unit || t.unit[lang]}
               </Typography>
             </View>
 

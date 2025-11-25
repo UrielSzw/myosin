@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { router } from "expo-router";
 import { FolderEdit } from "lucide-react-native";
@@ -16,6 +18,9 @@ export const FoldersBody: React.FC<Props> = ({
   selectedFolderId,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
@@ -39,7 +44,7 @@ export const FoldersBody: React.FC<Props> = ({
         }}
       >
         <Button variant="ghost" size="sm" onPress={handleGoBack}>
-          ← Volver a carpetas
+          ← {t.backToFolders[lang]}
         </Button>
         <Button
           variant="ghost"
@@ -47,7 +52,7 @@ export const FoldersBody: React.FC<Props> = ({
           onPress={handleEditFolder}
           icon={<FolderEdit size={18} color={colors.primary[500]} />}
         >
-          Editar
+          {t.edit[lang]}
         </Button>
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>

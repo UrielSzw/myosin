@@ -1,6 +1,8 @@
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { useQueryClient } from "@tanstack/react-query";
@@ -26,6 +28,9 @@ export const MoveRoutineModal: React.FC<Props> = ({
   currentFolderId,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const queryClient = useQueryClient();
 
   if (!routine) return null;
@@ -65,7 +70,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
           }}
         >
           <Typography variant="h6" weight="semibold">
-            Mover Rutina
+            {t.moveRoutine[lang]}
           </Typography>
           <TouchableOpacity onPress={onClose}>
             <X size={24} color={colors.text} />
@@ -87,7 +92,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
               color="textMuted"
               style={{ marginBottom: 4 }}
             >
-              Rutina seleccionada:
+              {t.selectedRoutine[lang]}
             </Typography>
             <Typography variant="h6" weight="medium">
               {routine.name}
@@ -98,7 +103,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
                 color="textMuted"
                 style={{ marginTop: 4 }}
               >
-                Actualmente en:{" "}
+                {t.currentlyIn[lang]}{" "}
                 {folders?.find((f) => f.id === currentFolderId)?.name}
               </Typography>
             )}
@@ -134,10 +139,10 @@ export const MoveRoutineModal: React.FC<Props> = ({
               </View>
               <View style={{ flex: 1 }}>
                 <Typography variant="body1" weight="medium">
-                  Sacar de carpeta
+                  {t.removeFromFolder[lang]}
                 </Typography>
                 <Typography variant="body2" color="textMuted">
-                  Mover a rutinas principales
+                  {t.moveToMainRoutines[lang]}
                 </Typography>
               </View>
             </TouchableOpacity>
@@ -145,7 +150,9 @@ export const MoveRoutineModal: React.FC<Props> = ({
 
           {/* Available folders */}
           <Typography variant="h6" weight="medium" style={{ marginBottom: 16 }}>
-            {currentFolderId ? "Mover a otra carpeta:" : "Mover a carpeta:"}
+            {currentFolderId
+              ? t.moveToAnotherFolder[lang]
+              : t.moveToFolder[lang]}
           </Typography>
 
           {availableFolders && availableFolders?.length > 0 ? (
@@ -184,7 +191,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
                     {folder.name}
                   </Typography>
                   <Typography variant="body2" color="textMuted">
-                    Carpeta
+                    {t.folder[lang]}
                   </Typography>
                 </View>
               </TouchableOpacity>
@@ -202,9 +209,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
                 style={{ marginBottom: 16 }}
               />
               <Typography variant="body1" color="textMuted">
-                {currentFolderId
-                  ? "No hay otras carpetas disponibles"
-                  : "No hay carpetas disponibles"}
+                {currentFolderId ? t.noOtherFolders[lang] : t.noFolders[lang]}
               </Typography>
             </View>
           )}
@@ -219,7 +224,7 @@ export const MoveRoutineModal: React.FC<Props> = ({
           }}
         >
           <Button variant="outline" onPress={onClose}>
-            Cancelar
+            {t.cancel[lang]}
           </Button>
         </View>
       </View>

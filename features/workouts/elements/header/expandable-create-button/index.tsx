@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
@@ -21,6 +23,9 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const [isExpanded, setIsExpanded] = React.useState(false);
 
   // Animaciones
@@ -142,7 +147,7 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
                 ]}
               >
                 <Typography variant="body2" weight="medium">
-                  Crear desde 0
+                  {t.createFromScratch[lang]}
                 </Typography>
               </View>
               <View
@@ -178,7 +183,7 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
                 ]}
               >
                 <Typography variant="body2" weight="medium">
-                  Usar template
+                  {t.useTemplate[lang]}
                 </Typography>
               </View>
               <View

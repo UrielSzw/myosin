@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
 import { Pressable, View } from "react-native";
@@ -6,13 +7,16 @@ import { Pressable, View } from "react-native";
 type Props = {
   showRecent: boolean;
   onShowRecentToggle: () => void;
+  lang: "es" | "en";
 };
 
 export const SessionListFilters: React.FC<Props> = ({
   showRecent,
   onShowRecentToggle,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = workoutSessionListTranslations;
 
   return (
     <View style={{ marginBottom: 20 }}>
@@ -38,6 +42,8 @@ export const SessionListFilters: React.FC<Props> = ({
                   borderColor: colors.border,
                 },
           ]}
+          accessibilityRole="button"
+          accessibilityLabel={t.recent[lang]}
         >
           <Typography
             variant="caption"
@@ -46,7 +52,7 @@ export const SessionListFilters: React.FC<Props> = ({
               color: showRecent ? "#ffffff" : colors.text,
             }}
           >
-            Recientes
+            {t.recent[lang]}
           </Typography>
         </Pressable>
       </View>

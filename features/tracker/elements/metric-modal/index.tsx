@@ -7,6 +7,7 @@ import {
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { trackerUiTranslations } from "@/shared/translations/tracker";
 import React, { useState } from "react";
 import {
   KeyboardAvoidingView,
@@ -28,13 +29,16 @@ type Props = {
   selectedMetric: MainMetric | null;
   setSelectedMetric: (metric: MainMetric | null) => void;
   selectedDate: string;
+  lang: "es" | "en";
 };
 
 export const MetricModal: React.FC<Props> = ({
   selectedMetric,
   setSelectedMetric,
   selectedDate,
+  lang,
 }) => {
+  const tUi = trackerUiTranslations;
   const { colors } = useColorScheme();
   const { user } = useAuth();
   const addEntryMutation = useAddEntry();
@@ -93,6 +97,7 @@ export const MetricModal: React.FC<Props> = ({
             currentValue={currentValue}
             onClose={handleCloseModal}
             onOpenSettings={handleOpenSettings}
+            lang={lang}
           />
 
           <ScrollView
@@ -111,12 +116,14 @@ export const MetricModal: React.FC<Props> = ({
                   selectedMetric={selectedMetric}
                   selectedDate={selectedDate}
                   onCloseModal={handleCloseModal}
+                  lang={lang}
                 />
 
                 <ManualInput
                   selectedMetric={selectedMetric}
                   selectedDate={selectedDate}
                   onCloseModal={handleCloseModal}
+                  lang={lang}
                 />
               </>
             ) : selectedMetric.input_type === "scale_discrete" ? (
@@ -134,13 +141,14 @@ export const MetricModal: React.FC<Props> = ({
                       userId: user?.id || "",
                       displayValue,
                       recordedAt: selectedDate,
-                      notes: "Scale input entry",
+                      notes: tUi.scaleInputEntry[lang],
                     });
                     handleCloseModal();
                   } catch (error) {
                     console.error("Error adding scale entry:", error);
                   }
                 }}
+                lang={lang}
               />
             ) : selectedMetric.input_type === "boolean_toggle" ? (
               <BooleanToggleInput
@@ -153,13 +161,14 @@ export const MetricModal: React.FC<Props> = ({
                       userId: user?.id || "",
                       displayValue,
                       recordedAt: selectedDate,
-                      notes: "Boolean input entry",
+                      notes: tUi.booleanInputEntry[lang],
                     });
                     handleCloseModal();
                   } catch (error) {
                     console.error("Error adding boolean entry:", error);
                   }
                 }}
+                lang={lang}
               />
             ) : null}
             {/* Historial del Día */}
@@ -168,6 +177,7 @@ export const MetricModal: React.FC<Props> = ({
               unit={selectedMetric.unit}
               dayData={dayData}
               metricSlug={selectedMetric.slug}
+              lang={lang}
             />
             {/* Daily Summary */}
             <DailySummary
@@ -176,6 +186,7 @@ export const MetricModal: React.FC<Props> = ({
               defaultTarget={selectedMetric.default_target}
               color={selectedMetric.color}
               metricSlug={selectedMetric.slug}
+              lang={lang}
             />
           </ScrollView>
         </View>
@@ -189,6 +200,7 @@ export const MetricModal: React.FC<Props> = ({
           selectedMetric={selectedMetric}
           onSaveTarget={handleSaveTarget}
           onDeleteMetric={handleDeleteMetric}
+          lang={lang}
         />
       )}
     </Modal>

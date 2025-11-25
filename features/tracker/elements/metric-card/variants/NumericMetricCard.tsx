@@ -1,6 +1,7 @@
 import type { MetricDisplayData } from "@/features/tracker/types/visual-states";
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { getMetricName } from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import React from "react";
@@ -13,10 +14,11 @@ type NumericMetricCardProps = {
   metric: TrackerMetricWithQuickActions;
   displayData: MetricDisplayData;
   onPress: () => void;
+  lang: "es" | "en";
 };
 
 export const NumericMetricCard: React.FC<NumericMetricCardProps> = React.memo(
-  ({ metric, displayData, onPress }) => {
+  ({ metric, displayData, onPress, lang }) => {
     const isCompleted = displayData.state === "completed";
 
     // Get user's weight unit preference
@@ -47,7 +49,7 @@ export const NumericMetricCard: React.FC<NumericMetricCardProps> = React.memo(
         isCompleted={isCompleted}
       >
         {/* Metric Label */}
-        <MetricLabel name={metric.name} />
+        <MetricLabel name={getMetricName(metric, lang)} />
 
         {/* Icon with Progress Ring */}
         <MetricIcon

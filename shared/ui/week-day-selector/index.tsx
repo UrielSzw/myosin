@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -25,6 +27,9 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
   disabled = false,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
 
   const handleDayToggle = (dayKey: string) => {
     if (disabled) return;
@@ -43,15 +48,14 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
         weight="medium"
         style={{ marginBottom: 4, color: colors.text }}
       >
-        Cuándo hacer esta rutina
+        {t.whenToDoRoutine[lang]}
       </Typography>
       <Typography
         variant="caption"
         color="textMuted"
         style={{ marginBottom: 12 }}
       >
-        Opcional - selecciona los días que entrenarás para calcular el volumen
-        semanal
+        {t.whenToDoRoutineSubtitle[lang]}
       </Typography>
       <ScrollView
         horizontal
@@ -110,8 +114,13 @@ export const WeekDaySelector: React.FC<WeekDaySelectorProps> = ({
           color="textMuted"
           style={{ marginTop: 8 }}
         >
-          {selectedDays.length} día{selectedDays.length !== 1 ? "s" : ""}{" "}
-          seleccionado{selectedDays.length !== 1 ? "s" : ""}
+          {selectedDays.length}{" "}
+          {selectedDays.length !== 1
+            ? t.daysSelectedPlural[lang]
+            : t.daysSelected[lang]}{" "}
+          {selectedDays.length !== 1
+            ? t.selectedPlural[lang]
+            : t.selected[lang]}
         </Typography>
       )}
     </View>

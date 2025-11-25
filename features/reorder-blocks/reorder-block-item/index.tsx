@@ -2,6 +2,8 @@ import { BlockInsert } from "@/shared/db/schema";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useReorderBlocksState } from "@/shared/hooks/use-reorder-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { GripVertical } from "lucide-react-native";
@@ -19,6 +21,9 @@ export const ReorderBlockItem: React.FC<Props> = ({
   isActive,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = sharedUiTranslations;
   const { getBlockTypeLabel } = useBlockStyles();
   const { exercisesByBlock, exercisesInBlock } = useReorderBlocksState();
 
@@ -37,12 +42,12 @@ export const ReorderBlockItem: React.FC<Props> = ({
 
   const exercisesNames = exercisesIds.map((ex) => {
     const exercise = exercisesInBlock[ex];
-    return exercise ? exercise.exercise.name : "Ejercicio eliminado";
+    return exercise ? exercise.exercise.name : t.deletedExercise[lang];
   });
 
   const exerciseNames = exercisesNames.length
     ? exercisesNames.join(", ")
-    : "Sin ejercicios";
+    : t.noExercises[lang];
 
   return (
     <TouchableOpacity

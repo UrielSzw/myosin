@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { rpeSelectorTranslations } from "@/shared/translations/rpe-selector";
 import { RPEValue } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
@@ -24,55 +26,55 @@ const RPE_OPTIONS: RPEOption[] = [
   {
     value: 6,
     label: "6.0",
-    description: "Podrías hacer 4+ reps más",
+    description: "rpe6",
     color: "#10B981", // green-500
   },
   {
     value: 6.5,
     label: "6.5",
-    description: "Podrías hacer 3-4 reps más",
+    description: "rpe65",
     color: "#22C55E", // green-400
   },
   {
     value: 7,
     label: "7.0",
-    description: "Podrías hacer 2-3 reps más",
+    description: "rpe7",
     color: "#84CC16", // lime-400
   },
   {
     value: 7.5,
     label: "7.5",
-    description: "Podrías hacer 1-2 reps más",
+    description: "rpe75",
     color: "#EAB308", // yellow-500
   },
   {
     value: 8,
     label: "8.0",
-    description: "Podrías hacer 1 rep más",
+    description: "rpe8",
     color: "#F97316", // orange-500
   },
   {
     value: 8.5,
     label: "8.5",
-    description: "Tal vez 1 rep más",
+    description: "rpe85",
     color: "#EF4444", // red-500
   },
   {
     value: 9,
     label: "9.0",
-    description: "No podrías hacer otra rep",
+    description: "rpe9",
     color: "#DC2626", // red-600
   },
   {
     value: 9.5,
     label: "9.5",
-    description: "La técnica empezó a fallar",
+    description: "rpe95",
     color: "#B91C1C", // red-700
   },
   {
     value: 10,
     label: "10",
-    description: "Máximo esfuerzo / Falla",
+    description: "rpe10",
     color: "#7F1D1D", // red-900
   },
 ];
@@ -80,6 +82,9 @@ const RPE_OPTIONS: RPEOption[] = [
 export const RPESelector = forwardRef<BottomSheetModal, Props>(
   ({ plannedRPE, selectedRPE, onSelect, onDismiss, mode = "workout" }, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = rpeSelectorTranslations;
 
     const handleSelect = useCallback(
       (rpe: RPEValue) => {
@@ -127,8 +132,8 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
               }}
             >
               {mode === "form"
-                ? "Seleccionar RPE Objetivo"
-                : "Escala de Esfuerzo Percibido"}
+                ? t.selectTargetRPE[lang]
+                : t.perceivedEffortScale[lang]}
             </Typography>
 
             {mode === "workout" && plannedRPE && (
@@ -146,14 +151,14 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                   color="textMuted"
                   style={{ textAlign: "center" }}
                 >
-                  RPE Objetivo: {plannedRPE}
+                  {t.targetRPE[lang]} {plannedRPE}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="textMuted"
                   style={{ textAlign: "center", marginTop: 2 }}
                 >
-                  ¿Cómo se sintió realmente esta serie?
+                  {t.howDidItFeel[lang]}
                 </Typography>
               </View>
             )}
@@ -164,7 +169,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 color="textMuted"
                 style={{ textAlign: "center" }}
               >
-                Configura la intensidad objetivo para este ejercicio
+                {t.configureTargetIntensity[lang]}
               </Typography>
             )}
           </View>
@@ -248,7 +253,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                         marginBottom: 4,
                       }}
                     >
-                      {option.description}
+                      {t[option.description as keyof typeof t][lang]}
                     </Typography>
 
                     {mode === "workout" && isPlanned && (
@@ -260,7 +265,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                           fontWeight: "600",
                         }}
                       >
-                        🎯 Intensidad planificada
+                        {t.plannedIntensity[lang]}
                       </Typography>
                     )}
                   </View>
@@ -316,7 +321,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
               activeOpacity={0.7}
             >
               <Typography variant="body1" weight="semibold" color="textMuted">
-                Cancelar
+                {t.cancel[lang]}
               </Typography>
             </TouchableOpacity>
 
@@ -343,7 +348,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                   weight="semibold"
                   style={{ color: "#dc2626" }}
                 >
-                  Limpiar
+                  {t.clear[lang]}
                 </Typography>
               </TouchableOpacity>
             )}
@@ -377,8 +382,8 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 }}
               >
                 {selectedRPE
-                  ? `Confirmar RPE ${selectedRPE}`
-                  : "Seleccionar RPE"}
+                  ? `${t.confirmRPE[lang]} ${selectedRPE}`
+                  : t.selectRPEButton[lang]}
               </Typography>
             </TouchableOpacity>
           </View>

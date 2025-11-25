@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
@@ -12,6 +14,10 @@ type Props = {
 };
 
 export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = prDetailTranslations;
+
   const { data, isLoading, error } = usePRDetail(exerciseId);
 
   // Usar los progressStats que vienen del hook (ya calculados correctamente)
@@ -38,10 +44,10 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
   if (isLoading) {
     return (
       <ScreenWrapper fullscreen>
-        <PRDetailHeader exerciseName="Cargando..." />
+        <PRDetailHeader exerciseName={t.loading[lang]} lang={lang} />
         <View style={{ padding: 16, alignItems: "center" }}>
           <Typography variant="body2" color="textMuted">
-            Cargando datos del PR...
+            {t.loadingData[lang]}
           </Typography>
         </View>
       </ScreenWrapper>
@@ -51,10 +57,10 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
   if (!data) {
     return (
       <ScreenWrapper fullscreen>
-        <PRDetailHeader exerciseName="Error" />
+        <PRDetailHeader exerciseName={t.error[lang]} lang={lang} />
         <View style={{ padding: 16, alignItems: "center" }}>
           <Typography variant="body2" color="textMuted">
-            No se pudieron cargar los datos del PR
+            {t.couldNotLoadData[lang]}
           </Typography>
         </View>
       </ScreenWrapper>
@@ -63,7 +69,7 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
 
   return (
     <ScreenWrapper fullscreen>
-      <PRDetailHeader exerciseName={data.exerciseInfo.name} />
+      <PRDetailHeader exerciseName={data.exerciseInfo.name} lang={lang} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -77,11 +83,12 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
             lastPR={progressStats.lastPR}
             totalProgress={progressStats.totalProgress}
             timeSpan={progressStats.timeSpan}
+            lang={lang}
           />
         )}
 
         {/* Chart Section */}
-        <PRChartSection history={data.history} />
+        <PRChartSection history={data.history} lang={lang} />
       </ScrollView>
     </ScreenWrapper>
   );

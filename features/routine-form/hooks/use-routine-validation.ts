@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { useMemo } from "react";
 import { useRoutineFormState } from "./use-routine-form-store";
 
@@ -28,6 +30,9 @@ export const useRoutineValidation = (): RoutineValidation => {
     blocks,
     exercisesInBlock,
   } = useRoutineFormState();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
 
   return useMemo(() => {
     const errors: RoutineValidation["errors"] = {};
@@ -42,18 +47,18 @@ export const useRoutineValidation = (): RoutineValidation => {
 
     if (!hasValidName) {
       if (!routineName) {
-        errors.routineName = "El nombre de la rutina es requerido";
+        errors.routineName = t.routineNameRequired[lang];
       } else if (routineName.length < 2) {
-        errors.routineName = "El nombre debe tener al menos 2 caracteres";
+        errors.routineName = t.nameTooShort[lang];
       } else if (routineName.length > 100) {
-        errors.routineName = "El nombre no puede exceder 100 caracteres";
+        errors.routineName = t.nameTooLong[lang];
       }
     }
 
     // 2. Validar que hay al menos un bloque
     const hasBlocks = blocksByRoutine.length > 0;
     if (!hasBlocks) {
-      errors.blocks = "La rutina debe tener al menos un bloque";
+      errors.blocks = t.atLeastOneBlock[lang];
     }
 
     // 3. Validar que cada bloque tiene al menos un ejercicio
@@ -62,15 +67,16 @@ export const useRoutineValidation = (): RoutineValidation => {
       const exerciseIds = exercisesByBlock[blockId] || [];
       if (exerciseIds.length === 0) {
         const block = blocks[blockId];
-        blocksWithoutExercises.push(block?.name || "Bloque sin nombre");
+        blocksWithoutExercises.push(block?.name || t.blockWithoutName[lang]);
       }
     });
 
     const hasExercises = blocksWithoutExercises.length === 0;
     if (!hasExercises) {
-      errors.exercises = `Los siguientes bloques no tienen ejercicios: ${blocksWithoutExercises.join(
-        ", "
-      )}`;
+      errors.exercises = t.blocksWithoutExercises[lang].replace(
+        "{blocks}",
+        blocksWithoutExercises.join(", ")
+      );
     }
 
     // 4. Validar que cada ejercicio tiene al menos un set
@@ -81,7 +87,7 @@ export const useRoutineValidation = (): RoutineValidation => {
         if (setIds.length === 0) {
           const exercise = exercisesInBlock[exerciseId];
           exercisesWithoutSets.push(
-            exercise?.exercise?.name || "Ejercicio sin nombre"
+            exercise?.exercise?.name || t.exerciseWithoutName[lang]
           );
         }
       });
@@ -89,9 +95,10 @@ export const useRoutineValidation = (): RoutineValidation => {
 
     const hasSets = exercisesWithoutSets.length === 0;
     if (!hasSets) {
-      errors.sets = `Los siguientes ejercicios no tienen sets: ${exercisesWithoutSets.join(
-        ", "
-      )}`;
+      errors.sets = t.exercisesWithoutSets[lang].replace(
+        "{exercises}",
+        exercisesWithoutSets.join(", ")
+      );
     }
 
     // 5. Resultado final
@@ -116,5 +123,7 @@ export const useRoutineValidation = (): RoutineValidation => {
     setsByExercise,
     blocks,
     exercisesInBlock,
+    lang,
+    t,
   ]);
 };

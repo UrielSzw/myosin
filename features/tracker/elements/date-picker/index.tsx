@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
@@ -9,10 +10,16 @@ import { TouchableOpacity, View } from "react-native";
 type Props = {
   selectedDate: string;
   onDateChange: (date: string) => void;
+  lang: "es" | "en";
 };
 
-export const DatePicker: React.FC<Props> = ({ selectedDate, onDateChange }) => {
+export const DatePicker: React.FC<Props> = ({
+  selectedDate,
+  onDateChange,
+  lang,
+}) => {
   const { colors } = useColorScheme();
+  const t = trackerTranslations;
 
   const formatDate = (dateString: string) => {
     // Usar el dateString directamente para evitar problemas de timezone
@@ -27,10 +34,10 @@ export const DatePicker: React.FC<Props> = ({ selectedDate, onDateChange }) => {
     const todayString = getDayKey(today);
     const yesterdayString = getDayKey(yesterday);
 
-    if (dateString === todayString) return "Hoy";
-    if (dateString === yesterdayString) return "Ayer";
+    if (dateString === todayString) return t.datePicker.today[lang];
+    if (dateString === yesterdayString) return t.datePicker.yesterday[lang];
 
-    return date.toLocaleDateString("es-ES", {
+    return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
       weekday: "short",
       day: "numeric",
       month: "short",

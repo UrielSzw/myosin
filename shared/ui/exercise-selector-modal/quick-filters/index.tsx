@@ -3,6 +3,9 @@ import {
   QuickFilterType,
 } from "@/shared/constants/exercise-filters";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseFiltersTranslations } from "@/shared/translations/exercise-filters";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell, Layers, Settings, Target, User } from "lucide-react-native";
 import React from "react";
@@ -18,6 +21,10 @@ export const QuickFilters: React.FC<Props> = ({
   onFilterToggle,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseFiltersTranslations;
+  const sharedT = sharedUiTranslations;
 
   // Helper para obtener el icono correcto
   const getIcon = (iconName: string, isSelected: boolean) => {
@@ -76,7 +83,9 @@ export const QuickFilters: React.FC<Props> = ({
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
               accessibilityLabel={filter.description}
-              accessibilityHint={`Filtrar por ${filter.label.toLowerCase()}`}
+              accessibilityHint={`${
+                sharedT.filterBy[lang]
+              } ${filter.label.toLowerCase()}`}
             >
               {icon && <View style={{ marginRight: 6 }}>{icon}</View>}
               <Typography
@@ -85,7 +94,7 @@ export const QuickFilters: React.FC<Props> = ({
                 color={isSelected ? "white" : "text"}
                 style={{ fontSize: 13 }}
               >
-                {filter.label}
+                {(t as any)[filter.label]?.label?.[lang] || filter.label}
               </Typography>
             </TouchableOpacity>
           );

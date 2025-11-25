@@ -2,6 +2,10 @@ import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import {
+  getMetricName,
+  trackerTranslations,
+} from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { icons, Settings, X } from "lucide-react-native";
@@ -13,6 +17,7 @@ type Props = {
   currentValue?: number;
   onClose: () => void;
   onOpenSettings?: () => void;
+  lang: "es" | "en";
 };
 
 export const ModalHeader: React.FC<Props> = ({
@@ -20,10 +25,12 @@ export const ModalHeader: React.FC<Props> = ({
   currentValue,
   onClose,
   onOpenSettings,
+  lang,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = trackerTranslations;
 
   const IconComponent = (icons as any)[selectedMetric.icon];
   const isWeightMetric = selectedMetric.slug === "weight";
@@ -68,11 +75,12 @@ export const ModalHeader: React.FC<Props> = ({
         </View>
         <View>
           <Typography variant="h6" weight="semibold">
-            {selectedMetric.name}
+            {getMetricName(selectedMetric, lang)}
           </Typography>
           {displayValue !== undefined && (
             <Typography variant="caption" color="textMuted">
-              Actual: {formatValue(displayValue)} {displayUnit}
+              {t.modalHeader.current[lang]}: {formatValue(displayValue)}{" "}
+              {displayUnit}
             </Typography>
           )}
         </View>

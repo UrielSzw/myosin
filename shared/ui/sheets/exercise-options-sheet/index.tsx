@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { BottomSheetOptions } from "@/shared/ui/bottom-sheet-options";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { RotateCcw, Trash } from "lucide-react-native";
@@ -17,11 +19,14 @@ export const ExerciseOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     ref
   ) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = sharedUiTranslations;
 
     const options = [
       {
         type: "replace",
-        label: "Remplazar ejercicio",
+        label: t.replaceExercise[lang],
         method: onShowReplace,
         icon: <RotateCcw color={colors.text} size={20} />,
       },
@@ -30,13 +35,13 @@ export const ExerciseOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetOptions
         ref={ref}
-        title="Opciones de Ejercicio"
+        title={t.exerciseOptions[lang]}
         subtitle={exerciseName || ""}
         options={options}
         warningOption={
           isInMultipleExercisesBlock
             ? {
-                label: "Eliminar ejercicio",
+                label: t.deleteExercise[lang],
                 method: onDelete,
                 icon: <Trash color={colors.error[500]} size={20} />,
               }

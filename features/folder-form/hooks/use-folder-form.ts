@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "react-native";
 
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { ValidationState } from "@/shared/ui/enhanced-input";
 import { useQueryClient } from "@tanstack/react-query";
 import { folderService } from "../service/folder";
@@ -15,6 +17,9 @@ type Props = {
 };
 
 export const useFolderForm = ({ isEditMode }: Props) => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = folderFormTranslations;
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
@@ -58,15 +63,15 @@ export const useFolderForm = ({ isEditMode }: Props) => {
     async (folderName: string): Promise<ValidationState> => {
       // Basic validations
       if (!folderName.trim()) {
-        return { isValid: false, error: "El nombre es requerido" };
+        return { isValid: false, error: t.nameRequired[lang] };
       }
 
       if (folderName.length > 50) {
-        return { isValid: false, error: "Máximo 50 caracteres" };
+        return { isValid: false, error: t.maxCharacters[lang] };
       }
 
       if (folderName.length < 2) {
-        return { isValid: false, error: "Mínimo 2 caracteres" };
+        return { isValid: false, error: t.minCharacters[lang] };
       }
 
       // Check for duplicate names (skip if editing the same folder)
@@ -81,7 +86,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
         if (duplicateFolder) {
           return {
             isValid: false,
-            error: "Ya existe una carpeta con este nombre",
+            error: t.duplicateName[lang],
           };
         }
       } catch (error) {
@@ -91,7 +96,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
 
       return { isValid: true, error: null };
     },
-    [editingId]
+    [editingId, t, lang]
   );
 
   // Handle name change with smart validation
@@ -119,19 +124,19 @@ export const useFolderForm = ({ isEditMode }: Props) => {
 
       // Basic instant validations that don't require async operations
       if (!newName.trim()) {
-        setNameValidation({ isValid: false, error: "El nombre es requerido" });
+        setNameValidation({ isValid: false, error: t.nameRequired[lang] });
         setIsCurrentlyValid(false);
         return;
       }
 
       if (newName.length > 50) {
-        setNameValidation({ isValid: false, error: "Máximo 50 caracteres" });
+        setNameValidation({ isValid: false, error: t.maxCharacters[lang] });
         setIsCurrentlyValid(false);
         return;
       }
 
       if (newName.length < 2) {
-        setNameValidation({ isValid: false, error: "Mínimo 2 caracteres" });
+        setNameValidation({ isValid: false, error: t.minCharacters[lang] });
         setIsCurrentlyValid(false);
         return;
       }
@@ -180,11 +185,11 @@ export const useFolderForm = ({ isEditMode }: Props) => {
         resetForm();
         router.back();
       } else {
-        Alert.alert("Error", result.error);
+        Alert.alert(t.error[lang], result.error);
       }
     } catch (error) {
       console.error("Error saving folder:", error);
-      Alert.alert("Error", "No se pudo guardar la carpeta");
+      Alert.alert(t.error[lang], t.couldNotSaveFolder[lang]);
     } finally {
       setIsSaving(false);
     }
@@ -193,38 +198,34 @@ export const useFolderForm = ({ isEditMode }: Props) => {
   const handleDeleteFolder = async () => {
     if (!isEditMode || !editingId) return;
 
-    Alert.alert(
-      "Eliminar Carpeta",
-      "¿Estás seguro de que quieres eliminar esta carpeta? Esta acción no se puede deshacer.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            setIsDeleting(true);
-            try {
-              await folderService.deleteFolder(editingId);
+    Alert.alert(t.deleteFolderTitle[lang], t.deleteFolderMessage[lang], [
+      { text: t.cancel[lang], style: "cancel" },
+      {
+        text: t.delete[lang],
+        style: "destructive",
+        onPress: async () => {
+          setIsDeleting(true);
+          try {
+            await folderService.deleteFolder(editingId);
 
-              // Sync to Supabase after deletion
-              sync("FOLDER_DELETE", { id: editingId });
+            // Sync to Supabase after deletion
+            sync("FOLDER_DELETE", { id: editingId });
 
-              queryClient.invalidateQueries({
-                queryKey: ["workouts", "folders"],
-              });
-              setSelectedFolder(null);
-              resetForm();
-              router.back();
-            } catch (error) {
-              console.error("Error deleting folder:", error);
-              Alert.alert("Error", "No se pudo eliminar la carpeta");
-            } finally {
-              setIsDeleting(false);
-            }
-          },
+            queryClient.invalidateQueries({
+              queryKey: ["workouts", "folders"],
+            });
+            setSelectedFolder(null);
+            resetForm();
+            router.back();
+          } catch (error) {
+            console.error("Error deleting folder:", error);
+            Alert.alert(t.error[lang], t.couldNotDeleteFolder[lang]);
+          } finally {
+            setIsDeleting(false);
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   // Cleanup validation timeout on unmount

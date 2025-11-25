@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prListTranslations } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import React, { useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
@@ -8,15 +9,16 @@ type Props = {
   onMuscleGroupToggle: (category: string) => void; // Cambiado a categorías
   showRecent: boolean;
   onShowRecentToggle: () => void;
+  lang: "es" | "en";
 };
 
 const MUSCLE_CATEGORIES = [
-  { key: "chest", label: "Pecho" },
-  { key: "back", label: "Espalda" },
-  { key: "shoulders", label: "Hombros" },
-  { key: "arms", label: "Brazos" },
-  { key: "legs", label: "Piernas" },
-  { key: "core", label: "Core" },
+  { key: "chest", label: { es: "Pecho", en: "Chest" } },
+  { key: "back", label: { es: "Espalda", en: "Back" } },
+  { key: "shoulders", label: { es: "Hombros", en: "Shoulders" } },
+  { key: "arms", label: { es: "Brazos", en: "Arms" } },
+  { key: "legs", label: { es: "Piernas", en: "Legs" } },
+  { key: "core", label: { es: "Core", en: "Core" } },
 ];
 
 export const PRListFilters: React.FC<Props> = ({
@@ -24,8 +26,10 @@ export const PRListFilters: React.FC<Props> = ({
   onMuscleGroupToggle,
   showRecent,
   onShowRecentToggle,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = prListTranslations;
   const [showAllMuscles, setShowAllMuscles] = useState(false);
 
   const displayedMuscles = showAllMuscles
@@ -72,7 +76,7 @@ export const PRListFilters: React.FC<Props> = ({
                   color: isSelected ? "#ffffff" : colors.text,
                 }}
               >
-                {muscle.label}
+                {muscle.label[lang]}
               </Typography>
             </Pressable>
           );
@@ -107,7 +111,7 @@ export const PRListFilters: React.FC<Props> = ({
               color: showRecent ? "#ffffff" : colors.text,
             }}
           >
-            Recientes
+            {t.recent[lang]}
           </Typography>
         </Pressable>
 
@@ -127,7 +131,7 @@ export const PRListFilters: React.FC<Props> = ({
             ]}
           >
             <Typography variant="caption" color="textMuted">
-              {showAllMuscles ? "Ver menos" : "Ver más"}
+              {showAllMuscles ? t.viewLess[lang] : t.viewMore[lang]}
             </Typography>
           </Pressable>
         )}

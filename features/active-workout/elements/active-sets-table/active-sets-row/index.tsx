@@ -9,6 +9,7 @@ import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
 import { MeasurementInput } from "@/shared/ui/measurement-input";
@@ -50,6 +51,8 @@ export const ActiveSetRow: React.FC<Props> = ({
 
   // Get user's weight unit preference
   const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = activeWorkoutTranslations;
   const weightUnit = prefs?.weight_unit ?? "kg";
 
   // Hook para indicador de próximo set (solo para superseries y circuitos)
@@ -494,14 +497,10 @@ export const ActiveSetRow: React.FC<Props> = ({
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel={
-              isSetCompleted
-                ? "Marcar serie como incompleta"
-                : "Completar serie"
+              isSetCompleted ? t.markAsIncomplete[lang] : t.completeSet[lang]
             }
             accessibilityHint={
-              isSetCompleted
-                ? "Toca para desmarcar esta serie"
-                : "Toca para marcar esta serie como completada"
+              isSetCompleted ? t.tapToUnmark[lang] : t.tapToMarkComplete[lang]
             }
             accessibilityState={{ checked: isSetCompleted }}
           >

@@ -1,5 +1,6 @@
-import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { ExerciseMedia } from "@/shared/ui/exercise-media";
 import { Typography } from "@/shared/ui/typography";
@@ -22,6 +23,9 @@ export const ActiveExerciseHeader: React.FC<Props> = ({
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const muscleT = exerciseMuscleTranslations;
 
   return (
     <View
@@ -52,7 +56,7 @@ export const ActiveExerciseHeader: React.FC<Props> = ({
           </Typography>
         </View>
         <Typography variant="caption" color="textMuted">
-          {EXERCISE_CATEGORY_LABELS[exerciseMainMuscle as IExerciseMuscle]}
+          {muscleT[exerciseMainMuscle as IExerciseMuscle]?.[lang]}
         </Typography>
       </View>
 

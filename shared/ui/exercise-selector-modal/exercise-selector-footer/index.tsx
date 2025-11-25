@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import React from "react";
 import { View } from "react-native";
 import { Button } from "../../button";
@@ -20,6 +22,9 @@ export const ExerciseSelectorFooter: React.FC<Props> = ({
   onAddToReplace,
   onAddToBlock,
 }) => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
   const { colors } = useColorScheme();
 
   return (
@@ -35,26 +40,26 @@ export const ExerciseSelectorFooter: React.FC<Props> = ({
         <View style={{ gap: 12 }}>
           {selectedExercisesLength > 1 && (
             <Button variant="primary" fullWidth onPress={onAddMultiBlock}>
-              Agregar como superset
+              {t.addAsSuperset[lang]}
             </Button>
           )}
           <Button variant="outline" fullWidth onPress={onAddAsIndividual}>
             {selectedExercisesLength > 1
-              ? "Agregar por separado"
-              : "Agregar ejercicio"}
+              ? t.addSeparately[lang]
+              : t.addExercise[lang]}
           </Button>
         </View>
       )}
 
       {exerciseModalMode === "replace" && selectedExercisesLength > 0 && (
         <Button variant="primary" fullWidth onPress={onAddToReplace}>
-          Remplazar ejercicio
+          {t.replaceExercise[lang]}
         </Button>
       )}
 
       {exerciseModalMode === "add-to-block" && (
         <Button variant="primary" fullWidth onPress={onAddToBlock}>
-          Agregar al superset
+          {t.addToSuperset[lang]}
         </Button>
       )}
     </View>

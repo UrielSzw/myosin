@@ -1,4 +1,5 @@
 import { Link2, RotateCcw, Target } from "lucide-react-native";
+import { routineFormTranslations } from "../translations/routine-form";
 import {
   MeasurementTemplateId,
   getMeasurementTemplate,
@@ -10,6 +11,7 @@ import { useUserPreferences } from "./use-user-preferences-store";
 
 export const useBlockStyles = () => {
   const { colors } = useColorScheme();
+  const t = routineFormTranslations;
 
   // Get user's weight unit preference
   const prefs = useUserPreferences();
@@ -38,15 +40,16 @@ export const useBlockStyles = () => {
     }
   };
 
-  const getBlockTypeLabel = (blockType: IBlockType) => {
-    switch (blockType) {
-      case "superset":
-        return "Superserie";
-      case "circuit":
-        return "Circuito";
-      default:
-        return "Individual";
-    }
+  const getBlockTypeLabel = (
+    blockType: IBlockType,
+    lang: "es" | "en" = "es"
+  ) => {
+    const blockTypeMap = {
+      superset: t.blockTypeSuperset[lang],
+      circuit: t.blockTypeCircuit[lang],
+      individual: t.blockTypeIndividual[lang],
+    };
+    return blockTypeMap[blockType] || blockTypeMap.individual;
   };
 
   const getSetTypeLabel = (type: string) => {

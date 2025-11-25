@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { AnimatedIllustration } from "@/shared/ui/animated-illustration";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
@@ -7,6 +9,10 @@ import { ScrollView, View } from "react-native";
 import Animated, { FadeInUp } from "react-native-reanimated";
 
 export const EmptyState = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
+
   const handleCreateRoutine = () => {
     router.push("/routines/create");
   };
@@ -37,7 +43,7 @@ export const EmptyState = () => {
             weight="semibold"
             style={{ marginBottom: 8 }}
           >
-            ¡Tu espacio de entrenamiento te espera!
+            {t.emptyStateTitle[lang]}
           </Typography>
 
           <Typography
@@ -46,12 +52,12 @@ export const EmptyState = () => {
             align="center"
             style={{ marginBottom: 24 }}
           >
-            Diseña rutinas personalizadas y lleva tu progreso al siguiente nivel
+            {t.emptyStateSubtitle[lang]}
           </Typography>
 
           <View style={{ flexDirection: "row", gap: 12, width: "100%" }}>
             <Button variant="primary" size="lg" onPress={handleCreateRoutine}>
-              Crear Primera Rutina
+              {t.createFirstRoutine[lang]}
             </Button>
           </View>
         </Animated.View>

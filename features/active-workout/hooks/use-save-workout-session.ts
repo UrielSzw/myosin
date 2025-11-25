@@ -12,8 +12,10 @@ import type {
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
@@ -21,6 +23,9 @@ import { useActiveWorkout } from "./use-active-workout-store";
 type SaveSessionState = "idle" | "saving" | "success" | "error";
 
 export const useSaveWorkoutSession = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = activeWorkoutTranslations;
   const [saveState, setSaveState] = useState<SaveSessionState>("idle");
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
@@ -311,7 +316,7 @@ export const useSaveWorkoutSession = () => {
       return savedSession.id;
     } catch (err) {
       console.error("Error saving workout session:", err);
-      setError("Error al guardar la sesión. Intenta nuevamente.");
+      setError(t.errorSavingSession[lang]);
       setSaveState("error");
       return null;
     }

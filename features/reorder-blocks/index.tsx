@@ -1,5 +1,7 @@
 import { BlockInsert } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { reorderTranslations } from "@/shared/translations/reorder";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { ArrowLeft } from "lucide-react-native";
@@ -20,6 +22,9 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
   onCancel,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = reorderTranslations;
 
   const [reorderedBlocks, setReorderedBlocks] = useState(blocks);
 
@@ -64,7 +69,7 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
         </Button>
 
         <Typography variant="h6" weight="semibold">
-          Reordenar Bloques
+          {t.reorderBlocks[lang]}
         </Typography>
 
         <Button
@@ -82,7 +87,7 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
             variant="button"
             style={{ color: "white", marginLeft: 4, fontSize: 14 }}
           >
-            Guardar
+            {t.save[lang]}
           </Typography>
         </Button>
       </View>
@@ -94,7 +99,7 @@ export const ReorderBlocksFeature: React.FC<Props> = ({
           color="textMuted"
           style={{ textAlign: "center" }}
         >
-          Mantén presionado un bloque por 300ms para arrastrarlo y reordenar
+          {t.reorderBlocksInstructions[lang]}
         </Typography>
       </View>
 

@@ -12,18 +12,23 @@ import { SessionAnalytics } from "../../hooks/use-session-detail";
 type Props = {
   session: WorkoutSessionFull;
   analytics: SessionAnalytics | null;
+  lang: "es" | "en";
 };
 
-const formatDate = (dateString: string): string => {
+const formatDate = (dateString: string, lang: "es" | "en"): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("es-ES", {
+  return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 };
 
-export const SessionHeader: React.FC<Props> = ({ session, analytics }) => {
+export const SessionHeader: React.FC<Props> = ({
+  session,
+  analytics,
+  lang,
+}) => {
   const { colors } = useColorScheme();
   const router = useRouter();
 
@@ -61,7 +66,7 @@ export const SessionHeader: React.FC<Props> = ({ session, analytics }) => {
             color="textMuted"
             style={{ marginTop: 2 }}
           >
-            {formatDate(session.started_at)}
+            {formatDate(session.started_at, lang)}
           </Typography>
         </View>
 

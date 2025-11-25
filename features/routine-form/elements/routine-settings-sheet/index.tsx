@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineSettingsTranslations } from "@/shared/translations/routine-settings";
 import { Typography } from "@/shared/ui/typography";
 import {
   BottomSheetBackdrop,
@@ -17,6 +19,9 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
   // eslint-disable-next-line no-empty-pattern
   ({}, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = routineSettingsTranslations;
     const { setRoutineFlags } = useMainActions();
     const { routine } = useRoutineFormState();
 
@@ -80,20 +85,20 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
             weight="semibold"
             style={{ marginBottom: 12 }}
           >
-            Configuración de la rutina
+            {t.title[lang]}
           </Typography>
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Typography variant="body1">Mostrar RPE</Typography>
+              <Typography variant="body1">{t.showRpe[lang]}</Typography>
               <Typography variant="caption" color="textMuted">
-                Escala de esfuerzo del 1-10
+                {t.rpeDescription[lang]}
               </Typography>
             </View>
             <Switch
               value={renderShowRpe}
               onValueChange={handleRpeChange}
-              accessibilityLabel="Mostrar RPE"
+              accessibilityLabel={t.showRpe[lang]}
               trackColor={{
                 false: colors.gray[300],
                 true: colors.primary[500],
@@ -104,15 +109,15 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
 
           <View style={styles.row}>
             <View style={styles.rowLeft}>
-              <Typography variant="body1">Mostrar Tempo</Typography>
+              <Typography variant="body1">{t.showTempo[lang]}</Typography>
               <Typography variant="caption" color="textMuted">
-                Controla la velocidad de las repeticiones
+                {t.tempoDescription[lang]}
               </Typography>
             </View>
             <Switch
               value={renderShowTempo}
               onValueChange={handleTempoChange}
-              accessibilityLabel="Mostrar Tempo"
+              accessibilityLabel={t.showTempo[lang]}
               trackColor={{
                 false: colors.gray[300],
                 true: colors.primary[500],

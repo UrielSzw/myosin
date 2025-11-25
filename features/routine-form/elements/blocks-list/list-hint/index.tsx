@@ -1,9 +1,14 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Typography } from "@/shared/ui/typography";
 import { View } from "react-native";
 
 export const ListHint: React.FC = () => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
 
   return (
     <View
@@ -23,8 +28,7 @@ export const ListHint: React.FC = () => {
           fontWeight: "500",
         }}
       >
-        💡 Consejo: Mantén presionado cualquier bloque para reordenar los
-        ejercicios
+        {t.listHint[lang]}
       </Typography>
     </View>
   );

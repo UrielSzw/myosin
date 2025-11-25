@@ -1,6 +1,8 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useUserProfile } from "@/shared/hooks/use-user-profile";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations } from "@/shared/translations/profile";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
@@ -35,6 +37,9 @@ const AVATAR_COLORS = [
 export default function ProfileEditScreen() {
   const { user } = useAuth();
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = profileTranslations;
   const { profile, updateDisplayName, updateAvatarColor } =
     useUserProfile(user);
 
@@ -56,13 +61,10 @@ export default function ProfileEditScreen() {
       if (nameSuccess && colorSuccess) {
         router.back();
       } else {
-        Alert.alert(
-          "Error",
-          "No se pudo guardar el perfil. Verifica tu conexión."
-        );
+        Alert.alert(t.error[lang], t.errorSavingProfile[lang]);
       }
     } catch {
-      Alert.alert("Error", "Ocurrió un error al guardar el perfil");
+      Alert.alert(t.error[lang], t.errorOccurred[lang]);
     } finally {
       setSaving(false);
     }
@@ -89,7 +91,7 @@ export default function ProfileEditScreen() {
               <X size={24} color={colors.text} />
             </TouchableOpacity>
             <Typography variant="h3" weight="bold">
-              Editar Perfil
+              {t.editProfileTitle[lang]}
             </Typography>
             <View style={{ width: 24 }} />
           </View>
@@ -114,7 +116,7 @@ export default function ProfileEditScreen() {
                   align="center"
                   style={{ marginTop: 12 }}
                 >
-                  Tu avatar
+                  {t.yourAvatar[lang]}
                 </Typography>
               </View>
 
@@ -125,7 +127,7 @@ export default function ProfileEditScreen() {
                   weight="semibold"
                   style={{ marginBottom: 12 }}
                 >
-                  Color del avatar
+                  {t.avatarColor[lang]}
                 </Typography>
                 <View style={styles.colorGrid}>
                   {AVATAR_COLORS.map((color) => (
@@ -150,8 +152,8 @@ export default function ProfileEditScreen() {
               {/* Form Fields */}
               <View style={styles.section}>
                 <EnhancedInput
-                  label="Nombre"
-                  placeholder="Tu nombre"
+                  label={t.name[lang]}
+                  placeholder={t.yourName[lang]}
                   value={name}
                   onChangeText={setName}
                   autoCapitalize="words"
@@ -161,11 +163,11 @@ export default function ProfileEditScreen() {
                 />
 
                 <EnhancedInput
-                  label="Email"
+                  label={t.email[lang]}
                   placeholder={user?.email}
                   value={user?.email}
                   editable={false}
-                  helpText="El email no se puede modificar"
+                  helpText={t.emailCannotBeModified[lang]}
                   containerStyle={{ ...styles.input, opacity: 0.6 }}
                 />
               </View>
@@ -179,7 +181,7 @@ export default function ProfileEditScreen() {
                 size="lg"
                 fullWidth
               >
-                Cancelar
+                {t.cancel[lang]}
               </Button>
               <Button
                 onPress={handleSave}
@@ -187,7 +189,7 @@ export default function ProfileEditScreen() {
                 fullWidth
                 disabled={saving}
               >
-                {saving ? "Guardando..." : "Guardar Cambios"}
+                {saving ? t.saving[lang] : t.saveChanges[lang]}
               </Button>
             </View>
           </ScrollView>

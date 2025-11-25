@@ -1,5 +1,7 @@
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { X } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
@@ -19,6 +21,9 @@ export const ExerciseSelectorHeader: React.FC<Props> = ({
   exerciseModalMode,
   exerciseToReplace,
 }) => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
   const { colors } = useColorScheme();
 
   const selectedExercisesLength = Object.keys(selectedExercises).length;
@@ -37,8 +42,8 @@ export const ExerciseSelectorHeader: React.FC<Props> = ({
       <View style={{ flex: 1 }}>
         <Typography variant="h5" weight="semibold">
           {exerciseModalMode === "replace"
-            ? "Reemplazar"
-            : "Seleccionar Ejercicios"}
+            ? t.replace[lang]
+            : t.selectExercises[lang]}
         </Typography>
         {exerciseModalMode === "replace" && exerciseToReplace ? (
           <Typography variant="body2" color="textMuted">
@@ -47,12 +52,12 @@ export const ExerciseSelectorHeader: React.FC<Props> = ({
         ) : exerciseModalMode === "replace" ? (
           <Typography variant="body2" color="textMuted">
             {selectedExercisesLength > 0
-              ? `Reemplazando ${selectedExercisesLength} ejercicio`
-              : "Selecciona un ejercicio para reemplazar"}
+              ? `${t.replacing[lang]} ${selectedExercisesLength} ${t.exercise[lang]}`
+              : t.selectExerciseToReplace[lang]}
           </Typography>
         ) : (
           <Typography variant="body2" color="textMuted">
-            {selectedExercisesLength} ejercicios seleccionados
+            {selectedExercisesLength} {t.exercisesSelected[lang]}
           </Typography>
         )}
       </View>

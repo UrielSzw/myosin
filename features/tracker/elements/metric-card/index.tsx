@@ -12,9 +12,15 @@ type Props = {
   metric: TrackerMetricWithQuickActions;
   date: string;
   onPress: () => void;
+  lang: "es" | "en";
 };
 
-export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
+export const MetricCard: React.FC<Props> = ({
+  metric,
+  date,
+  onPress,
+  lang,
+}) => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
 
@@ -34,8 +40,8 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
 
   // Calcular display data optimizado con memoización
   const displayData = useMemo(
-    () => getMetricDisplayData(metric, metricData, colors),
-    [metric, metricData, colors]
+    () => getMetricDisplayData(metric, metricData, colors, lang),
+    [metric, metricData, colors, lang]
   );
 
   // Renderizar componente específico según input_type
@@ -46,6 +52,7 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
           metric={metric}
           displayData={displayData}
           onPress={onPress}
+          lang={lang}
         />
       );
 
@@ -55,6 +62,7 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
           metric={metric}
           displayData={displayData}
           onPress={onPress}
+          lang={lang}
         />
       );
 
@@ -65,6 +73,7 @@ export const MetricCard: React.FC<Props> = ({ metric, date, onPress }) => {
           metric={metric}
           displayData={displayData}
           onPress={onPress}
+          lang={lang}
         />
       );
   }

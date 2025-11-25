@@ -6,9 +6,14 @@ import { SessionBlockItem } from "../session-block-item";
 type Props = {
   blocks: WorkoutBlockWithExercises[];
   showRpe: boolean;
+  lang: "es" | "en";
 };
 
-export const SessionBlocksList: React.FC<Props> = ({ blocks, showRpe }) => {
+export const SessionBlocksList: React.FC<Props> = ({
+  blocks,
+  showRpe,
+  lang,
+}) => {
   return (
     <View>
       {blocks.map((block, index) => (
@@ -17,6 +22,7 @@ export const SessionBlocksList: React.FC<Props> = ({ blocks, showRpe }) => {
           block={block}
           isLast={index === blocks.length - 1}
           showRpe={showRpe}
+          lang={lang}
         />
       ))}
     </View>

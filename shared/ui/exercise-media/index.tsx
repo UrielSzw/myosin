@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { mediaUrlCache } from "@/shared/services/secure-media-service";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { Image } from "expo-image";
 import { Dumbbell } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -26,6 +28,9 @@ export const ExerciseMedia: React.FC<Props> = ({
   variant,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = exerciseSelectorTranslations;
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -102,7 +107,7 @@ export const ExerciseMedia: React.FC<Props> = ({
           color="textMuted"
           style={{ marginTop: 8 }}
         >
-          No hay imágenes disponibles
+          {t.noImagesAvailable[lang]}
         </Typography>
       </View>
     );
@@ -126,7 +131,7 @@ export const ExerciseMedia: React.FC<Props> = ({
           variant={variant === "detail" ? "caption" : "caption"}
           color="textMuted"
         >
-          {variant === "detail" ? "Cargando..." : "..."}
+          {variant === "detail" ? t.loading[lang] : "..."}
         </Typography>
       </View>
     );

@@ -1,6 +1,7 @@
-import { EXERCISE_CATEGORY_LABELS } from "@/shared/constants/exercise";
 import { WorkoutExerciseWithSets } from "@/shared/db/schema/workout-session";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
+import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import { supportsPRCalculation } from "@/shared/types/measurement";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -13,14 +14,18 @@ type Props = {
   exercise: WorkoutExerciseWithSets;
   isLast: boolean;
   showRpe: boolean;
+  lang: "es" | "en";
 };
 
 export const SessionExerciseItem: React.FC<Props> = ({
   exercise,
   isLast,
   showRpe,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = workoutSessionDetailTranslations;
+  const muscleT = exerciseMuscleTranslations;
 
   // Check if any set is a PR based on high estimated 1RM - only for exercises that support PR calculation
   const hasPR = exercise.sets.some((set) => {
@@ -110,17 +115,17 @@ export const SessionExerciseItem: React.FC<Props> = ({
           >
             <Typography variant="caption" color="textMuted">
               {
-                EXERCISE_CATEGORY_LABELS[
+                muscleT[
                   exercise.exercise.main_muscle_group as IExerciseMuscle
-                ]
+                ]?.[lang]
               }
             </Typography>
             <Typography variant="caption" color="textMuted">
-              {completedSets}/{totalSets} sets
+              {completedSets}/{totalSets} {t.sets[lang]}
             </Typography>
             {exercise.execution_order !== null && (
               <Typography variant="caption" color="textMuted">
-                Orden: {exercise.execution_order + 1}
+                {t.order[lang]}: {exercise.execution_order + 1}
               </Typography>
             )}
           </View>
@@ -128,7 +133,7 @@ export const SessionExerciseItem: React.FC<Props> = ({
       </View>
 
       {/* Sets Table */}
-      <SessionSetsTable sets={exercise.sets} showRpe={showRpe} />
+      <SessionSetsTable sets={exercise.sets} showRpe={showRpe} lang={lang} />
     </View>
   );
 };

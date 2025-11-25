@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { VolumeDisplay } from "@/shared/ui/volume-display";
@@ -19,17 +21,20 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
   showTop = 4,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = analyticsTranslations;
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (loading) {
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Volumen Semanal
+          {t.weeklyVolume[lang]}
         </Typography>
         <Card variant="outlined" padding="md">
           <Typography variant="body2" color="textMuted">
-            Cargando...
+            {t.loading[lang]}
           </Typography>
         </Card>
       </View>
@@ -40,7 +45,7 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Volumen Semanal
+          {t.weeklyVolume[lang]}
         </Typography>
         <Card variant="outlined" padding="lg">
           <View style={{ alignItems: "center", paddingVertical: 20 }}>
@@ -50,10 +55,10 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
               style={{ marginBottom: 8 }}
             />
             <Typography variant="body1" color="textMuted" align="center">
-              No hay datos de volumen disponibles
+              {t.noVolumeData[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
-              Agrega rutinas con días activos para ver el análisis
+              {t.addRoutinesForAnalysis[lang]}
             </Typography>
           </View>
         </Card>
@@ -65,7 +70,7 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
   const volumeEntries = Object.entries(data)
     .filter(([_, volumeData]) => volumeData.totalSets > 0)
     .map(([category, volumeData]) => ({
-      category: getCategoryDisplayName(category),
+      category: getCategoryDisplayName(category, lang),
       sets: volumeData.totalSets,
       percentage: 0, // Se calculará después
     }))
@@ -89,7 +94,7 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Volumen Semanal
+          {t.weeklyVolume[lang]}
         </Typography>
         <Card variant="outlined" padding="lg">
           <View style={{ alignItems: "center", paddingVertical: 20 }}>
@@ -99,10 +104,10 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
               style={{ marginBottom: 8 }}
             />
             <Typography variant="body1" color="textMuted" align="center">
-              Sin datos de volumen
+              {t.noVolumeDataShort[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
-              Programa rutinas con ejercicios para ver el análisis
+              {t.scheduleRoutinesForAnalysis[lang]}
             </Typography>
           </View>
         </Card>
@@ -121,10 +126,10 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
         }}
       >
         <Typography variant="h5" weight="semibold">
-          Volumen Semanal
+          {t.weeklyVolume[lang]}
         </Typography>
         <Typography variant="caption" color="textMuted">
-          {totalSets} sets/semana
+          {totalSets} {t.setsPerWeek[lang]}
         </Typography>
       </View>
 
@@ -133,8 +138,8 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
         <VolumeDisplay
           volumeData={displayData}
           totalSets={totalSets}
-          title="Distribución Completa por Músculo"
-          subtitle="Análisis detallado de volumen semanal"
+          title={t.fullDistribution[lang]}
+          subtitle={t.detailedWeeklyAnalysis[lang]}
         />
       ) : (
         // Vista compacta con top músculos
@@ -149,7 +154,7 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
           >
             <TrendingUp size={18} color={colors.primary[500]} />
             <Typography variant="body1" weight="medium">
-              Top {showTop} Músculos
+              {t.topMuscles[lang].replace("{count}", showTop.toString())}
             </Typography>
           </View>
 
@@ -175,7 +180,7 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
                   style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
                 >
                   <Typography variant="caption" color="textMuted">
-                    {item.sets} sets
+                    {item.sets} {t.sets[lang]}
                   </Typography>
                   <Typography
                     variant="caption"
@@ -232,14 +237,14 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
             <>
               <ChevronUp size={16} color={colors.primary[500]} />
               <Typography variant="body2" weight="medium" color="primary">
-                Ver menos
+                {t.viewLess[lang]}
               </Typography>
             </>
           ) : (
             <>
               <ChevronDown size={16} color={colors.primary[500]} />
               <Typography variant="body2" weight="medium" color="primary">
-                Ver todos ({hiddenCount} más)
+                {t.viewAll[lang].replace("{count}", hiddenCount.toString())}
               </Typography>
             </>
           )}
@@ -249,18 +254,11 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
   );
 };
 
-// Helper para nombres de categorías en español
-function getCategoryDisplayName(category: string): string {
-  const displayNames: Record<string, string> = {
-    chest: "Pecho",
-    back: "Espalda",
-    shoulders: "Hombros",
-    arms: "Brazos",
-    legs: "Piernas",
-    core: "Core",
-    other: "Otro",
-  };
-  return displayNames[category] || category;
+// Helper para nombres de categorías
+function getCategoryDisplayName(category: string, lang: "es" | "en"): string {
+  const t = analyticsTranslations;
+  const key = category as keyof typeof t.muscleCategories;
+  return t.muscleCategories[key]?.[lang] || category;
 }
 
 export const SmartVolumeDisplay = React.memo(SmartVolumeDisplayComponent);

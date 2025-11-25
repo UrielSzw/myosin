@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { workoutSessionListTranslations } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
@@ -8,13 +10,17 @@ import { TouchableOpacity, View } from "react-native";
 type Props = {
   totalSessions: number;
   recentSessions: number;
+  lang: "es" | "en";
 };
 
 export const SessionListHeader: React.FC<Props> = ({
   totalSessions,
   recentSessions,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = workoutSessionListTranslations;
+  const tShared = sharedUiTranslations;
 
   const handleGoBack = () => {
     router.back();
@@ -38,16 +44,19 @@ export const SessionListHeader: React.FC<Props> = ({
           padding: 8,
           marginRight: 12,
         }}
+        accessibilityRole="button"
+        accessibilityLabel={tShared.goBack[lang]}
       >
         <ArrowLeft size={24} color={colors.text} />
       </TouchableOpacity>
 
       <View style={{ flex: 1 }}>
         <Typography variant="h6" weight="semibold">
-          Sesiones de Entrenamiento
+          {t.trainingSessions[lang]}
         </Typography>
         <Typography variant="caption" color="textMuted">
-          {totalSessions} sesiones totales · {recentSessions} recientes
+          {t.totalSessions[lang].replace("{count}", totalSessions.toString())} ·{" "}
+          {t.recentSessions[lang].replace("{count}", recentSessions.toString())}
         </Typography>
       </View>
     </View>

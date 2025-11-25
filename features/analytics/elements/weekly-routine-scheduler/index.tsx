@@ -1,6 +1,8 @@
 import { WEEK_DAYS, WeekDay } from "@/shared/constants/analytics";
 import type { RoutineFull } from "@/shared/db/schema/routine";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { Calendar } from "lucide-react-native";
@@ -18,6 +20,9 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
   loading,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = analyticsTranslations;
 
   // Agrupar rutinas por día
   const routinesByDay = React.useMemo(() => {
@@ -48,11 +53,11 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Rutinas de la Semana
+          {t.weeklyRoutines[lang]}
         </Typography>
         <Card variant="outlined" padding="md">
           <Typography variant="body2" color="textMuted">
-            Cargando...
+            {t.loading[lang]}
           </Typography>
         </Card>
       </View>
@@ -75,11 +80,12 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
         }}
       >
         <Typography variant="h5" weight="semibold">
-          Rutinas de la Semana
+          {t.weeklyRoutines[lang]}
         </Typography>
         <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
           <Typography variant="caption" color="textMuted">
-            {totalActiveDays} días • {totalRoutines} rutinas
+            {totalActiveDays} {t.days[lang]} • {totalRoutines}{" "}
+            {t.routines[lang]}
           </Typography>
         </View>
       </View>
@@ -95,7 +101,7 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
         >
           <Calendar size={18} color={colors.primary[500]} />
           <Typography variant="body2" color="textMuted">
-            Entrenamientos programados
+            {t.scheduledWorkouts[lang]}
           </Typography>
         </View>
 
@@ -127,10 +133,10 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
             }}
           >
             <Typography variant="body2" color="textMuted" align="center">
-              No hay rutinas programadas para esta semana
+              {t.noScheduledRoutines[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
-              Asigna días de entrenamiento a tus rutinas
+              {t.assignTrainingDays[lang]}
             </Typography>
           </View>
         )}
@@ -145,13 +151,13 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
             }}
           >
             <Typography variant="caption" color="textMuted">
-              • Círculo activo = día con entrenamiento programado
+              {t.activeDayInfo[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted">
-              • Número = cantidad de rutinas ese día
+              {t.numberInfo[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted">
-              • Punto naranja = múltiples rutinas el mismo día
+              {t.multipleRoutinesInfo[lang]}
             </Typography>
           </View>
         )}

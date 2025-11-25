@@ -1,5 +1,9 @@
 import type { MetricDisplayData } from "@/features/tracker/types/visual-states";
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
+import {
+  getMetricName,
+  trackerTranslations,
+} from "@/shared/translations/tracker";
 import React from "react";
 import { MetricCardContainer } from "../shared/MetricCardContainer";
 import { MetricIcon } from "../shared/MetricIcon";
@@ -10,13 +14,16 @@ type ScaleMetricCardProps = {
   metric: TrackerMetricWithQuickActions;
   displayData: MetricDisplayData;
   onPress: () => void;
+  lang: "es" | "en";
 };
 
 export const ScaleMetricCard: React.FC<ScaleMetricCardProps> = React.memo(
-  ({ metric, displayData, onPress }) => {
+  ({ metric, displayData, onPress, lang }) => {
+    const t = trackerTranslations;
+
     // Para scale metrics, mostramos el nivel actual como subtitle
     const subtitle = displayData.hasEntry
-      ? `Nivel ${Math.round(displayData.currentValue)}`
+      ? `${t.states.level[lang]} ${Math.round(displayData.currentValue)}`
       : undefined;
 
     return (
@@ -26,7 +33,7 @@ export const ScaleMetricCard: React.FC<ScaleMetricCardProps> = React.memo(
         borderColor={displayData.borderColor}
       >
         {/* Metric Label */}
-        <MetricLabel name={metric.name} />
+        <MetricLabel name={getMetricName(metric, lang)} />
 
         {/* Icon (sin progress ring) */}
         <MetricIcon

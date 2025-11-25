@@ -8,6 +8,10 @@ import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import {
+  getQuickActionLabel,
+  trackerTranslations,
+} from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -19,12 +23,14 @@ type Props = {
   selectedMetric: TrackerMetricWithQuickActions;
   selectedDate: string;
   onCloseModal: () => void;
+  lang: "es" | "en";
 };
 
 export const QuickActions: React.FC<Props> = ({
   selectedMetric,
   onCloseModal,
   selectedDate,
+  lang,
 }) => {
   const [quickActionCounts, setQuickActionCounts] = useState<{
     [index: number]: number;
@@ -36,6 +42,7 @@ export const QuickActions: React.FC<Props> = ({
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = trackerTranslations;
 
   const isWeightMetric = selectedMetric.slug === "weight";
   const displayUnit = isWeightMetric ? weightUnit : selectedMetric.unit;
@@ -89,7 +96,7 @@ export const QuickActions: React.FC<Props> = ({
               await addQuickActionMutation.mutateAsync({
                 quickActionId: action.id,
                 userId: user.id,
-                notes: `Quick: ${action.label}`,
+                notes: `Quick: ${getQuickActionLabel(action, lang)}`,
                 recordedAt: selectedDate,
                 slug: selectedMetric.slug,
               });
@@ -103,7 +110,7 @@ export const QuickActions: React.FC<Props> = ({
                 metricId: selectedMetric.id,
                 value: action.value,
                 userId: user.id,
-                notes: `Quick: ${action.label}`,
+                notes: `Quick: ${getQuickActionLabel(action, lang)}`,
                 recordedAt: selectedDate,
                 displayValue:
                   (action as any).display_value || `${action.value}`,
@@ -153,7 +160,7 @@ export const QuickActions: React.FC<Props> = ({
   return (
     <View style={{ marginBottom: 32 }}>
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        Opciones Rápidas
+        {t.quickActions.title[lang]}
       </Typography>
       <View style={{ flexDirection: "column", gap: 8 }}>
         {quickActions.map((action, index) => {
@@ -197,7 +204,7 @@ export const QuickActions: React.FC<Props> = ({
                       weight="medium"
                       style={{ marginBottom: 2 }}
                     >
-                      {action.label}
+                      {getQuickActionLabel(action, lang)}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
                       +
@@ -308,7 +315,7 @@ export const QuickActions: React.FC<Props> = ({
             style={{ marginTop: 8 }}
             icon={<Icons.Plus size={20} color="#ffffff" />}
           >
-            Agregar selección (+
+            {t.quickActions.addSelection[lang]} (+
             {formatValue(
               isWeightMetric
                 ? fromKg(getTotalQuickActionValue(), weightUnit, 1)

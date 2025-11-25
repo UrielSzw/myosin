@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { MUSCLE_CATEGORIES } from "@/shared/utils/muscle-categories";
@@ -77,10 +79,14 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
   volumeData,
   totalSets,
   showPercentages = true,
-  title = "Análisis de Volumen",
+  title,
   subtitle,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = sharedUiTranslations;
+  const displayTitle = title || t.volumeAnalysis[lang];
 
   // Filtrar datos con sets > 0 y ordenar por cantidad
   const filteredData = volumeData
@@ -110,10 +116,10 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
             style={{ marginBottom: 8 }}
           />
           <Typography variant="body1" color="textMuted" align="center">
-            No hay datos de volumen disponibles
+            {t.noVolumeData[lang]}
           </Typography>
           <Typography variant="caption" color="textMuted" align="center">
-            Selecciona rutinas con días activos para ver el análisis
+            {t.selectRoutinesHint[lang]}
           </Typography>
         </View>
       </Card>
@@ -131,8 +137,9 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
             marginBottom: 4,
           }}
         >
+          <Activity size={16} color={colors.primary[500]} />
           <Typography variant="h6" weight="semibold">
-            {title}
+            {displayTitle}
           </Typography>
         </View>
         {subtitle && (
@@ -159,10 +166,10 @@ export const VolumeDisplay: React.FC<VolumeDisplayProps> = ({
           style={{ marginRight: 8 }}
         />
         <Typography variant="body2" color="textMuted">
-          Total:
+          {t.total[lang]}
         </Typography>
         <Typography variant="body1" weight="semibold" style={{ marginLeft: 4 }}>
-          {totalSets} sets semanales
+          {totalSets} {t.weeklySets[lang]}
         </Typography>
       </View>
 

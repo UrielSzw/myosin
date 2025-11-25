@@ -1,6 +1,8 @@
 import { WorkoutBlockWithExercises } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { reorderTranslations } from "@/shared/translations/reorder";
+import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { ChevronDown, ChevronRight } from "lucide-react-native";
@@ -12,16 +14,20 @@ type Props = {
   block: WorkoutBlockWithExercises;
   isLast: boolean;
   showRpe: boolean;
+  lang: "es" | "en";
 };
 
 export const SessionBlockItem: React.FC<Props> = ({
   block,
   isLast,
   showRpe,
+  lang,
 }) => {
   const { colors } = useColorScheme();
   const { getBlockColors } = useBlockStyles();
   const [isExpanded, setIsExpanded] = useState(true);
+  const t = workoutSessionDetailTranslations;
+  const blockT = reorderTranslations;
 
   const blockColors = getBlockColors(block.type);
 
@@ -39,11 +45,11 @@ export const SessionBlockItem: React.FC<Props> = ({
   const getBlockTypeLabel = (type: string) => {
     switch (type) {
       case "superset":
-        return "Superset";
+        return blockT.superset[lang];
       case "circuit":
-        return "Circuito";
+        return blockT.circuit[lang];
       default:
-        return "Individual";
+        return blockT.individual[lang];
     }
   };
 
@@ -53,9 +59,9 @@ export const SessionBlockItem: React.FC<Props> = ({
         onPress={() => setIsExpanded(!isExpanded)}
         activeOpacity={1}
         accessibilityRole="button"
-        accessibilityLabel={`${isExpanded ? "Contraer" : "Expandir"} bloque ${
-          block.name
-        }`}
+        accessibilityLabel={`${
+          isExpanded ? t.collapse[lang] : t.expand[lang]
+        } ${t.block[lang]} ${block.name}`}
       >
         <Card variant="outlined" padding="none">
           {/* Block Header - Similar to routine-form */}
@@ -99,7 +105,7 @@ export const SessionBlockItem: React.FC<Props> = ({
               >
                 <Typography variant="body1" weight="semibold">
                   {block.type === "individual"
-                    ? "Ejercicio Individual"
+                    ? t.individualExercise[lang]
                     : block.name}
                 </Typography>
               </View>
@@ -109,9 +115,11 @@ export const SessionBlockItem: React.FC<Props> = ({
                 color="textMuted"
                 style={{ marginTop: 2 }}
               >
-                {block.exercises.length} ejercicio
-                {block.exercises.length !== 1 ? "s" : ""} • {completedSets}/
-                {totalSets} sets
+                {block.exercises.length}{" "}
+                {block.exercises.length !== 1
+                  ? t.exercises[lang]
+                  : t.exercise[lang]}{" "}
+                • {completedSets}/{totalSets} {t.sets[lang]}
               </Typography>
             </View>
 
@@ -134,6 +142,7 @@ export const SessionBlockItem: React.FC<Props> = ({
                   exercise={exercise}
                   isLast={index === block.exercises.length - 1}
                   showRpe={showRpe}
+                  lang={lang}
                 />
               ))}
             </View>

@@ -4,6 +4,10 @@ import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import {
+  trackerTranslations,
+  trackerUiTranslations,
+} from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { toKg } from "@/shared/utils/weight-conversion";
@@ -15,16 +19,20 @@ type Props = {
   selectedMetric: TrackerMetricWithQuickActions;
   selectedDate: string;
   onCloseModal: () => void;
+  lang: "es" | "en";
 };
 
 export const ManualInput: React.FC<Props> = ({
   selectedMetric,
   selectedDate,
   onCloseModal,
+  lang,
 }) => {
   const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
   const { user } = useAuth();
+  const t = trackerTranslations;
+  const tUi = trackerUiTranslations;
 
   // Get user's weight unit preference
   const prefs = useUserPreferences();
@@ -56,7 +64,7 @@ export const ManualInput: React.FC<Props> = ({
           value: valueToStore,
           userId: user.id,
           recordedAt: selectedDate,
-          notes: "Manual entry",
+          notes: tUi.manualEntry[lang],
         });
         onCloseModal();
       } catch (error) {
@@ -68,7 +76,7 @@ export const ManualInput: React.FC<Props> = ({
   return (
     <View style={{ marginBottom: 32 }}>
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        Cantidad Manual
+        {t.manualInput.title[lang]}
       </Typography>
 
       <View
@@ -92,7 +100,7 @@ export const ManualInput: React.FC<Props> = ({
           }}
           value={inputValue}
           onChangeText={setInputValue}
-          placeholder={`Cantidad en ${displayUnit}`}
+          placeholder={`${t.manualInput.placeholder[lang]} ${displayUnit}`}
           placeholderTextColor={colors.textMuted}
           keyboardType="numeric"
           returnKeyType="done"
@@ -117,7 +125,8 @@ export const ManualInput: React.FC<Props> = ({
         style={{ marginTop: 16 }}
         icon={<Plus size={20} color="#ffffff" />}
       >
-        Agregar {inputValue ? formatValue(parseFloat(inputValue) || 0) : "0"}{" "}
+        {t.manualInput.addButton[lang]}{" "}
+        {inputValue ? formatValue(parseFloat(inputValue) || 0) : "0"}{" "}
         {displayUnit}
       </Button>
     </View>

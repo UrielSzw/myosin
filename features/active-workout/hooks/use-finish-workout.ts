@@ -1,3 +1,5 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { router } from "expo-router";
 import { Alert } from "react-native";
 import {
@@ -8,6 +10,9 @@ import { useSaveWorkoutSession } from "./use-save-workout-session";
 import { useUpdateRoutine } from "./use-update-routine";
 
 export const useFinishWorkout = () => {
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = activeWorkoutTranslations;
   const { clearWorkout } = useActiveMainActions();
   const { totalSetsCompleted, totalSetsPlanned } = useActiveWorkoutStats();
   const { detectWorkoutChanges } = useActiveMainActions();
@@ -22,71 +27,59 @@ export const useFinishWorkout = () => {
       clearWorkout();
       router.back();
     } else {
-      Alert.alert(
-        "Actualizar rutina",
-        "¿Quieres guardar los cambios realizados en esta rutina para futuras sesiones?",
-        [
-          {
-            text: "No",
-            style: "cancel",
-            onPress: async () => {
-              await saveWorkoutSession();
-              clearWorkout();
-              router.back();
-            },
+      Alert.alert(t.updateRoutineTitle[lang], t.updateRoutineMessage[lang], [
+        {
+          text: t.no[lang],
+          style: "cancel",
+          onPress: async () => {
+            await saveWorkoutSession();
+            clearWorkout();
+            router.back();
           },
-          {
-            text: "Sí, guardar",
-            style: "destructive",
-            onPress: async () => {
-              await updateRoutine();
-              await saveWorkoutSession();
-              clearWorkout();
-              router.back();
-            },
+        },
+        {
+          text: t.yesSave[lang],
+          style: "destructive",
+          onPress: async () => {
+            await updateRoutine();
+            await saveWorkoutSession();
+            clearWorkout();
+            router.back();
           },
-        ]
-      );
+        },
+      ]);
     }
   };
 
   const handleFinishWorkout = () => {
     if (totalSetsCompleted < totalSetsPlanned) {
-      Alert.alert(
-        "Confirmar",
-        "Aún no has completado todos los sets planeados. ¿Estás seguro de que quieres finalizar el entrenamiento?",
-        [
-          { text: "No", style: "cancel" },
-          {
-            text: "Sí, finalizar",
-            style: "destructive",
-            onPress: () => {
-              handleValidateWorkout();
-            },
+      Alert.alert(t.confirmTitle[lang], t.incompleteSetsMessage[lang], [
+        { text: t.no[lang], style: "cancel" },
+        {
+          text: t.yesFinish[lang],
+          style: "destructive",
+          onPress: () => {
+            handleValidateWorkout();
           },
-        ]
-      );
+        },
+      ]);
     } else {
       handleValidateWorkout();
     }
   };
 
   const handleExitWorkout = () => {
-    Alert.alert(
-      "Confirmar",
-      "Esto eliminará todo el progreso del entrenamiento. ¿Estás seguro?",
-      [
-        { text: "No", style: "cancel" },
-        {
-          text: "Sí, eliminar",
-          style: "destructive",
-          onPress: () => {
-            clearWorkout();
-            router.back();
-          },
+    Alert.alert(t.confirmTitle[lang], t.exitWorkoutMessage[lang], [
+      { text: t.no[lang], style: "cancel" },
+      {
+        text: t.yesDelete[lang],
+        style: "destructive",
+        onPress: () => {
+          clearWorkout();
+          router.back();
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return { handleFinishWorkout, handleExitWorkout };

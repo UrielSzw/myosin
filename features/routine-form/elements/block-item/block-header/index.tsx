@@ -3,6 +3,8 @@ import { useMainActions } from "@/features/routine-form/hooks/use-routine-form-s
 import { BlockInsert } from "@/shared/db/schema";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Typography } from "@/shared/ui/typography";
 import { EllipsisVertical, Timer } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
@@ -23,6 +25,10 @@ export const BlockHeader: React.FC<Props> = ({
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = routineFormTranslations;
+
   const { setCurrentState } = useMainActions();
   const {
     getBlockColors,
@@ -53,13 +59,15 @@ export const BlockHeader: React.FC<Props> = ({
 
   const getBlockTitle = () => {
     const blockOrder = block.order_index + 1;
-    const blockTypeLabel = getBlockTypeLabel(block.type);
+    const blockTypeLabel = getBlockTypeLabel(block.type, lang);
 
     if (block.type === "individual") {
-      return `Ejercicio ${blockOrder}`;
+      return t.exerciseNumber[lang].replace("{number}", blockOrder.toString());
     }
 
-    return `${blockTypeLabel} ${blockOrder}`;
+    return t.blockNumber[lang]
+      .replace("{type}", blockTypeLabel)
+      .replace("{number}", blockOrder.toString());
   };
 
   return (
@@ -139,8 +147,8 @@ export const BlockHeader: React.FC<Props> = ({
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Configurar tiempo de descanso entre ejercicios"
-                  accessibilityHint="Toca para ajustar el tiempo de descanso entre ejercicios"
+                  accessibilityLabel={t.restBetweenExercises[lang]}
+                  accessibilityHint={t.restBetweenExercisesHint[lang]}
                   accessibilityValue={{
                     text: formatRestTime(block.rest_between_exercises_seconds),
                   }}
@@ -154,7 +162,7 @@ export const BlockHeader: React.FC<Props> = ({
                       marginLeft: 4,
                     }}
                   >
-                    Entre:{" "}
+                    {t.restBetween[lang]}{" "}
                     {formatRestTime(block.rest_between_exercises_seconds)}
                   </Typography>
                 </TouchableOpacity>
@@ -174,8 +182,8 @@ export const BlockHeader: React.FC<Props> = ({
                   }}
                   accessible={true}
                   accessibilityRole="button"
-                  accessibilityLabel="Configurar tiempo de descanso entre vueltas"
-                  accessibilityHint="Toca para ajustar el tiempo de descanso entre vueltas del bloque"
+                  accessibilityLabel={t.restBetweenRounds[lang]}
+                  accessibilityHint={t.restBetweenRoundsHint[lang]}
                   accessibilityValue={{
                     text: formatRestTime(block.rest_time_seconds),
                   }}
@@ -189,7 +197,8 @@ export const BlockHeader: React.FC<Props> = ({
                       marginLeft: 4,
                     }}
                   >
-                    Vueltas: {formatRestTime(block.rest_time_seconds)}
+                    {t.restRounds[lang]}{" "}
+                    {formatRestTime(block.rest_time_seconds)}
                   </Typography>
                 </TouchableOpacity>
               </>
@@ -209,8 +218,8 @@ export const BlockHeader: React.FC<Props> = ({
                 }}
                 accessible={true}
                 accessibilityRole="button"
-                accessibilityLabel="Configurar tiempo de descanso entre series"
-                accessibilityHint="Toca para ajustar el tiempo de descanso entre series"
+                accessibilityLabel={t.restBetweenSets[lang]}
+                accessibilityHint={t.restBetweenSetsHint[lang]}
                 accessibilityValue={{
                   text: formatRestTime(block.rest_time_seconds),
                 }}

@@ -4,6 +4,7 @@ import {
   MetricIconKey,
 } from "@/shared/constants/metric-icons";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import * as Haptics from "expo-haptics";
@@ -21,6 +22,7 @@ interface MetricStyleFormProps {
   metricColor: string;
   onIconChange: (icon: MetricIconKey) => void;
   onColorChange: (color: string) => void;
+  lang: "es" | "en";
 }
 
 const AnimatedTouchableOpacity =
@@ -123,13 +125,16 @@ export const MetricStyleForm: React.FC<MetricStyleFormProps> = ({
   metricColor,
   onIconChange,
   onColorChange,
+  lang,
 }) => {
+  const t = metricFormTranslations;
+
   return (
     <View>
       {/* Icon Selection */}
       <Card variant="outlined" padding="lg" style={{ marginBottom: 20 }}>
         <Typography variant="h6" weight="semibold" style={{ marginBottom: 12 }}>
-          Icono
+          {t.icon[lang]}
         </Typography>
 
         <Typography
@@ -137,7 +142,7 @@ export const MetricStyleForm: React.FC<MetricStyleFormProps> = ({
           color="textMuted"
           style={{ marginBottom: 16 }}
         >
-          Selecciona un icono que represente tu métrica
+          {t.iconDescription[lang]}
         </Typography>
 
         <ScrollView
@@ -182,7 +187,7 @@ export const MetricStyleForm: React.FC<MetricStyleFormProps> = ({
       {/* Color Selection */}
       <Card variant="outlined" padding="lg">
         <Typography variant="h6" weight="semibold" style={{ marginBottom: 12 }}>
-          Color
+          {t.color[lang]}
         </Typography>
 
         <Typography
@@ -190,7 +195,7 @@ export const MetricStyleForm: React.FC<MetricStyleFormProps> = ({
           color="textMuted"
           style={{ marginBottom: 16 }}
         >
-          Elige un color para personalizar tu métrica
+          {t.colorDescription[lang]}
         </Typography>
 
         <View

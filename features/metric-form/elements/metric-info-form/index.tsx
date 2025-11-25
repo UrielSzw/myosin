@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
@@ -15,6 +16,7 @@ interface MetricInfoFormProps {
   onTypeChange: (type: "counter" | "value") => void;
   onUnitChange: (unit: string) => void;
   onTargetChange: (target?: number) => void;
+  lang: "es" | "en";
 }
 
 export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
@@ -27,8 +29,10 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
   onTypeChange,
   onUnitChange,
   onTargetChange,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = metricFormTranslations;
 
   const handleTargetChange = (value: string) => {
     const numValue = parseFloat(value);
@@ -42,14 +46,14 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
   return (
     <View style={{ marginBottom: 24 }}>
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        Información Básica
+        {t.basicInformation[lang]}
       </Typography>
 
       {/* Metric Name */}
       <View style={{ marginBottom: 16 }}>
         <EnhancedInput
-          label="Nombre de la Métrica"
-          placeholder="Ej: Mi Métrica Personalizada"
+          label={t.metricNameLabel[lang]}
+          placeholder={t.metricNamePlaceholder[lang]}
           value={metricName}
           onChangeText={onNameChange}
           error={nameValidation.errors.name}
@@ -61,7 +65,7 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
       {/* Metric Type */}
       <View style={{ marginBottom: 16 }}>
         <Typography variant="body2" weight="medium" style={{ marginBottom: 8 }}>
-          Tipo de Métrica
+          {t.metricTypeLabel[lang]}
         </Typography>
         <View style={{ flexDirection: "row", gap: 12 }}>
           <TouchableOpacity
@@ -87,14 +91,14 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
                 marginBottom: 4,
               }}
             >
-              📊 Contador
+              {t.counterType[lang]}
             </Typography>
             <Typography
               variant="caption"
               color="textMuted"
               style={{ lineHeight: 16 }}
             >
-              Se acumula durante el día (ej: agua, calorías, pasos)
+              {t.counterDescription[lang]}
             </Typography>
           </TouchableOpacity>
 
@@ -121,14 +125,14 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
                 marginBottom: 4,
               }}
             >
-              📈 Valor
+              {t.valueType[lang]}
             </Typography>
             <Typography
               variant="caption"
               color="textMuted"
               style={{ lineHeight: 16 }}
             >
-              Valor único del día (ej: peso, estado de ánimo)
+              {t.valueDescription[lang]}
             </Typography>
           </TouchableOpacity>
         </View>
@@ -137,8 +141,8 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
       {/* Unit */}
       <View style={{ marginBottom: 16 }}>
         <EnhancedInput
-          label="Unidad de Medida"
-          placeholder="Ej: kg, ml, reps, %"
+          label={t.unitLabel[lang]}
+          placeholder={t.unitPlaceholder[lang]}
           value={unit}
           onChangeText={onUnitChange}
           error={nameValidation.errors.unit}
@@ -150,13 +154,13 @@ export const MetricInfoForm: React.FC<MetricInfoFormProps> = ({
       {/* Default Target (Optional) */}
       <View style={{ marginBottom: 0 }}>
         <EnhancedInput
-          label="Objetivo Diario (Opcional)"
-          placeholder="Ej: 100"
+          label={t.targetLabel[lang]}
+          placeholder={t.targetPlaceholder[lang]}
           value={defaultTarget?.toString() || ""}
           onChangeText={handleTargetChange}
           error={nameValidation.errors.target}
           keyboardType="numeric"
-          helpText="Si estableces un objetivo, verás tu progreso en la tarjeta de la métrica"
+          helpText={t.targetHelpText[lang]}
         />
       </View>
     </View>

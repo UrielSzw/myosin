@@ -1,6 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import {
+  getMetricName,
+  getMetricUnit,
+  trackerTranslations,
+} from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
 import { Plus, RotateCcw, X } from "lucide-react-native";
@@ -16,13 +21,19 @@ import {
 type Props = {
   visible: boolean;
   onClose: () => void;
+  lang?: "es" | "en";
 };
 
-export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
+export const MetricSelectorModal: React.FC<Props> = ({
+  visible,
+  onClose,
+  lang = "es",
+}) => {
   const { colors } = useColorScheme();
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = trackerTranslations;
   const [showDeleted, setShowDeleted] = useState(false);
 
   // Obtener templates disponibles y métricas eliminadas
@@ -49,7 +60,7 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
             backgroundColor: colors.background,
           }}
         >
-          <Typography>Cargando métricas...</Typography>
+          <Typography>{t.loadingMetrics[lang]}</Typography>
         </View>
       </Modal>
     );
@@ -90,7 +101,7 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
           }}
         >
           <Typography variant="h6" weight="semibold">
-            Agregar Métricas
+            {t.addMetrics[lang]}
           </Typography>
           <TouchableOpacity onPress={onClose} style={{ padding: 8 }}>
             <X size={24} color={colors.textMuted} />
@@ -104,14 +115,13 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
             weight="semibold"
             style={{ marginBottom: 16 }}
           >
-            Métricas Disponibles
+            {t.predefinedMetrics[lang]}
           </Typography>
 
           <View style={{ gap: 12 }}>
             {availableTemplates.map((template) => {
               const IconComponent = (Icons as any)[template.icon];
-              const displayUnit =
-                template.slug === "weight" ? weightUnit : template.unit;
+              const displayUnit = getMetricUnit(template, lang, weightUnit);
 
               return (
                 <TouchableOpacity
@@ -152,12 +162,12 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                       weight="medium"
                       style={{ marginBottom: 2 }}
                     >
-                      {template.name}
+                      {getMetricName(template, lang)}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
                       {template.default_target
-                        ? `Meta: ${template.default_target} ${displayUnit}`
-                        : `Unidad: ${displayUnit}`}
+                        ? `${t.goal[lang]}: ${template.default_target} ${displayUnit}`
+                        : displayUnit}
                     </Typography>
                   </View>
 
@@ -190,7 +200,7 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
               }}
             >
               <Typography variant="body2" color="textMuted" align="center">
-                No hay templates disponibles para agregar
+                {t.noTemplatesAvailable[lang]}
               </Typography>
             </View>
           )}
@@ -208,7 +218,7 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                 }}
               >
                 <Typography variant="h6" weight="semibold">
-                  Métricas Eliminadas ({deletedMetrics.length})
+                  {t.customMetrics[lang]} ({deletedMetrics.length})
                 </Typography>
                 <View
                   style={{
@@ -223,8 +233,7 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                 <View style={{ gap: 12 }}>
                   {deletedMetrics.map((metric) => {
                     const IconComponent = (Icons as any)[metric.icon];
-                    const displayUnit =
-                      metric.slug === "weight" ? weightUnit : metric.unit;
+                    const displayUnit = getMetricUnit(metric, lang, weightUnit);
 
                     return (
                       <TouchableOpacity
@@ -271,12 +280,12 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
                             weight="medium"
                             style={{ marginBottom: 2, opacity: 0.7 }}
                           >
-                            {metric.name}
+                            {getMetricName(metric, lang)}
                           </Typography>
                           <Typography variant="caption" color="textMuted">
                             {metric.default_target
-                              ? `Meta: ${metric.default_target} ${displayUnit}`
-                              : `Unidad: ${displayUnit}`}
+                              ? `${t.goal[lang]}: ${metric.default_target} ${displayUnit}`
+                              : displayUnit}
                           </Typography>
                         </View>
 
@@ -300,28 +309,30 @@ export const MetricSelectorModal: React.FC<Props> = ({ visible, onClose }) => {
             </View>
           )}
 
-          {/* Create Custom Metric Button */}
+          {/* Create Custom Metric Button - Commented out for now */}
+          {/*
           <View style={{ marginTop: 32, marginBottom: 32 }}>
-            {/* <Typography
+            <Typography
               variant="h6"
               weight="semibold"
               style={{ marginBottom: 16 }}
             >
               Métrica Personalizada
-            </Typography> */}
+            </Typography>
 
-            {/* <Button
+            <Button
               variant="outline"
               fullWidth
               onPress={() => {
                 onClose();
                 router.push("/metric/create");
               }}
-              icon={<Plus size={20} color={colors.primary[500]} />}
+              icon={<Plus size={16} color={colors.primary[500]} />}
             >
-              Crear Métrica Personalizada
-            </Button> */}
+              {t.createCustomMetric[lang]}
+            </Button>
           </View>
+          */}
         </ScrollView>
       </View>
     </Modal>

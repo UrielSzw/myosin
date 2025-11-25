@@ -3,6 +3,7 @@ import { formatTime, formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerDayData } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { Clock, Trash2 } from "lucide-react-native";
@@ -14,6 +15,7 @@ type Props = {
   unit: string | null;
   dayData?: TrackerDayData;
   metricSlug?: string | null;
+  lang: "es" | "en";
 };
 
 export const DailyHistory: React.FC<Props> = ({
@@ -21,11 +23,13 @@ export const DailyHistory: React.FC<Props> = ({
   unit,
   dayData,
   metricSlug,
+  lang,
 }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
   const deleteEntryMutation = useDeleteEntry();
+  const t = trackerTranslations;
 
   const isWeightMetric = metricSlug === "weight";
   const displayUnit = isWeightMetric ? weightUnit : unit;
@@ -51,7 +55,7 @@ export const DailyHistory: React.FC<Props> = ({
   return (
     <View style={{ marginBottom: 32 }}>
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        Historial de Hoy
+        {t.dailyHistory.title[lang]}
       </Typography>
       <View
         style={{

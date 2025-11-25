@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { setTypeTranslations } from "@/shared/translations/set-type";
 import { ISetType } from "@/shared/types/workout";
 import {
   BottomSheetBackdrop,
@@ -28,6 +30,9 @@ type Props = {
 export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ onSelectSetType, onDeleteSet, currentSetType }, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = setTypeTranslations;
 
     // Estados para la navegación
     const [viewMode, setViewMode] = useState<"selection" | "info">("selection");
@@ -36,16 +41,16 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
     );
 
     const setTypes = [
-      { type: "normal" as const, label: "Normal" },
-      { type: "warmup" as const, label: "Calentamiento" },
-      { type: "failure" as const, label: "Al Fallo" },
-      { type: "drop" as const, label: "Drop Set" },
-      { type: "cluster" as const, label: "Cluster" },
-      { type: "rest-pause" as const, label: "Rest-Pause" },
-      { type: "mechanical" as const, label: "Mecánico" },
-      { type: "eccentric" as const, label: "Excéntrico" },
-      { type: "partial" as const, label: "Parciales" },
-      { type: "isometric" as const, label: "Isométrico" },
+      { type: "normal" as const, label: "normal" },
+      { type: "warmup" as const, label: "warmup" },
+      { type: "failure" as const, label: "failure" },
+      { type: "drop" as const, label: "drop" },
+      { type: "cluster" as const, label: "cluster" },
+      { type: "rest-pause" as const, label: "restPause" },
+      { type: "mechanical" as const, label: "mechanical" },
+      { type: "eccentric" as const, label: "eccentric" },
+      { type: "partial" as const, label: "partial" },
+      { type: "isometric" as const, label: "isometric" },
     ];
 
     // Función para mostrar información
@@ -148,7 +153,9 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
                         : "transparent",
                   }}
                 >
-                  <Typography variant="body1">{option.label}</Typography>
+                  <Typography variant="body1">
+                    {t.types[option.label as keyof typeof t.types].label[lang]}
+                  </Typography>
 
                   <TouchableOpacity
                     onPress={(event) => handleShowInfo(option.type, event)}
@@ -171,7 +178,7 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
                   variant="body1"
                   style={{ color: colors.error[500] }}
                 >
-                  Eliminar Serie
+                  {t.deleteSet[lang]}
                 </Typography>
               </TouchableOpacity>
             </Animated.View>

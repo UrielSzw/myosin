@@ -1,4 +1,6 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { authTranslations } from "@/shared/translations/auth";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { GlassCard } from "@/shared/ui/glass-card";
@@ -22,6 +24,9 @@ export default function ForgotPasswordScreen() {
   const [sent, setSent] = useState(false);
 
   const { resetPassword } = useAuth();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = authTranslations.forgotPassword;
 
   const handleResetPassword = async () => {
     if (!email.trim()) return;
@@ -57,7 +62,7 @@ export default function ForgotPasswordScreen() {
                     align="center"
                     style={styles.title}
                   >
-                    Revisa tu Email
+                    {t.successTitle[lang]}
                   </Typography>
                   <Typography
                     variant="body1"
@@ -65,7 +70,7 @@ export default function ForgotPasswordScreen() {
                     align="center"
                     style={styles.subtitle}
                   >
-                    Enviamos instrucciones a {email}
+                    {t.successSubtitle[lang].replace("{email}", email)}
                   </Typography>
                 </View>
               </View>
@@ -76,7 +81,7 @@ export default function ForgotPasswordScreen() {
                   size="lg"
                   style={styles.backButton}
                 >
-                  Volver al Inicio
+                  {t.backToSignIn[lang]}
                 </Button>
               </GlassCard>
             </ScrollView>
@@ -109,7 +114,7 @@ export default function ForgotPasswordScreen() {
                   align="center"
                   style={styles.title}
                 >
-                  ¡Listo!
+                  {t.title[lang]}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -117,7 +122,10 @@ export default function ForgotPasswordScreen() {
                   align="center"
                   style={styles.subtitle}
                 >
-                  Revisa {email} y sigue los pasos
+                  {t.subtitle[lang].replace(
+                    "{email}",
+                    email || t.emailPlaceholder[lang]
+                  )}
                 </Typography>
               </View>
             </View>
@@ -125,8 +133,8 @@ export default function ForgotPasswordScreen() {
             <GlassCard style={styles.card}>
               <View style={styles.form}>
                 <EnhancedInput
-                  label="Email"
-                  placeholder="tu@email.com"
+                  label={t.emailLabel[lang]}
+                  placeholder={t.emailPlaceholder[lang]}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -143,14 +151,14 @@ export default function ForgotPasswordScreen() {
                   size="lg"
                   style={styles.resetButton}
                 >
-                  {loading ? "Enviando..." : "Enviar Instrucciones"}
+                  {loading ? t.sending[lang] : t.sendInstructions[lang]}
                 </Button>
               </View>
             </GlassCard>
 
             <View style={styles.footer}>
               <Typography variant="body1" color="textMuted" align="center">
-                ¿Ya la recordaste?
+                {t.remembered[lang]}
               </Typography>
               <Button
                 variant="ghost"
@@ -158,7 +166,7 @@ export default function ForgotPasswordScreen() {
                 size="lg"
                 style={styles.signInButton}
               >
-                Volver
+                {t.goBack[lang]}
               </Button>
             </View>
           </ScrollView>

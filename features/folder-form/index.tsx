@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -17,6 +19,9 @@ type Props = {
 
 export const FolderFormFeature = ({ isEditMode }: Props) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = folderFormTranslations;
 
   // Animation for preview card
   const previewScale = useSharedValue(1);
@@ -105,7 +110,7 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
 
         <View style={{ flex: 1, paddingHorizontal: 16 }}>
           <Typography variant="h5" weight="semibold">
-            {isEditMode ? "Editar Carpeta" : "Nueva Carpeta"}
+            {isEditMode ? t.editFolder[lang] : t.newFolder[lang]}
           </Typography>
         </View>
 
@@ -116,7 +121,11 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
           disabled={isSaveDisabled}
           loading={isSaving}
         >
-          {isSaving ? "Guardando..." : isEditMode ? "Guardar" : "Crear"}
+          {isSaving
+            ? t.saving[lang]
+            : isEditMode
+            ? t.save[lang]
+            : t.create[lang]}
         </Button>
       </View>
 
@@ -136,6 +145,7 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
           onIconChange={handleIconChange}
           onColorChange={handleColorChange}
           isEditMode={isEditMode}
+          lang={lang}
         />
 
         {/* Preview Card */}
@@ -145,7 +155,7 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
             weight="semibold"
             style={{ marginBottom: 12 }}
           >
-            Vista Previa
+            {t.preview[lang]}
           </Typography>
 
           <Card variant="outlined" padding="md">
@@ -170,10 +180,10 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
                   weight="semibold"
                   style={{ marginBottom: 2 }}
                 >
-                  {folderName || "Nombre de la carpeta"}
+                  {folderName || t.folderNameDefault[lang]}
                 </Typography>
                 <Typography variant="body2" color="textMuted">
-                  0 rutinas
+                  {t.routinesCount[lang]}
                 </Typography>
               </View>
             </View>
@@ -189,7 +199,7 @@ export const FolderFormFeature = ({ isEditMode }: Props) => {
               disabled={isSaving || isDeleting}
               loading={isDeleting}
             >
-              {isDeleting ? "Eliminando..." : "Eliminar Carpeta"}
+              {isDeleting ? t.deleting[lang] : t.deleteFolder[lang]}
             </Button>
           </View>
         )}

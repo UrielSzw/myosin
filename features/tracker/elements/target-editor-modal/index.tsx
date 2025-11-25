@@ -1,6 +1,10 @@
 import { MainMetric } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import {
+  getMetricName,
+  trackerTranslations,
+} from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { EnhancedInput } from "@/shared/ui/enhanced-input";
 import { Typography } from "@/shared/ui/typography";
@@ -21,6 +25,7 @@ type Props = {
   selectedMetric: MainMetric;
   onSaveTarget: (target: number | null) => Promise<void>;
   onDeleteMetric: () => Promise<void>;
+  lang?: "es" | "en";
 };
 
 export const TargetEditorModal: React.FC<Props> = ({
@@ -29,10 +34,12 @@ export const TargetEditorModal: React.FC<Props> = ({
   selectedMetric,
   onSaveTarget,
   onDeleteMetric,
+  lang = "es",
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const t = trackerTranslations;
   const [targetValue, setTargetValue] = useState<string>(
     selectedMetric.default_target?.toString() || ""
   );
@@ -62,15 +69,18 @@ export const TargetEditorModal: React.FC<Props> = ({
 
   const handleDeleteMetric = async () => {
     Alert.alert(
-      "Eliminar Métrica",
-      `¿Estás seguro de que quieres eliminar "${selectedMetric.name}"? Esta acción se puede deshacer desde el selector de métricas.`,
+      t.targetEditor.deleteConfirmTitle[lang],
+      `${t.targetEditor.deleteConfirmMessage[lang]} "${getMetricName(
+        selectedMetric,
+        lang
+      )}"? ${t.targetEditor.deleteConfirmNote[lang]}`,
       [
         {
-          text: "Cancelar",
+          text: t.cancel[lang],
           style: "cancel",
         },
         {
-          text: "Eliminar",
+          text: t.targetEditor.deleteMetric[lang],
           style: "destructive",
           onPress: async () => {
             setIsLoading(true);
@@ -135,7 +145,7 @@ export const TargetEditorModal: React.FC<Props> = ({
                   <Settings size={16} color={colors.primary[600]} />
                 </View>
                 <Typography variant="h6" weight="semibold">
-                  Configurar Métrica
+                  {t.targetEditor.title[lang]}
                 </Typography>
               </View>
               <Button variant="ghost" size="sm" onPress={onClose}>
@@ -163,10 +173,10 @@ export const TargetEditorModal: React.FC<Props> = ({
                   color="textMuted"
                   style={{ marginBottom: 4 }}
                 >
-                  Métrica
+                  {t.selectMetric[lang]}
                 </Typography>
                 <Typography variant="h6" weight="medium">
-                  {selectedMetric.name}
+                  {getMetricName(selectedMetric, lang)}
                 </Typography>
               </View>
 
@@ -177,16 +187,16 @@ export const TargetEditorModal: React.FC<Props> = ({
                   weight="medium"
                   style={{ marginBottom: 16 }}
                 >
-                  Objetivo Diario
+                  {t.targetEditor.targetGoal[lang]}
                 </Typography>
 
                 <EnhancedInput
                   value={targetValue}
                   onChangeText={setTargetValue}
-                  placeholder="Ej: 8000"
+                  placeholder={t.targetEditor.enterTarget[lang]}
                   keyboardType="numeric"
-                  label="Valor objetivo"
-                  helpText={`Unidad: ${displayUnit}. Deja vacío para sin objetivo`}
+                  label={`${t.goal[lang]} (${t.targetEditor.optional[lang]})`}
+                  helpText={displayUnit}
                 />
               </View>
 
@@ -198,7 +208,7 @@ export const TargetEditorModal: React.FC<Props> = ({
                   loading={isLoading}
                   disabled={isLoading}
                 >
-                  Guardar Cambios
+                  {t.targetEditor.saveChanges[lang]}
                 </Button>
 
                 <Button
@@ -206,7 +216,7 @@ export const TargetEditorModal: React.FC<Props> = ({
                   onPress={resetForm}
                   disabled={isLoading}
                 >
-                  Restablecer
+                  {t.save[lang]}
                 </Button>
 
                 <Button
@@ -220,7 +230,7 @@ export const TargetEditorModal: React.FC<Props> = ({
                   }}
                 >
                   <Typography style={{ color: colors.error[500] }}>
-                    Eliminar Métrica
+                    {t.targetEditor.deleteMetric[lang]}
                   </Typography>
                 </Button>
               </View>

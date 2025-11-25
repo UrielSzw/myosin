@@ -1,3 +1,4 @@
+import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { View } from "react-native";
@@ -5,9 +6,11 @@ import { useMainActions } from "../../../hooks/use-routine-form-store";
 
 type Props = {
   exercisesInBlockCount: number;
+  lang: "es" | "en";
 };
 
-export const ExerciseListTop = ({ exercisesInBlockCount }: Props) => {
+export const ExerciseListTop = ({ exercisesInBlockCount, lang }: Props) => {
+  const t = routineFormTranslations;
   const { setIsExerciseModalOpen, setExerciseModalMode } = useMainActions();
 
   const handleOpenModal = () => {
@@ -25,11 +28,14 @@ export const ExerciseListTop = ({ exercisesInBlockCount }: Props) => {
       }}
     >
       <Typography variant="h6" weight="semibold">
-        Ejercicios ({exercisesInBlockCount})
+        {t.exercisesCount[lang].replace(
+          "{count}",
+          exercisesInBlockCount.toString()
+        )}
       </Typography>
 
       <Button variant="ghost" size="sm" onPress={handleOpenModal}>
-        + Agregar Ejercicio
+        {t.addExercise[lang]}
       </Button>
     </View>
   );

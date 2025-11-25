@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { tempoSelectorTranslations } from "@/shared/translations/tempo-selector";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import {
@@ -35,25 +37,25 @@ interface Props {
 const TEMPO_PHASES: TempoPhase[] = [
   {
     name: "Excéntrica",
-    description: "Fase de descenso",
+    description: "eccentric", // translation key
     color: "#22C55E", // green-500 - from TempoMetronome
     icon: "ArrowDown",
   },
   {
     name: "Pausa Inferior",
-    description: "Pausa en el fondo",
+    description: "pause1", // translation key
     color: "#F59E0B", // amber-500 - from TempoMetronome (same for both pauses)
     icon: "Pause",
   },
   {
     name: "Concéntrica",
-    description: "Fase de subida",
+    description: "concentric", // translation key
     color: "#EF4444", // red-500 - from TempoMetronome
     icon: "ArrowUp",
   },
   {
     name: "Pausa Superior",
-    description: "Pausa arriba",
+    description: "pause2", // translation key
     color: "#F59E0B", // amber-500 - from TempoMetronome (same as bottom pause)
     icon: "Square",
   },
@@ -62,35 +64,38 @@ const TEMPO_PHASES: TempoPhase[] = [
 const PRESET_TEMPOS = [
   {
     value: "2-0-2-0",
-    label: "Estándar",
-    description: "Tempo controlado básico",
+    label: "standard",
+    description: "standard",
   },
   {
     value: "3-1-2-1",
-    label: "Fuerza",
-    description: "Enfoque en fuerza máxima",
+    label: "strength",
+    description: "strength",
   },
   {
     value: "4-2-1-0",
-    label: "Excéntrico",
-    description: "Énfasis en fase negativa",
+    label: "eccentric",
+    description: "eccentric",
   },
-  { value: "1-0-3-1", label: "Explosivo", description: "Potencia y velocidad" },
+  { value: "1-0-3-1", label: "explosive", description: "explosive" },
   {
     value: "5-3-2-2",
-    label: "Hipertrofia",
-    description: "Tiempo bajo tensión",
+    label: "hypertrophy",
+    description: "hypertrophy",
   },
   {
     value: "2-2-2-2",
-    label: "Metabólico",
-    description: "Stress metabólico alto",
+    label: "metabolic",
+    description: "metabolic",
   },
 ];
 
 export const TempoSelector = forwardRef<BottomSheetModal, Props>(
   ({ selectedTempo, onSelect, onDismiss }, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = tempoSelectorTranslations;
 
     // Helper function to render phase icons
     const renderPhaseIcon = (
@@ -235,7 +240,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                 color: colors.text,
               }}
             >
-              Seleccionar Tempo
+              {t.selectTempo[lang]}
             </Typography>
 
             <Typography
@@ -331,7 +336,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                       marginBottom: 4,
                     }}
                   >
-                    Personalizado
+                    {t.custom[lang]}
                   </Typography>
                   <Typography
                     variant="h2"
@@ -353,8 +358,10 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                 style={{ marginTop: 4 }}
               >
                 {displayState.isEmpty
-                  ? "Selecciona un tempo para el ejercicio"
-                  : "Excéntrica - Pausa - Concéntrica - Pausa"}
+                  ? t.selectTempoForExercise[lang]
+                  : lang === "es"
+                  ? "Excéntrica - Pausa - Concéntrica - Pausa"
+                  : "Eccentric - Pause - Concentric - Pause"}
               </Typography>
             </View>
           </View>
@@ -413,7 +420,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                   color: isCustomMode ? "white" : colors.textMuted,
                 }}
               >
-                Personalizado
+                {t.custom[lang]}
               </Typography>
             </TouchableOpacity>
           </View>
@@ -492,14 +499,20 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                           marginBottom: 4,
                         }}
                       >
-                        {preset.label}
+                        {
+                          t.presets[preset.label as keyof typeof t.presets]
+                            .label[lang]
+                        }
                       </Typography>
                       <Typography
                         variant="body2"
                         color="textMuted"
                         style={{ marginBottom: 8 }}
                       >
-                        {preset.description}
+                        {
+                          t.presets[preset.label as keyof typeof t.presets]
+                            .description[lang]
+                        }
                       </Typography>
 
                       {/* Phase indicators */}
@@ -615,7 +628,11 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                           {phase.name}
                         </Typography>
                         <Typography variant="caption" color="textMuted">
-                          {phase.description}
+                          {
+                            t.phases[
+                              phase.description as keyof typeof t.phases
+                            ][lang]
+                          }
                         </Typography>
                       </View>
                     </View>
@@ -743,7 +760,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                   color: displayState.isEmpty ? colors.textMuted : "#dc2626",
                 }}
               >
-                Eliminar
+                {t.delete[lang]}
               </Typography>
             </TouchableOpacity>
 
@@ -766,7 +783,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                 weight="bold"
                 style={{ color: "white" }}
               >
-                Guardar
+                {t.save[lang]}
               </Typography>
             </TouchableOpacity>
           </View>

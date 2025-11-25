@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
@@ -18,6 +20,9 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
   loading,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = analyticsTranslations;
   const router = useRouter();
 
   const handleHeaderPress = () => {
@@ -28,11 +33,11 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Sesiones Recientes
+          {t.recentSessions[lang]}
         </Typography>
         <Card variant="outlined" padding="md">
           <Typography variant="body2" color="textMuted">
-            Cargando...
+            {t.loading[lang]}
           </Typography>
         </Card>
       </View>
@@ -43,7 +48,7 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Sesiones Recientes
+          {t.recentSessions[lang]}
         </Typography>
         <Card variant="outlined" padding="lg">
           <View style={{ alignItems: "center", paddingVertical: 20 }}>
@@ -53,10 +58,10 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
               style={{ marginBottom: 8 }}
             />
             <Typography variant="body1" color="textMuted" align="center">
-              No hay sesiones recientes
+              {t.noRecentSessions[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
-              Completa tu primer entrenamiento para ver el historial
+              {t.completeFirstWorkout[lang]}
             </Typography>
           </View>
         </Card>
@@ -91,7 +96,7 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
         }}
       >
         <Typography variant="h5" weight="semibold">
-          Sesiones Recientes
+          {t.recentSessions[lang]}
         </Typography>
         <Pressable
           onPress={handleHeaderPress}
@@ -103,7 +108,7 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
           })}
         >
           <Typography variant="caption" color="textMuted">
-            {data.length} sesiones
+            {data.length} {t.sessions[lang]}
           </Typography>
           <ChevronRight size={14} color={colors.textMuted} />
         </Pressable>
@@ -124,10 +129,10 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
         }}
       >
         <Typography variant="caption" color="textMuted">
-          Promedio: {avgCompletion}% completado
+          {t.average[lang]} {avgCompletion}% {t.completed[lang]}
         </Typography>
         <Typography variant="caption" color="textMuted">
-          Total: {totalSetsCompleted} sets
+          {t.totalSets[lang]} {totalSetsCompleted} {t.sets[lang]}
         </Typography>
       </View>
     </View>

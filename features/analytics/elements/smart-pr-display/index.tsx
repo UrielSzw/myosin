@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
@@ -25,6 +27,9 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
   showTop = 4,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = analyticsTranslations;
   const router = useRouter();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -36,11 +41,11 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Records Personales
+          {t.personalRecords[lang]}
         </Typography>
         <Card variant="outlined" padding="md">
           <Typography variant="body2" color="textMuted">
-            Cargando...
+            {t.loading[lang]}
           </Typography>
         </Card>
       </View>
@@ -61,7 +66,7 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
     return (
       <View style={{ marginBottom: 20 }}>
         <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          Records Personales
+          {t.personalRecords[lang]}
         </Typography>
         <Card variant="outlined" padding="lg">
           <View style={{ alignItems: "center", paddingVertical: 20 }}>
@@ -71,10 +76,10 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
               style={{ marginBottom: 8 }}
             />
             <Typography variant="body1" color="textMuted" align="center">
-              Sin records personales aún
+              {t.noPRsYet[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
-              Completa entrenamientos para establecer tus primeros PRs
+              {t.completeWorkoutsForPRs[lang]}
             </Typography>
           </View>
         </Card>
@@ -93,14 +98,14 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
         }}
       >
         <Typography variant="h5" weight="semibold">
-          Records Personales
+          {t.personalRecords[lang]}
         </Typography>
         <Pressable
           style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
           onPress={handleSeeAllPress}
         >
           <Typography variant="caption" color="textMuted">
-            {sortedPRs.length} total
+            {sortedPRs.length} {t.total[lang]}
           </Typography>
           <ChevronRight size={14} color={colors.textMuted} />
         </Pressable>
@@ -122,11 +127,11 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
           }}
         >
           <Typography variant="caption" color="textMuted">
-            Mejor 1RM:{" "}
+            {t.best1RM[lang]}{" "}
             {Math.max(...sortedPRs.map((pr) => pr.estimated_1rm)).toFixed(0)}kg
           </Typography>
           <Typography variant="caption" color="textMuted">
-            Esta semana:{" "}
+            {t.thisWeek[lang]}{" "}
             {
               sortedPRs.filter(
                 (pr) =>
@@ -134,7 +139,7 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
                   7 * 24 * 60 * 60 * 1000
               ).length
             }{" "}
-            nuevos
+            {t.newPRs[lang]}
           </Typography>
         </View>
       )}
@@ -163,14 +168,14 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
             <>
               <ChevronUp size={16} color={colors.primary[500]} />
               <Typography variant="body2" weight="medium" color="primary">
-                Ver menos
+                {t.viewLess[lang]}
               </Typography>
             </>
           ) : (
             <>
               <ChevronDown size={16} color={colors.primary[500]} />
               <Typography variant="body2" weight="medium" color="primary">
-                Ver todos ({hiddenCount} más)
+                {t.viewAll[lang].replace("{count}", hiddenCount.toString())}
               </Typography>
             </>
           )}

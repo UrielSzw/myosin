@@ -13,8 +13,8 @@ export interface TrainingMethodInfo {
 export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   normal: {
     type: "normal",
-    title: "Serie Normal",
-    shortDescription: "Series tradicionales con descanso completo",
+    title: "normal",
+    shortDescription: "normal",
     detailedDescription:
       "Las series normales son la base del entrenamiento de fuerza. Consisten en realizar un número determinado de repeticiones con una carga específica, seguido de un período de descanso completo antes de la siguiente serie. Este método permite el uso de cargas máximas y es fundamental para el desarrollo de fuerza.",
     primaryBenefits: [
@@ -29,8 +29,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   warmup: {
     type: "warmup",
-    title: "Calentamiento",
-    shortDescription: "Series preparatorias con cargas ligeras",
+    title: "warmup",
+    shortDescription: "warmup",
     detailedDescription:
       "Las series de calentamiento utilizan cargas progresivamente incrementales (40-70% 1RM) para preparar el sistema neuromuscular y articular. Son esenciales para optimizar el rendimiento y reducir el riesgo de lesiones durante el entrenamiento principal.",
     primaryBenefits: [
@@ -45,7 +45,7 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   failure: {
     type: "failure",
-    title: "Al Fallo",
+    title: "failure",
     shortDescription:
       "Series llevadas hasta la incapacidad de completar otra repetición",
     detailedDescription:
@@ -62,8 +62,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   drop: {
     type: "drop",
-    title: "Drop Set",
-    shortDescription: "Reducción inmediata de peso al alcanzar el fallo",
+    title: "drop",
+    shortDescription: "drop",
     detailedDescription:
       "Los drop sets involucran reducir el peso inmediatamente después de alcanzar el fallo muscular (típicamente 15-25%) y continuar la serie. Esta técnica extiende el tiempo bajo tensión y maximiza el reclutamiento muscular cuando el músculo ya está fatigado.",
     primaryBenefits: [
@@ -78,8 +78,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   cluster: {
     type: "cluster",
-    title: "Cluster Set",
-    shortDescription: "Series divididas con micro-descansos",
+    title: "cluster",
+    shortDescription: "cluster",
     detailedDescription:
       "Los cluster sets dividen una serie tradicional en segmentos más pequeños con breves períodos de descanso (10-30 segundos) entre ellos. Esto permite mantener una mayor intensidad y calidad de movimiento a lo largo de toda la serie.",
     primaryBenefits: [
@@ -94,8 +94,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   "rest-pause": {
     type: "rest-pause",
-    title: "Rest-Pause",
-    shortDescription: "Pausas breves para continuar tras el fallo",
+    title: "restPause",
+    shortDescription: "restPause",
     detailedDescription:
       "La técnica rest-pause implica alcanzar el fallo muscular, descansar 10-20 segundos, y luego continuar con 2-5 repeticiones adicionales. Se puede repetir este ciclo 2-3 veces en la misma serie para maximizar el estímulo con cargas pesadas.",
     primaryBenefits: [
@@ -110,8 +110,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   mechanical: {
     type: "mechanical",
-    title: "Advantage Mecánica",
-    shortDescription: "Progresión desde ejercicios más difíciles a más fáciles",
+    title: "mechanical",
+    shortDescription: "mechanical",
     detailedDescription:
       "Los drop sets mecánicos implican cambiar a una variación más fácil del mismo ejercicio al alcanzar el fallo, en lugar de reducir peso. Se progresa desde posiciones de mayor dificultad mecánica a posiciones más favorables para extender la serie.",
     primaryBenefits: [
@@ -126,8 +126,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   eccentric: {
     type: "eccentric",
-    title: "Series Excéntricas",
-    shortDescription: "Énfasis en la fase de descenso/alargamiento del músculo",
+    title: "eccentric",
+    shortDescription: "eccentric",
     detailedDescription:
       "Las series excéntricas o negativas se enfocan en la fase de alargamiento del músculo, donde este puede generar más fuerza. Se utilizan cargas del 105-120% del 1RM con control lento (3-6 segundos) en la fase excéntrica. Requieren asistencia para la fase concéntrica.",
     primaryBenefits: [
@@ -142,8 +142,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   partial: {
     type: "partial",
-    title: "Repeticiones Parciales",
-    shortDescription: "Repeticiones en rango de movimiento reducido",
+    title: "partial",
+    shortDescription: "partial",
     detailedDescription:
       "Las repeticiones parciales utilizan un rango de movimiento limitado, típicamente en la porción más fuerte del movimiento. Se pueden hacer al final de una serie tradicional para extender el trabajo, o como método principal usando cargas supramáximas.",
     primaryBenefits: [
@@ -158,8 +158,8 @@ export const TRAINING_METHODS: Record<ISetType, TrainingMethodInfo> = {
   },
   isometric: {
     type: "isometric",
-    title: "Contracciones Isométricas",
-    shortDescription: "Mantenimiento de posición sin movimiento articular",
+    title: "isometric",
+    shortDescription: "isometric",
     detailedDescription:
       "Las contracciones isométricas mantienen una posición fija sin movimiento articular, generando tensión muscular constante. Pueden realizarse en diferentes ángulos del movimiento, típicamente manteniéndose 10-60 segundos dependiendo del objetivo.",
     primaryBenefits: [

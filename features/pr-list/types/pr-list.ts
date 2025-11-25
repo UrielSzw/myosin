@@ -85,6 +85,8 @@ export const MUSCLE_CATEGORY_MAP: Record<IExerciseMuscle, string> = {
 };
 
 export const MUSCLE_CATEGORY_LABELS: Record<string, string> = {
+  // DEPRECATED: Use prListTranslations.muscleCategories instead
+  // This is kept for backwards compatibility only
   chest: "Pecho",
   back: "Espalda",
   shoulders: "Hombros",

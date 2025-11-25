@@ -12,6 +12,7 @@ type Props = {
   icon?: "trophy" | "search";
   actionLabel?: string;
   onAction?: () => void;
+  lang: "es" | "en";
 };
 
 export const EmptyState: React.FC<Props> = ({

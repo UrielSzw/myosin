@@ -4,6 +4,8 @@ import {
   useUserPreferencesActions,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations } from "@/shared/translations/profile";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ProfileSection } from "@/shared/ui/profile-section";
@@ -12,16 +14,18 @@ import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
 import { Activity, ArrowLeft, Clock } from "lucide-react-native";
 import React from "react";
-import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export const ProfileWorkoutConfigFeature: React.FC = () => {
   const { user } = useAuth();
   const { colors } = useColorScheme();
-  const { t } = useTranslation("profile");
 
   const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = profileTranslations;
+  const tShared = sharedUiTranslations;
+
   const { setUnit, setShowRpe, setShowTempo } = useUserPreferencesActions();
 
   const unit = prefs?.weight_unit ?? "kg";
@@ -49,7 +53,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
 
         <View style={{ flex: 1, paddingHorizontal: 16 }}>
           <Typography variant="h5" weight="semibold">
-            Configuración de Entrenamiento
+            {t.workoutConfig[lang]}
           </Typography>
         </View>
       </View>
@@ -59,15 +63,15 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 20 }}
         showsVerticalScrollIndicator={false}
       >
-        <ProfileSection title={t("sections.units")}>
+        <ProfileSection title={t.unitsSection[lang]}>
           <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
               <View style={{ flex: 1 }}>
                 <Typography variant="body1" weight="semibold">
-                  {t("weightUnit.title")}
+                  {t.weightUnitTitle[lang]}
                 </Typography>
                 <Typography variant="body2" color="textMuted">
-                  {t("weightUnit.subtitle")}
+                  {t.weightUnitSubtitle[lang]}
                 </Typography>
               </View>
 
@@ -84,7 +88,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 >
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Seleccionar kilogramos"
+                    accessibilityLabel={tShared.selectKilograms[lang]}
                     onPress={() => {
                       if (user?.id) setUnit(user.id, "kg");
                     }}
@@ -108,7 +112,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
 
                   <Pressable
                     accessibilityRole="button"
-                    accessibilityLabel="Seleccionar libras"
+                    accessibilityLabel={tShared.selectPounds[lang]}
                     onPress={() => {
                       if (user?.id) setUnit(user.id, "lbs");
                     }}
@@ -139,7 +143,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
           </Card>
         </ProfileSection>
 
-        <ProfileSection title={t("sections.workoutPreferences")}>
+        <ProfileSection title={t.workoutPreferencesSection[lang]}>
           <SettingItem
             icon={
               <Activity
@@ -147,8 +151,8 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 color={rpeEnabled ? colors.primary[500] : colors.textMuted}
               />
             }
-            title={t("rpe.title")}
-            subtitle={t("rpe.subtitle")}
+            title={t.rpeTitle[lang]}
+            subtitle={t.rpeSubtitle[lang]}
             rightElement={
               <Switch
                 value={rpeEnabled}
@@ -171,8 +175,8 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 color={tempoEnabled ? colors.primary[500] : colors.textMuted}
               />
             }
-            title={t("tempo.title")}
-            subtitle={t("tempo.subtitle")}
+            title={t.tempoTitle[lang]}
+            subtitle={t.tempoSubtitle[lang]}
             rightElement={
               <Switch
                 value={tempoEnabled}

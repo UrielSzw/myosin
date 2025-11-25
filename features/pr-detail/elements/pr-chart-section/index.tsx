@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { TrendingUp } from "lucide-react-native";
@@ -9,10 +10,12 @@ import { PRProgressChart } from "../pr-progress-chart";
 
 type Props = {
   history: PRHistoryItem[];
+  lang: "es" | "en";
 };
 
-export const PRChartSection: React.FC<Props> = ({ history }) => {
+export const PRChartSection: React.FC<Props> = ({ history, lang }) => {
   const { colors } = useColorScheme();
+  const t = prDetailTranslations;
 
   // Si hay pocos datos, mostrar estado reducido
   if (history.length < 2) {
@@ -33,12 +36,12 @@ export const PRChartSection: React.FC<Props> = ({ history }) => {
             <TrendingUp size={24} color={colors.primary[500]} />
           </View>
           <Typography variant="h6" style={{ marginBottom: 8 }}>
-            Progresión de PRs
+            {t.prProgression[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted" align="center">
             {history.length === 0
-              ? "No hay PRs registrados aún"
-              : "Necesitas al menos 2 PRs para ver el gráfico de progresión"}
+              ? t.noPRsRecorded[lang]
+              : t.needAtLeastTwoPRs[lang]}
           </Typography>
         </View>
       </Card>
@@ -69,10 +72,11 @@ export const PRChartSection: React.FC<Props> = ({ history }) => {
           <TrendingUp size={16} color={colors.primary[500]} />
         </View>
         <View style={{ flex: 1 }}>
-          <Typography variant="h6">Progresión de PRs</Typography>
+          <Typography variant="h6">{t.prProgression[lang]}</Typography>
           <Typography variant="caption" color="textMuted">
-            {history.length} record{history.length !== 1 ? "s" : ""} • Estimado
-            1RM
+            {t.recordsEstimated1RM[lang]
+              .replace("{count}", history.length.toString())
+              .replace("{plural}", history.length !== 1 ? "s" : "")}
           </Typography>
         </View>
       </View>
@@ -93,7 +97,7 @@ export const PRChartSection: React.FC<Props> = ({ history }) => {
       >
         <View>
           <Typography variant="caption" color="textMuted">
-            Mejor PR
+            {t.bestPR[lang]}
           </Typography>
           <Typography variant="body2" weight="medium">
             {Math.max(...history.map((h) => h.estimated_1rm)).toFixed(1)}kg
@@ -101,7 +105,7 @@ export const PRChartSection: React.FC<Props> = ({ history }) => {
         </View>
         <View style={{ alignItems: "center" }}>
           <Typography variant="caption" color="textMuted">
-            Progreso Total
+            {t.totalProgress[lang]}
           </Typography>
           <Typography variant="body2" weight="medium">
             +
@@ -114,7 +118,7 @@ export const PRChartSection: React.FC<Props> = ({ history }) => {
         </View>
         <View style={{ alignItems: "flex-end" }}>
           <Typography variant="caption" color="textMuted">
-            Último PR
+            {t.lastPRChart[lang]}
           </Typography>
           <Typography variant="body2" weight="medium">
             {history[0]?.estimated_1rm.toFixed(1)}kg

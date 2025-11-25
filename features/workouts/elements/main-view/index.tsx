@@ -1,7 +1,9 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { HintBox } from "@/shared/ui/hint-box";
 import { Typography } from "@/shared/ui/typography";
@@ -27,6 +29,9 @@ export const MainView: React.FC<Props> = ({
   routinesCount = 0,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
@@ -89,7 +94,7 @@ export const MainView: React.FC<Props> = ({
               }}
             >
               <Typography variant="h5" weight="semibold">
-                Carpetas
+                {t.folders[lang]}
               </Typography>
               <Button
                 variant="ghost"
@@ -97,7 +102,7 @@ export const MainView: React.FC<Props> = ({
                 onPress={handleCreateFolder}
                 icon={<FolderPlus size={18} color={colors.primary[500]} />}
               >
-                Nueva
+                {t.newFolder[lang]}
               </Button>
             </View>
 
@@ -107,7 +112,7 @@ export const MainView: React.FC<Props> = ({
                 variant="promotional"
                 icon={<Folder size={16} color={colors.primary[500]} />}
               >
-                Organiza tus rutinas en carpetas temáticas
+                {t.organizeFoldersHint[lang]}
               </HintBox>
             )}
           </View>

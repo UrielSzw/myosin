@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import * as Icons from "lucide-react-native";
@@ -11,14 +12,17 @@ interface DiscreteScaleInputProps {
   metric: MainMetric;
   onValueSelect: (value: number, displayValue: string) => void;
   defaultValue?: number;
+  lang?: "es" | "en";
 }
 
 export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
   metric,
   onValueSelect,
   defaultValue,
+  lang = "es",
 }) => {
   const { colors } = useColorScheme();
+  const t = trackerTranslations;
   const [selectedValue, setSelectedValue] = useState<number | null>(
     defaultValue || null
   );
@@ -35,6 +39,18 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
 
   const { scaleLabels, scaleIcons, min = 1 } = inputConfig;
 
+  // Get translated labels if available
+  const getTranslatedLabel = (value: number): string => {
+    const metricSlug = metric.slug;
+    if (metricSlug && (t.scaleLabels as any)[metricSlug]) {
+      const scaleLabelsForMetric = (t.scaleLabels as any)[metricSlug];
+      return (
+        scaleLabelsForMetric[value]?.[lang] || scaleLabels[value - min] || ""
+      );
+    }
+    return scaleLabels[value - min] || "";
+  };
+
   const handleValueSelect = (index: number) => {
     const value = min + index;
     setSelectedValue(value);
@@ -45,7 +61,7 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
 
     const index = selectedValue - min;
     const iconName = scaleIcons[index] || "";
-    const label = scaleLabels[index] || "";
+    const label = getTranslatedLabel(selectedValue);
     const displayValue = `${iconName} ${label}`;
 
     onValueSelect(selectedValue, displayValue);
@@ -63,6 +79,7 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
           const isSelected = selectedValue === value;
           const iconName = scaleIcons[index] || "";
           const isAlreadySelected = defaultValue === value;
+          const translatedLabel = getTranslatedLabel(value);
 
           // Helper para renderizar el icono
           const renderIcon = () => {
@@ -116,16 +133,16 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
                       marginBottom: 2,
                     }}
                   >
-                    {label}
+                    {translatedLabel}
                     {isAlreadySelected && !isSelected && (
                       <Typography variant="caption" color="textMuted">
                         {" "}
-                        (actual)
+                        ({t.states.notRecorded[lang]})
                       </Typography>
                     )}
                   </Typography>
                   <Typography variant="caption" color="textMuted">
-                    Nivel {value}
+                    {t.states.level[lang]} {value}
                   </Typography>
                 </View>
                 {isSelected && (
@@ -158,9 +175,9 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
             style={{ marginTop: 8 }}
           >
             {defaultValue && selectedValue !== defaultValue
-              ? "Remplazar con"
-              : "Registrar"}
-            : {scaleLabels[selectedValue - min]}
+              ? `${t.manualInput.addButton[lang]}: `
+              : `${t.manualInput.addButton[lang]}: `}
+            {getTranslatedLabel(selectedValue)}
           </Button>
         )}
       </View>

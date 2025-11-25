@@ -1,6 +1,8 @@
 import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
@@ -15,22 +17,15 @@ type Props = {
   onPress: (routine: RoutineWithMetrics | null) => void;
 };
 
-const WEEK_DAYS = [
-  { key: "monday", short: "L", full: "Lunes" },
-  { key: "tuesday", short: "M", full: "Martes" },
-  { key: "wednesday", short: "X", full: "Miércoles" },
-  { key: "thursday", short: "J", full: "Jueves" },
-  { key: "friday", short: "V", full: "Viernes" },
-  { key: "saturday", short: "S", full: "Sábado" },
-  { key: "sunday", short: "D", full: "Domingo" },
-];
-
 export const RoutineCard: React.FC<Props> = ({
   routine,
   onLongPress,
   onPress,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
   const { initializeWorkout } = useActiveMainActions();
 
   // Verificar si es una rutina reciente (modificada en los últimos 7 días)
@@ -57,14 +52,14 @@ export const RoutineCard: React.FC<Props> = ({
 
       router.push("/workout/active");
     } catch (error) {
-      console.error("Error iniciando workout:", error);
+      console.error(t.errorStartingWorkout[lang], error);
     }
   };
 
   const formatDays = (days: string[]) => {
     return days
       .map((day) => {
-        const weekDay = WEEK_DAYS.find((d) => d.key === day);
+        const weekDay = t.weekDays[lang][day as keyof typeof t.weekDays.es];
         return weekDay ? weekDay.short : day;
       })
       .join(" - ");
@@ -117,8 +112,8 @@ export const RoutineCard: React.FC<Props> = ({
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Hash size={14} color={colors.textMuted} />
             <Typography variant="caption" color="textMuted">
-              {routine.blocksCount} bloque
-              {routine.blocksCount !== 1 ? "s" : ""}
+              {routine.blocksCount}{" "}
+              {routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]}
             </Typography>
           </View>
 
@@ -126,8 +121,10 @@ export const RoutineCard: React.FC<Props> = ({
           <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
             <Dumbbell size={14} color={colors.textMuted} />
             <Typography variant="caption" color="textMuted">
-              {routine.exercisesCount} ejercicio
-              {routine.exercisesCount !== 1 ? "s" : ""}
+              {routine.exercisesCount}{" "}
+              {routine.exercisesCount === 1
+                ? t.exercise[lang]
+                : t.exercises[lang]}
             </Typography>
           </View>
 
@@ -163,7 +160,7 @@ export const RoutineCard: React.FC<Props> = ({
             paddingVertical: 12,
           }}
         >
-          Iniciar Entrenamiento
+          {t.startWorkout[lang]}
         </Button>
       </Card>
     </TouchableOpacity>

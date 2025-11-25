@@ -1,8 +1,12 @@
-import {
-  EXERCISE_CATEGORY_LABELS,
-  EXERCISE_EQUIPMENT_LABELS,
-} from "@/shared/constants/exercise";
 import { BaseExercise } from "@/shared/db/schema";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import {
+  exerciseEquipmentTranslations,
+  exerciseMuscleTranslations,
+} from "@/shared/translations/exercise-labels";
+import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { Check, Info, Plus, Star } from "lucide-react-native";
 import { memo, useCallback } from "react";
 import { View } from "react-native";
@@ -43,6 +47,13 @@ export const ExerciseCard: React.FC<Props> = memo(
     onSelectExercise,
     onSeeMoreInfo,
   }) => {
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const t = exerciseSelectorTranslations;
+    const sharedT = sharedUiTranslations;
+    const muscleT = exerciseMuscleTranslations;
+    const equipmentT = exerciseEquipmentTranslations;
+
     const handleSelectExercise = useCallback(() => {
       onSelectExercise(exercise);
     }, [onSelectExercise, exercise]);
@@ -105,16 +116,12 @@ export const ExerciseCard: React.FC<Props> = memo(
                 style={{ marginBottom: 8 }}
               >
                 {
-                  EXERCISE_EQUIPMENT_LABELS[
-                    exercise.primary_equipment as keyof typeof EXERCISE_EQUIPMENT_LABELS
-                  ]
+                  equipmentT[
+                    exercise.primary_equipment as IExerciseEquipment
+                  ]?.[lang]
                 }{" "}
                 •{" "}
-                {
-                  EXERCISE_CATEGORY_LABELS[
-                    exercise.main_muscle_group as keyof typeof EXERCISE_CATEGORY_LABELS
-                  ]
-                }
+                {muscleT[exercise.main_muscle_group as IExerciseMuscle]?.[lang]}
               </Typography>
 
               <View
@@ -143,13 +150,13 @@ export const ExerciseCard: React.FC<Props> = memo(
                 >
                   {exerciseModalMode !== "replace"
                     ? isSelected
-                      ? "Agregado"
-                      : "Agregar"
+                      ? t.added[lang]
+                      : t.add[lang]
                     : isSelected
-                    ? "Seleccionado"
+                    ? t.selected[lang]
                     : isRecommended
-                    ? "Recomendado"
-                    : "Seleccionar"}
+                    ? t.recommended[lang]
+                    : sharedT.select[lang]}
                 </Button>
                 <Button
                   variant="ghost"

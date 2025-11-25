@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import {
   MEASUREMENT_TEMPLATES,
   MeasurementTemplate,
@@ -22,6 +24,9 @@ import {
 export const MeasurementTemplateSelector = forwardRef<BottomSheetModal>(
   (_, ref) => {
     const { colors } = useColorScheme();
+    const prefs = useUserPreferences();
+    const lang = prefs?.language ?? "es";
+    const sharedT = sharedUiTranslations;
     const { currentMeasurementTemplate } = useRoutineFormCurrentState();
     const { updateMeasurementTemplate } = useExerciseActions();
 
@@ -50,7 +55,7 @@ export const MeasurementTemplateSelector = forwardRef<BottomSheetModal>(
           }}
           accessible={true}
           accessibilityRole="button"
-          accessibilityLabel={`Seleccionar ${template.name}`}
+          accessibilityLabel={`${sharedT.select[lang]} ${template.name}`}
           accessibilityHint={template.description}
           accessibilityState={{ selected: isSelected }}
         >

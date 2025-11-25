@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import { StatCard } from "@/shared/ui/stat-card";
 import { Calendar, TrendingUp } from "lucide-react-native";
 import React from "react";
@@ -10,6 +11,7 @@ type Props = {
   lastPR: CurrentPR | null;
   totalProgress: number; // Diferencia en kg
   timeSpan: string; // "8 meses", "1 año", etc.
+  lang: "es" | "en";
 };
 
 export const PRStatsCards: React.FC<Props> = ({
@@ -17,8 +19,10 @@ export const PRStatsCards: React.FC<Props> = ({
   lastPR,
   totalProgress,
   timeSpan,
+  lang,
 }) => {
   const { colors } = useColorScheme();
+  const t = prDetailTranslations;
 
   if (!firstPR || !lastPR) {
     return null;
@@ -41,15 +45,15 @@ export const PRStatsCards: React.FC<Props> = ({
     >
       <StatCard
         icon={<Calendar size={20} color={colors.textMuted} />}
-        title="Primer PR"
+        title={t.firstPR[lang]}
         value={`${firstPR.weight}kg`}
         color={colors.textMuted}
-        subtitle={`Hace ${timeSpan}`}
+        subtitle={t.ago[lang].replace("{timeSpan}", timeSpan)}
       />
 
       <StatCard
         icon={<TrendingUp size={20} color={progressColor} />}
-        title="Último PR"
+        title={t.lastPR[lang]}
         value={`${lastPR.best_weight}kg`}
         color={progressColor}
         subtitle={progressText}

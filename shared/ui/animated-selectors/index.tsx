@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { Typography } from "@/shared/ui/typography";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useMemo } from "react";
@@ -30,6 +32,9 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
   size = 48,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = sharedUiTranslations;
 
   // Animated values
   const scale = useSharedValue(1);
@@ -86,7 +91,7 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
         },
         animatedStyle,
       ]}
-      accessibilityLabel={`Seleccionar icono ${icon}`}
+      accessibilityLabel={`${t.selectIcon[lang]} ${icon}`}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
     >
@@ -109,6 +114,9 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
   size = 40,
 }) => {
   const { colors } = useColorScheme();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = sharedUiTranslations;
 
   // Animated values
   const scale = useSharedValue(1);
@@ -154,7 +162,7 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
         },
         animatedStyle,
       ]}
-      accessibilityLabel={`Seleccionar color ${color}`}
+      accessibilityLabel={`${t.selectColor[lang]} ${color}`}
       accessibilityRole="button"
       accessibilityState={{ selected: isSelected }}
     />

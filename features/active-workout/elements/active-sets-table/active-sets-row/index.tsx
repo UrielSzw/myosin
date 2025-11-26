@@ -95,8 +95,11 @@ export const ActiveSetRow: React.FC<Props> = ({
       uncompleteSet(setId);
       resetCelebration();
     } else {
-      const userPrimaryInput = setData.primaryValue || null;
-      const userSecondaryInput = setData.secondaryValue || null;
+      // Prioridad: 1) Input del usuario (local state), 2) Valor autocompletado del store
+      const userPrimaryInput =
+        setData.primaryValue ?? set.actual_primary_value ?? null;
+      const userSecondaryInput =
+        setData.secondaryValue ?? set.actual_secondary_value ?? null;
       const userRpeInput = set.actual_rpe || null;
 
       // Helper para obtener valor efectivo con auto-completion
@@ -134,25 +137,17 @@ export const ActiveSetRow: React.FC<Props> = ({
         ? validatePR(effectivePrimaryValue, effectiveSecondaryValue)
         : { isPR: false, estimatedOneRM: 0 };
 
-      const shouldStartTimer = completeSet(
-        exerciseInBlock.tempId,
-        setId,
-        blockId,
-        {
-          primaryValue: effectivePrimaryValue,
-          secondaryValue: effectiveSecondaryValue,
-          actualRpe: userRpeInput || set.planned_rpe || 0,
-          estimated1RM: prValidation.estimatedOneRM,
-          isPR: prValidation.isPR,
-        }
-      );
+      completeSet(exerciseInBlock.tempId, setId, blockId, {
+        primaryValue: effectivePrimaryValue,
+        secondaryValue: effectiveSecondaryValue,
+        actualRpe: userRpeInput || set.planned_rpe || 0,
+        estimated1RM: prValidation.estimatedOneRM,
+        isPR: prValidation.isPR,
+      });
 
       if (prValidation.isPR) {
         triggerCelebration();
       }
-
-      // El timer banner se muestra automáticamente cuando shouldStartTimer es true
-      // Ya no necesitamos abrir manualmente el sheet
     }
   };
 

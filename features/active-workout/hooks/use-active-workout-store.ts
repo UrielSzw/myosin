@@ -1277,6 +1277,44 @@ const useActiveWorkoutStore = create<Store>()(
             lastPrevSet // Pasar como fallback
           );
 
+          // Auto-fill BEGIN
+          // Auto-fill actual values from last COMPLETED set (Option B)
+          // Only for weight and distance fields (not reps, time, etc.)
+          const lastCompletedSet = [...currentSets]
+            .reverse()
+            .map((setId) => state.activeWorkout.sets[setId])
+            .find((s) => s?.completed_at !== null);
+          console.log("Last completed set:", lastCompletedSet);
+          if (lastCompletedSet) {
+            const template = getMeasurementTemplate(
+              lastCompletedSet.measurement_template,
+              "kg"
+            );
+
+            // Primary field: copy only if weight or distance
+            const primaryFieldType = template.fields[0]?.type;
+            if (
+              (primaryFieldType === "weight" ||
+                primaryFieldType === "distance") &&
+              lastCompletedSet.actual_primary_value !== null
+            ) {
+              newSet.actual_primary_value =
+                lastCompletedSet.actual_primary_value;
+            }
+
+            // Secondary field: copy only if weight or distance
+            const secondaryFieldType = template.fields[1]?.type;
+            if (
+              (secondaryFieldType === "weight" ||
+                secondaryFieldType === "distance") &&
+              lastCompletedSet.actual_secondary_value !== null
+            ) {
+              newSet.actual_secondary_value =
+                lastCompletedSet.actual_secondary_value;
+            }
+          }
+          // Auto-fill END
+
           // Agregar el nuevo set al estado
           state.activeWorkout.sets[newSet.tempId] = newSet;
           state.activeWorkout.setsByExercise[exerciseInBlockId].push(

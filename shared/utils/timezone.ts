@@ -13,13 +13,17 @@ export const getUserTimezone = (): string => {
     console.warn("Intl.DateTimeFormat no disponible, usando expo-localization");
   }
 
-  // Fallback a expo-localization
+  // Fallback a expo-localization (API actualizada en versiones recientes)
   try {
-    return Localization.timezone || "America/Argentina/Buenos_Aires";
+    const calendars = Localization.getCalendars();
+    const timezone = calendars?.[0]?.timeZone;
+    if (timezone) return timezone;
   } catch (error) {
-    console.warn("Error detectando timezone, usando default:", error);
-    return "America/Argentina/Buenos_Aires"; // Default para Argentina
+    console.warn("Error con expo-localization:", error);
   }
+
+  // Default fallback
+  return "America/Argentina/Buenos_Aires";
 };
 
 /**
@@ -78,14 +82,18 @@ export const formatTimeToUserTimezone = (
 };
 
 /**
- * Obtiene el day_key en UTC para agregaciones consistentes
- * Siempre devuelve el día en UTC sin importar la zona horaria local
+ * Obtiene el day_key basado en la hora LOCAL del usuario
+ * El día corresponde a lo que el usuario ve en su zona horaria
  * @param date - Fecha actual (opcional, usa new Date() si no se proporciona)
- * @returns String en formato YYYY-MM-DD en UTC
+ * @returns String en formato YYYY-MM-DD en hora local
  */
-export const getDayKeyUTC = (date?: Date): string => {
+export const getDayKeyLocal = (date?: Date): string => {
   const d = date || new Date();
-  return d.toISOString().split("T")[0]; // "2025-11-10"
+  // Usar fecha local para que el día corresponda a la zona horaria del usuario
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 /**

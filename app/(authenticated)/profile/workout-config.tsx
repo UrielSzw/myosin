@@ -1,5 +1,10 @@
 import { ProfileWorkoutConfigFeature } from "@/features/profile-workout-config";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 
 export default function ProfileWorkoutConfigScreen() {
-  return <ProfileWorkoutConfigFeature />;
+  return (
+    <BottomSheetModalProvider>
+      <ProfileWorkoutConfigFeature />
+    </BottomSheetModalProvider>
+  );
 }

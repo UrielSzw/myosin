@@ -45,7 +45,8 @@ export const ActiveSetRow: React.FC<Props> = ({
     getBlockColors,
     formatMeasurementValue,
   } = useBlockStyles();
-  const { completeSet, uncompleteSet } = useActiveSetActions();
+  const { completeSet, uncompleteSet, autoFillFollowingSets } =
+    useActiveSetActions();
   const { setCurrentState } = useActiveMainActions();
   const { sets, exercisePreviousSets, session } = useActiveWorkout();
 
@@ -150,9 +151,8 @@ export const ActiveSetRow: React.FC<Props> = ({
         triggerCelebration();
       }
 
-      if (shouldStartTimer) {
-        onToggleSheet("restTimer");
-      }
+      // El timer banner se muestra automáticamente cuando shouldStartTimer es true
+      // Ya no necesitamos abrir manualmente el sheet
     }
   };
 
@@ -395,12 +395,15 @@ export const ActiveSetRow: React.FC<Props> = ({
           <MeasurementInput
             field={template?.fields[0]!}
             value={renderPrimaryValue}
-            onChange={(value) =>
+            onChange={(value) => {
               setSetData((prev) => ({
                 ...prev,
                 primaryValue: value,
-              }))
-            }
+              }));
+              autoFillFollowingSets(exerciseInBlock.tempId, set.order_index, {
+                primaryValue: value,
+              });
+            }}
             placeholder={getPlaceholderValue("primary")}
             setNumber={set.order_index + 1}
             activeWorkout={true}
@@ -414,12 +417,15 @@ export const ActiveSetRow: React.FC<Props> = ({
             <MeasurementInput
               field={template.fields[1]}
               value={renderSecondaryValue}
-              onChange={(value) =>
+              onChange={(value) => {
                 setSetData((prev) => ({
                   ...prev,
                   secondaryValue: value,
-                }))
-              }
+                }));
+                autoFillFollowingSets(exerciseInBlock.tempId, set.order_index, {
+                  secondaryValue: value,
+                });
+              }}
               placeholder={getPlaceholderValue("secondary")}
               setNumber={set.order_index + 1}
               activeWorkout={true}

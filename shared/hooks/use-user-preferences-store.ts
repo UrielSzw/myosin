@@ -42,6 +42,7 @@ type PrefsState = {
     setUnit: (userId: string, unit: "kg" | "lbs") => void;
     setShowRpe: (userId: string, show: boolean) => void;
     setShowTempo: (userId: string, show: boolean) => void;
+    setDefaultRestTime: (userId: string, seconds: number) => void;
     setColorScheme: (userId: string, scheme: ColorSchemeName) => void;
     setLanguage: (userId: string, language: "en" | "es") => void;
   };
@@ -60,6 +61,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
         weight_unit: prefs.weight_unit,
         show_rpe: prefs.show_rpe,
         show_tempo: prefs.show_tempo,
+        default_rest_time_seconds: prefs.default_rest_time_seconds,
         theme: prefs.theme,
         language: prefs.language,
       } as Partial<BaseUserPreferences>;
@@ -101,6 +103,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
               language: "es",
               show_rpe: false,
               show_tempo: false,
+              default_rest_time_seconds: 60,
             } as BaseUserPreferences;
 
             await usersRepository.createUserPreferences(
@@ -142,6 +145,15 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
           prefs: {
             ...(s.prefs ?? ({} as BaseUserPreferences)),
             show_tempo: value,
+          },
+        }));
+        schedulePersist(userId);
+      },
+      setDefaultRestTime: (userId: string, seconds: number) => {
+        set((s) => ({
+          prefs: {
+            ...(s.prefs ?? ({} as BaseUserPreferences)),
+            default_rest_time_seconds: seconds,
           },
         }));
         schedulePersist(userId);

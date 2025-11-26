@@ -6,6 +6,7 @@ import {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useUserPreferencesStore } from "@/shared/hooks/use-user-preferences-store";
 import {
   MeasurementTemplateId,
   getDefaultTemplate,
@@ -505,13 +506,20 @@ const useRoutineFormStore = create<Store>()(
             ? Object.keys(formState.blocks).length
             : 0;
 
+          const prefs = useUserPreferencesStore.getState().prefs;
+          const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
+
           const {
             newBlocks,
             newExercisesInBlock,
             newSets,
             exercisesByBlock,
             setsByExercise,
-          } = createIndividualBlocks(selectedExercises, currentBlockCount);
+          } = createIndividualBlocks(
+            selectedExercises,
+            currentBlockCount,
+            defaultRestTime
+          );
 
           if (!state.formState) return;
 
@@ -550,13 +558,20 @@ const useRoutineFormStore = create<Store>()(
             ? Object.keys(formState.blocks).length
             : 0;
 
+          const prefs = useUserPreferencesStore.getState().prefs;
+          const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
+
           const {
             newBlock,
             newExercisesInBlock,
             newSets,
             exercisesByBlock,
             setsByExercise,
-          } = createMultiBlock(selectedExercises, currentBlockCount);
+          } = createMultiBlock(
+            selectedExercises,
+            currentBlockCount,
+            defaultRestTime
+          );
 
           if (!state.formState) return;
 

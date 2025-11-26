@@ -141,9 +141,9 @@ export const useTimer = (options: UseTimerOptions = {}): UseTimerReturn => {
   const startTimer = useCallback(
     async (durationSeconds: number, title?: string, body?: string) => {
       try {
-        // Limpiar cualquier timer anterior antes de empezar uno nuevo
-        await timerService.clearTimer();
-
+        // IMPORTANTE: No llamar clearTimer si ya hay un timer activo
+        // porque triggerea onComplete. En su lugar, el timerService.startTimer
+        // ya llama a clearTimer internamente.
         await timerService.startTimer(
           durationSeconds,
           title || "Tiempo de descanso terminado",

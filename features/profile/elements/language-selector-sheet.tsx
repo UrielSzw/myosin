@@ -57,6 +57,7 @@ export const LanguageSelectorSheet = forwardRef<BottomSheetModal>((_, ref) => {
       ref={ref}
       snapPoints={snapPoints}
       enablePanDownToClose
+      enableDynamicSizing={false}
       backgroundStyle={{
         backgroundColor: colors.background,
       }}

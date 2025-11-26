@@ -118,8 +118,15 @@ class TimerService {
     title: string = "Timer Completado",
     body: string = "Tu timer ha terminado"
   ): Promise<string> {
-    // Limpiar timer anterior si existe
-    await this.clearTimer();
+    // Si ya hay un timer activo, solo cancelar la notificación
+    // sin llamar a clearTimer completo para evitar triggerar onComplete
+    if (this.currentTimer?.isActive && this.notificationId) {
+      await Notifications.cancelScheduledNotificationAsync(this.notificationId);
+      this.notificationId = null;
+    } else if (!this.currentTimer?.isActive) {
+      // Solo limpiar completamente si NO hay timer activo
+      await this.clearTimer();
+    }
 
     const timerId = `timer-${Date.now()}`;
     const startedAt = Date.now();
@@ -177,7 +184,7 @@ class TimerService {
         content: {
           title,
           body,
-          sound: true,
+          sound: "timer-complete.wav",
           priority: Notifications.AndroidNotificationPriority.HIGH,
           vibrate: [100, 50, 500, 50, 100],
           data: { timerId },

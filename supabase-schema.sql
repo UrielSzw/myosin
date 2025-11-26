@@ -308,6 +308,7 @@ CREATE TABLE user_preferences (
     language TEXT DEFAULT 'es' NOT NULL,
     show_rpe BOOLEAN DEFAULT true NOT NULL,
     show_tempo BOOLEAN DEFAULT true NOT NULL,
+    default_rest_time_seconds INTEGER DEFAULT 60 NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

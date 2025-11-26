@@ -244,7 +244,8 @@ type CreateIndividualBlocksResponse = {
 
 export const createIndividualBlocks = (
   selectedExercises: BaseExercise[],
-  currentBlockCount: number
+  currentBlockCount: number,
+  defaultRestTime: number = 60
 ): CreateIndividualBlocksResponse => {
   const newBlocks: ActiveWorkoutBlock[] = [];
   const newExercisesInBlock: ActiveWorkoutExercise[] = [];
@@ -264,7 +265,7 @@ export const createIndividualBlocks = (
       id: "",
       type: "individual",
       order_index: currentBlockCount + index,
-      rest_time_seconds: 60,
+      rest_time_seconds: defaultRestTime,
       rest_between_exercises_seconds: 0,
       original_block_id: null,
       name: "",
@@ -319,7 +320,8 @@ type CreateMultiBlockResponse = {
 
 export const createMultiBlock = (
   selectedExercises: BaseExercise[],
-  currentBlockCount: number
+  currentBlockCount: number,
+  defaultRestTime: number = 60
 ): CreateMultiBlockResponse => {
   const blockId = generateTempId();
 
@@ -330,7 +332,7 @@ export const createMultiBlock = (
     id: "",
     type: "superset",
     order_index: currentBlockCount,
-    rest_time_seconds: 60,
+    rest_time_seconds: defaultRestTime,
     rest_between_exercises_seconds: 0,
     original_block_id: null,
     name: "",

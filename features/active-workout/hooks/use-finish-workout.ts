@@ -19,7 +19,7 @@ export const useFinishWorkout = () => {
   const { updateRoutine } = useUpdateRoutine();
   const { saveWorkoutSession } = useSaveWorkoutSession();
 
-  const handleValidateWorkout = async () => {
+  const handleValidateWorkout = async (): Promise<void> => {
     const changes = detectWorkoutChanges();
 
     if (!changes) {
@@ -27,45 +27,56 @@ export const useFinishWorkout = () => {
       clearWorkout();
       router.back();
     } else {
-      Alert.alert(t.updateRoutineTitle[lang], t.updateRoutineMessage[lang], [
-        {
-          text: t.no[lang],
-          style: "cancel",
-          onPress: async () => {
-            await saveWorkoutSession();
-            clearWorkout();
-            router.back();
+      return new Promise((resolve) => {
+        Alert.alert(t.updateRoutineTitle[lang], t.updateRoutineMessage[lang], [
+          {
+            text: t.no[lang],
+            style: "cancel",
+            onPress: async () => {
+              await saveWorkoutSession();
+              clearWorkout();
+              router.back();
+              resolve();
+            },
           },
-        },
-        {
-          text: t.yesSave[lang],
-          style: "destructive",
-          onPress: async () => {
-            await updateRoutine();
-            await saveWorkoutSession();
-            clearWorkout();
-            router.back();
+          {
+            text: t.yesSave[lang],
+            style: "destructive",
+            onPress: async () => {
+              await updateRoutine();
+              await saveWorkoutSession();
+              clearWorkout();
+              router.back();
+              resolve();
+            },
           },
-        },
-      ]);
+        ]);
+      });
     }
   };
 
-  const handleFinishWorkout = () => {
-    if (totalSetsCompleted < totalSetsPlanned) {
-      Alert.alert(t.confirmTitle[lang], t.incompleteSetsMessage[lang], [
-        { text: t.no[lang], style: "cancel" },
-        {
-          text: t.yesFinish[lang],
-          style: "destructive",
-          onPress: () => {
-            handleValidateWorkout();
+  const handleFinishWorkout = (): Promise<void> => {
+    return new Promise((resolve) => {
+      if (totalSetsCompleted < totalSetsPlanned) {
+        Alert.alert(t.confirmTitle[lang], t.incompleteSetsMessage[lang], [
+          {
+            text: t.no[lang],
+            style: "cancel",
+            onPress: () => resolve(),
           },
-        },
-      ]);
-    } else {
-      handleValidateWorkout();
-    }
+          {
+            text: t.yesFinish[lang],
+            style: "destructive",
+            onPress: async () => {
+              await handleValidateWorkout();
+              resolve();
+            },
+          },
+        ]);
+      } else {
+        handleValidateWorkout().then(resolve);
+      }
+    });
   };
 
   const handleExitWorkout = () => {

@@ -10,10 +10,12 @@ import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { ProfileSection } from "@/shared/ui/profile-section";
 import { SettingItem } from "@/shared/ui/setting-item";
+import { RestTimeBottomSheet } from "@/shared/ui/sheets/rest-time-sheet";
 import { Typography } from "@/shared/ui/typography";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import { Activity, ArrowLeft, Clock } from "lucide-react-native";
-import React from "react";
+import { Activity, ArrowLeft, Clock, Timer } from "lucide-react-native";
+import React, { useRef } from "react";
 import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,11 +28,23 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
   const t = profileTranslations;
   const tShared = sharedUiTranslations;
 
-  const { setUnit, setShowRpe, setShowTempo } = useUserPreferencesActions();
+  const { setUnit, setShowRpe, setShowTempo, setDefaultRestTime } =
+    useUserPreferencesActions();
 
   const unit = prefs?.weight_unit ?? "kg";
   const rpeEnabled = prefs?.show_rpe ?? false;
   const tempoEnabled = prefs?.show_tempo ?? false;
+  const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
+
+  const restTimeSheetRef = useRef<BottomSheetModal>(null);
+
+  const formatRestTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
@@ -170,7 +184,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
 
           <SettingItem
             icon={
-              <Clock
+              <Timer
                 size={20}
                 color={tempoEnabled ? colors.primary[500] : colors.textMuted}
               />
@@ -191,10 +205,46 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
               />
             }
           />
+
+          <SettingItem
+            icon={<Clock size={20} color={colors.primary[500]} />}
+            title={t.defaultRestTimeTitle[lang]}
+            subtitle={t.defaultRestTimeSubtitle[lang]}
+            onPress={() => restTimeSheetRef.current?.present()}
+            rightElement={
+              <View
+                style={{
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                  borderRadius: 6,
+                  backgroundColor: colors.gray[100],
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  weight="semibold"
+                  style={{ color: colors.primary[500] }}
+                >
+                  {formatRestTime(defaultRestTime)}
+                </Typography>
+              </View>
+            }
+          />
         </ProfileSection>
 
         <View style={{ height: 100 }} />
       </ScrollView>
+
+      <RestTimeBottomSheet
+        ref={restTimeSheetRef}
+        currentRestTime={defaultRestTime}
+        onSelectRestTime={(seconds) => {
+          if (user?.id) {
+            setDefaultRestTime(user.id, seconds);
+          }
+          restTimeSheetRef.current?.dismiss();
+        }}
+      />
     </SafeAreaView>
   );
 };

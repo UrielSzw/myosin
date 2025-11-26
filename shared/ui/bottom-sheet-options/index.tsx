@@ -49,6 +49,7 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
         ref={ref}
         snapPoints={snapPoints}
         enablePanDownToClose
+        enableDynamicSizing={false}
         backgroundStyle={{
           backgroundColor: colors.surface,
           shadowColor: "#000",

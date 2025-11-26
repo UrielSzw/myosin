@@ -114,6 +114,10 @@ export const activeWorkoutTranslations = {
     es: "Tiempo de descanso terminado",
     en: "Rest time finished",
   },
+  restTimeFinishedBody: {
+    es: "Tu descanso ha terminado. ¡Continúa con tu entrenamiento!",
+    en: "Your rest time is over. Continue with your workout!",
+  },
   userNotAuthenticated: {
     es: "Usuario no autenticado",
     en: "User not authenticated",

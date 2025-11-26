@@ -174,6 +174,14 @@ export const profileTranslations = {
     es: "Velocidad de las repeticiones",
     en: "Speed of repetitions",
   },
+  defaultRestTimeTitle: {
+    es: "Descanso por Defecto",
+    en: "Default Rest Time",
+  },
+  defaultRestTimeSubtitle: {
+    es: "Tiempo de descanso entre series",
+    en: "Rest time between sets",
+  },
 
   // Language Selector
   languageSelectorTitle: {

@@ -30,12 +30,12 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
 
     React.useEffect(() => {
       setAudioModeAsync({
-        playsInSilentMode: true, // Reproduce aunque el celular esté en silencio
+        playsInSilentMode: true,
         shouldPlayInBackground: false,
       });
     }, []);
 
-    // 🔥 SOLUCIÓN SIMPLE: Si el timer del store desaparece, cerrar el sheet
+    // Si el timer del store desaparece, cerrar el sheet
     React.useEffect(() => {
       if (!restTimerStore && ref && "current" in ref && ref.current) {
         ref.current.dismiss();
@@ -89,10 +89,17 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
         startTimer(
           restTimeSeconds,
           t.restTimeFinished[lang],
-          "Tu descanso ha terminado. ¡Continúa con tu entrenamiento!"
+          t.restTimeFinishedBody[lang]
         );
       }
-    }, [startedAt, restTimeSeconds, startTimer, lang, t.restTimeFinished]);
+    }, [
+      startedAt,
+      restTimeSeconds,
+      startTimer,
+      lang,
+      t.restTimeFinished,
+      t.restTimeFinishedBody,
+    ]);
 
     // Formatear tiempo
     const formatTime = useCallback((seconds: number) => {

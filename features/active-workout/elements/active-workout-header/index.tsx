@@ -3,7 +3,7 @@ import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { Flag, Timer, X } from "lucide-react-native";
 import React, { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, TouchableOpacity, View } from "react-native";
 import { useActiveWorkout } from "../../hooks/use-active-workout-store";
 import { useFinishWorkout } from "../../hooks/use-finish-workout";
 import { ElapsedTime } from "./elapsed-time";
@@ -11,10 +11,20 @@ import { ProgressLine } from "./progress-line";
 
 export const ActiveWorkoutHeader = () => {
   const [elapsedTime, setElapsedTime] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
 
   const { colors, isDarkMode } = useColorScheme();
   const { session } = useActiveWorkout();
   const { handleFinishWorkout, handleExitWorkout } = useFinishWorkout();
+
+  const onFinishPress = async () => {
+    setIsSaving(true);
+    try {
+      await handleFinishWorkout();
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   if (!session) return null;
 
@@ -75,8 +85,12 @@ export const ActiveWorkoutHeader = () => {
 
       {/* Espacio para mantener balance */}
       <View>
-        <Button size="sm" onPress={handleFinishWorkout}>
-          <Flag size={20} color="#fff" />
+        <Button size="sm" onPress={onFinishPress} disabled={isSaving}>
+          {isSaving ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Flag size={20} color="#fff" />
+          )}
         </Button>
       </View>
     </View>

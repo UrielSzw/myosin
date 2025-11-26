@@ -28,6 +28,11 @@ export const user_preferences = sqliteTable(
       .default(true)
       .notNull(),
 
+    // Workout defaults
+    default_rest_time_seconds: integer("default_rest_time_seconds")
+      .default(60)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [index("idx_user_preferences_user_id").on(t.user_id)]

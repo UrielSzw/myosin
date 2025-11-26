@@ -1,0 +1,1 @@
+ALTER TABLE `user_preferences` ADD `default_rest_time_seconds` integer DEFAULT 60 NOT NULL;

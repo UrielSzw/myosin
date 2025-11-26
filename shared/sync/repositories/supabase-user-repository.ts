@@ -16,6 +16,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           language: data.language || "es",
           show_rpe: data.show_rpe ?? false,
           show_tempo: data.show_tempo ?? false,
+          default_rest_time_seconds: data.default_rest_time_seconds ?? 60,
         })
         .select()
         .single();
@@ -40,6 +41,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           language: data.language,
           show_rpe: data.show_rpe,
           show_tempo: data.show_tempo,
+          default_rest_time_seconds: data.default_rest_time_seconds,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", userId)

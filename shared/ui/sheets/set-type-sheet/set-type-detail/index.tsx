@@ -1,4 +1,3 @@
-import { getTrainingMethodInfo } from "@/shared/constants/training-methods";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -31,7 +30,13 @@ export const SetTypeDetail: React.FC<Props> = ({
   const lang = prefs?.language ?? "es";
   const t = setTypeTranslations;
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
-  const methodInfo = getTrainingMethodInfo(setType);
+
+  // Map ISetType to translation key
+  const typeKey =
+    setType === "rest-pause"
+      ? "rest-pause"
+      : (setType as keyof typeof t.methods);
+  const methodInfo = t.methods[typeKey];
 
   const setTypeColor = getSetTypeColor(setType);
   const setTypeLabel = getSetTypeLabel(setType);
@@ -100,10 +105,10 @@ export const SetTypeDetail: React.FC<Props> = ({
 
           <View style={{ flex: 1 }}>
             <Typography variant="h3" weight="bold" style={{ marginBottom: 4 }}>
-              {methodInfo.title}
+              {methodInfo.title[lang]}
             </Typography>
             <Typography variant="body2" color="textMuted">
-              {methodInfo.shortDescription}
+              {methodInfo.shortDescription[lang]}
             </Typography>
           </View>
         </View>
@@ -127,7 +132,7 @@ export const SetTypeDetail: React.FC<Props> = ({
             </Typography>
           </View>
           <Typography variant="body1" style={{ lineHeight: 24 }}>
-            {methodInfo.detailedDescription}
+            {methodInfo.detailedDescription[lang]}
           </Typography>
         </Card>
 
@@ -175,7 +180,7 @@ export const SetTypeDetail: React.FC<Props> = ({
                   lineHeight: 22,
                 }}
               >
-                {benefit}
+                {benefit[lang]}
               </Typography>
             </View>
           ))}
@@ -206,7 +211,7 @@ export const SetTypeDetail: React.FC<Props> = ({
               fontStyle: "italic",
             }}
           >
-            {methodInfo.whenToUse}
+            {methodInfo.whenToUse[lang]}
           </Typography>
         </Card>
 
@@ -226,7 +231,7 @@ export const SetTypeDetail: React.FC<Props> = ({
             weight="semibold"
             style={{ color: "white" }}
           >
-            {t.use[lang]} {methodInfo.title}
+            {t.use[lang]} {methodInfo.title[lang]}
           </Typography>
         </TouchableOpacity>
       </ScrollView>

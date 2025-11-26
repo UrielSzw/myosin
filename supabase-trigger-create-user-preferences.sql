@@ -15,14 +15,16 @@ BEGIN
         weight_unit,
         language,
         show_rpe,
-        show_tempo
+        show_tempo,
+        default_rest_time_seconds
     ) VALUES (
         NEW.id,              -- user_id from auth.users
         'dark',              -- default theme
         'kg',                -- default weight unit
         'es',                -- default language (Spanish)
         false,               -- default show_rpe
-        false                -- default show_tempo
+        false,               -- default show_tempo
+        60                   -- default rest time (60 seconds = 1 minute)
     );
     
     RETURN NEW;

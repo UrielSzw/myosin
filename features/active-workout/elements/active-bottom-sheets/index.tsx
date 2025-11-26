@@ -14,7 +14,6 @@ import {
   useActiveSetActions,
   useActiveWorkoutState,
 } from "../../hooks/use-active-workout-store";
-import { RestTimerBottomSheet } from "../rest-timer-sheet";
 
 type Props = {
   setTypeBottomSheetRef: React.RefObject<BottomSheetModal | null>;
@@ -120,8 +119,6 @@ export const ActiveBottomSheets: React.FC<Props> = ({
 
   return (
     <>
-      <RestTimerBottomSheet ref={restTimerSheetRef} />
-
       <SetTypeBottomSheet
         ref={setTypeBottomSheetRef}
         onSelectSetType={handleUpdateSetType}

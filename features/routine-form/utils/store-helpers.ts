@@ -80,7 +80,8 @@ type CreateIndividualBlocksParams = {
 
 export const createIndividualBlocks = (
   exercises: BaseExercise[],
-  totalBlocks: number
+  totalBlocks: number,
+  defaultRestTime: number = 60
 ): CreateIndividualBlocksParams => {
   const newBlocks: (BlockInsert & {
     tempId: string;
@@ -106,7 +107,7 @@ export const createIndividualBlocks = (
       name: exercise.name,
       order_index: totalBlocks + index,
       rest_between_exercises_seconds: 0,
-      rest_time_seconds: 60,
+      rest_time_seconds: defaultRestTime,
       routine_id: "",
       id: "",
     };
@@ -161,7 +162,8 @@ type CreateMultiBlockParams = {
 
 export const createMultiBlock = (
   exercises: BaseExercise[],
-  totalBlocks: number
+  totalBlocks: number,
+  defaultRestTime: number = 60
 ): CreateMultiBlockParams => {
   const blockTempId = generateTempId();
   const newExercisesInBlock: (ExerciseInBlockInsert & {
@@ -181,7 +183,7 @@ export const createMultiBlock = (
     name: "Superserie",
     order_index: totalBlocks,
     rest_between_exercises_seconds: 0, // No rest = superset
-    rest_time_seconds: 90,
+    rest_time_seconds: defaultRestTime,
     routine_id: "",
     id: "",
   };

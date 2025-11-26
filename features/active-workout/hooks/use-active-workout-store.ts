@@ -10,7 +10,11 @@ import {
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
 import { computeEpley1RM } from "@/shared/db/utils/pr";
-import { MeasurementTemplateId } from "@/shared/types/measurement";
+import { useUserPreferencesStore } from "@/shared/hooks/use-user-preferences-store";
+import {
+  getMeasurementTemplate,
+  MeasurementTemplateId,
+} from "@/shared/types/measurement";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
@@ -186,6 +190,18 @@ type Store = {
     deleteSet: () => void;
     updateSetType: (setType: ISetType) => void;
     updateRpe: (rpe: RPEValue | null) => void;
+    autoFillFollowingSets: (
+      exerciseInBlockId: string,
+      currentSetOrder: number,
+      updates: {
+        primaryValue?: number | null;
+        secondaryValue?: number | null;
+        primaryMin?: number | null;
+        primaryMax?: number | null;
+        secondaryMin?: number | null;
+        secondaryMax?: number | null;
+      }
+    ) => void;
   };
 
   timerActions: {
@@ -708,13 +724,20 @@ const useActiveWorkoutStore = create<Store>()(
 
           const currentBlockCount = state.activeWorkout.blocksBySession.length;
 
+          const prefs = useUserPreferencesStore.getState().prefs;
+          const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
+
           const {
             newBlocks,
             newExercisesInBlock,
             newSets,
             exercisesByBlock,
             setsByExercise,
-          } = createIndividualBlocks(selectedExercises, currentBlockCount);
+          } = createIndividualBlocks(
+            selectedExercises,
+            currentBlockCount,
+            defaultRestTime
+          );
 
           // Agregar nuevos bloques
           newBlocks.forEach((block) => {
@@ -760,13 +783,20 @@ const useActiveWorkoutStore = create<Store>()(
 
           const currentBlockCount = state.activeWorkout.blocksBySession.length;
 
+          const prefs = useUserPreferencesStore.getState().prefs;
+          const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
+
           const {
             newBlock,
             newExercisesInBlock,
             newSets,
             exercisesByBlock,
             setsByExercise,
-          } = createMultiBlock(selectedExercises, currentBlockCount);
+          } = createMultiBlock(
+            selectedExercises,
+            currentBlockCount,
+            defaultRestTime
+          );
 
           // Agregar nuevo bloque
           state.activeWorkout.blocks[newBlock.tempId] = newBlock;
@@ -1326,12 +1356,6 @@ const useActiveWorkoutStore = create<Store>()(
 
           state.stats.totalSetsCompleted += 1;
 
-          // 🔥 SOLUCIÓN SIMPLE: Si hay un timer activo, resetearlo
-          const wasTimerActive = state.restTimer?.isActive;
-          if (wasTimerActive) {
-            state.restTimer = null; // Reset del timer
-          }
-
           const nextSetId = state.activeWorkout.setsByExercise[
             exerciseInBlockId
           ].find(
@@ -1388,12 +1412,21 @@ const useActiveWorkoutStore = create<Store>()(
             }
 
             if (restTimeResult > 0) {
-              state.restTimer = {
-                totalTime: restTimeResult,
-                timeRemaining: restTimeResult,
-                isActive: true,
-                startedAt: Date.now(),
-              };
+              // ✅ Si hay un timer activo, actualizarlo en vez de resetearlo
+              // Esto evita que el sheet se cierre y se vuelva a abrir
+              if (state.restTimer?.isActive) {
+                state.restTimer.totalTime = restTimeResult;
+                state.restTimer.timeRemaining = restTimeResult;
+                state.restTimer.startedAt = Date.now();
+              } else {
+                // Solo crear nuevo timer si no había uno activo
+                state.restTimer = {
+                  totalTime: restTimeResult,
+                  timeRemaining: restTimeResult,
+                  isActive: true,
+                  startedAt: Date.now(),
+                };
+              }
 
               shouldStartTimer = true;
             }
@@ -1562,6 +1595,85 @@ const useActiveWorkoutStore = create<Store>()(
                   : set.was_modified_during_workout,
             };
           }
+        });
+      },
+      autoFillFollowingSets: (exerciseInBlockId, currentSetOrder, updates) => {
+        set((state) => {
+          // Guard: Check if there's an active workout
+          if (!state.activeWorkout.session) return;
+
+          // Find the block that contains this exercise
+          const blockId = Object.keys(
+            state.activeWorkout.exercisesByBlock
+          ).find((bId) =>
+            state.activeWorkout.exercisesByBlock[bId]?.includes(
+              exerciseInBlockId
+            )
+          );
+
+          if (!blockId) return;
+
+          // Get the exercise
+          const exerciseInBlock =
+            state.activeWorkout.exercises[exerciseInBlockId];
+          if (!exerciseInBlock) return;
+
+          // Get all sets for this exercise
+          const setIds =
+            state.activeWorkout.setsByExercise[exerciseInBlockId] || [];
+          if (setIds.length === 0) return;
+
+          // Get the first set to determine measurement template
+          const firstSetId = setIds[0];
+          const firstSet = state.activeWorkout.sets[firstSetId];
+          if (!firstSet) return;
+
+          // Get measurement template to determine field types
+          const template = getMeasurementTemplate(
+            firstSet.measurement_template,
+            "kg" // Default to kg, this should ideally come from user preferences
+          );
+
+          // Get following sets (order_index > currentSetOrder)
+          const followingSets = setIds
+            .map((id) => state.activeWorkout.sets[id])
+            .filter(
+              (set) =>
+                set && set.order_index > currentSetOrder && !set.completed_at // Skip completed sets
+            );
+
+          // Auto-fill following uncompleted sets with smart logic
+          followingSets.forEach((nextSet) => {
+            // Handle primary value
+            if (updates.primaryValue !== undefined) {
+              const primaryFieldType = template.fields[0]?.type;
+
+              // Smart auto-fill rules:
+              // 1. Weight fields ALWAYS auto-fill (weight typically stays constant)
+              // 2. Reps fields NEVER auto-fill (reps vary due to fatigue)
+              // 3. Other fields (time, distance, etc.) only if empty
+              const shouldAutoFillPrimary =
+                primaryFieldType === "weight" || // ALWAYS for weight
+                nextSet.actual_primary_value === null; // Or if empty
+
+              if (shouldAutoFillPrimary && primaryFieldType !== "reps") {
+                nextSet.actual_primary_value = updates.primaryValue;
+              }
+            }
+
+            // Handle secondary value
+            if (updates.secondaryValue !== undefined) {
+              const secondaryFieldType = template.fields[1]?.type;
+
+              const shouldAutoFillSecondary =
+                secondaryFieldType === "weight" || // ALWAYS for weight
+                nextSet.actual_secondary_value === null; // Or if empty
+
+              if (shouldAutoFillSecondary && secondaryFieldType !== "reps") {
+                nextSet.actual_secondary_value = updates.secondaryValue;
+              }
+            }
+          });
         });
       },
     },

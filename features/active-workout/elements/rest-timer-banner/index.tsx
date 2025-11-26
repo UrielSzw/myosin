@@ -11,6 +11,7 @@ import {
 } from "lucide-react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  AppState,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -19,7 +20,6 @@ import {
   View,
 } from "react-native";
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -106,13 +106,21 @@ export const RestTimerBanner: React.FC = () => {
     addTime,
   } = useTimer({
     onComplete: () => {
-      playCompletionAlert();
-      setTimeout(() => {
-        runOnJS(dismissBanner)();
-        setTimeout(() => {
-          skipRestTimer();
-        }, 300);
-      }, 1000);
+      // Solo reproducir alerta si la app está en foreground
+      // (evita que suene cuando volvemos del background y el timer ya expiró)
+      if (AppState.currentState === "active") {
+        playCompletionAlert();
+      }
+
+      setTimeout(
+        () => {
+          dismissBanner();
+          setTimeout(() => {
+            skipRestTimer();
+          }, 300);
+        },
+        AppState.currentState === "active" ? 1000 : 0
+      );
     },
   });
 

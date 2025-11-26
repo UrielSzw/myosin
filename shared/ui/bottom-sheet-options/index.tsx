@@ -19,13 +19,26 @@ type Props = {
     icon?: React.ReactNode;
   }[];
   warningOption?: { label: string; method: () => void; icon?: React.ReactNode };
+  enableDynamicSizing?: boolean;
+  snapPoints?: string[];
 };
 
 export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
-  ({ title, subtitle, options, warningOption }, ref) => {
+  (
+    {
+      title,
+      subtitle,
+      options,
+      warningOption,
+      enableDynamicSizing = true,
+      snapPoints = ["50%"],
+    },
+    ref
+  ) => {
     const { colors } = useColorScheme();
 
-    const snapPoints = useMemo(() => ["50%"], []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const snapPointsMemo = useMemo(() => snapPoints, []);
 
     const handleOptionPress = (type: string) => {
       const option = options.find((opt) => opt.type === type);
@@ -47,9 +60,9 @@ export const BottomSheetOptions = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={snapPoints}
+        snapPoints={snapPointsMemo}
         enablePanDownToClose
-        enableDynamicSizing={false}
+        enableDynamicSizing={enableDynamicSizing}
         backgroundStyle={{
           backgroundColor: colors.surface,
           shadowColor: "#000",

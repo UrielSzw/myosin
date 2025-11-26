@@ -184,7 +184,7 @@ class TimerService {
         content: {
           title,
           body,
-          sound: "timer-complete.wav",
+          sound: "timer_complete.wav",
           priority: Notifications.AndroidNotificationPriority.HIGH,
           vibrate: [100, 50, 500, 50, 100],
           data: { timerId },

@@ -43,7 +43,7 @@ export const RestTimerBanner: React.FC = () => {
   const { totalTime, startedAt } = restTimerStore || {};
 
   const audioPlayer = useAudioPlayer(
-    require("@/assets/audio/timer-complete.wav")
+    require("@/assets/audio/timer_complete.wav")
   );
 
   // Keyboard visibility tracking

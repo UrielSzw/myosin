@@ -55,7 +55,7 @@
       [
         "expo-notifications",
         {
-          "sounds": ["./assets/audio/timer-complete.wav"],
+          "sounds": ["./assets/audio/timer_complete.wav"],
           "enableBackgroundRemoteNotifications": true
         }
       ]

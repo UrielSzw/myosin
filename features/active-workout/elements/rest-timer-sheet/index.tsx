@@ -25,7 +25,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
     const { totalTime, startedAt } = restTimerStore || {};
 
     const audioPlayer = useAudioPlayer(
-      require("@/assets/audio/timer-complete.wav")
+      require("@/assets/audio/timer_complete.wav")
     );
 
     React.useEffect(() => {

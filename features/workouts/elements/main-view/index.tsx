@@ -21,12 +21,14 @@ type Props = {
   children: React.ReactNode;
   folders?: FolderWithMetrics[];
   routinesCount?: number;
+  headerContent?: React.ReactNode;
 };
 
 export const MainView: React.FC<Props> = ({
   folders,
   children,
   routinesCount = 0,
+  headerContent,
 }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
@@ -85,6 +87,9 @@ export const MainView: React.FC<Props> = ({
         activationDistance={15}
         ListHeaderComponent={() => (
           <View style={{ marginBottom: 16 }}>
+            {/* Greeting & Next Workout */}
+            {headerContent}
+
             <View
               style={{
                 flexDirection: "row",

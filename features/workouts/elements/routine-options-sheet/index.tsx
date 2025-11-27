@@ -50,7 +50,7 @@ export const RoutineOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
           icon: <Trash color={colors.error[500]} size={20} />,
         }}
         enableDynamicSizing={false}
-        snapPoints={["30%"]}
+        snapPoints={["35%"]}
       />
     );
   }

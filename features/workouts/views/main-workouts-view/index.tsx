@@ -1,10 +1,13 @@
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import React, { useEffect } from "react";
 import { View } from "react-native";
 import { EmptyState } from "../../elements/empty-state";
 import { MainView } from "../../elements/main-view";
 import { MoveRoutineModal } from "../../elements/move-routine-modal";
+import { NextWorkoutCard } from "../../elements/next-workout-card";
 import { RoutineList } from "../../elements/routine-list";
 import { useMainWorkoutsData } from "../../hooks/use-main-workouts-data";
 import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store";
@@ -24,18 +27,28 @@ export const MainWorkoutsView = ({
     (state) => state.setTotalRoutines
   );
   const { routines, folders, count } = useMainWorkoutsData();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
+  const t = workoutsTranslations;
 
   useEffect(() => {
     setTotalRoutines(count);
   }, [count, setTotalRoutines]);
 
+  // Combine all routines (including those in folders) for next workout calculation
+  const allRoutines = routines;
+
   return (
     <>
-      <MainView folders={folders} routinesCount={routines.length}>
+      <MainView
+        folders={folders}
+        routinesCount={routines.length}
+        headerContent={<NextWorkoutCard routines={allRoutines} />}
+      >
         {routines.length > 0 && (
           <View style={{ marginBottom: 24, marginTop: 16 }}>
             <Typography variant="h5" weight="semibold">
-              Rutinas
+              {t.myRoutines[lang]}
             </Typography>
           </View>
         )}

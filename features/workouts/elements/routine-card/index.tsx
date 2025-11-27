@@ -4,13 +4,12 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { workoutsTranslations } from "@/shared/translations/workouts";
-import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
-import { Calendar, Dumbbell, Hash, Play } from "lucide-react-native";
+import { Calendar, ChevronRight, Dumbbell, Hash, Play } from "lucide-react-native";
 import React from "react";
-import { TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 type Props = {
   routine: RoutineWithMetrics;
@@ -30,32 +29,19 @@ export const RoutineCard: React.FC<Props> = ({
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 
-  // Verificar si es una rutina reciente (modificada en los últimos 7 días)
-  const isRecent = () => {
-    // const updatedDate = routine.updated_at;
-
-    // if (!updatedDate) return false;
-
-    // const weekAgo = new Date();
-    // weekAgo.setDate(weekAgo.getDate() - 7);
-
-    // return updatedDate > weekAgo;
-
-    return routine.training_days && routine.training_days.length > 0;
-  };
+  const hasTrainingDays = routine.training_days && routine.training_days.length > 0;
 
   const handleSelectRoutine = () => {
     onPress(routine);
   };
 
-  const handleStartRoutine = async (routine: RoutineWithMetrics) => {
+  const handleStartRoutine = async () => {
     try {
       if (!user?.id) {
         console.error("No user ID available");
         return;
       }
       await initializeWorkout(routine.id, user.id);
-
       router.push("/workout/active");
     } catch (error) {
       console.error(t.errorStartingWorkout[lang], error);
@@ -68,107 +54,152 @@ export const RoutineCard: React.FC<Props> = ({
         const weekDay = t.weekDays[lang][day as keyof typeof t.weekDays.es];
         return weekDay ? weekDay.short : day;
       })
-      .join(" - ");
+      .join(" · ");
   };
 
   return (
     <TouchableOpacity
       onLongPress={onLongPress ? () => onLongPress(routine) : undefined}
       delayLongPress={500}
-      activeOpacity={onLongPress ? 0.7 : 1}
+      activeOpacity={0.7}
       onPress={handleSelectRoutine}
     >
       <Card
         variant="outlined"
         padding="md"
-        style={{
-          marginBottom: 12,
-        }}
+        style={styles.card}
       >
-        {/* Header con título y indicador de reciente */}
-        <View style={{ marginBottom: 16 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <Typography variant="h6" weight="semibold" style={{ flex: 1 }}>
-              {routine.name}
-            </Typography>
-
-            {isRecent() && (
-              <View
-                style={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: 4,
-                  backgroundColor: colors.primary[500],
-                }}
-              />
-            )}
-          </View>
-        </View>
-
-        {/* Estadísticas en fila */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 20,
-            marginBottom: 16,
-          }}
-        >
-          {/* Bloques */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <Hash size={14} color={colors.textMuted} />
-            <Typography variant="caption" color="textMuted">
-              {routine.blocksCount}{" "}
-              {routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]}
-            </Typography>
-          </View>
-
-          {/* Ejercicios */}
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-            <Dumbbell size={14} color={colors.textMuted} />
-            <Typography variant="caption" color="textMuted">
-              {routine.exercisesCount}{" "}
-              {routine.exercisesCount === 1
-                ? t.exercise[lang]
-                : t.exercises[lang]}
-            </Typography>
-          </View>
-
-          {/* Dias de la semana */}
-          {routine.training_days && routine.training_days.length > 0 && (
-            <View
-              style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
-            >
-              <Calendar size={14} color={colors.textMuted} />
-              <Typography variant="caption" color="textMuted">
-                {formatDays(routine.training_days)}
+        <View style={styles.content}>
+          {/* Left: Info */}
+          <View style={styles.info}>
+            {/* Title row */}
+            <View style={styles.titleRow}>
+              <Typography
+                variant="body1"
+                weight="semibold"
+                style={styles.title}
+                numberOfLines={1}
+              >
+                {routine.name}
               </Typography>
+              {hasTrainingDays && (
+                <View
+                  style={[
+                    styles.scheduledDot,
+                    { backgroundColor: colors.primary[500] },
+                  ]}
+                />
+              )}
             </View>
-          )}
 
-          {/* Tiempo estimado */}
-          {/* <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <Clock size={14} color={colors.textMuted} />
-            <Typography variant="caption" color="textMuted">
-              ~{estimatedMinutes} min
-            </Typography>
-          </View> */}
+            {/* Stats row */}
+            <View style={styles.statsRow}>
+              <View style={styles.stat}>
+                <Hash size={12} color={colors.textMuted} />
+                <Typography variant="caption" color="textMuted">
+                  {routine.blocksCount}
+                </Typography>
+              </View>
+
+              <View style={styles.stat}>
+                <Dumbbell size={12} color={colors.textMuted} />
+                <Typography variant="caption" color="textMuted">
+                  {routine.exercisesCount}
+                </Typography>
+              </View>
+
+              {hasTrainingDays && (
+                <View style={styles.stat}>
+                  <Calendar size={12} color={colors.textMuted} />
+                  <Typography variant="caption" color="textMuted">
+                    {formatDays(routine.training_days!)}
+                  </Typography>
+                </View>
+              )}
+            </View>
+          </View>
+
+          {/* Right: Play button */}
+          <TouchableOpacity
+            onPress={handleStartRoutine}
+            activeOpacity={0.8}
+            style={[styles.playButton, { backgroundColor: colors.primary[500] }]}
+          >
+            <Play size={18} color="#ffffff" fill="#ffffff" />
+          </TouchableOpacity>
         </View>
 
-        <Button
-          variant="primary"
-          size="md"
-          onPress={() => handleStartRoutine(routine)}
-          icon={<Play size={18} color="#ffffff" />}
-          iconPosition="left"
-          style={{
-            paddingHorizontal: 24,
-            paddingVertical: 12,
-          }}
-        >
-          {t.startWorkout[lang]}
-        </Button>
+        {/* Tap hint */}
+        <View style={styles.tapHint}>
+          <Typography variant="caption" color="textMuted" style={styles.tapHintText}>
+            {t.routineOptions[lang]}
+          </Typography>
+          <ChevronRight size={12} color={colors.textMuted} />
+        </View>
       </Card>
     </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    marginBottom: 10,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  info: {
+    flex: 1,
+    marginRight: 12,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 6,
+  },
+  title: {
+    flex: 1,
+  },
+  scheduledDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  stat: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  playButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tapHint: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(128,128,128,0.1)",
+    gap: 4,
+  },
+  tapHintText: {
+    fontSize: 11,
+  },
+});

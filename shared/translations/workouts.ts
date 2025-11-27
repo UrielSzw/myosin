@@ -1,8 +1,64 @@
 export const workoutsTranslations = {
+  // Greetings (time-based)
+  greetingMorning: {
+    es: "Buenos días",
+    en: "Good morning",
+  },
+  greetingAfternoon: {
+    es: "Buenas tardes",
+    en: "Good afternoon",
+  },
+  greetingEvening: {
+    es: "Buenas noches",
+    en: "Good evening",
+  },
+  // Motivational subtitles
+  motivationalSubtitles: {
+    es: [
+      "¡Es hora de entrenar! 💪",
+      "Tu mejor versión te espera",
+      "Cada rep cuenta",
+      "Hoy es un gran día para progresar",
+      "La constancia hace la diferencia",
+    ],
+    en: [
+      "Time to train! 💪",
+      "Your best self awaits",
+      "Every rep counts",
+      "Today is a great day to progress",
+      "Consistency makes the difference",
+    ],
+  },
+  // Next workout
+  nextWorkout: {
+    es: "Próximo entrenamiento",
+    en: "Next workout",
+  },
+  todayWorkout: {
+    es: "Hoy entrenas",
+    en: "Today's workout",
+  },
+  scheduledFor: {
+    es: "Programado para",
+    en: "Scheduled for",
+  },
+  noScheduledWorkouts: {
+    es: "Sin entrenamientos programados",
+    en: "No scheduled workouts",
+  },
+  configureTrainingDays: {
+    es: "Configura tus días de entrenamiento",
+    en: "Configure your training days",
+  },
+
   // Header
   myRoutines: {
     es: "Mis Rutinas",
     en: "My Routines",
+  },
+  routine: {
+    es: "rutina",
+    en: "routine",
   },
   routinesSingular: {
     es: "rutina",

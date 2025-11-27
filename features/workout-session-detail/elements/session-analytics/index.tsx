@@ -43,24 +43,24 @@ export const SessionAnalytics: React.FC<Props> = ({ analytics, lang }) => {
       <View style={{ flexDirection: "row", gap: 12, marginBottom: 16 }}>
         {analytics.averageRPE && (
           <StatCard
-            icon={<Zap size={20} color={colors.warning[500]} />}
+            icon={<Zap size={20} color={colors.primary[500]} />}
             title={t.averageRPE[lang]}
             value={analytics.averageRPE.toString()}
             subtitle={t.setsWithRPE[lang].replace(
               "{percentage}",
               analytics.plannedVsActual.rpeUsage.toString()
             )}
-            color={colors.warning[500]}
+            color={colors.primary[500]}
           />
         )}
 
         {analytics.bestSets.length > 0 && (
           <StatCard
-            icon={<Target size={20} color={colors.success[500]} />}
+            icon={<Target size={20} color={colors.primary[500]} />}
             title={t.bestSet[lang]}
             value={`${displayWeight}${weightUnit}`}
             subtitle={`${analytics.bestSets[0].reps} ${t.reps[lang]} - ${analytics.bestSets[0].exerciseName}`}
-            color={colors.success[500]}
+            color={colors.primary[500]}
           />
         )}
       </View>

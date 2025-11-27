@@ -4,8 +4,8 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import {
-  getMeasurementTemplate,
-  hasWeightMeasurement,
+    getMeasurementTemplate,
+    hasWeightMeasurement,
 } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -242,9 +242,31 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe, lang }) => {
             }}
           >
             {set.completed ? (
-              <Check size={16} color={colors.primary[500]} />
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: colors.success[500],
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Check size={12} color="#ffffff" />
+              </View>
             ) : (
-              <X size={16} color={colors.error[500]} />
+              <View
+                style={{
+                  width: 20,
+                  height: 20,
+                  borderRadius: 10,
+                  backgroundColor: colors.gray[200],
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <X size={12} color={colors.gray[500]} />
+              </View>
             )}
           </View>
         </View>

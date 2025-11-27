@@ -63,16 +63,16 @@ export const SessionExerciseItem: React.FC<Props> = ({
         {/* Exercise Icon */}
         <View
           style={{
-            width: 48,
-            height: 48,
-            borderRadius: 8,
-            backgroundColor: colors.border,
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            backgroundColor: colors.primary[100],
             alignItems: "center",
             justifyContent: "center",
             marginRight: 12,
           }}
         >
-          <Dumbbell size={24} color={colors.textMuted} />
+          <Dumbbell size={20} color={colors.primary[600]} />
         </View>
 
         {/* Exercise Info */}
@@ -87,17 +87,17 @@ export const SessionExerciseItem: React.FC<Props> = ({
                   flexDirection: "row",
                   alignItems: "center",
                   gap: 4,
-                  backgroundColor: "#FFD70020",
-                  paddingHorizontal: 6,
-                  paddingVertical: 2,
-                  borderRadius: 8,
+                  backgroundColor: colors.primary[500],
+                  paddingHorizontal: 8,
+                  paddingVertical: 3,
+                  borderRadius: 10,
                 }}
               >
-                <Trophy size={12} color="#FFD700" />
+                <Trophy size={10} color="#ffffff" />
                 <Typography
                   variant="caption"
-                  style={{ color: "#FFD700", fontSize: 10 }}
-                  weight="semibold"
+                  style={{ color: "#ffffff", fontSize: 10 }}
+                  weight="bold"
                 >
                   PR
                 </Typography>

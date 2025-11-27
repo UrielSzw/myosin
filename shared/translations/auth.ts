@@ -114,12 +114,12 @@ export const authTranslations = {
   // Forgot Password
   forgotPassword: {
     title: {
-      es: "¡Listo!",
-      en: "All set!",
+      es: "Recuperar acceso",
+      en: "Recover access",
     },
     subtitle: {
-      es: "Revisa {email} y sigue los pasos",
-      en: "Check {email} and follow the steps",
+      es: "Te enviaremos un enlace para restablecer tu contraseña",
+      en: "We'll send you a link to reset your password",
     },
     emailLabel: {
       es: "Email",
@@ -146,12 +146,12 @@ export const authTranslations = {
       en: "Go Back",
     },
     successTitle: {
-      es: "Revisa tu Email",
-      en: "Check your Email",
+      es: "¡Revisa tu email!",
+      en: "Check your email!",
     },
     successSubtitle: {
-      es: "Enviamos instrucciones a {email}",
-      en: "We sent instructions to {email}",
+      es: "Te enviamos las instrucciones para recuperar tu cuenta",
+      en: "We sent you instructions to recover your account",
     },
     backToSignIn: {
       es: "Volver al Inicio",

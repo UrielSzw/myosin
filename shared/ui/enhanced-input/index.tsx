@@ -4,11 +4,11 @@ import { AlertCircle, Check } from "lucide-react-native";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { TextInput, TextInputProps, View, ViewStyle } from "react-native";
 import Animated, {
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
+    interpolateColor,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
+    withTiming,
 } from "react-native-reanimated";
 
 export interface ValidationState {
@@ -16,6 +16,28 @@ export interface ValidationState {
   error: string | null;
   isValidating?: boolean;
 }
+
+// Built-in validation rules
+export type ValidationRule =
+  | "email"
+  | "required"
+  | "minLength"
+  | "maxLength"
+  | { type: "minLength"; value: number; message?: string }
+  | { type: "maxLength"; value: number; message?: string }
+  | { type: "pattern"; value: RegExp; message: string }
+  | { type: "custom"; validate: (value: string) => string | null };
+
+// Email regex - RFC 5322 simplified
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Default error messages
+const DEFAULT_MESSAGES = {
+  required: "Este campo es requerido",
+  email: "Ingresa un email válido",
+  minLength: (min: number) => `Mínimo ${min} caracteres`,
+  maxLength: (max: number) => `Máximo ${max} caracteres`,
+};
 
 interface EnhancedInputProps extends Omit<TextInputProps, "style"> {
   label?: string;
@@ -30,6 +52,10 @@ interface EnhancedInputProps extends Omit<TextInputProps, "style"> {
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   onValidationChange?: (validation: ValidationState) => void;
+  /** Array of validation rules to apply */
+  validationRules?: ValidationRule[];
+  /** Validate on blur instead of on change (better UX for some cases) */
+  validateOnBlur?: boolean;
 }
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
@@ -47,6 +73,8 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
   leftIcon,
   rightIcon,
   onValidationChange,
+  validationRules = [],
+  validateOnBlur = false,
   value = "",
   onChangeText,
   onFocus,
@@ -55,7 +83,93 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
 }) => {
   const { colors } = useColorScheme();
   const [isFocused, setIsFocused] = useState(false);
+  const [internalError, setInternalError] = useState<string | null>(null);
+  const [hasBeenBlurred, setHasBeenBlurred] = useState(false);
+  const [hasBeenValidated, setHasBeenValidated] = useState(false);
   const inputRef = useRef<TextInput>(null);
+
+  // Combine external error with internal validation error
+  const displayError = error || internalError;
+
+  // Check if we have validation rules that need to run
+  const hasValidationRules = validationRules.length > 0 || required;
+
+  // Validate value against all rules
+  const validateValue = useCallback(
+    (text: string): string | null => {
+      // Build complete rules array including legacy props
+      const allRules: ValidationRule[] = [...validationRules];
+
+      // Add legacy 'required' prop as a rule
+      if (required && !allRules.includes("required")) {
+        allRules.unshift("required");
+      }
+
+      // Add legacy 'maxLength' prop as a rule
+      if (maxLength && !allRules.some((r) => typeof r === "object" && r.type === "maxLength")) {
+        allRules.push({ type: "maxLength", value: maxLength });
+      }
+
+      for (const rule of allRules) {
+        // String shorthand rules
+        if (rule === "required") {
+          if (!text.trim()) {
+            return DEFAULT_MESSAGES.required;
+          }
+        } else if (rule === "email") {
+          // Only validate if there's content (use with 'required' for mandatory emails)
+          if (text.trim() && !EMAIL_REGEX.test(text.trim())) {
+            return DEFAULT_MESSAGES.email;
+          }
+        } else if (typeof rule === "object") {
+          // Object rules
+          switch (rule.type) {
+            case "minLength":
+              if (text.length < rule.value) {
+                return rule.message || DEFAULT_MESSAGES.minLength(rule.value);
+              }
+              break;
+            case "maxLength":
+              if (text.length > rule.value) {
+                return rule.message || DEFAULT_MESSAGES.maxLength(rule.value);
+              }
+              break;
+            case "pattern":
+              if (!rule.value.test(text)) {
+                return rule.message;
+              }
+              break;
+            case "custom":
+              const customError = rule.validate(text);
+              if (customError) {
+                return customError;
+              }
+              break;
+          }
+        }
+      }
+
+      return null;
+    },
+    [validationRules, required, maxLength]
+  );
+
+  // Run validation and update state
+  const runValidation = useCallback(
+    (text: string) => {
+      const validationError = validateValue(text);
+      setInternalError(validationError);
+      setHasBeenValidated(true);
+
+      if (onValidationChange) {
+        onValidationChange({
+          isValid: !validationError,
+          error: validationError,
+        });
+      }
+    },
+    [validateValue, onValidationChange]
+  );
 
   // Animated values
   const focusAnimValue = useSharedValue(0);
@@ -74,19 +188,21 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
   }, [isFocused, focusAnimValue, isFocusedValue]);
 
   useEffect(() => {
-    errorAnimValue.value = withTiming(error ? 1 : 0, { duration: 200 });
-    hasErrorValue.value = error ? 1 : 0;
-  }, [error, errorAnimValue, hasErrorValue]);
+    errorAnimValue.value = withTiming(displayError ? 1 : 0, { duration: 200 });
+    hasErrorValue.value = displayError ? 1 : 0;
+  }, [displayError, errorAnimValue, hasErrorValue]);
 
   useEffect(() => {
-    // Smart animation for valid state - avoid flickering when just validating
+    // Smart animation for valid state
+    // If we have validation rules with validateOnBlur, only show check after validation ran
+    const validationComplete = !hasValidationRules || !validateOnBlur || hasBeenValidated;
     const shouldShowValid =
-      isValid && value.length > 0 && !error && !isValidating;
+      isValid && value.length > 0 && !displayError && !isValidating && validationComplete;
 
     validAnimValue.value = withTiming(shouldShowValid ? 1 : 0, {
       duration: shouldShowValid ? 300 : 150, // Slower entrance, faster exit
     });
-  }, [isValid, value, error, validAnimValue, isValidating]);
+  }, [isValid, value, displayError, validAnimValue, isValidating, hasValidationRules, validateOnBlur, hasBeenValidated]);
 
   // Handle focus events
   const handleFocus = useCallback(
@@ -100,9 +216,16 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
   const handleBlur = useCallback(
     (e: any) => {
       setIsFocused(false);
+      setHasBeenBlurred(true);
+
+      // Validate on blur if configured
+      if (validateOnBlur) {
+        runValidation(value);
+      }
+
       onBlur?.(e);
     },
-    [onBlur]
+    [onBlur, validateOnBlur, runValidation, value]
   );
 
   // Handle text change with validation
@@ -110,24 +233,12 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
     (text: string) => {
       onChangeText?.(text);
 
-      // Call validation callback if provided
-      if (onValidationChange) {
-        // Simple built-in validations
-        let validation: ValidationState = { isValid: true, error: null };
-
-        if (required && !text.trim()) {
-          validation = { isValid: false, error: "Este campo es requerido" };
-        } else if (maxLength && text.length > maxLength) {
-          validation = {
-            isValid: false,
-            error: `Máximo ${maxLength} caracteres`,
-          };
-        }
-
-        onValidationChange(validation);
+      // Only validate on change if not using validateOnBlur, OR if user has already blurred once
+      if (!validateOnBlur || hasBeenBlurred) {
+        runValidation(text);
       }
     },
-    [onChangeText, onValidationChange, required, maxLength]
+    [onChangeText, validateOnBlur, hasBeenBlurred, runValidation]
   );
 
   // Extract colors to avoid accessing them inside worklets
@@ -185,7 +296,7 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
     opacity: errorAnimValue.value,
     transform: [
       {
-        translateY: withTiming(error ? 0 : -10, { duration: 200 }),
+        translateY: withTiming(displayError ? 0 : -10, { duration: 200 }),
       },
     ],
   }));
@@ -268,15 +379,21 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
             </View>
           )}
 
-          {/* Valid Icon */}
-          {isValid && value.length > 0 && !error && !isValidating && (
-            <Animated.View style={[{ marginLeft: 8 }, validIconAnimatedStyle]}>
-              <Check size={16} color={colors.success[500]} />
-            </Animated.View>
-          )}
+          {/* Valid Icon - only show if validation has passed */}
+          {isValid &&
+            value.length > 0 &&
+            !displayError &&
+            !isValidating &&
+            (!hasValidationRules || !validateOnBlur || hasBeenValidated) && (
+              <Animated.View
+                style={[{ marginLeft: 8 }, validIconAnimatedStyle]}
+              >
+                <Check size={16} color={colors.success[500]} />
+              </Animated.View>
+            )}
 
           {/* Error Icon */}
-          {error && (
+          {displayError && (
             <Animated.View style={[{ marginLeft: 8 }, errorIconAnimatedStyle]}>
               <AlertCircle size={16} color={colors.error[500]} />
             </Animated.View>
@@ -299,13 +416,13 @@ export const EnhancedInput: React.FC<EnhancedInputProps> = ({
       >
         {/* Error or Help Text */}
         <View style={{ flex: 1, marginRight: 8 }}>
-          {error ? (
+          {displayError ? (
             <Animated.View style={errorTextAnimatedStyle}>
               <Typography
                 variant="caption"
                 style={{ color: colors.error[500] }}
               >
-                {error}
+                {displayError}
               </Typography>
             </Animated.View>
           ) : helpText ? (

@@ -2,11 +2,11 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
 import {
-  ActivityIndicator,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableOpacityProps,
-  View,
+    ActivityIndicator,
+    StyleSheet,
+    TouchableOpacity,
+    TouchableOpacityProps,
+    View,
 } from "react-native";
 import { Typography } from "../typography";
 
@@ -67,7 +67,8 @@ export const Button: React.FC<ButtonProps> = ({
     if (isDisabled) {
       return {
         ...baseStyles,
-        backgroundColor: colors.primary[200],
+        backgroundColor: colors.primary[500],
+        opacity: 0.4,
         borderWidth: 0,
       };
     }

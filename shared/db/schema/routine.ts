@@ -114,6 +114,9 @@ export const routines = sqliteTable("routines", {
     .default(true)
     .notNull(),
 
+  // Soft delete - NULL = activa, timestamp = eliminada
+  deleted_at: text("deleted_at"),
+
   ...timestamps,
 });
 
@@ -290,8 +293,13 @@ export type SRoutine = BaseRoutine;
 export type SFolder = BaseFolder;
 export type SBlocks = BlockWithExercises;
 
-// 4. Tipos para inserts (sin timestamps automáticos)
-export type RoutineInsert = Omit<BaseRoutine, "created_at" | "updated_at">;
+// 4. Tipos para inserts (sin timestamps automáticos, deleted_at opcional)
+export type RoutineInsert = Omit<
+  BaseRoutine,
+  "created_at" | "updated_at" | "deleted_at"
+> & {
+  deleted_at?: string | null;
+};
 export type BlockInsert = Omit<BaseBlock, "created_at" | "updated_at">;
 export type ExerciseInBlockInsert = Omit<
   BaseExerciseInBlock,

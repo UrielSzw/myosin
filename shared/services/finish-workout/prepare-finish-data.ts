@@ -47,7 +47,7 @@ type ActiveWorkoutState = {
     string,
     {
       tempId: string;
-      original_block_id: string | null;
+      // NOTA: Eliminamos original_block_id - ya no existe en schema
       type: "individual" | "superset" | "circuit";
       order_index: number;
       name: string;
@@ -61,7 +61,7 @@ type ActiveWorkoutState = {
     {
       tempId: string;
       exercise_id: string;
-      original_exercise_in_block_id: string | null;
+      // NOTA: Eliminamos original_exercise_in_block_id - ya no existe en schema
       order_index: number;
       notes: string | null;
       was_added_during_workout: boolean;
@@ -317,25 +317,15 @@ function prepareWorkoutSessionData(
   });
 
   // Blocks data
+  // NOTA: Eliminamos original_block_id - ya no existe en schema
   const blocksData: WorkoutBlockInsert[] = activeWorkout.blocksBySession.map(
     (tempBlockId, index) => {
       const block = activeWorkout.blocks[tempBlockId];
-
-      // Determine original_block_id:
-      // - If updating routine: use the NEW routine block ID
-      // - If not updating: use the existing original_block_id (if any)
-      let originalBlockId: string | null;
-      if (shouldUpdateRoutine) {
-        originalBlockId = idMappings.blocks[tempBlockId];
-      } else {
-        originalBlockId = block.original_block_id;
-      }
 
       return {
         id: workoutBlockIdMapping[tempBlockId],
         user_id: userId,
         workout_session_id: sessionId,
-        original_block_id: originalBlockId,
         type: block.type,
         order_index: index,
         name: block.name,
@@ -350,24 +340,16 @@ function prepareWorkoutSessionData(
   const exerciseExecutionData = calculateExerciseExecutionOrder(activeWorkout);
 
   // Exercises data
+  // NOTA: Eliminamos original_exercise_in_block_id - ya no existe en schema
   const exercisesData: WorkoutExerciseInsert[] = exerciseExecutionData.map(
     (execData, globalIndex) => {
       const exercise = activeWorkout.exercises[execData.tempId];
-
-      // Determine original_exercise_in_block_id
-      let originalExerciseId: string | null;
-      if (shouldUpdateRoutine) {
-        originalExerciseId = idMappings.exercises[execData.tempId];
-      } else {
-        originalExerciseId = exercise.original_exercise_in_block_id;
-      }
 
       return {
         id: workoutExerciseIdMapping[execData.tempId],
         user_id: userId,
         workout_block_id: workoutBlockIdMapping[execData.blockId],
         exercise_id: exercise.exercise_id,
-        original_exercise_in_block_id: originalExerciseId,
         order_index: exercise.order_index,
         execution_order: execData.executionTime ? globalIndex : null,
         notes: exercise.notes,
@@ -383,6 +365,7 @@ function prepareWorkoutSessionData(
   });
 
   // Sets data (only completed sets)
+  // NOTA: Eliminamos original_set_id - ya no existe en schema
   const setsData: WorkoutSetInsert[] = [];
   Object.entries(activeWorkout.setsByExercise).forEach(
     ([tempExerciseId, setIds]) => {
@@ -393,20 +376,11 @@ function prepareWorkoutSessionData(
 
         // Only save completed sets
         if (set.completed) {
-          // Determine original_set_id
-          let originalSetId: string | null;
-          if (shouldUpdateRoutine) {
-            originalSetId = idMappings.sets[tempSetId];
-          } else {
-            originalSetId = set.original_set_id;
-          }
-
           setsData.push({
             id: workoutSetIdMapping[tempSetId],
             user_id: userId,
             workout_exercise_id: workoutExerciseIdMapping[tempExerciseId],
             exercise_id: exercise.exercise_id,
-            original_set_id: originalSetId,
             order_index: set.order_index,
             measurement_template: set.measurement_template,
             planned_primary_value: set.planned_primary_value,

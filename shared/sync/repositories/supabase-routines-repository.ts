@@ -49,10 +49,11 @@ export class SupabaseRoutinesRepository extends BaseSupabaseRepository {
 
   async deleteRoutineById(routineId: string): Promise<void> {
     try {
-      // Usar RPC function para cascade delete
-      const { error } = await this.supabase.rpc("delete_routine_by_id", {
-        routine_id_param: routineId,
-      });
+      // Soft delete: actualizar deleted_at en lugar de eliminar
+      const { error } = await this.supabase
+        .from("routines")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", routineId);
 
       if (error) throw error;
     } catch (error) {

@@ -33,29 +33,6 @@ const createDefaultSets = (
     actual_rpe: null,
     completed: false,
     completed_at: null,
-    original_set_id: null,
-    planned_tempo: null,
-  },
-  {
-    tempId: generateTempId(),
-    user_id: "default-user",
-    exercise_id: exerciseId,
-    id: "",
-    order_index: 1,
-    measurement_template: measurementTemplate,
-    planned_primary_value: null,
-    planned_secondary_value: null,
-    planned_primary_range: null,
-    planned_secondary_range: null,
-    set_type: "normal",
-    workout_exercise_id: exerciseInBlockId,
-    planned_rpe: null,
-    actual_primary_value: null,
-    actual_secondary_value: null,
-    actual_rpe: null,
-    completed: false,
-    completed_at: null,
-    original_set_id: null,
     planned_tempo: null,
   },
   {
@@ -77,7 +54,27 @@ const createDefaultSets = (
     actual_rpe: null,
     completed: false,
     completed_at: null,
-    original_set_id: null,
+    planned_tempo: null,
+  },
+  {
+    tempId: generateTempId(),
+    user_id: "default-user",
+    exercise_id: exerciseId,
+    id: "",
+    order_index: 2,
+    measurement_template: measurementTemplate,
+    planned_primary_value: null,
+    planned_secondary_value: null,
+    planned_primary_range: null,
+    planned_secondary_range: null,
+    set_type: "normal",
+    workout_exercise_id: exerciseInBlockId,
+    planned_rpe: null,
+    actual_primary_value: null,
+    actual_secondary_value: null,
+    actual_rpe: null,
+    completed: false,
+    completed_at: null,
     planned_tempo: null,
   },
 ];
@@ -152,7 +149,6 @@ export const createNewSetForExercise = (
     actual_rpe: null,
     completed: false,
     completed_at: null,
-    original_set_id: null,
     workout_exercise_id: exerciseInBlockId,
     planned_tempo: null,
   };
@@ -267,7 +263,6 @@ export const createIndividualBlocks = (
       order_index: currentBlockCount + index,
       rest_time_seconds: defaultRestTime,
       rest_between_exercises_seconds: 0,
-      original_block_id: null,
       name: "",
       was_added_during_workout: true,
     };
@@ -282,7 +277,6 @@ export const createIndividualBlocks = (
       exercise_id: exercise.id,
       notes: "",
       order_index: 0,
-      original_exercise_in_block_id: null,
       was_added_during_workout: true,
     };
 
@@ -334,7 +328,6 @@ export const createMultiBlock = (
     order_index: currentBlockCount,
     rest_time_seconds: defaultRestTime,
     rest_between_exercises_seconds: 0,
-    original_block_id: null,
     name: "",
     was_added_during_workout: true,
   };
@@ -361,7 +354,6 @@ export const createMultiBlock = (
       exercise_id: exercise.id,
       notes: "",
       order_index: index,
-      original_exercise_in_block_id: null,
       was_added_during_workout: true,
     };
 
@@ -420,7 +412,6 @@ export const createExercises = (
       exercise_id: exercise.id,
       notes: "",
       order_index: startOrderIndex + index,
-      original_exercise_in_block_id: null,
       was_added_during_workout: true,
     };
 
@@ -469,7 +460,6 @@ export const convertBlockToIndividualBlocks = (
       order_index: originalBlock.order_index + index,
       rest_between_exercises_seconds: 0,
       rest_time_seconds: originalBlock.rest_time_seconds,
-      original_block_id: null, // Nuevo bloque, no es original
       was_added_during_workout: true,
     };
 
@@ -484,7 +474,6 @@ export const convertBlockToIndividualBlocks = (
       order_index: 0, // Único ejercicio en el bloque
       execution_order: exerciseInBlock.execution_order, // Mantener si ya se ejecutó
       notes: exerciseInBlock.notes,
-      original_exercise_in_block_id: null, // Nuevo ejercicio, no es original
       was_added_during_workout: true,
     };
 
@@ -502,7 +491,6 @@ export const convertBlockToIndividualBlocks = (
           tempId: newSetTempId,
           id: "",
           workout_exercise_id: newExerciseInBlockTempId,
-          original_set_id: null, // Nuevo set, no es original
         };
 
         copiedSets.push(copiedSet);

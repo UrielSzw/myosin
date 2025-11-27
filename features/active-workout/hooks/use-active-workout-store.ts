@@ -345,8 +345,10 @@ const useActiveWorkoutStore = create<Store>()(
             };
 
             // 6. Transformar bloques de routine a active workout
+            // Usamos Maps locales para mapear IDs originales → tempIds
             const activeBlocks: Record<string, ActiveWorkoutBlock> = {};
             const blocksBySession: string[] = [];
+            const blockIdToTempId = new Map<string, string>(); // NUEVO: mapeo para lookup
 
             Object.values(blocks).forEach((block) => {
               const blockTempId = generateTempId();
@@ -355,7 +357,6 @@ const useActiveWorkoutStore = create<Store>()(
                 user_id: "default-user",
                 id: blockTempId,
                 workout_session_id: sessionTempId,
-                original_block_id: block.id,
                 name: block.name,
                 type: block.type,
                 order_index: block.order_index,
@@ -363,53 +364,51 @@ const useActiveWorkoutStore = create<Store>()(
                 rest_between_exercises_seconds:
                   block.rest_between_exercises_seconds,
                 was_added_during_workout: false,
-                was_modified_during_workout: false, // NUEVO: inicializar en false
+                was_modified_during_workout: false,
               };
 
               activeBlocks[blockTempId] = activeBlock;
               blocksBySession.push(blockTempId);
+              blockIdToTempId.set(block.id, blockTempId); // NUEVO: guardar mapeo
             });
 
             // 7. Transformar ejercicios
             const activeExercises: Record<string, ActiveWorkoutExercise> = {};
             const exercisesByBlock: Record<string, string[]> = {};
+            const exerciseInBlockIdToTempId = new Map<string, string>(); // NUEVO: mapeo para lookup
 
             Object.values(exercisesInBlock).forEach((exerciseData) => {
               const { exerciseInBlock, exercise } = exerciseData;
               const exerciseTempId = generateTempId();
 
-              // Encontrar el bloque activo correspondiente
-              const originalBlock = Object.values(blocks).find(
-                (b) => b.id === exerciseInBlock.block_id
+              // Encontrar el bloque activo correspondiente usando el mapeo
+              const activeBlockTempId = blockIdToTempId.get(
+                exerciseInBlock.block_id
               );
-              const activeBlock = Object.values(activeBlocks).find(
-                (ab) => ab.original_block_id === originalBlock?.id
-              );
-
-              if (!activeBlock) return;
+              if (!activeBlockTempId) return;
 
               const activeExercise: ActiveWorkoutExercise = {
                 tempId: exerciseTempId,
                 user_id: "default-user",
                 id: exerciseTempId,
-                workout_block_id: activeBlock.tempId,
+                workout_block_id: activeBlockTempId,
                 exercise_id: exerciseInBlock.exercise_id,
-                exercise: exercise as BaseExercise, // Snapshot del ejercicio
-                original_exercise_in_block_id: exerciseInBlock.id,
+                exercise: exercise as BaseExercise,
                 order_index: exerciseInBlock.order_index,
-                execution_order: null, // Se asigna cuando se ejecuta
+                execution_order: null,
                 notes: exerciseInBlock.notes,
                 was_added_during_workout: false,
                 pr: prMap[exerciseInBlock.exercise_id] || null,
               };
 
               activeExercises[exerciseTempId] = activeExercise;
+              exerciseInBlockIdToTempId.set(exerciseInBlock.id, exerciseTempId); // NUEVO: guardar mapeo
 
               // Agregar al índice
-              if (!exercisesByBlock[activeBlock.tempId]) {
-                exercisesByBlock[activeBlock.tempId] = [];
+              if (!exercisesByBlock[activeBlockTempId]) {
+                exercisesByBlock[activeBlockTempId] = [];
               }
-              exercisesByBlock[activeBlock.tempId].push(exerciseTempId);
+              exercisesByBlock[activeBlockTempId].push(exerciseTempId);
             });
 
             // 8. Transformar sets
@@ -419,16 +418,13 @@ const useActiveWorkoutStore = create<Store>()(
             Object.values(sets).forEach((set) => {
               const setTempId = generateTempId();
 
-              // Encontrar el ejercicio activo correspondiente
-              const originalExerciseData = Object.values(exercisesInBlock).find(
-                (data) => data.exerciseInBlock.id === set.exercise_in_block_id
+              // Encontrar el ejercicio activo correspondiente usando el mapeo
+              const activeExerciseTempId = exerciseInBlockIdToTempId.get(
+                set.exercise_in_block_id
               );
-              const activeExercise = Object.values(activeExercises).find(
-                (ae) =>
-                  ae.original_exercise_in_block_id ===
-                  originalExerciseData?.exerciseInBlock.id
-              );
+              if (!activeExerciseTempId) return;
 
+              const activeExercise = activeExercises[activeExerciseTempId];
               if (!activeExercise) return;
 
               const activeSet: ActiveWorkoutSet = {
@@ -437,7 +433,6 @@ const useActiveWorkoutStore = create<Store>()(
                 exercise_id: activeExercise.exercise_id,
                 id: setTempId,
                 workout_exercise_id: activeExercise.tempId,
-                original_set_id: set.id,
                 order_index: set.order_index,
                 measurement_template: set.measurement_template,
                 set_type: set.set_type,
@@ -622,26 +617,20 @@ const useActiveWorkoutStore = create<Store>()(
         // 2. Check ejercicios agregados/reemplazados
         for (const exercise of Object.values(activeWorkout.exercises)) {
           if (exercise.was_added_during_workout) return true;
-          if (exercise.original_exercise_in_block_id === null) return true;
         }
 
-        // 3. Check sets agregados
-        for (const set of Object.values(activeWorkout.sets)) {
-          if (set.original_set_id === null) return true;
-        }
-
-        // 4. Check eliminaciones por diferencia de count
+        // 3. Check eliminaciones por diferencia de count
         const currentSetsCount = Object.keys(activeWorkout.sets).length;
         const originalSetsCount = activeWorkout.session.original_sets_count;
 
         if (currentSetsCount !== originalSetsCount) return true;
 
-        // 5. Check sets modificados (NUEVO)
+        // 4. Check sets modificados (valores planificados cambiados)
         for (const set of Object.values(activeWorkout.sets)) {
           if (set.was_modified_during_workout) return true;
         }
 
-        // 6. Check bloques modificados (NUEVO)
+        // 5. Check bloques modificados (rest time, etc)
         for (const block of Object.values(activeWorkout.blocks)) {
           if (block.was_modified_during_workout) return true;
         }
@@ -1111,7 +1100,6 @@ const useActiveWorkoutStore = create<Store>()(
             workout_block_id: currentExercise.workout_block_id,
             exercise_id: newExercise.id, // Nuevo ejercicio
             exercise: newExercise, // Nuevo snapshot
-            original_exercise_in_block_id: null, // Ya no es original
             order_index: currentExercise.order_index, // Mantener posición
             execution_order: currentExercise.execution_order, // Mantener si ya se ejecutó
             notes: currentExercise.notes, // Mantener notas
@@ -1134,7 +1122,6 @@ const useActiveWorkoutStore = create<Store>()(
                 tempId: newSetTempId, // Nuevo tempId
                 id: newSetTempId, // Usar tempId como id temporal
                 workout_exercise_id: newExerciseTempId, // Apuntar al nuevo ejercicio
-                original_set_id: null, // Ya no es original
               };
 
               // Guardar nuevo set
@@ -1608,10 +1595,8 @@ const useActiveWorkoutStore = create<Store>()(
           if (!set) return;
 
           set.set_type = setType;
-          // Marcar como modificado si no es un set nuevo
-          if (set.original_set_id !== null) {
-            set.was_modified_during_workout = true;
-          }
+          // Marcar como modificado - esto indica que el set fue cambiado
+          set.was_modified_during_workout = true;
         });
       },
 
@@ -1626,11 +1611,6 @@ const useActiveWorkoutStore = create<Store>()(
             state.activeWorkout.sets[setId] = {
               ...set,
               actual_rpe: rpe,
-              // Marcar como modificado si no es un set nuevo
-              was_modified_during_workout:
-                set.original_set_id !== null
-                  ? true
-                  : set.was_modified_during_workout,
             };
           }
         });

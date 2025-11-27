@@ -14,13 +14,8 @@ import {
 } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
 import { generateUUID } from "../utils/uuid";
-import {
-  exercise_in_block,
-  exercises,
-  routine_blocks,
-  routine_sets,
-  routines,
-} from "./routine";
+// Solo necesitamos exercises y routines - eliminamos FKs a tablas de rutinas mutables
+import { exercises, routines } from "./routine";
 
 // ---------------- Sesiones de Workout ----------------
 export const workout_sessions = sqliteTable(
@@ -65,10 +60,7 @@ export const workout_blocks = sqliteTable(
       .references(() => workout_sessions.id, { onDelete: "cascade" })
       .notNull(),
 
-    // Referencia al bloque original (NULL si se agregó durante workout)
-    original_block_id: text("original_block_id").references(
-      () => routine_blocks.id
-    ),
+    // NOTA: Eliminamos original_block_id - causaba FK issues cuando rutinas cambiaban
 
     type: text("type").$type<"individual" | "superset" | "circuit">().notNull(),
     order_index: integer("order_index").notNull(),
@@ -91,7 +83,6 @@ export const workout_blocks = sqliteTable(
   (t) => [
     index("idx_workout_blocks_user_id").on(t.user_id),
     index("idx_workout_blocks_session_id").on(t.user_id, t.workout_session_id),
-    index("idx_workout_blocks_original_id").on(t.user_id, t.original_block_id),
   ]
 );
 
@@ -110,10 +101,7 @@ export const workout_exercises = sqliteTable(
       .references(() => exercises.id)
       .notNull(),
 
-    // Referencia original (NULL si se agregó durante workout)
-    original_exercise_in_block_id: text(
-      "original_exercise_in_block_id"
-    ).references(() => exercise_in_block.id),
+    // NOTA: Eliminamos original_exercise_in_block_id - causaba FK issues cuando rutinas cambiaban
 
     order_index: integer("order_index").notNull(), // Orden dentro del bloque
     execution_order: integer("execution_order"), // Orden real de ejecución
@@ -154,8 +142,7 @@ export const workout_sets = sqliteTable(
       .references(() => exercises.id)
       .notNull(),
 
-    // Referencia original (NULL si se agregó durante workout)
-    original_set_id: text("original_set_id").references(() => routine_sets.id),
+    // NOTA: Eliminamos original_set_id - causaba FK issues cuando rutinas cambiaban
     order_index: integer("order_index").notNull(), // Orden dentro del ejercicio
 
     // Measurement system
@@ -203,7 +190,6 @@ export const workout_sets = sqliteTable(
       t.user_id,
       t.workout_exercise_id
     ),
-    index("idx_workout_sets_original_id").on(t.user_id, t.original_set_id),
     index("idx_workout_sets_completed").on(t.user_id, t.completed),
   ]
 );
@@ -233,11 +219,7 @@ export const workoutBlocksRelations = relations(
       fields: [workout_blocks.workout_session_id],
       references: [workout_sessions.id],
     }),
-    // Un bloque puede referenciar un bloque original (many-to-one)
-    originalBlock: one(routine_blocks, {
-      fields: [workout_blocks.original_block_id],
-      references: [routine_blocks.id],
-    }),
+    // NOTA: Eliminamos originalBlock - ya no tenemos original_block_id
     // Un bloque tiene muchos ejercicios (one-to-many)
     exercises: many(workout_exercises),
   })
@@ -257,11 +239,7 @@ export const workoutExercisesRelations = relations(
       fields: [workout_exercises.exercise_id],
       references: [exercises.id],
     }),
-    // Un ejercicio puede referenciar un exercise_in_block original (many-to-one)
-    originalExerciseInBlock: one(exercise_in_block, {
-      fields: [workout_exercises.original_exercise_in_block_id],
-      references: [exercise_in_block.id],
-    }),
+    // NOTA: Eliminamos originalExerciseInBlock - ya no tenemos original_exercise_in_block_id
     // Un ejercicio tiene muchos sets (one-to-many)
     sets: many(workout_sets),
   })
@@ -279,11 +257,7 @@ export const workoutSetsRelations = relations(workout_sets, ({ one }) => ({
     fields: [workout_sets.exercise_id],
     references: [exercises.id],
   }),
-  // Un set puede referenciar un set original (many-to-one)
-  originalSet: one(routine_sets, {
-    fields: [workout_sets.original_set_id],
-    references: [routine_sets.id],
-  }),
+  // NOTA: Eliminamos originalSet - ya no tenemos original_set_id
 }));
 
 // ---------------- Tipos ----------------

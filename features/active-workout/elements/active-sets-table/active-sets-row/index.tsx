@@ -103,15 +103,18 @@ export const ActiveSetRow: React.FC<Props> = ({
       const userRpeInput = set.actual_rpe || null;
 
       // Helper para obtener valor efectivo con auto-completion
+      // Incluye prev value como fallback cuando no hay valores planificados
       const getEffectiveValue = (
         userInput: number | null,
         plannedRange: { min: number; max: number } | null,
         plannedValue: number | null,
+        prevValue: number | null | undefined,
         fallback: number = 0
       ): number => {
         if (userInput !== null) return userInput;
         if (plannedRange) return plannedRange.min; // Usar min del range como default
         if (plannedValue) return plannedValue;
+        if (prevValue) return prevValue; // Usar valor anterior si no hay plan
         return fallback;
       };
 
@@ -119,6 +122,7 @@ export const ActiveSetRow: React.FC<Props> = ({
         userPrimaryInput,
         set.planned_primary_range,
         set.planned_primary_value,
+        prevSet?.actual_primary_value,
         0
       );
 
@@ -126,6 +130,7 @@ export const ActiveSetRow: React.FC<Props> = ({
         userSecondaryInput,
         set.planned_secondary_range,
         set.planned_secondary_value,
+        prevSet?.actual_secondary_value,
         0
       );
 
@@ -175,7 +180,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   const template = getMeasurementTemplate(set.measurement_template, weightUnit);
   const hasSecondaryField = template?.fields && template.fields.length > 1;
 
-  // Helper para obtener placeholders basado en el template - CORREGIDO
+  // Helper para obtener placeholders basado en el template
   const getPlaceholderValue = (fieldType: "primary" | "secondary") => {
     const isSecondary = fieldType === "secondary";
     const plannedValue = isSecondary
@@ -211,8 +216,9 @@ export const ActiveSetRow: React.FC<Props> = ({
       return plannedValue.toString();
     }
 
-    // PRIORIDAD 3: Si hay valor previo y la sesión fue realizada antes, usarlo
-    if (session?.hasBeenPerformed && prevValue) {
+    // PRIORIDAD 3: Si NO hay valores planificados pero hay prev value, usarlo como placeholder
+    // Esto permite que el auto-complete use el valor anterior cuando no hay plan
+    if (prevValue) {
       if (isWeightField && weightUnit) {
         const formatted = fromKg(prevValue, weightUnit, 1);
         return formatted.toString();
@@ -403,6 +409,7 @@ export const ActiveSetRow: React.FC<Props> = ({
             setNumber={set.order_index + 1}
             activeWorkout={true}
             weightUnit={weightUnit}
+            disabled={isSetCompleted}
           />
         </View>
 
@@ -425,6 +432,7 @@ export const ActiveSetRow: React.FC<Props> = ({
               setNumber={set.order_index + 1}
               activeWorkout={true}
               weightUnit={weightUnit}
+              disabled={isSetCompleted}
             />
           </View>
         )}

@@ -37,6 +37,10 @@ type MeasurementInputProps = {
    * Only used when field.type === "weight"
    */
   weightUnit?: WeightUnit;
+  /**
+   * Disable input (e.g., when set is completed)
+   */
+  disabled?: boolean;
 };
 
 export const MeasurementInput: React.FC<MeasurementInputProps> = ({
@@ -50,6 +54,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   setNumber = 1,
   activeWorkout = false,
   weightUnit = "kg",
+  disabled = false,
 }) => {
   const { colors } = useColorScheme();
 
@@ -211,16 +216,17 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   const inputStyles: StyleProp<TextStyle> = {
     backgroundColor: "transparent" as const,
     borderWidth: 0,
-    borderBottomWidth: 1,
+    borderBottomWidth: disabled ? 0 : 1,
     borderBottomColor: colors.border,
     paddingHorizontal: 8,
     paddingVertical: 6,
     textAlign: "center" as const,
-    color: colors.text,
+    color: disabled ? colors.text : colors.text,
     fontSize: 16,
     fontWeight: "500" as const,
     width: "100%",
     minHeight: 32,
+    opacity: disabled ? 0.8 : 1,
   };
 
   const rangeInputStyles: StyleProp<TextStyle> = {
@@ -265,6 +271,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
             placeholder={getPlaceholder()}
             placeholderTextColor={colors.textMuted}
             keyboardType={getKeyboardType()}
+            selectTextOnFocus={true}
             style={rangeInputStyles}
             accessible={true}
             accessibilityLabel={`${field.label} mínimo para set ${setNumber}`}
@@ -295,6 +302,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
             placeholder={getPlaceholder()}
             placeholderTextColor={colors.textMuted}
             keyboardType={getKeyboardType()}
+            selectTextOnFocus={true}
             style={rangeInputStyles}
             accessible={true}
             accessibilityLabel={`${field.label} máximo para set ${setNumber}`}
@@ -322,7 +330,9 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
           placeholder={getPlaceholder()}
           placeholderTextColor={colors.textMuted}
           keyboardType="numeric"
+          selectTextOnFocus={true}
           style={inputStyles}
+          editable={!disabled}
           accessible={true}
           accessibilityLabel={
             accessibilityLabel || `${field.label} para set ${setNumber}`
@@ -354,7 +364,9 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
         placeholder={getPlaceholder()}
         placeholderTextColor={colors.textMuted}
         keyboardType={getKeyboardType()}
+        selectTextOnFocus={true}
         style={inputStyles}
+        editable={!disabled}
         accessible={true}
         accessibilityLabel={
           accessibilityLabel || `${field.label} para set ${setNumber}`

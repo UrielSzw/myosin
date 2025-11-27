@@ -2,6 +2,7 @@ import { useActiveMainActions } from "@/features/active-workout/hooks/use-active
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
@@ -27,6 +28,7 @@ export const RoutineCard: React.FC<Props> = ({
   const lang = prefs?.language ?? "es";
   const t = workoutsTranslations;
   const { initializeWorkout } = useActiveMainActions();
+  const { user } = useAuth();
 
   // Verificar si es una rutina reciente (modificada en los últimos 7 días)
   const isRecent = () => {
@@ -48,7 +50,11 @@ export const RoutineCard: React.FC<Props> = ({
 
   const handleStartRoutine = async (routine: RoutineWithMetrics) => {
     try {
-      await initializeWorkout(routine.id);
+      if (!user?.id) {
+        console.error("No user ID available");
+        return;
+      }
+      await initializeWorkout(routine.id, user.id);
 
       router.push("/workout/active");
     } catch (error) {

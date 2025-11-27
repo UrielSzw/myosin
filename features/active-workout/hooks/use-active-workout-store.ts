@@ -98,6 +98,8 @@ type Store = {
         created_at: string;
       }
     >; // exercise_id → best PR data
+    // User ID for current workout session
+    userId: string | null;
   };
 
   // Timer de descanso
@@ -134,8 +136,8 @@ type Store = {
   };
 
   mainActions: {
-    initializeWorkout: (routineId: string) => Promise<void>;
-    initializeQuickWorkout: () => Promise<{
+    initializeWorkout: (routineId: string, userId: string) => Promise<void>;
+    initializeQuickWorkout: (userId: string) => Promise<{
       id: string;
       name: string;
       created_by_user_id: string;
@@ -220,7 +222,7 @@ type Store = {
 };
 
 const useActiveWorkoutStore = create<Store>()(
-  immer((set) => ({
+  immer((set, get) => ({
     // Estado principal - null cuando no hay workout activo
     activeWorkout: {
       session: null,
@@ -232,6 +234,7 @@ const useActiveWorkoutStore = create<Store>()(
       setsByExercise: {},
       exercisePreviousSets: {},
       sessionBestPRs: {},
+      userId: null, // User ID for current active workout
     },
 
     // Timer de descanso
@@ -263,7 +266,7 @@ const useActiveWorkoutStore = create<Store>()(
     },
 
     mainActions: {
-      initializeWorkout: async (routineId: string) => {
+      initializeWorkout: async (routineId: string, userId: string) => {
         try {
           // 1. Obtener la rutina completa con todos sus datos
           const routineData = await routinesRepository.findRoutineById(
@@ -294,7 +297,7 @@ const useActiveWorkoutStore = create<Store>()(
               const previousSets =
                 await workoutSessionsRepository.getLastSetsForExercise(
                   exerciseId,
-                  "default-user"
+                  userId
                 );
               exercisePreviousSets[exerciseId] = previousSets;
             } catch (error) {
@@ -311,7 +314,7 @@ const useActiveWorkoutStore = create<Store>()(
           let prMap: Record<string, BasePRCurrent | null> = {};
           try {
             prMap = await prRepository.getCurrentPRsForExercises(
-              "default-user",
+              userId,
               uniqueExerciseIds
             );
           } catch (error) {
@@ -325,7 +328,7 @@ const useActiveWorkoutStore = create<Store>()(
             hasBeenPerformed =
               await workoutSessionsRepository.hasRoutineBeenPerformed(
                 routineId,
-                "default-user"
+                userId
               );
           } catch (error) {
             console.warn("Failed to check routine performance history:", error);
@@ -337,7 +340,7 @@ const useActiveWorkoutStore = create<Store>()(
             const sessionTempId = generateTempId();
             const session: ActiveWorkoutSession = {
               tempId: sessionTempId,
-              user_id: "default-user",
+              user_id: userId,
               id: sessionTempId,
               routine_id: routine.id,
               routine: routine, // Snapshot para referencia
@@ -362,7 +365,7 @@ const useActiveWorkoutStore = create<Store>()(
               const blockTempId = generateTempId();
               const activeBlock: ActiveWorkoutBlock = {
                 tempId: blockTempId,
-                user_id: "default-user",
+                user_id: userId,
                 id: blockTempId,
                 workout_session_id: sessionTempId,
                 name: block.name,
@@ -397,7 +400,7 @@ const useActiveWorkoutStore = create<Store>()(
 
               const activeExercise: ActiveWorkoutExercise = {
                 tempId: exerciseTempId,
-                user_id: "default-user",
+                user_id: userId,
                 id: exerciseTempId,
                 workout_block_id: activeBlockTempId,
                 exercise_id: exerciseInBlock.exercise_id,
@@ -437,7 +440,7 @@ const useActiveWorkoutStore = create<Store>()(
 
               const activeSet: ActiveWorkoutSet = {
                 tempId: setTempId,
-                user_id: "default-user",
+                user_id: userId,
                 exercise_id: activeExercise.exercise_id,
                 id: setTempId,
                 workout_exercise_id: activeExercise.tempId,
@@ -510,6 +513,7 @@ const useActiveWorkoutStore = create<Store>()(
               setsByExercise,
               exercisePreviousSets, // Use the loaded previous sets
               sessionBestPRs: {},
+              userId, // Store userId for later use
             };
 
             // 11. Actualizar stats
@@ -554,6 +558,7 @@ const useActiveWorkoutStore = create<Store>()(
             setsByExercise: {},
             exercisePreviousSets: {},
             sessionBestPRs: {},
+            userId: null, // Clear userId on workout clear
           };
 
           state.stats = {
@@ -649,6 +654,12 @@ const useActiveWorkoutStore = create<Store>()(
       // Helper method to load previous sets for new exercises
       loadPreviousSetsForExercises: async (exerciseIds: string[]) => {
         try {
+          const userId = get().activeWorkout.userId;
+          if (!userId) {
+            console.warn("No userId available, cannot load previous sets");
+            return;
+          }
+
           const newPreviousSets: Record<string, PreviousSetData[]> = {};
 
           // Load previous sets for each exercise
@@ -657,7 +668,7 @@ const useActiveWorkoutStore = create<Store>()(
               const previousSets =
                 await workoutSessionsRepository.getLastSetsForExercise(
                   exerciseId,
-                  "default-user"
+                  userId
                 );
               newPreviousSets[exerciseId] = previousSets;
             } catch (error) {
@@ -710,14 +721,14 @@ const useActiveWorkoutStore = create<Store>()(
         });
       },
 
-      initializeQuickWorkout: async () => {
+      initializeQuickWorkout: async (userId: string) => {
         try {
           // 1. Obtener preferencias del usuario para show_rpe y show_tempo
           const prefs = useUserPreferencesStore.getState().prefs;
 
           // 2. Crear rutina temporal vacía con is_quick_workout=true
           const quickRoutine =
-            await routinesRepository.createQuickWorkoutRoutine("default-user", {
+            await routinesRepository.createQuickWorkoutRoutine(userId, {
               show_rpe: prefs?.show_rpe ?? false,
               show_tempo: prefs?.show_tempo ?? false,
             });
@@ -727,7 +738,7 @@ const useActiveWorkoutStore = create<Store>()(
             const sessionTempId = generateTempId();
             const session: ActiveWorkoutSession = {
               tempId: sessionTempId,
-              user_id: "default-user",
+              user_id: userId,
               id: sessionTempId,
               routine_id: quickRoutine.id,
               routine: quickRoutine, // Snapshot
@@ -753,6 +764,7 @@ const useActiveWorkoutStore = create<Store>()(
               setsByExercise: {},
               exercisePreviousSets: {},
               sessionBestPRs: {},
+              userId, // Store userId for later use
             };
 
             state.stats = {
@@ -1184,7 +1196,7 @@ const useActiveWorkoutStore = create<Store>()(
           // 2. Crear nuevo ejercicio manteniendo valores importantes
           const replacedExercise: ActiveWorkoutExercise = {
             tempId: newExerciseTempId,
-            user_id: "default-user",
+            user_id: state.activeWorkout.userId ?? "",
             id: newExerciseTempId, // Usar tempId como id temporal
             workout_block_id: currentExercise.workout_block_id,
             exercise_id: newExercise.id, // Nuevo ejercicio

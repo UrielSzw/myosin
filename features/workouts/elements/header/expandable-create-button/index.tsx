@@ -96,18 +96,20 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
     collapseMenu();
     setIsLoadingQuickWorkout(true);
     try {
+      if (!user?.id) {
+        console.error("No user ID available");
+        return;
+      }
       // Crear rutina local y obtener datos para sync
-      const routineData = await initializeQuickWorkout();
+      const routineData = await initializeQuickWorkout(user.id);
 
       // Sync rutina a Supabase en background (no bloqueamos UI)
-      if (user?.id) {
-        sync("ROUTINE_CREATE_QUICK_WORKOUT", {
-          ...routineData,
-          created_by_user_id: user.id, // Usar el user ID real
-        }).catch((err) => {
-          console.warn("Failed to sync quick workout routine:", err);
-        });
-      }
+      sync("ROUTINE_CREATE_QUICK_WORKOUT", {
+        ...routineData,
+        created_by_user_id: user.id, // Usar el user ID real
+      }).catch((err) => {
+        console.warn("Failed to sync quick workout routine:", err);
+      });
 
       router.push("/workout/active");
     } catch (error) {

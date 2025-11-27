@@ -49,10 +49,11 @@ export class SupabaseRoutinesRepository extends BaseSupabaseRepository {
 
   async deleteRoutineById(routineId: string): Promise<void> {
     try {
-      // Usar RPC function para cascade delete
-      const { error } = await this.supabase.rpc("delete_routine_by_id", {
-        routine_id_param: routineId,
-      });
+      // Soft delete: actualizar deleted_at en lugar de eliminar
+      const { error } = await this.supabase
+        .from("routines")
+        .update({ deleted_at: new Date().toISOString() })
+        .eq("id", routineId);
 
       if (error) throw error;
     } catch (error) {
@@ -70,6 +71,55 @@ export class SupabaseRoutinesRepository extends BaseSupabaseRepository {
       if (error) throw error;
     } catch (error) {
       await this.handleError(error, "clear routine training days");
+    }
+  }
+
+  /**
+   * Crea una rutina Quick Workout (is_quick_workout=true)
+   */
+  async createQuickWorkoutRoutine(routine: {
+    id: string;
+    name: string;
+    created_by_user_id: string;
+    is_quick_workout: boolean;
+    show_rpe?: boolean;
+    show_tempo?: boolean;
+  }): Promise<void> {
+    try {
+      const { error } = await this.supabase.from("routines").insert({
+        id: routine.id,
+        name: routine.name,
+        created_by_user_id: routine.created_by_user_id,
+        is_quick_workout: routine.is_quick_workout,
+        show_rpe: routine.show_rpe ?? false,
+        show_tempo: routine.show_tempo ?? false,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      await this.handleError(error, "create quick workout routine");
+    }
+  }
+
+  /**
+   * Convierte un Quick Workout en una rutina normal (is_quick_workout=false)
+   */
+  async convertQuickWorkoutToRoutine(
+    routineId: string,
+    newName?: string
+  ): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from("routines")
+        .update({
+          is_quick_workout: false,
+          ...(newName && { name: newName }),
+        })
+        .eq("id", routineId);
+
+      if (error) throw error;
+    } catch (error) {
+      await this.handleError(error, "convert quick workout to routine");
     }
   }
 }

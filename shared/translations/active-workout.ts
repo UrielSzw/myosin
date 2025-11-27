@@ -134,4 +134,38 @@ export const activeWorkoutTranslations = {
     es: "Error al guardar la sesión. Intenta nuevamente.",
     en: "Error saving session. Please try again.",
   },
+  // Quick Workout translations
+  saveAsRoutineTitle: {
+    es: "Guardar como rutina",
+    en: "Save as routine",
+  },
+  saveAsRoutineMessage: {
+    es: "¿Deseas guardar este entrenamiento como una nueva rutina reutilizable?",
+    en: "Do you want to save this workout as a new reusable routine?",
+  },
+  noJustSave: {
+    es: "No, solo guardar",
+    en: "No, just save",
+  },
+  yesCreateRoutine: {
+    es: "Sí, crear rutina",
+    en: "Yes, create routine",
+  },
+  // Empty Workout State
+  emptyWorkoutTitle: {
+    es: "¡Hora de entrenar!",
+    en: "Time to train!",
+  },
+  emptyWorkoutSubtitle: {
+    es: "Agrega tu primer ejercicio y comienza a registrar tu progreso",
+    en: "Add your first exercise and start tracking your progress",
+  },
+  emptyWorkoutCTA: {
+    es: "Agregar primer ejercicio",
+    en: "Add first exercise",
+  },
+  emptyWorkoutHint: {
+    es: "Puedes agregar más ejercicios en cualquier momento",
+    en: "You can add more exercises at any time",
+  },
 };

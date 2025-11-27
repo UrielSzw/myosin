@@ -8,6 +8,7 @@ import { ActiveBottomSheets } from "./elements/active-bottom-sheets";
 import { ActiveExerciseModal } from "./elements/active-exercise-modal";
 import { ActiveWorkoutHeader } from "./elements/active-workout-header";
 import { AddExerciseButton } from "./elements/add-exercise-button";
+import { EmptyWorkoutState } from "./elements/empty-workout-state";
 import { RestTimerBanner } from "./elements/rest-timer-banner";
 import { useActiveWorkoutSheets } from "./hooks/use-active-workout-sheets";
 import { useActiveWorkout } from "./hooks/use-active-workout-store";
@@ -27,6 +28,8 @@ export const ActiveWorkoutFeature = () => {
     tempoMetronomeRef,
   } = useActiveWorkoutSheets();
 
+  const hasExercises = blocksBySession && blocksBySession.length > 0;
+
   return (
     <BottomSheetModalProvider>
       <ScreenWrapper withSheets fullscreen>
@@ -37,19 +40,23 @@ export const ActiveWorkoutFeature = () => {
         >
           <ActiveWorkoutHeader />
 
-          <ScrollView style={{ flex: 1 }}>
-            {blocksBySession?.map((blockId) => (
-              <ActiveBlockItem
-                key={blockId}
-                blockId={blockId}
-                onToggleSheet={handleToggleSheet}
-              />
-            ))}
+          {hasExercises ? (
+            <ScrollView style={{ flex: 1 }}>
+              {blocksBySession.map((blockId) => (
+                <ActiveBlockItem
+                  key={blockId}
+                  blockId={blockId}
+                  onToggleSheet={handleToggleSheet}
+                />
+              ))}
 
-            <AddExerciseButton />
+              <AddExerciseButton />
 
-            <View style={{ height: 200 }} />
-          </ScrollView>
+              <View style={{ height: 200 }} />
+            </ScrollView>
+          ) : (
+            <EmptyWorkoutState />
+          )}
 
           <RestTimerBanner />
         </KeyboardAvoidingView>

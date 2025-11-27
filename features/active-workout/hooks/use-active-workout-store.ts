@@ -98,6 +98,8 @@ type Store = {
         created_at: string;
       }
     >; // exercise_id → best PR data
+    // User ID for current workout session
+    userId: string | null;
   };
 
   // Timer de descanso
@@ -134,7 +136,18 @@ type Store = {
   };
 
   mainActions: {
-    initializeWorkout: (routineId: string) => Promise<void>;
+    initializeWorkout: (routineId: string, userId: string) => Promise<void>;
+    initializeQuickWorkout: (
+      userId: string,
+      name?: string
+    ) => Promise<{
+      id: string;
+      name: string;
+      created_by_user_id: string;
+      is_quick_workout: boolean;
+      show_rpe: boolean;
+      show_tempo: boolean;
+    }>;
     clearWorkout: () => void;
     setExerciseModalMode: (
       mode: "add-new" | "replace" | "add-to-block" | null
@@ -212,7 +225,7 @@ type Store = {
 };
 
 const useActiveWorkoutStore = create<Store>()(
-  immer((set) => ({
+  immer((set, get) => ({
     // Estado principal - null cuando no hay workout activo
     activeWorkout: {
       session: null,
@@ -224,6 +237,7 @@ const useActiveWorkoutStore = create<Store>()(
       setsByExercise: {},
       exercisePreviousSets: {},
       sessionBestPRs: {},
+      userId: null, // User ID for current active workout
     },
 
     // Timer de descanso
@@ -255,7 +269,7 @@ const useActiveWorkoutStore = create<Store>()(
     },
 
     mainActions: {
-      initializeWorkout: async (routineId: string) => {
+      initializeWorkout: async (routineId: string, userId: string) => {
         try {
           // 1. Obtener la rutina completa con todos sus datos
           const routineData = await routinesRepository.findRoutineById(
@@ -286,7 +300,7 @@ const useActiveWorkoutStore = create<Store>()(
               const previousSets =
                 await workoutSessionsRepository.getLastSetsForExercise(
                   exerciseId,
-                  "default-user"
+                  userId
                 );
               exercisePreviousSets[exerciseId] = previousSets;
             } catch (error) {
@@ -303,7 +317,7 @@ const useActiveWorkoutStore = create<Store>()(
           let prMap: Record<string, BasePRCurrent | null> = {};
           try {
             prMap = await prRepository.getCurrentPRsForExercises(
-              "default-user",
+              userId,
               uniqueExerciseIds
             );
           } catch (error) {
@@ -317,7 +331,7 @@ const useActiveWorkoutStore = create<Store>()(
             hasBeenPerformed =
               await workoutSessionsRepository.hasRoutineBeenPerformed(
                 routineId,
-                "default-user"
+                userId
               );
           } catch (error) {
             console.warn("Failed to check routine performance history:", error);
@@ -329,7 +343,7 @@ const useActiveWorkoutStore = create<Store>()(
             const sessionTempId = generateTempId();
             const session: ActiveWorkoutSession = {
               tempId: sessionTempId,
-              user_id: "default-user",
+              user_id: userId,
               id: sessionTempId,
               routine_id: routine.id,
               routine: routine, // Snapshot para referencia
@@ -345,17 +359,18 @@ const useActiveWorkoutStore = create<Store>()(
             };
 
             // 6. Transformar bloques de routine a active workout
+            // Usamos Maps locales para mapear IDs originales → tempIds
             const activeBlocks: Record<string, ActiveWorkoutBlock> = {};
             const blocksBySession: string[] = [];
+            const blockIdToTempId = new Map<string, string>(); // NUEVO: mapeo para lookup
 
             Object.values(blocks).forEach((block) => {
               const blockTempId = generateTempId();
               const activeBlock: ActiveWorkoutBlock = {
                 tempId: blockTempId,
-                user_id: "default-user",
+                user_id: userId,
                 id: blockTempId,
                 workout_session_id: sessionTempId,
-                original_block_id: block.id,
                 name: block.name,
                 type: block.type,
                 order_index: block.order_index,
@@ -363,53 +378,51 @@ const useActiveWorkoutStore = create<Store>()(
                 rest_between_exercises_seconds:
                   block.rest_between_exercises_seconds,
                 was_added_during_workout: false,
-                was_modified_during_workout: false, // NUEVO: inicializar en false
+                was_modified_during_workout: false,
               };
 
               activeBlocks[blockTempId] = activeBlock;
               blocksBySession.push(blockTempId);
+              blockIdToTempId.set(block.id, blockTempId); // NUEVO: guardar mapeo
             });
 
             // 7. Transformar ejercicios
             const activeExercises: Record<string, ActiveWorkoutExercise> = {};
             const exercisesByBlock: Record<string, string[]> = {};
+            const exerciseInBlockIdToTempId = new Map<string, string>(); // NUEVO: mapeo para lookup
 
             Object.values(exercisesInBlock).forEach((exerciseData) => {
               const { exerciseInBlock, exercise } = exerciseData;
               const exerciseTempId = generateTempId();
 
-              // Encontrar el bloque activo correspondiente
-              const originalBlock = Object.values(blocks).find(
-                (b) => b.id === exerciseInBlock.block_id
+              // Encontrar el bloque activo correspondiente usando el mapeo
+              const activeBlockTempId = blockIdToTempId.get(
+                exerciseInBlock.block_id
               );
-              const activeBlock = Object.values(activeBlocks).find(
-                (ab) => ab.original_block_id === originalBlock?.id
-              );
-
-              if (!activeBlock) return;
+              if (!activeBlockTempId) return;
 
               const activeExercise: ActiveWorkoutExercise = {
                 tempId: exerciseTempId,
-                user_id: "default-user",
+                user_id: userId,
                 id: exerciseTempId,
-                workout_block_id: activeBlock.tempId,
+                workout_block_id: activeBlockTempId,
                 exercise_id: exerciseInBlock.exercise_id,
-                exercise: exercise as BaseExercise, // Snapshot del ejercicio
-                original_exercise_in_block_id: exerciseInBlock.id,
+                exercise: exercise as BaseExercise,
                 order_index: exerciseInBlock.order_index,
-                execution_order: null, // Se asigna cuando se ejecuta
+                execution_order: null,
                 notes: exerciseInBlock.notes,
                 was_added_during_workout: false,
                 pr: prMap[exerciseInBlock.exercise_id] || null,
               };
 
               activeExercises[exerciseTempId] = activeExercise;
+              exerciseInBlockIdToTempId.set(exerciseInBlock.id, exerciseTempId); // NUEVO: guardar mapeo
 
               // Agregar al índice
-              if (!exercisesByBlock[activeBlock.tempId]) {
-                exercisesByBlock[activeBlock.tempId] = [];
+              if (!exercisesByBlock[activeBlockTempId]) {
+                exercisesByBlock[activeBlockTempId] = [];
               }
-              exercisesByBlock[activeBlock.tempId].push(exerciseTempId);
+              exercisesByBlock[activeBlockTempId].push(exerciseTempId);
             });
 
             // 8. Transformar sets
@@ -419,25 +432,21 @@ const useActiveWorkoutStore = create<Store>()(
             Object.values(sets).forEach((set) => {
               const setTempId = generateTempId();
 
-              // Encontrar el ejercicio activo correspondiente
-              const originalExerciseData = Object.values(exercisesInBlock).find(
-                (data) => data.exerciseInBlock.id === set.exercise_in_block_id
+              // Encontrar el ejercicio activo correspondiente usando el mapeo
+              const activeExerciseTempId = exerciseInBlockIdToTempId.get(
+                set.exercise_in_block_id
               );
-              const activeExercise = Object.values(activeExercises).find(
-                (ae) =>
-                  ae.original_exercise_in_block_id ===
-                  originalExerciseData?.exerciseInBlock.id
-              );
+              if (!activeExerciseTempId) return;
 
+              const activeExercise = activeExercises[activeExerciseTempId];
               if (!activeExercise) return;
 
               const activeSet: ActiveWorkoutSet = {
                 tempId: setTempId,
-                user_id: "default-user",
+                user_id: userId,
                 exercise_id: activeExercise.exercise_id,
                 id: setTempId,
                 workout_exercise_id: activeExercise.tempId,
-                original_set_id: set.id,
                 order_index: set.order_index,
                 measurement_template: set.measurement_template,
                 set_type: set.set_type,
@@ -507,6 +516,7 @@ const useActiveWorkoutStore = create<Store>()(
               setsByExercise,
               exercisePreviousSets, // Use the loaded previous sets
               sessionBestPRs: {},
+              userId, // Store userId for later use
             };
 
             // 11. Actualizar stats
@@ -551,6 +561,7 @@ const useActiveWorkoutStore = create<Store>()(
             setsByExercise: {},
             exercisePreviousSets: {},
             sessionBestPRs: {},
+            userId: null, // Clear userId on workout clear
           };
 
           state.stats = {
@@ -622,26 +633,20 @@ const useActiveWorkoutStore = create<Store>()(
         // 2. Check ejercicios agregados/reemplazados
         for (const exercise of Object.values(activeWorkout.exercises)) {
           if (exercise.was_added_during_workout) return true;
-          if (exercise.original_exercise_in_block_id === null) return true;
         }
 
-        // 3. Check sets agregados
-        for (const set of Object.values(activeWorkout.sets)) {
-          if (set.original_set_id === null) return true;
-        }
-
-        // 4. Check eliminaciones por diferencia de count
+        // 3. Check eliminaciones por diferencia de count
         const currentSetsCount = Object.keys(activeWorkout.sets).length;
         const originalSetsCount = activeWorkout.session.original_sets_count;
 
         if (currentSetsCount !== originalSetsCount) return true;
 
-        // 5. Check sets modificados (NUEVO)
+        // 4. Check sets modificados (valores planificados cambiados)
         for (const set of Object.values(activeWorkout.sets)) {
           if (set.was_modified_during_workout) return true;
         }
 
-        // 6. Check bloques modificados (NUEVO)
+        // 5. Check bloques modificados (rest time, etc)
         for (const block of Object.values(activeWorkout.blocks)) {
           if (block.was_modified_during_workout) return true;
         }
@@ -652,6 +657,12 @@ const useActiveWorkoutStore = create<Store>()(
       // Helper method to load previous sets for new exercises
       loadPreviousSetsForExercises: async (exerciseIds: string[]) => {
         try {
+          const userId = get().activeWorkout.userId;
+          if (!userId) {
+            console.warn("No userId available, cannot load previous sets");
+            return;
+          }
+
           const newPreviousSets: Record<string, PreviousSetData[]> = {};
 
           // Load previous sets for each exercise
@@ -660,7 +671,7 @@ const useActiveWorkoutStore = create<Store>()(
               const previousSets =
                 await workoutSessionsRepository.getLastSetsForExercise(
                   exerciseId,
-                  "default-user"
+                  userId
                 );
               newPreviousSets[exerciseId] = previousSets;
             } catch (error) {
@@ -711,6 +722,89 @@ const useActiveWorkoutStore = create<Store>()(
         set((state) => {
           state.activeWorkout.sessionBestPRs = {};
         });
+      },
+
+      initializeQuickWorkout: async (userId: string, name?: string) => {
+        try {
+          // 1. Obtener preferencias del usuario para show_rpe y show_tempo
+          const prefs = useUserPreferencesStore.getState().prefs;
+
+          // 2. Crear rutina temporal vacía con is_quick_workout=true
+          const quickRoutine =
+            await routinesRepository.createQuickWorkoutRoutine(userId, {
+              show_rpe: prefs?.show_rpe ?? false,
+              show_tempo: prefs?.show_tempo ?? false,
+              name,
+            });
+
+          set((state) => {
+            // 2. Crear sesión de workout VACÍA
+            const sessionTempId = generateTempId();
+            const session: ActiveWorkoutSession = {
+              tempId: sessionTempId,
+              user_id: userId,
+              id: sessionTempId,
+              routine_id: quickRoutine.id,
+              routine: quickRoutine, // Snapshot
+              started_at: new Date().toISOString(),
+              finished_at: new Date().toISOString(),
+              total_duration_seconds: 0,
+              total_sets_planned: 0,
+              total_sets_completed: 0,
+              total_volume_kg: null,
+              average_rpe: null,
+              original_sets_count: 0,
+              hasBeenPerformed: false,
+            };
+
+            // 3. Inicializar estado VACÍO (sin bloques/ejercicios/sets)
+            state.activeWorkout = {
+              session,
+              blocks: {},
+              exercises: {},
+              sets: {},
+              blocksBySession: [],
+              exercisesByBlock: {},
+              setsByExercise: {},
+              exercisePreviousSets: {},
+              sessionBestPRs: {},
+              userId, // Store userId for later use
+            };
+
+            state.stats = {
+              totalSetsPlanned: 0,
+              totalSetsCompleted: 0,
+            };
+
+            state.currentState = {
+              currentBlockId: null,
+              currentExerciseInBlockId: null,
+              currentSetId: null,
+              currentRestTime: null,
+              currentRestTimeType: null,
+              currentSetType: null,
+              exerciseModalMode: null,
+              currentExercisesCount: null,
+              currentExerciseName: null,
+              isCurrentBlockMulti: false,
+            };
+
+            state.restTimer = null;
+          });
+
+          // 4. Retornar datos de la rutina para sync
+          return {
+            id: quickRoutine.id,
+            name: quickRoutine.name,
+            created_by_user_id: quickRoutine.created_by_user_id,
+            is_quick_workout: quickRoutine.is_quick_workout ?? true,
+            show_rpe: quickRoutine.show_rpe,
+            show_tempo: quickRoutine.show_tempo,
+          };
+        } catch (error) {
+          console.error("Error initializing quick workout:", error);
+          throw error;
+        }
       },
     },
 
@@ -1106,12 +1200,11 @@ const useActiveWorkoutStore = create<Store>()(
           // 2. Crear nuevo ejercicio manteniendo valores importantes
           const replacedExercise: ActiveWorkoutExercise = {
             tempId: newExerciseTempId,
-            user_id: "default-user",
+            user_id: state.activeWorkout.userId ?? "",
             id: newExerciseTempId, // Usar tempId como id temporal
             workout_block_id: currentExercise.workout_block_id,
             exercise_id: newExercise.id, // Nuevo ejercicio
             exercise: newExercise, // Nuevo snapshot
-            original_exercise_in_block_id: null, // Ya no es original
             order_index: currentExercise.order_index, // Mantener posición
             execution_order: currentExercise.execution_order, // Mantener si ya se ejecutó
             notes: currentExercise.notes, // Mantener notas
@@ -1134,7 +1227,6 @@ const useActiveWorkoutStore = create<Store>()(
                 tempId: newSetTempId, // Nuevo tempId
                 id: newSetTempId, // Usar tempId como id temporal
                 workout_exercise_id: newExerciseTempId, // Apuntar al nuevo ejercicio
-                original_set_id: null, // Ya no es original
               };
 
               // Guardar nuevo set
@@ -1276,6 +1368,44 @@ const useActiveWorkoutStore = create<Store>()(
             exerciseInBlock.exercise_id,
             lastPrevSet // Pasar como fallback
           );
+
+          // Auto-fill BEGIN
+          // Auto-fill actual values from last COMPLETED set (Option B)
+          // Only for weight and distance fields (not reps, time, etc.)
+          const lastCompletedSet = [...currentSets]
+            .reverse()
+            .map((setId) => state.activeWorkout.sets[setId])
+            .find((s) => s?.completed_at !== null);
+          console.log("Last completed set:", lastCompletedSet);
+          if (lastCompletedSet) {
+            const template = getMeasurementTemplate(
+              lastCompletedSet.measurement_template,
+              "kg"
+            );
+
+            // Primary field: copy only if weight or distance
+            const primaryFieldType = template.fields[0]?.type;
+            if (
+              (primaryFieldType === "weight" ||
+                primaryFieldType === "distance") &&
+              lastCompletedSet.actual_primary_value !== null
+            ) {
+              newSet.actual_primary_value =
+                lastCompletedSet.actual_primary_value;
+            }
+
+            // Secondary field: copy only if weight or distance
+            const secondaryFieldType = template.fields[1]?.type;
+            if (
+              (secondaryFieldType === "weight" ||
+                secondaryFieldType === "distance") &&
+              lastCompletedSet.actual_secondary_value !== null
+            ) {
+              newSet.actual_secondary_value =
+                lastCompletedSet.actual_secondary_value;
+            }
+          }
+          // Auto-fill END
 
           // Agregar el nuevo set al estado
           state.activeWorkout.sets[newSet.tempId] = newSet;
@@ -1570,10 +1700,8 @@ const useActiveWorkoutStore = create<Store>()(
           if (!set) return;
 
           set.set_type = setType;
-          // Marcar como modificado si no es un set nuevo
-          if (set.original_set_id !== null) {
-            set.was_modified_during_workout = true;
-          }
+          // Marcar como modificado - esto indica que el set fue cambiado
+          set.was_modified_during_workout = true;
         });
       },
 
@@ -1588,11 +1716,6 @@ const useActiveWorkoutStore = create<Store>()(
             state.activeWorkout.sets[setId] = {
               ...set,
               actual_rpe: rpe,
-              // Marcar como modificado si no es un set nuevo
-              was_modified_during_workout:
-                set.original_set_id !== null
-                  ? true
-                  : set.was_modified_during_workout,
             };
           }
         });

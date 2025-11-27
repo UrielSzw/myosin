@@ -49,6 +49,8 @@ export const RoutineOptionsBottomSheet = forwardRef<BottomSheetModal, Props>(
           method: onDelete,
           icon: <Trash color={colors.error[500]} size={20} />,
         }}
+        enableDynamicSizing={false}
+        snapPoints={["30%"]}
       />
     );
   }

@@ -14,7 +14,7 @@ import { syncToSupabase } from "@/shared/sync/sync-engine";
 import type { MutationCode } from "@/shared/sync/types/mutations";
 import {
   combineSelectedDateWithCurrentTime,
-  getDayKeyUTC,
+  getDayKeyLocal,
   toUTCISOString,
 } from "@/shared/utils/timezone";
 import NetInfo from "@react-native-community/netinfo";
@@ -296,7 +296,7 @@ export const trackerService = {
       ? combineSelectedDateWithCurrentTime(recordedAt)
       : toUTCISOString();
     // day_key debe basarse en la fecha seleccionada, no en el timestamp UTC
-    const dayKey = recordedAt ? recordedAt : getDayKeyUTC();
+    const dayKey = recordedAt ? recordedAt : getDayKeyLocal();
 
     // Calcular valor normalizado
     const valueNormalized = value * (metric.conversion_factor || 1);
@@ -356,7 +356,7 @@ export const trackerService = {
       ? combineSelectedDateWithCurrentTime(recordedAt)
       : toUTCISOString();
     // day_key debe basarse en la fecha seleccionada, no en el timestamp UTC
-    const dayKey = recordedAt ? recordedAt : getDayKeyUTC();
+    const dayKey = recordedAt ? recordedAt : getDayKeyLocal();
 
     // Local first: crear en SQLite
     const result = await trackerRepository.createEntryFromQuickAction(
@@ -485,7 +485,7 @@ export const trackerService = {
    */
   getTodayData: async (userId: string): Promise<TrackerDayData> => {
     if (!userId) throw new Error("User ID is required");
-    const today = getDayKeyUTC();
+    const today = getDayKeyLocal();
     return await trackerService.getDayData(today, userId);
   },
 
@@ -508,10 +508,10 @@ export const trackerService = {
     days: number = 30,
     userId: string
   ): Promise<BaseTrackerDailyAggregate[]> => {
-    const endDate = getDayKeyUTC();
+    const endDate = getDayKeyLocal();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days + 1);
-    const startDateKey = getDayKeyUTC(startDate);
+    const startDateKey = getDayKeyLocal(startDate);
 
     return await trackerRepository.getDailyAggregatesRange(
       userId,
@@ -538,10 +538,10 @@ export const trackerService = {
     }
 
     // Calcular rango de fechas
-    const endDate = getDayKeyUTC();
+    const endDate = getDayKeyLocal();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days + 1);
-    const startDateKey = getDayKeyUTC(startDate);
+    const startDateKey = getDayKeyLocal(startDate);
 
     // Obtener agregados del período
     const aggregates = await trackerRepository.getDailyAggregatesRange(
@@ -565,7 +565,7 @@ export const trackerService = {
     for (let i = 0; i < days; i++) {
       const checkDate = new Date(today);
       checkDate.setDate(checkDate.getDate() - i);
-      const checkDateKey = getDayKeyUTC(checkDate);
+      const checkDateKey = getDayKeyLocal(checkDate);
 
       const dayAggregate = aggregates.find(
         (agg) => agg.day_key === checkDateKey
@@ -584,7 +584,7 @@ export const trackerService = {
 
     if (hasTarget && aggregates.length > 0) {
       const todayAggregate = aggregates.find(
-        (agg) => agg.day_key === getDayKeyUTC()
+        (agg) => agg.day_key === getDayKeyLocal()
       );
 
       if (todayAggregate) {
@@ -809,7 +809,7 @@ export const trackerService = {
     const last7Days = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - i);
-      return getDayKeyUTC(date);
+      return getDayKeyLocal(date);
     });
 
     const entriesByDay = last7Days.map((dayKey) => ({

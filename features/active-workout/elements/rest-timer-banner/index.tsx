@@ -11,6 +11,7 @@ import {
 } from "lucide-react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import {
+  AppState,
   Keyboard,
   Pressable,
   StyleSheet,
@@ -19,7 +20,6 @@ import {
   View,
 } from "react-native";
 import Animated, {
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -52,6 +52,7 @@ export const RestTimerBanner: React.FC = () => {
   // Shared values for animations
   const translateY = useSharedValue(BANNER_HEIGHT + PROGRESS_HEIGHT);
   const opacity = useSharedValue(0);
+  const progressWidth = useSharedValue(0);
 
   useEffect(() => {
     setAudioModeAsync({
@@ -105,19 +106,30 @@ export const RestTimerBanner: React.FC = () => {
     addTime,
   } = useTimer({
     onComplete: () => {
-      playCompletionAlert();
-      setTimeout(() => {
-        runOnJS(dismissBanner)();
-        setTimeout(() => {
-          skipRestTimer();
-        }, 300);
-      }, 1000);
+      // Solo reproducir alerta si la app está en foreground
+      // (evita que suene cuando volvemos del background y el timer ya expiró)
+      if (AppState.currentState === "active") {
+        playCompletionAlert();
+      }
+
+      setTimeout(
+        () => {
+          dismissBanner();
+          setTimeout(() => {
+            skipRestTimer();
+          }, 300);
+        },
+        AppState.currentState === "active" ? 1000 : 0
+      );
     },
   });
 
   // Show banner when timer starts
   useEffect(() => {
     if (startedAt && restTimeSeconds > 0) {
+      // Resetear progress a 0 antes de animar
+      progressWidth.value = 0;
+
       startTimer(
         restTimeSeconds,
         t.restTimeFinished[lang],
@@ -137,6 +149,7 @@ export const RestTimerBanner: React.FC = () => {
     t.restTimeFinishedBody,
     translateY,
     opacity,
+    progressWidth,
   ]);
 
   // Hide banner when timer is cleared
@@ -179,8 +192,6 @@ export const RestTimerBanner: React.FC = () => {
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   }, []);
-
-  const progressWidth = useSharedValue(0);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

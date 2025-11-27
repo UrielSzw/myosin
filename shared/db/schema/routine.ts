@@ -114,6 +114,14 @@ export const routines = sqliteTable("routines", {
     .default(true)
     .notNull(),
 
+  // Soft delete - NULL = activa, timestamp = eliminada
+  deleted_at: text("deleted_at"),
+
+  // Quick workout flag - rutinas temporales ocultas creadas desde Quick Workout
+  is_quick_workout: integer("is_quick_workout", { mode: "boolean" })
+    .notNull()
+    .default(false),
+
   ...timestamps,
 });
 
@@ -290,8 +298,14 @@ export type SRoutine = BaseRoutine;
 export type SFolder = BaseFolder;
 export type SBlocks = BlockWithExercises;
 
-// 4. Tipos para inserts (sin timestamps automáticos)
-export type RoutineInsert = Omit<BaseRoutine, "created_at" | "updated_at">;
+// 4. Tipos para inserts (sin timestamps automáticos, deleted_at opcional)
+export type RoutineInsert = Omit<
+  BaseRoutine,
+  "created_at" | "updated_at" | "deleted_at" | "is_quick_workout"
+> & {
+  deleted_at?: string | null;
+  is_quick_workout?: boolean;
+};
 export type BlockInsert = Omit<BaseBlock, "created_at" | "updated_at">;
 export type ExerciseInBlockInsert = Omit<
   BaseExerciseInBlock,

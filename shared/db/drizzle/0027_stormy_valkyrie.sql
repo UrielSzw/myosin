@@ -1,0 +1,1 @@
+ALTER TABLE `routines` ADD `is_quick_workout` integer DEFAULT false NOT NULL;

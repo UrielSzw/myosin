@@ -392,8 +392,9 @@ BEGIN
   RETURNING id INTO created_session_id;
 
   -- 2. Insertar bloques
-  -- Schema: id, user_id, workout_session_id, original_block_id, type, order_index, name,
+  -- Schema: id, user_id, workout_session_id, type, order_index, name,
   --         rest_time_seconds, rest_between_exercises_seconds, was_added_during_workout, created_at, updated_at
+  -- NOTE: Removed original_block_id - we no longer track FK references to mutable routine data
   IF jsonb_array_length(blocks_data) > 0 THEN
     FOR block_item IN SELECT * FROM jsonb_array_elements(blocks_data)
     LOOP
@@ -401,7 +402,6 @@ BEGIN
         id,
         user_id,
         workout_session_id,
-        original_block_id,
         type,
         order_index,
         name,
@@ -413,11 +413,6 @@ BEGIN
         (block_item->>'id')::uuid,
         (block_item->>'user_id')::uuid,
         created_session_id,
-        CASE 
-          WHEN block_item->>'original_block_id' IS NOT NULL 
-          THEN (block_item->>'original_block_id')::uuid 
-          ELSE NULL 
-        END,
         block_item->>'type',
         (block_item->>'order_index')::integer,
         block_item->>'name',
@@ -429,8 +424,9 @@ BEGIN
   END IF;
 
   -- 3. Insertar ejercicios
-  -- Schema: id, user_id, workout_block_id, exercise_id, original_exercise_in_block_id,
+  -- Schema: id, user_id, workout_block_id, exercise_id,
   --         order_index, execution_order, notes, was_added_during_workout, created_at, updated_at
+  -- NOTE: Removed original_exercise_in_block_id - we no longer track FK references to mutable routine data
   IF jsonb_array_length(exercises_data) > 0 THEN
     FOR exercise_item IN SELECT * FROM jsonb_array_elements(exercises_data)
     LOOP
@@ -439,7 +435,6 @@ BEGIN
         user_id,
         workout_block_id,
         exercise_id,
-        original_exercise_in_block_id,
         order_index,
         execution_order,
         notes,
@@ -450,11 +445,6 @@ BEGIN
         (exercise_item->>'user_id')::uuid,
         (exercise_item->>'workout_block_id')::uuid,
         (exercise_item->>'exercise_id')::uuid,
-        CASE 
-          WHEN exercise_item->>'original_exercise_in_block_id' IS NOT NULL 
-          THEN (exercise_item->>'original_exercise_in_block_id')::uuid 
-          ELSE NULL 
-        END,
         (exercise_item->>'order_index')::integer,
         CASE 
           WHEN exercise_item->>'execution_order' IS NOT NULL 
@@ -468,10 +458,11 @@ BEGIN
   END IF;
 
   -- 4. Insertar sets
-  -- Schema: id, user_id, workout_exercise_id, exercise_id, original_set_id, order_index,
+  -- Schema: id, user_id, workout_exercise_id, exercise_id, order_index,
   --         measurement_template, planned_primary_value, planned_secondary_value, planned_primary_range,
   --         planned_secondary_range, planned_rpe, planned_tempo, actual_primary_value, actual_secondary_value,
   --         actual_rpe, set_type, completed, created_at, updated_at
+  -- NOTE: Removed original_set_id - we no longer track FK references to mutable routine data
   IF jsonb_array_length(sets_data) > 0 THEN
     FOR set_item IN SELECT * FROM jsonb_array_elements(sets_data)
     LOOP
@@ -480,7 +471,6 @@ BEGIN
         user_id,
         workout_exercise_id,
         exercise_id,
-        original_set_id,
         order_index,
         measurement_template,
         planned_primary_value,
@@ -500,11 +490,6 @@ BEGIN
         (set_item->>'user_id')::uuid,
         (set_item->>'workout_exercise_id')::uuid,
         (set_item->>'exercise_id')::uuid,
-        CASE 
-          WHEN set_item->>'original_set_id' IS NOT NULL 
-          THEN (set_item->>'original_set_id')::uuid 
-          ELSE NULL 
-        END,
         (set_item->>'order_index')::integer,
         set_item->>'measurement_template',
         CASE 

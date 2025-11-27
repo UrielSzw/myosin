@@ -66,6 +66,8 @@ CREATE TABLE routines (
     training_days JSONB,  -- array of days
     show_rpe BOOLEAN DEFAULT true NOT NULL,
     show_tempo BOOLEAN DEFAULT true NOT NULL,
+    deleted_at TIMESTAMPTZ,  -- Soft delete: NULL = active, timestamp = deleted
+    is_quick_workout BOOLEAN NOT NULL DEFAULT false,  -- Quick workout: hidden routines
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -119,10 +121,12 @@ CREATE TABLE routine_sets (
 -- ============================================================================
 
 -- Workout sessions table
+-- NOTE: routine_id uses RESTRICT instead of CASCADE to preserve workout history
+--       when a routine is soft-deleted
 CREATE TABLE workout_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
-    routine_id UUID NOT NULL REFERENCES routines(id) ON DELETE CASCADE,
+    routine_id UUID NOT NULL REFERENCES routines(id) ON DELETE RESTRICT,
     started_at TIMESTAMPTZ NOT NULL,
     finished_at TIMESTAMPTZ NOT NULL,
     total_duration_seconds INTEGER NOT NULL,
@@ -135,11 +139,11 @@ CREATE TABLE workout_sessions (
 );
 
 -- Workout blocks table
+-- NOTE: Removed original_block_id - we no longer track FK references to mutable routine data
 CREATE TABLE workout_blocks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     workout_session_id UUID NOT NULL REFERENCES workout_sessions(id) ON DELETE CASCADE,
-    original_block_id UUID REFERENCES routine_blocks(id) ON DELETE SET NULL,
     type TEXT NOT NULL,  -- 'individual' | 'superset' | 'circuit'
     order_index INTEGER NOT NULL,
     name TEXT NOT NULL,
@@ -151,12 +155,12 @@ CREATE TABLE workout_blocks (
 );
 
 -- Workout exercises table
+-- NOTE: Removed original_exercise_in_block_id - we no longer track FK references to mutable routine data
 CREATE TABLE workout_exercises (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     workout_block_id UUID NOT NULL REFERENCES workout_blocks(id) ON DELETE CASCADE,
     exercise_id UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-    original_exercise_in_block_id UUID REFERENCES exercise_in_block(id) ON DELETE SET NULL,
     order_index INTEGER NOT NULL,
     execution_order INTEGER,
     notes TEXT,
@@ -166,12 +170,12 @@ CREATE TABLE workout_exercises (
 );
 
 -- Workout sets table
+-- NOTE: Removed original_set_id - we no longer track FK references to mutable routine data
 CREATE TABLE workout_sets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     workout_exercise_id UUID NOT NULL REFERENCES workout_exercises(id) ON DELETE CASCADE,
     exercise_id UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-    original_set_id UUID REFERENCES routine_sets(id) ON DELETE SET NULL,
     order_index INTEGER NOT NULL,
     measurement_template TEXT NOT NULL,
     planned_primary_value DECIMAL(10,2),
@@ -329,6 +333,7 @@ CREATE INDEX idx_folders_created_by_user_id ON folders(created_by_user_id);
 -- Routines indexes
 CREATE INDEX idx_routines_created_by_user_id ON routines(created_by_user_id);
 CREATE INDEX idx_routines_folder_id ON routines(folder_id);
+CREATE INDEX idx_routines_deleted_at ON routines(deleted_at);  -- For filtering active routines
 
 -- Routine blocks indexes
 CREATE INDEX idx_routine_blocks_user_id ON routine_blocks(user_id);
@@ -351,7 +356,6 @@ CREATE INDEX idx_workout_sessions_started_at ON workout_sessions(started_at);
 -- Workout blocks indexes
 CREATE INDEX idx_workout_blocks_user_id ON workout_blocks(user_id);
 CREATE INDEX idx_workout_blocks_workout_session_id ON workout_blocks(workout_session_id);
-CREATE INDEX idx_workout_blocks_original_block_id ON workout_blocks(original_block_id);
 
 -- Workout exercises indexes
 CREATE INDEX idx_workout_exercises_user_id ON workout_exercises(user_id);
@@ -363,7 +367,6 @@ CREATE INDEX idx_workout_exercises_execution_order ON workout_exercises(executio
 CREATE INDEX idx_workout_sets_user_id ON workout_sets(user_id);
 CREATE INDEX idx_workout_sets_workout_exercise_id ON workout_sets(workout_exercise_id);
 CREATE INDEX idx_workout_sets_exercise_id ON workout_sets(exercise_id);
-CREATE INDEX idx_workout_sets_original_set_id ON workout_sets(original_set_id);
 CREATE INDEX idx_workout_sets_completed ON workout_sets(completed);
 
 -- Tracker metrics indexes

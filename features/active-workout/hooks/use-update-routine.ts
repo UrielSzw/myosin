@@ -41,6 +41,7 @@ export const useUpdateRoutine = () => {
         show_rpe: session.routine.show_rpe,
         show_tempo: session.routine.show_tempo,
         training_days: session.routine.training_days,
+        deleted_at: null, // Rutinas activas no están eliminadas
       };
 
       // 2. Preparar bloques con IDs reales

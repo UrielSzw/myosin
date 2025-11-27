@@ -99,7 +99,7 @@ export const workoutSessionsRepository = {
         routine_name: routines.name,
       })
       .from(workout_sessions)
-      .innerJoin(routines, eq(workout_sessions.routine_id, routines.id))
+      .leftJoin(routines, eq(workout_sessions.routine_id, routines.id))
       .orderBy(desc(workout_sessions.started_at))
       .limit(limit);
 
@@ -107,7 +107,7 @@ export const workoutSessionsRepository = {
       ...session,
       routine: {
         id: session.routine_id,
-        name: session.routine_name,
+        name: session.routine_name ?? "Rutina eliminada",
       },
       completion_percentage: Math.round(
         (session.total_sets_completed / session.total_sets_planned) * 100
@@ -141,7 +141,7 @@ export const workoutSessionsRepository = {
         },
       })
       .from(workout_sessions)
-      .innerJoin(routines, eq(workout_sessions.routine_id, routines.id))
+      .leftJoin(routines, eq(workout_sessions.routine_id, routines.id))
       .where(eq(workout_sessions.id, sessionId));
 
     if (!sessionData) {
@@ -184,7 +184,6 @@ export const workoutSessionsRepository = {
         user_id: workout_sets.user_id,
         workout_exercise_id: workout_sets.workout_exercise_id,
         exercise_id: workout_sets.exercise_id,
-        original_set_id: workout_sets.original_set_id,
         order_index: workout_sets.order_index,
 
         // New measurement system
@@ -238,7 +237,10 @@ export const workoutSessionsRepository = {
 
     return {
       ...sessionData.session,
-      routine: sessionData.routine,
+      routine: sessionData.routine ?? {
+        id: sessionData.session.routine_id,
+        name: "Rutina eliminada",
+      },
       blocks: blocksWithExercises as WorkoutBlockWithExercises[],
     };
   },
@@ -394,7 +396,7 @@ export const workoutSessionsRepository = {
 
   // Obtener sesiones recientes
   getRecentSessions: async (limit: number = 5) => {
-    return await db
+    const sessions = await db
       .select({
         id: workout_sessions.id,
         started_at: workout_sessions.started_at,
@@ -404,9 +406,14 @@ export const workoutSessionsRepository = {
         routine_name: routines.name,
       })
       .from(workout_sessions)
-      .innerJoin(routines, eq(workout_sessions.routine_id, routines.id))
+      .leftJoin(routines, eq(workout_sessions.routine_id, routines.id))
       .orderBy(desc(workout_sessions.started_at))
       .limit(limit);
+
+    return sessions.map((s) => ({
+      ...s,
+      routine_name: s.routine_name ?? "Rutina eliminada",
+    }));
   },
 
   // Verificar si una rutina específica ya fue realizada

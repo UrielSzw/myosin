@@ -1,9 +1,15 @@
 /**
  * Utility para calcular day_key consistente
+ * Usa la fecha LOCAL del usuario (no UTC) para que el día corresponda
+ * a lo que el usuario ve en su zona horaria
  */
 export const getDayKey = (date?: Date): string => {
   const d = date || new Date();
-  return d.toISOString().split("T")[0];
+  // Usar fecha local en vez de UTC
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 };
 
 /**

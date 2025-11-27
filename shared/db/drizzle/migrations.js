@@ -27,6 +27,8 @@ import m0022 from './0022_bumpy_jackpot.sql';
 import m0023 from './0023_glossy_ronan.sql';
 import m0024 from './0024_petite_jean_grey.sql';
 import m0025 from './0025_reflective_siren.sql';
+import m0026 from './0026_shocking_captain_stacy.sql';
+import m0027 from './0027_stormy_valkyrie.sql';
 
   export default {
     journal,
@@ -56,7 +58,9 @@ m0021,
 m0022,
 m0023,
 m0024,
-m0025
+m0025,
+m0026,
+m0027
     }
   }
   

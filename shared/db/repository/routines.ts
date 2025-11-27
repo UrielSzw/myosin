@@ -1,4 +1,4 @@
-import { eq, inArray, isNull, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, sql } from "drizzle-orm";
 import { db } from "../client";
 import {
   exercise_in_block,
@@ -14,6 +14,7 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "../schema/routine";
+import { generateUUID } from "../utils/uuid";
 
 export type RoutineWithMetrics = BaseRoutine & {
   blocksCount: number;
@@ -49,7 +50,15 @@ export const routinesRepository = {
         eq(exercise_in_block.block_id, routine_blocks.id)
       )
       .where(
-        folderId ? eq(routines.folder_id, folderId) : isNull(routines.folder_id)
+        and(
+          // Solo rutinas NO eliminadas (soft delete)
+          isNull(routines.deleted_at),
+          // Solo rutinas normales (no quick workouts)
+          eq(routines.is_quick_workout, false),
+          folderId
+            ? eq(routines.folder_id, folderId)
+            : isNull(routines.folder_id)
+        )
       )
       .groupBy(routines.id);
 
@@ -244,49 +253,16 @@ export const routinesRepository = {
     });
   },
 
+  /**
+   * Soft delete: marca la rutina como eliminada en lugar de borrarla.
+   * Esto preserva el historial de workout_sessions que referencian esta rutina.
+   * Los bloques, ejercicios y sets de la rutina permanecen intactos pero no son accesibles.
+   */
   deleteRoutineById: async (routineId: string): Promise<void> => {
-    return await db.transaction(async (tx) => {
-      // 1. Obtener todos los bloques de la rutina
-      const blocks = await tx
-        .select({ id: routine_blocks.id })
-        .from(routine_blocks)
-        .where(eq(routine_blocks.routine_id, routineId));
-
-      if (blocks.length > 0) {
-        const blockIds = blocks.map((block) => block.id);
-
-        // 2. Obtener todos los exercise_in_block de esos bloques
-        const exercisesInBlock = await tx
-          .select({ id: exercise_in_block.id })
-          .from(exercise_in_block)
-          .where(inArray(exercise_in_block.block_id, blockIds));
-
-        // Si hay ejercicios, eliminar sus sets
-        if (exercisesInBlock.length > 0) {
-          const exerciseInBlockIds = exercisesInBlock.map((ex) => ex.id);
-
-          // 3. Eliminar todos los sets primero
-          await tx
-            .delete(routine_sets)
-            .where(
-              inArray(routine_sets.exercise_in_block_id, exerciseInBlockIds)
-            );
-
-          // 4. Eliminar todos los exercise_in_block
-          await tx
-            .delete(exercise_in_block)
-            .where(inArray(exercise_in_block.block_id, blockIds));
-        }
-
-        // 5. Eliminar todos los bloques
-        await tx
-          .delete(routine_blocks)
-          .where(inArray(routine_blocks.id, blockIds));
-      }
-
-      // 6. Finalmente, eliminar la rutina
-      await tx.delete(routines).where(eq(routines.id, routineId));
-    });
+    await db
+      .update(routines)
+      .set({ deleted_at: new Date().toISOString() })
+      .where(eq(routines.id, routineId));
   },
 
   updateRoutineFolderId: async (
@@ -303,9 +279,61 @@ export const routinesRepository = {
     const result = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(routines)
+      .where(
+        and(
+          isNull(routines.deleted_at), // Solo rutinas NO eliminadas
+          eq(routines.is_quick_workout, false) // Solo rutinas normales
+        )
+      )
       .limit(1);
 
     return result[0].count;
+  },
+
+  /**
+   * Crea una rutina temporal para Quick Workout.
+   * Esta rutina tiene is_quick_workout=true y no aparece en la lista de rutinas.
+   * @param userId - ID del usuario
+   * @param options - Configuración opcional (show_rpe, show_tempo, name)
+   */
+  createQuickWorkoutRoutine: async (
+    userId: string,
+    options?: { show_rpe?: boolean; show_tempo?: boolean; name?: string }
+  ): Promise<BaseRoutine> => {
+    const quickRoutine: RoutineInsert = {
+      id: generateUUID(),
+      name: options?.name ?? "Quick Workout",
+      folder_id: null,
+      created_by_user_id: userId,
+      show_rpe: options?.show_rpe ?? false,
+      show_tempo: options?.show_tempo ?? false,
+      training_days: null,
+      is_quick_workout: true,
+    };
+
+    const [created] = await db
+      .insert(routines)
+      .values(quickRoutine)
+      .returning();
+
+    return created;
+  },
+
+  /**
+   * Convierte un Quick Workout en una rutina normal visible.
+   * Cambia is_quick_workout de true a false.
+   */
+  convertQuickWorkoutToRoutine: async (
+    routineId: string,
+    newName?: string
+  ): Promise<void> => {
+    await db
+      .update(routines)
+      .set({
+        is_quick_workout: false,
+        ...(newName && { name: newName }),
+      })
+      .where(eq(routines.id, routineId));
   },
 
   clearRoutineTrainingDays: async (routineId: string): Promise<void> => {

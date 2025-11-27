@@ -100,8 +100,12 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
         console.error("No user ID available");
         return;
       }
-      // Crear rutina local y obtener datos para sync
-      const routineData = await initializeQuickWorkout(user.id);
+      // Crear rutina local y obtener datos para sync (con nombre traducido)
+      const quickWorkoutName = t.quickWorkout[lang];
+      const routineData = await initializeQuickWorkout(
+        user.id,
+        quickWorkoutName
+      );
 
       // Sync rutina a Supabase en background (no bloqueamos UI)
       sync("ROUTINE_CREATE_QUICK_WORKOUT", {

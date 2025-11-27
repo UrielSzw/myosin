@@ -294,15 +294,15 @@ export const routinesRepository = {
    * Crea una rutina temporal para Quick Workout.
    * Esta rutina tiene is_quick_workout=true y no aparece en la lista de rutinas.
    * @param userId - ID del usuario
-   * @param options - Configuración opcional (show_rpe, show_tempo)
+   * @param options - Configuración opcional (show_rpe, show_tempo, name)
    */
   createQuickWorkoutRoutine: async (
     userId: string,
-    options?: { show_rpe?: boolean; show_tempo?: boolean }
+    options?: { show_rpe?: boolean; show_tempo?: boolean; name?: string }
   ): Promise<BaseRoutine> => {
     const quickRoutine: RoutineInsert = {
       id: generateUUID(),
-      name: "Quick Workout",
+      name: options?.name ?? "Quick Workout",
       folder_id: null,
       created_by_user_id: userId,
       show_rpe: options?.show_rpe ?? false,

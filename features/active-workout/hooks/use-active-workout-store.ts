@@ -137,7 +137,10 @@ type Store = {
 
   mainActions: {
     initializeWorkout: (routineId: string, userId: string) => Promise<void>;
-    initializeQuickWorkout: (userId: string) => Promise<{
+    initializeQuickWorkout: (
+      userId: string,
+      name?: string
+    ) => Promise<{
       id: string;
       name: string;
       created_by_user_id: string;
@@ -721,7 +724,7 @@ const useActiveWorkoutStore = create<Store>()(
         });
       },
 
-      initializeQuickWorkout: async (userId: string) => {
+      initializeQuickWorkout: async (userId: string, name?: string) => {
         try {
           // 1. Obtener preferencias del usuario para show_rpe y show_tempo
           const prefs = useUserPreferencesStore.getState().prefs;
@@ -731,6 +734,7 @@ const useActiveWorkoutStore = create<Store>()(
             await routinesRepository.createQuickWorkoutRoutine(userId, {
               show_rpe: prefs?.show_rpe ?? false,
               show_tempo: prefs?.show_tempo ?? false,
+              name,
             });
 
           set((state) => {

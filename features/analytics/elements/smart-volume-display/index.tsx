@@ -5,9 +5,9 @@ import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { VolumeDisplay } from "@/shared/ui/volume-display";
 import type { WeeklyVolumeMap } from "@/shared/utils/volume-calculator";
-import { ChevronDown, ChevronUp, TrendingUp } from "lucide-react-native";
+import { BarChart3, ChevronDown, ChevronUp } from "lucide-react-native";
 import React, { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 type Props = {
   data?: WeeklyVolumeMap;
@@ -28,14 +28,24 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
 
   if (loading) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.weeklyVolume[lang]}
-        </Typography>
-        <Card variant="outlined" padding="md">
-          <Typography variant="body2" color="textMuted">
-            {t.loading[lang]}
-          </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <BarChart3 size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.weeklyVolume[lang]}
+            </Typography>
+          </View>
+        </View>
+        <Card variant="outlined" padding="lg">
+          <View style={styles.skeletonBars}>
+            {[1, 2, 3, 4].map((i) => (
+              <View key={i} style={styles.skeletonBarRow}>
+                <View style={[styles.skeletonLabel, { backgroundColor: colors.gray[200] }]} />
+                <View style={[styles.skeletonBar, { backgroundColor: colors.gray[200], width: `${100 - i * 15}%` }]} />
+              </View>
+            ))}
+          </View>
         </Card>
       </View>
     );
@@ -43,18 +53,24 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
 
   if (!data) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.weeklyVolume[lang]}
-        </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <BarChart3 size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.weeklyVolume[lang]}
+            </Typography>
+          </View>
+        </View>
         <Card variant="outlined" padding="lg">
-          <View style={{ alignItems: "center", paddingVertical: 20 }}>
-            <TrendingUp
-              size={32}
-              color={colors.gray[400]}
-              style={{ marginBottom: 8 }}
-            />
-            <Typography variant="body1" color="textMuted" align="center">
+          <View style={styles.emptyState}>
+            <BarChart3 size={32} color={colors.gray[400]} />
+            <Typography
+              variant="body2"
+              color="textMuted"
+              align="center"
+              style={styles.emptyText}
+            >
               {t.noVolumeData[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
@@ -92,18 +108,24 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
 
   if (volumeEntries.length === 0) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.weeklyVolume[lang]}
-        </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <BarChart3 size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.weeklyVolume[lang]}
+            </Typography>
+          </View>
+        </View>
         <Card variant="outlined" padding="lg">
-          <View style={{ alignItems: "center", paddingVertical: 20 }}>
-            <TrendingUp
-              size={32}
-              color={colors.gray[400]}
-              style={{ marginBottom: 8 }}
-            />
-            <Typography variant="body1" color="textMuted" align="center">
+          <View style={styles.emptyState}>
+            <BarChart3 size={32} color={colors.gray[400]} />
+            <Typography
+              variant="body2"
+              color="textMuted"
+              align="center"
+              style={styles.emptyText}
+            >
               {t.noVolumeDataShort[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
@@ -116,18 +138,14 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
   }
 
   return (
-    <View style={{ marginBottom: 20 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
-      >
-        <Typography variant="h5" weight="semibold">
-          {t.weeklyVolume[lang]}
-        </Typography>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <BarChart3 size={20} color={colors.primary[500]} />
+          <Typography variant="h5" weight="semibold">
+            {t.weeklyVolume[lang]}
+          </Typography>
+        </View>
         <Typography variant="caption" color="textMuted">
           {totalSets} {t.setsPerWeek[lang]}
         </Typography>
@@ -144,68 +162,40 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
       ) : (
         // Vista compacta con top músculos
         <Card variant="outlined" padding="lg">
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-              marginBottom: 16,
-            }}
-          >
-            <TrendingUp size={18} color={colors.primary[500]} />
-            <Typography variant="body1" weight="medium">
-              {t.topMuscles[lang].replace("{count}", showTop.toString())}
-            </Typography>
-          </View>
-
           {displayData.map((item, index) => (
             <View
               key={item.category}
-              style={{
-                marginBottom: index === displayData.length - 1 ? 0 : 12,
-              }}
+              style={[
+                styles.volumeItem,
+                index === displayData.length - 1 && styles.volumeItemLast,
+              ]}
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginBottom: 4,
-                }}
-              >
+              <View style={styles.volumeItemHeader}>
                 <Typography variant="body2" weight="medium">
                   {item.category}
                 </Typography>
-                <View
-                  style={{ flexDirection: "row", alignItems: "center", gap: 8 }}
-                >
+                <View style={styles.volumeStats}>
                   <Typography variant="caption" color="textMuted">
                     {item.sets} {t.sets[lang]}
                   </Typography>
                   <Typography
                     variant="caption"
-                    weight="medium"
+                    weight="semibold"
                     style={{ color: colors.primary[500] }}
                   >
-                    {item.percentage.toFixed(1)}%
+                    {item.percentage.toFixed(0)}%
                   </Typography>
                 </View>
               </View>
-              <View
-                style={{
-                  height: 4,
-                  backgroundColor: colors.gray[200],
-                  borderRadius: 2,
-                  overflow: "hidden",
-                }}
-              >
+              <View style={[styles.progressBar, { backgroundColor: colors.gray[200] }]}>
                 <View
-                  style={{
-                    height: "100%",
-                    width: `${(item.sets / volumeEntries[0].sets) * 100}%`,
-                    backgroundColor: colors.primary[500],
-                    borderRadius: 2,
-                  }}
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${(item.sets / volumeEntries[0].sets) * 100}%`,
+                      backgroundColor: colors.primary[500],
+                    },
+                  ]}
                 />
               </View>
             </View>
@@ -218,18 +208,10 @@ export const SmartVolumeDisplayComponent: React.FC<Props> = ({
         <Pressable
           onPress={() => setIsExpanded(!isExpanded)}
           style={({ pressed }) => [
+            styles.expandButton,
             {
-              marginTop: 12,
-              paddingVertical: 12,
-              paddingHorizontal: 16,
               backgroundColor: pressed ? colors.gray[100] : colors.surface,
-              borderRadius: 8,
-              borderWidth: 1,
               borderColor: colors.border,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
             },
           ]}
         >
@@ -260,6 +242,83 @@ function getCategoryDisplayName(category: string, lang: "es" | "en"): string {
   const key = category as keyof typeof t.muscleCategories;
   return t.muscleCategories[key]?.[lang] || category;
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 24,
+    gap: 8,
+  },
+  emptyText: {
+    marginTop: 4,
+  },
+  skeletonBars: {
+    gap: 12,
+  },
+  skeletonBarRow: {
+    gap: 8,
+  },
+  skeletonLabel: {
+    width: 80,
+    height: 14,
+    borderRadius: 4,
+  },
+  skeletonBar: {
+    height: 6,
+    borderRadius: 3,
+  },
+  volumeItem: {
+    marginBottom: 14,
+  },
+  volumeItemLast: {
+    marginBottom: 0,
+  },
+  volumeItemHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 6,
+  },
+  volumeStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  progressBar: {
+    height: 6,
+    borderRadius: 3,
+    overflow: "hidden",
+  },
+  progressFill: {
+    height: "100%",
+    borderRadius: 3,
+  },
+  expandButton: {
+    marginTop: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+});
 
 export const SmartVolumeDisplay = React.memo(SmartVolumeDisplayComponent);
 export default SmartVolumeDisplay;

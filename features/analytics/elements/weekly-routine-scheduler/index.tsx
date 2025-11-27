@@ -5,9 +5,9 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
-import { Calendar } from "lucide-react-native";
+import { CalendarDays } from "lucide-react-native";
 import React from "react";
-import { View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { DayIndicator } from "./day-indicator";
 
 type Props = {
@@ -49,69 +49,47 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
     return dayMap;
   }, [activeRoutines]);
 
+  const totalActiveDays = Object.values(routinesByDay).filter(
+    (routines) => routines.length > 0
+  ).length;
+
   if (loading) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.weeklyRoutines[lang]}
-        </Typography>
-        <Card variant="outlined" padding="md">
-          <Typography variant="body2" color="textMuted">
-            {t.loading[lang]}
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <Typography variant="h5" weight="semibold">
+            {t.weeklyRoutines[lang]}
           </Typography>
+        </View>
+        <Card variant="outlined" padding="lg">
+          <View style={styles.daysRow}>
+            {WEEK_DAYS.map((day) => (
+              <View key={day.key} style={styles.skeletonDay}>
+                <View style={[styles.skeleton, { backgroundColor: colors.gray[200] }]} />
+              </View>
+            ))}
+          </View>
         </Card>
       </View>
     );
   }
 
-  const totalActiveDays = Object.values(routinesByDay).filter(
-    (routines) => routines.length > 0
-  ).length;
-  const totalRoutines = activeRoutines.length;
-
   return (
-    <View style={{ marginBottom: 20 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 10,
-        }}
-      >
-        <Typography variant="h5" weight="semibold">
-          {t.weeklyRoutines[lang]}
-        </Typography>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
-          <Typography variant="caption" color="textMuted">
-            {totalActiveDays} {t.days[lang]} • {totalRoutines}{" "}
-            {t.routines[lang]}
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <CalendarDays size={20} color={colors.primary[500]} />
+          <Typography variant="h5" weight="semibold">
+            {t.weeklyRoutines[lang]}
           </Typography>
         </View>
+        <Typography variant="caption" color="textMuted">
+          {totalActiveDays} {t.days[lang]}
+        </Typography>
       </View>
 
       <Card variant="outlined" padding="lg">
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            marginBottom: 16,
-          }}
-        >
-          <Calendar size={18} color={colors.primary[500]} />
-          <Typography variant="body2" color="textMuted">
-            {t.scheduledWorkouts[lang]}
-          </Typography>
-        </View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            paddingHorizontal: 4,
-          }}
-        >
+        <View style={styles.daysRow}>
           {WEEK_DAYS.map((day) => (
             <DayIndicator
               key={day.key}
@@ -123,41 +101,9 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
         </View>
 
         {totalActiveDays === 0 && (
-          <View
-            style={{
-              alignItems: "center",
-              paddingVertical: 16,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              marginTop: 16,
-            }}
-          >
-            <Typography variant="body2" color="textMuted" align="center">
-              {t.noScheduledRoutines[lang]}
-            </Typography>
+          <View style={[styles.emptyHint, { borderTopColor: colors.border }]}>
             <Typography variant="caption" color="textMuted" align="center">
               {t.assignTrainingDays[lang]}
-            </Typography>
-          </View>
-        )}
-
-        {totalActiveDays > 0 && (
-          <View
-            style={{
-              marginTop: 16,
-              paddingTop: 16,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-            }}
-          >
-            <Typography variant="caption" color="textMuted">
-              {t.activeDayInfo[lang]}
-            </Typography>
-            <Typography variant="caption" color="textMuted">
-              {t.numberInfo[lang]}
-            </Typography>
-            <Typography variant="caption" color="textMuted">
-              {t.multipleRoutinesInfo[lang]}
             </Typography>
           </View>
         )}
@@ -165,6 +111,41 @@ export const WeeklyRoutineScheduleComponent: React.FC<Props> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  daysRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  skeletonDay: {
+    flex: 1,
+    alignItems: "center",
+  },
+  skeleton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+  },
+  emptyHint: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+  },
+});
 
 export const WeeklyRoutineSchedule = React.memo(WeeklyRoutineScheduleComponent);
 export default WeeklyRoutineSchedule;

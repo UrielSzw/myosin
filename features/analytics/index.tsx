@@ -4,7 +4,8 @@ import { analyticsTranslations } from "@/shared/translations/analytics";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
-import { ScrollView, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { HeroStats } from "./elements/hero-stats";
 import { RecentSessionsList } from "./elements/recent-sessions-list";
 import { SmartPRDisplay } from "./elements/smart-pr-display";
 import { SmartVolumeDisplay } from "./elements/smart-volume-display";
@@ -23,13 +24,15 @@ export const AnalyticsFeature: React.FC = () => {
     console.error("[AnalyticsFeature] Error loading data:", error);
   }
 
-  console.log("[AnalyticsFeature] Data loaded:", JSON.stringify(data, null, 2));
-
   return (
     <ScreenWrapper withGradient fullscreen>
-      <ScrollView style={{ paddingHorizontal: 20, paddingTop: 20 }}>
-        <View style={{ marginBottom: 20 }}>
-          <Typography variant="h2" weight="bold" style={{ marginBottom: 6 }}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <Typography variant="h2" weight="bold">
             {t.analytics[lang]}
           </Typography>
           <Typography variant="body2" color="textMuted">
@@ -37,34 +40,50 @@ export const AnalyticsFeature: React.FC = () => {
           </Typography>
         </View>
 
-        {/* Vista semanal de rutinas programadas */}
+        {/* Hero Stats - 3 big numbers */}
+        <HeroStats data={data} loading={isLoading} />
+
+        {/* Weekly Schedule - Clean calendar view */}
         <WeeklyRoutineSchedule
           activeRoutines={data?.activeRoutines || []}
           loading={isLoading}
         />
 
-        {/* Volumen semanal inteligente */}
+        {/* Weekly Volume - Bar chart style */}
         <SmartVolumeDisplay
           data={data?.weeklyVolume}
           loading={isLoading}
           showTop={4}
         />
 
-        {/* PRs con expansión */}
+        {/* Personal Records */}
         <SmartPRDisplay
           data={data?.topPRs || []}
           loading={isLoading}
           showTop={4}
         />
 
-        {/* Sesiones recientes */}
+        {/* Recent Sessions */}
         <RecentSessionsList
           data={data?.recentSessions || []}
           loading={isLoading}
         />
 
-        <View style={{ height: 120 }} />
+        <View style={styles.bottomSpacer} />
       </ScrollView>
     </ScreenWrapper>
   );
 };
+
+const styles = StyleSheet.create({
+  scrollView: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  header: {
+    marginBottom: 24,
+  },
+  bottomSpacer: {
+    height: 120,
+  },
+});

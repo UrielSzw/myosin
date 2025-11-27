@@ -1,11 +1,12 @@
 import { PRData } from "@/features/analytics/types/pr";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { useRouter } from "expo-router";
-import { Calendar } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { ChevronRight, Trophy } from "lucide-react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 export const PRItem: React.FC<{
   pr: PRData;
@@ -14,135 +15,169 @@ export const PRItem: React.FC<{
   const router = useRouter();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
-
-  const achievedDate = new Date(pr.achieved_at);
-  const isRecent =
-    Date.now() - achievedDate.getTime() < 7 * 24 * 60 * 60 * 1000; // Último 7 días
+  const lang = prefs?.language ?? "es";
 
   const displayWeight = fromKg(pr.best_weight, weightUnit, 1);
   const display1RM = fromKg(pr.estimated_1rm, weightUnit, 1);
+
+  // Calculate time ago (short format)
+  const getTimeAgo = (): string => {
+    const achievedDate = new Date(pr.achieved_at);
+    const now = new Date();
+    const diffMs = now.getTime() - achievedDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) {
+      return lang === "es" ? "Hoy" : "Today";
+    } else if (diffDays === 1) {
+      return lang === "es" ? "Ayer" : "Yesterday";
+    } else if (diffDays < 7) {
+      return lang === "es" ? `${diffDays}d` : `${diffDays}d ago`;
+    } else if (diffDays < 30) {
+      const weeks = Math.floor(diffDays / 7);
+      return lang === "es" ? `${weeks}sem` : `${weeks}w ago`;
+    } else {
+      const months = Math.floor(diffDays / 30);
+      return lang === "es" ? `${months}m` : `${months}mo ago`;
+    }
+  };
 
   const handlePress = () => {
     router.push(`/pr-detail/${pr.exercise_id}` as any);
   };
 
   return (
-    <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
-      <Pressable
-        onPress={handlePress}
-        style={({ pressed }) => [
-          {
-            opacity: pressed ? 0.7 : 1,
-          },
-        ]}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
+    <Pressable onPress={handlePress}>
+      {({ pressed }) => (
+        <Card
+          variant="outlined"
+          padding="md"
+          style={[styles.card, { opacity: pressed ? 0.7 : 1 }]}
         >
-          <View style={{ flex: 1 }}>
+          <View style={styles.content}>
+            {/* Left: Trophy icon */}
             <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 6,
-                marginBottom: 4,
-              }}
+              style={[
+                styles.iconContainer,
+                { backgroundColor: colors.primary[100] },
+              ]}
             >
-              {isRecent && (
-                <View
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: colors.success[500],
-                  }}
-                />
-              )}
+              <Trophy size={18} color={colors.primary[600]} />
+            </View>
+
+            {/* Middle: Info */}
+            <View style={styles.info}>
               <Typography
                 variant="body1"
                 weight="semibold"
                 numberOfLines={1}
-                style={{ flex: 1 }}
+                style={styles.title}
               >
-                {pr.exercise_name ||
-                  `Ejercicio ${pr.exercise_id.slice(0, 8)}...`}
+                {pr.exercise_name || `Ejercicio ${pr.exercise_id.slice(0, 8)}...`}
               </Typography>
+              <View style={styles.metaRow}>
+                <Typography variant="caption" color="textMuted" numberOfLines={1}>
+                  {displayWeight}{weightUnit} × {pr.best_reps}
+                </Typography>
+                <View style={[styles.dot, { backgroundColor: colors.gray[300] }]} />
+                <Typography variant="caption" color="textMuted" numberOfLines={1} style={styles.timeAgo}>
+                  {getTimeAgo()}
+                </Typography>
+              </View>
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 2,
-              }}
-            >
-              <Typography variant="body2" color="textMuted">
-                {displayWeight}
-                {weightUnit} × {pr.best_reps} reps
-              </Typography>
-              <Typography variant="caption" color="textMuted">
-                •
-              </Typography>
-              <Typography variant="caption" color="textMuted">
-                1RM: {display1RM}
-                {weightUnit}
-              </Typography>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <Calendar size={12} color={colors.textMuted} />
-              <Typography variant="caption" color="textMuted">
-                {achievedDate.toLocaleDateString()}
-              </Typography>
-              {pr.source === "manual" && (
-                <>
-                  <Typography variant="caption" color="textMuted">
-                    •
-                  </Typography>
-                  <Typography variant="caption" color="textMuted">
-                    Manual
-                  </Typography>
-                </>
-              )}
+            {/* Right: 1RM badge + chevron */}
+            <View style={styles.rightSection}>
+              <View
+                style={[
+                  styles.rmBadge,
+                  { backgroundColor: colors.primary[500] },
+                ]}
+              >
+                <Typography
+                  variant="caption"
+                  weight="bold"
+                  style={styles.rmText}
+                >
+                  {Math.round(display1RM)}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  weight="medium"
+                  style={styles.rmUnit}
+                >
+                  {weightUnit}
+                </Typography>
+              </View>
+              <ChevronRight size={16} color={colors.textMuted} />
             </View>
           </View>
-
-          <View style={{ alignItems: "flex-end" }}>
-            <View
-              style={{
-                backgroundColor: colors.warning[100],
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 12,
-                marginBottom: 4,
-              }}
-            >
-              <Typography variant="caption" weight="medium" color="warning">
-                PR
-              </Typography>
-            </View>
-            <Typography
-              variant="h6"
-              weight="bold"
-              style={{ color: colors.primary[500] }}
-            >
-              {Math.round(display1RM)}
-              {weightUnit}
-            </Typography>
-          </View>
-        </View>
-      </Pressable>
-    </Card>
+        </Card>
+      )}
+    </Pressable>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    marginBottom: 10,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  info: {
+    flex: 1,
+    marginRight: 16,
+  },
+  title: {
+    marginBottom: 2,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexWrap: "nowrap",
+  },
+  dot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    flexShrink: 0,
+  },
+  timeAgo: {
+    flexShrink: 1,
+  },
+  rightSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    flexShrink: 0,
+  },
+  rmBadge: {
+    flexDirection: "row",
+    alignItems: "baseline",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 8,
+    gap: 1,
+    minWidth: 55,
+    justifyContent: "center",
+  },
+  rmText: {
+    color: "#ffffff",
+    fontSize: 14,
+  },
+  rmUnit: {
+    color: "rgba(255,255,255,0.8)",
+    fontSize: 10,
+  },
+});

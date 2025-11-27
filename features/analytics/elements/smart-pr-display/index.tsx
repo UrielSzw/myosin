@@ -11,7 +11,7 @@ import {
   Trophy,
 } from "lucide-react-native";
 import React, { useState } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { PRData } from "../../types/pr";
 import { PRItem } from "./pr-item";
 
@@ -39,14 +39,20 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
 
   if (loading) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.personalRecords[lang]}
-        </Typography>
-        <Card variant="outlined" padding="md">
-          <Typography variant="body2" color="textMuted">
-            {t.loading[lang]}
-          </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <Trophy size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.personalRecords[lang]}
+            </Typography>
+          </View>
+        </View>
+        <Card variant="outlined" padding="lg">
+          <View style={styles.skeletonRow}>
+            <View style={[styles.skeleton, { backgroundColor: colors.gray[200] }]} />
+            <View style={[styles.skeletonText, { backgroundColor: colors.gray[200] }]} />
+          </View>
         </Card>
       </View>
     );
@@ -64,18 +70,24 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
 
   if (sortedPRs.length === 0) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.personalRecords[lang]}
-        </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <Trophy size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.personalRecords[lang]}
+            </Typography>
+          </View>
+        </View>
         <Card variant="outlined" padding="lg">
-          <View style={{ alignItems: "center", paddingVertical: 20 }}>
-            <Trophy
-              size={32}
-              color={colors.gray[400]}
-              style={{ marginBottom: 8 }}
-            />
-            <Typography variant="body1" color="textMuted" align="center">
+          <View style={styles.emptyState}>
+            <Trophy size={32} color={colors.gray[400]} />
+            <Typography
+              variant="body2"
+              color="textMuted"
+              align="center"
+              style={styles.emptyText}
+            >
               {t.noPRsYet[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
@@ -88,20 +100,16 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
   }
 
   return (
-    <View style={{ marginBottom: 20 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <Typography variant="h5" weight="semibold">
-          {t.personalRecords[lang]}
-        </Typography>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <Trophy size={20} color={colors.primary[500]} />
+          <Typography variant="h5" weight="semibold">
+            {t.personalRecords[lang]}
+          </Typography>
+        </View>
         <Pressable
-          style={{ flexDirection: "row", alignItems: "center", gap: 4 }}
+          style={styles.seeAllButton}
           onPress={handleSeeAllPress}
         >
           <Typography variant="caption" color="textMuted">
@@ -115,52 +123,15 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
         <PRItem key={pr.id} pr={pr} colors={colors} />
       ))}
 
-      {/* Estadística rápida */}
-      {!isExpanded && sortedPRs.length > 0 && (
-        <View
-          style={{
-            marginBottom: 12,
-            paddingHorizontal: 4,
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="caption" color="textMuted">
-            {t.best1RM[lang]}{" "}
-            {Math.max(...sortedPRs.map((pr) => pr.estimated_1rm)).toFixed(0)}kg
-          </Typography>
-          <Typography variant="caption" color="textMuted">
-            {t.thisWeek[lang]}{" "}
-            {
-              sortedPRs.filter(
-                (pr) =>
-                  Date.now() - new Date(pr.achieved_at).getTime() <
-                  7 * 24 * 60 * 60 * 1000
-              ).length
-            }{" "}
-            {t.newPRs[lang]}
-          </Typography>
-        </View>
-      )}
-
       {/* Botón de expandir/contraer */}
       {hasMoreThanMax && (
         <Pressable
           onPress={() => setIsExpanded(!isExpanded)}
           style={({ pressed }) => [
+            styles.expandButton,
             {
-              marginTop: 12,
-              paddingVertical: 12,
-              paddingHorizontal: 16,
               backgroundColor: pressed ? colors.gray[100] : colors.surface,
-              borderRadius: 8,
-              borderWidth: 1,
               borderColor: colors.border,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
             },
           ]}
         >
@@ -184,6 +155,62 @@ export const SmartPRDisplayComponent: React.FC<Props> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  seeAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 24,
+    gap: 8,
+  },
+  emptyText: {
+    marginTop: 4,
+  },
+  skeletonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  skeleton: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+  },
+  skeletonText: {
+    flex: 1,
+    height: 16,
+    borderRadius: 4,
+  },
+  expandButton: {
+    marginTop: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    borderWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+});
 
 export const SmartPRDisplay = React.memo(SmartPRDisplayComponent);
 export default SmartPRDisplay;

@@ -4,9 +4,9 @@ import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
-import { ChevronRight, Clock } from "lucide-react-native";
+import { ChevronRight, Clock, History } from "lucide-react-native";
 import React from "react";
-import { Pressable, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { SessionData } from "../../types/session";
 import { SessionItem } from "./session-item";
 
@@ -31,14 +31,20 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
 
   if (loading) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.recentSessions[lang]}
-        </Typography>
-        <Card variant="outlined" padding="md">
-          <Typography variant="body2" color="textMuted">
-            {t.loading[lang]}
-          </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <History size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.recentSessions[lang]}
+            </Typography>
+          </View>
+        </View>
+        <Card variant="outlined" padding="lg">
+          <View style={styles.skeletonRow}>
+            <View style={[styles.skeleton, { backgroundColor: colors.gray[200] }]} />
+            <View style={[styles.skeletonText, { backgroundColor: colors.gray[200] }]} />
+          </View>
         </Card>
       </View>
     );
@@ -46,18 +52,24 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
 
   if (data.length === 0) {
     return (
-      <View style={{ marginBottom: 20 }}>
-        <Typography variant="h5" weight="semibold" style={{ marginBottom: 10 }}>
-          {t.recentSessions[lang]}
-        </Typography>
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.titleRow}>
+            <History size={20} color={colors.primary[500]} />
+            <Typography variant="h5" weight="semibold">
+              {t.recentSessions[lang]}
+            </Typography>
+          </View>
+        </View>
         <Card variant="outlined" padding="lg">
-          <View style={{ alignItems: "center", paddingVertical: 20 }}>
-            <Clock
-              size={32}
-              color={colors.gray[400]}
-              style={{ marginBottom: 8 }}
-            />
-            <Typography variant="body1" color="textMuted" align="center">
+          <View style={styles.emptyState}>
+            <Clock size={32} color={colors.gray[400]} />
+            <Typography
+              variant="body2"
+              color="textMuted"
+              align="center"
+              style={styles.emptyText}
+            >
               {t.noRecentSessions[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted" align="center">
@@ -69,43 +81,21 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
     );
   }
 
-  // Calcular estadísticas rápidas
-  const avgCompletion = Math.round(
-    (data.reduce(
-      (sum, session) =>
-        sum + session.total_sets_completed / session.total_sets_planned,
-      0
-    ) /
-      data.length) *
-      100
-  );
-
-  const totalSetsCompleted = data.reduce(
-    (sum, session) => sum + session.total_sets_completed,
-    0
-  );
-
   return (
-    <View style={{ marginBottom: 20 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 16,
-        }}
-      >
-        <Typography variant="h5" weight="semibold">
-          {t.recentSessions[lang]}
-        </Typography>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          <History size={20} color={colors.primary[500]} />
+          <Typography variant="h5" weight="semibold">
+            {t.recentSessions[lang]}
+          </Typography>
+        </View>
         <Pressable
           onPress={handleHeaderPress}
-          style={({ pressed }) => ({
-            opacity: pressed ? 0.6 : 1,
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 4,
-          })}
+          style={({ pressed }) => [
+            styles.seeAllButton,
+            { opacity: pressed ? 0.6 : 1 },
+          ]}
         >
           <Typography variant="caption" color="textMuted">
             {data.length} {t.sessions[lang]}
@@ -117,27 +107,54 @@ export const RecentSessionsListComponent: React.FC<Props> = ({
       {data.map((session) => (
         <SessionItem key={session.id} session={session} colors={colors} />
       ))}
-
-      {/* Estadísticas rápidas */}
-      <View
-        style={{
-          marginBottom: 12,
-          paddingHorizontal: 4,
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <Typography variant="caption" color="textMuted">
-          {t.average[lang]} {avgCompletion}% {t.completed[lang]}
-        </Typography>
-        <Typography variant="caption" color="textMuted">
-          {t.totalSets[lang]} {totalSetsCompleted} {t.sets[lang]}
-        </Typography>
-      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  seeAllButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  emptyState: {
+    alignItems: "center",
+    paddingVertical: 24,
+    gap: 8,
+  },
+  emptyText: {
+    marginTop: 4,
+  },
+  skeletonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  skeleton: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+  },
+  skeletonText: {
+    flex: 1,
+    height: 16,
+    borderRadius: 4,
+  },
+});
 
 export const RecentSessionsList = React.memo(RecentSessionsListComponent);
 export default RecentSessionsList;

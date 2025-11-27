@@ -1,9 +1,11 @@
 import { SessionData } from "@/features/analytics/types/session";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
-import { Calendar, Clock, Target } from "lucide-react-native";
-import { Pressable, View } from "react-native";
+import { ChevronRight, Clock, Dumbbell } from "lucide-react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 const formatDuration = (seconds: number): string => {
   const hours = Math.floor(seconds / 3600);
@@ -15,22 +17,26 @@ const formatDuration = (seconds: number): string => {
   return `${minutes}m`;
 };
 
-const getTimeAgo = (dateString: string): string => {
+const getTimeAgo = (dateString: string, lang: string = "es"): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
+  const t = (key: keyof typeof analyticsTranslations) =>
+    (analyticsTranslations[key] as Record<string, string>)[lang] ??
+    (analyticsTranslations[key] as Record<string, string>)["en"];
+
   if (diffDays === 0) {
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     if (diffHours === 0) {
-      return "Hace unos minutos";
+      return t("timeAgoMinutes");
     }
-    return `Hace ${diffHours}h`;
+    return t("timeAgoHours").replace("{hours}", String(diffHours));
   } else if (diffDays === 1) {
-    return "Ayer";
+    return t("timeAgoYesterday");
   } else if (diffDays < 7) {
-    return `Hace ${diffDays} días`;
+    return t("timeAgoDays").replace("{days}", String(diffDays));
   } else {
     return date.toLocaleDateString();
   }
@@ -41,133 +47,144 @@ export const SessionItem: React.FC<{
   colors: any;
 }> = ({ session, colors }) => {
   const router = useRouter();
+  const prefs = useUserPreferences();
+  const lang = prefs?.language ?? "es";
   const completionRate = Math.round(
     (session.total_sets_completed / session.total_sets_planned) * 100
   );
   const isCompleted = completionRate === 100;
-  const timeAgo = getTimeAgo(session.started_at);
+  const timeAgo = getTimeAgo(session.started_at, lang);
 
   const handleSessionPress = () => {
     router.push(`/workout-session/${session.id}` as any);
   };
 
   return (
-    <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
-      <Pressable
-        onPress={handleSessionPress}
-        style={({ pressed }) => [
-          {
-            opacity: pressed ? 0.7 : 1,
-          },
-        ]}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-          }}
+    <Pressable onPress={handleSessionPress}>
+      {({ pressed }) => (
+        <Card
+          variant="outlined"
+          padding="md"
+          style={[styles.card, { opacity: pressed ? 0.7 : 1 }]}
         >
-          <View style={{ flex: 1 }}>
+          <View style={styles.content}>
+            {/* Left: Dumbbell icon with completion indicator */}
             <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-                marginBottom: 4,
-              }}
+              style={[
+                styles.iconContainer,
+                {
+                  backgroundColor: isCompleted
+                    ? colors.success[100]
+                    : colors.gray[100],
+                },
+              ]}
             >
+              <Dumbbell
+                size={18}
+                color={isCompleted ? colors.success[600] : colors.gray[500]}
+              />
+            </View>
+
+            {/* Middle: Info */}
+            <View style={styles.info}>
               <Typography
                 variant="body1"
                 weight="semibold"
                 numberOfLines={1}
-                style={{ flex: 1 }}
+                style={styles.title}
               >
                 {session.routine_name}
               </Typography>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-                marginBottom: 6,
-              }}
-            >
-              <Calendar size={12} color={colors.textMuted} />
-              <Typography variant="caption" color="textMuted">
-                {timeAgo}
-              </Typography>
-            </View>
-
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-              }}
-            >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                }}
-              >
-                <Clock size={12} color={colors.textMuted} />
+              <View style={styles.metaRow}>
+                <Typography variant="caption" color="textMuted">
+                  {timeAgo}
+                </Typography>
+                <View style={[styles.dot, { backgroundColor: colors.textMuted }]} />
+                <Clock size={10} color={colors.textMuted} />
                 <Typography variant="caption" color="textMuted">
                   {formatDuration(session.total_duration_seconds)}
                 </Typography>
               </View>
+            </View>
 
+            {/* Right: Completion + chevron */}
+            <View style={styles.rightSection}>
               <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 4,
-                }}
+                style={[
+                  styles.badge,
+                  {
+                    backgroundColor: isCompleted
+                      ? colors.success[100]
+                      : completionRate >= 80
+                      ? colors.warning[100]
+                      : colors.gray[100],
+                  },
+                ]}
               >
-                <Target size={12} color={colors.textMuted} />
-                <Typography variant="caption" color="textMuted">
-                  {session.total_sets_completed}/{session.total_sets_planned}{" "}
-                  sets
+                <Typography
+                  variant="caption"
+                  weight="semibold"
+                  style={{
+                    color: isCompleted
+                      ? colors.success[700]
+                      : completionRate >= 80
+                      ? colors.warning[700]
+                      : colors.gray[600],
+                  }}
+                >
+                  {completionRate}%
                 </Typography>
               </View>
+              <ChevronRight size={16} color={colors.textMuted} />
             </View>
           </View>
-
-          <View style={{ alignItems: "flex-end", marginLeft: 12 }}>
-            <View
-              style={{
-                backgroundColor: isCompleted
-                  ? colors.success[100]
-                  : completionRate >= 80
-                  ? colors.warning[100]
-                  : colors.gray[100],
-                paddingHorizontal: 8,
-                paddingVertical: 4,
-                borderRadius: 12,
-                marginBottom: 4,
-              }}
-            >
-              <Typography
-                variant="caption"
-                weight="medium"
-                style={{
-                  color: isCompleted
-                    ? colors.success[700]
-                    : completionRate >= 80
-                    ? colors.warning[700]
-                    : colors.gray[700],
-                }}
-              >
-                {completionRate}%
-              </Typography>
-            </View>
-          </View>
-        </View>
-      </Pressable>
-    </Card>
+        </Card>
+      )}
+    </Pressable>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    marginBottom: 10,
+  },
+  content: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  iconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 12,
+  },
+  info: {
+    flex: 1,
+  },
+  title: {
+    marginBottom: 2,
+  },
+  metaRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  dot: {
+    width: 2,
+    height: 2,
+    borderRadius: 1,
+  },
+  rightSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginLeft: 8,
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+});

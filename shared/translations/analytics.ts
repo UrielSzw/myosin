@@ -163,6 +163,38 @@ export const analyticsTranslations = {
     en: "Loading...",
   },
 
+  // Hero Stats
+  heroThisWeek: {
+    es: "Esta semana",
+    en: "This week",
+  },
+  heroPrsMonth: {
+    es: "PRs del mes",
+    en: "PRs this month",
+  },
+  heroWeekStreak: {
+    es: "Racha semanal",
+    en: "Week streak",
+  },
+
+  // Time ago (for session items)
+  timeAgoMinutes: {
+    es: "Hace unos minutos",
+    en: "A few minutes ago",
+  },
+  timeAgoHours: {
+    es: "Hace {hours}h",
+    en: "{hours}h ago",
+  },
+  timeAgoYesterday: {
+    es: "Ayer",
+    en: "Yesterday",
+  },
+  timeAgoDays: {
+    es: "Hace {days} días",
+    en: "{days} days ago",
+  },
+
   // Muscle categories (for volume display)
   muscleCategories: {
     chest: {

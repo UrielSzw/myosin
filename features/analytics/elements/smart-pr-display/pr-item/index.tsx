@@ -1,6 +1,5 @@
 import { PRData } from "@/features/analytics/types/pr";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
-import { analyticsTranslations } from "@/shared/translations/analytics";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";

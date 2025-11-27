@@ -5,10 +5,10 @@ import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { useRouter } from "expo-router";
 import {
-  ChevronDown,
-  ChevronRight,
-  ChevronUp,
-  Trophy,
+    ChevronDown,
+    ChevronRight,
+    ChevronUp,
+    Trophy,
 } from "lucide-react-native";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";

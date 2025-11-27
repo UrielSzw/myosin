@@ -151,4 +151,21 @@ export const activeWorkoutTranslations = {
     es: "Sí, crear rutina",
     en: "Yes, create routine",
   },
+  // Empty Workout State
+  emptyWorkoutTitle: {
+    es: "¡Hora de entrenar!",
+    en: "Time to train!",
+  },
+  emptyWorkoutSubtitle: {
+    es: "Agrega tu primer ejercicio y comienza a registrar tu progreso",
+    en: "Add your first exercise and start tracking your progress",
+  },
+  emptyWorkoutCTA: {
+    es: "Agregar primer ejercicio",
+    en: "Add first exercise",
+  },
+  emptyWorkoutHint: {
+    es: "Puedes agregar más ejercicios en cualquier momento",
+    en: "You can add more exercises at any time",
+  },
 };

@@ -134,4 +134,21 @@ export const activeWorkoutTranslations = {
     es: "Error al guardar la sesión. Intenta nuevamente.",
     en: "Error saving session. Please try again.",
   },
+  // Quick Workout translations
+  saveAsRoutineTitle: {
+    es: "Guardar como rutina",
+    en: "Save as routine",
+  },
+  saveAsRoutineMessage: {
+    es: "¿Deseas guardar este entrenamiento como una nueva rutina reutilizable?",
+    en: "Do you want to save this workout as a new reusable routine?",
+  },
+  noJustSave: {
+    es: "No, solo guardar",
+    en: "No, just save",
+  },
+  yesCreateRoutine: {
+    es: "Sí, crear rutina",
+    en: "Yes, create routine",
+  },
 };

@@ -67,6 +67,7 @@ CREATE TABLE routines (
     show_rpe BOOLEAN DEFAULT true NOT NULL,
     show_tempo BOOLEAN DEFAULT true NOT NULL,
     deleted_at TIMESTAMPTZ,  -- Soft delete: NULL = active, timestamp = deleted
+    is_quick_workout BOOLEAN NOT NULL DEFAULT false,  -- Quick workout: hidden routines
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

@@ -1,12 +1,16 @@
+import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
-import { PenTool, Plus, X, Zap } from "lucide-react-native";
-import React, { useRef } from "react";
+import { Dumbbell, PenTool, Plus, X, Zap } from "lucide-react-native";
+import React, { useRef, useState } from "react";
 import {
+  Alert,
   Animated,
   Modal,
   Pressable,
@@ -27,6 +31,10 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
   const lang = prefs?.language ?? "es";
   const t = workoutsTranslations;
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isLoadingQuickWorkout, setIsLoadingQuickWorkout] = useState(false);
+  const { initializeQuickWorkout } = useActiveMainActions();
+  const { sync } = useSyncEngine();
+  const { user } = useAuth();
 
   // Animaciones
   const scaleAnim = useRef(new Animated.Value(0)).current;
@@ -84,6 +92,32 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
     router.push("/routines/templates");
   };
 
+  const handleQuickWorkout = async () => {
+    collapseMenu();
+    setIsLoadingQuickWorkout(true);
+    try {
+      // Crear rutina local y obtener datos para sync
+      const routineData = await initializeQuickWorkout();
+
+      // Sync rutina a Supabase en background (no bloqueamos UI)
+      if (user?.id) {
+        sync("ROUTINE_CREATE_QUICK_WORKOUT", {
+          ...routineData,
+          created_by_user_id: user.id, // Usar el user ID real
+        }).catch((err) => {
+          console.warn("Failed to sync quick workout routine:", err);
+        });
+      }
+
+      router.push("/workout/active");
+    } catch (error) {
+      console.error("Error starting quick workout:", error);
+      Alert.alert(t.errorTitle[lang], t.errorStartingQuickWorkout[lang]);
+    } finally {
+      setIsLoadingQuickWorkout(false);
+    }
+  };
+
   const handleBackdropPress = () => {
     if (isExpanded) {
       collapseMenu();
@@ -104,6 +138,11 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
   const option2TranslateY = scaleAnim.interpolate({
     inputRange: [0, 1],
     outputRange: [0, 130], // Se mueve más hacia ABAJO
+  });
+
+  const option3TranslateY = scaleAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 200], // Se mueve aún más hacia ABAJO
   });
 
   return (
@@ -193,6 +232,43 @@ export const ExpandableCreateButton: React.FC<ExpandableCreateButtonProps> = ({
                 ]}
               >
                 <Zap size={20} color="#ffffff" />
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+
+          {/* Opción 3: Quick Workout - Tercera opción */}
+          <Animated.View
+            style={[
+              styles.optionContainer,
+              {
+                transform: [{ translateY: option3TranslateY }],
+                opacity: opacityAnim,
+              },
+            ]}
+          >
+            <TouchableOpacity
+              style={styles.fullOptionButton}
+              onPress={handleQuickWorkout}
+              activeOpacity={0.8}
+              disabled={isLoadingQuickWorkout}
+            >
+              <View
+                style={[
+                  styles.labelContainer,
+                  { backgroundColor: colors.surface },
+                ]}
+              >
+                <Typography variant="body2" weight="medium">
+                  {t.quickWorkout[lang]}
+                </Typography>
+              </View>
+              <View
+                style={[
+                  styles.optionButton,
+                  { backgroundColor: colors.success[500] },
+                ]}
+              >
+                <Dumbbell size={20} color="#ffffff" />
               </View>
             </TouchableOpacity>
           </Animated.View>

@@ -24,6 +24,22 @@ export const supabaseSyncDictionary: Record<MutationCode, Function> = {
     routinesRepo.deleteRoutineById(payload.id),
   ROUTINE_CLEAR_TRAINING_DAYS: (payload: { routineId: string }) =>
     routinesRepo.clearRoutineTrainingDays(payload.routineId),
+  ROUTINE_CREATE_QUICK_WORKOUT: (payload: {
+    id: string;
+    name: string;
+    created_by_user_id: string;
+    is_quick_workout: boolean;
+    show_rpe?: boolean;
+    show_tempo?: boolean;
+  }) => routinesRepo.createQuickWorkoutRoutine(payload),
+  ROUTINE_CONVERT_FROM_QUICK: (payload: {
+    routineId: string;
+    newName?: string;
+  }) =>
+    routinesRepo.convertQuickWorkoutToRoutine(
+      payload.routineId,
+      payload.newName
+    ),
 
   // Folders
   FOLDER_CREATE: (payload: any) => foldersRepo.create(payload),

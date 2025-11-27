@@ -218,4 +218,12 @@ export const workoutsTranslations = {
     es: "Usar template",
     en: "Use template",
   },
+  quickWorkout: {
+    es: "Entrenamiento rápido",
+    en: "Quick workout",
+  },
+  errorStartingQuickWorkout: {
+    es: "No se pudo iniciar el entrenamiento rápido",
+    en: "Could not start quick workout",
+  },
 };

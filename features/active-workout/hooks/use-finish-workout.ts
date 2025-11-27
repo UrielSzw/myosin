@@ -1,10 +1,12 @@
 import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
+import { routinesRepository } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import {
   finishWorkout,
   prepareFinishData,
 } from "@/shared/services/finish-workout";
+import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -26,6 +28,7 @@ export const useFinishWorkout = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
+  const { sync } = useSyncEngine();
 
   /**
    * Executes the complete finish workout flow:
@@ -80,26 +83,38 @@ export const useFinishWorkout = () => {
 
   const handleValidateWorkout = async (): Promise<void> => {
     const hasChanges = detectWorkoutChanges();
+    const isQuickWorkout = activeWorkout?.session?.routine?.is_quick_workout;
 
-    if (!hasChanges) {
-      // No changes - just save the workout session
-      await executeFinishWorkout(false);
-    } else {
-      // Has changes - ask user if they want to update routine
+    // CASO 1: Quick Workout - preguntar si guardar como rutina
+    if (isQuickWorkout) {
       return new Promise((resolve) => {
-        Alert.alert(t.updateRoutineTitle[lang], t.updateRoutineMessage[lang], [
+        Alert.alert(t.saveAsRoutineTitle[lang], t.saveAsRoutineMessage[lang], [
           {
-            text: t.no[lang],
+            text: t.noJustSave[lang],
             style: "cancel",
             onPress: async () => {
-              await executeFinishWorkout(false);
+              // Guardar workout, rutina queda oculta (is_quick_workout=true)
+              // shouldUpdateRoutine=true porque el workout ES la rutina ahora
+              await executeFinishWorkout(true);
               resolve();
             },
           },
           {
-            text: t.yesSave[lang],
-            style: "destructive",
+            text: t.yesCreateRoutine[lang],
             onPress: async () => {
+              // Convertir a rutina normal (is_quick_workout=false)
+              if (activeWorkout?.session?.routine_id) {
+                const routineId = activeWorkout.session.routine_id;
+                await routinesRepository.convertQuickWorkoutToRoutine(
+                  routineId
+                );
+                // Sync conversión a Supabase en background
+                sync("ROUTINE_CONVERT_FROM_QUICK", { routineId }).catch(
+                  (err: unknown) => {
+                    console.warn("Failed to sync convert quick workout:", err);
+                  }
+                );
+              }
               await executeFinishWorkout(true);
               resolve();
             },
@@ -107,6 +122,34 @@ export const useFinishWorkout = () => {
         ]);
       });
     }
+
+    // CASO 2: Rutina normal sin cambios
+    if (!hasChanges) {
+      await executeFinishWorkout(false);
+      return;
+    }
+
+    // CASO 3: Rutina normal con cambios - preguntar si actualizar
+    return new Promise((resolve) => {
+      Alert.alert(t.updateRoutineTitle[lang], t.updateRoutineMessage[lang], [
+        {
+          text: t.no[lang],
+          style: "cancel",
+          onPress: async () => {
+            await executeFinishWorkout(false);
+            resolve();
+          },
+        },
+        {
+          text: t.yesSave[lang],
+          style: "destructive",
+          onPress: async () => {
+            await executeFinishWorkout(true);
+            resolve();
+          },
+        },
+      ]);
+    });
   };
 
   const handleFinishWorkout = (): Promise<void> => {

@@ -135,6 +135,14 @@ type Store = {
 
   mainActions: {
     initializeWorkout: (routineId: string) => Promise<void>;
+    initializeQuickWorkout: () => Promise<{
+      id: string;
+      name: string;
+      created_by_user_id: string;
+      is_quick_workout: boolean;
+      show_rpe: boolean;
+      show_tempo: boolean;
+    }>;
     clearWorkout: () => void;
     setExerciseModalMode: (
       mode: "add-new" | "replace" | "add-to-block" | null
@@ -700,6 +708,87 @@ const useActiveWorkoutStore = create<Store>()(
         set((state) => {
           state.activeWorkout.sessionBestPRs = {};
         });
+      },
+
+      initializeQuickWorkout: async () => {
+        try {
+          // 1. Obtener preferencias del usuario para show_rpe y show_tempo
+          const prefs = useUserPreferencesStore.getState().prefs;
+
+          // 2. Crear rutina temporal vacía con is_quick_workout=true
+          const quickRoutine =
+            await routinesRepository.createQuickWorkoutRoutine("default-user", {
+              show_rpe: prefs?.show_rpe ?? false,
+              show_tempo: prefs?.show_tempo ?? false,
+            });
+
+          set((state) => {
+            // 2. Crear sesión de workout VACÍA
+            const sessionTempId = generateTempId();
+            const session: ActiveWorkoutSession = {
+              tempId: sessionTempId,
+              user_id: "default-user",
+              id: sessionTempId,
+              routine_id: quickRoutine.id,
+              routine: quickRoutine, // Snapshot
+              started_at: new Date().toISOString(),
+              finished_at: new Date().toISOString(),
+              total_duration_seconds: 0,
+              total_sets_planned: 0,
+              total_sets_completed: 0,
+              total_volume_kg: null,
+              average_rpe: null,
+              original_sets_count: 0,
+              hasBeenPerformed: false,
+            };
+
+            // 3. Inicializar estado VACÍO (sin bloques/ejercicios/sets)
+            state.activeWorkout = {
+              session,
+              blocks: {},
+              exercises: {},
+              sets: {},
+              blocksBySession: [],
+              exercisesByBlock: {},
+              setsByExercise: {},
+              exercisePreviousSets: {},
+              sessionBestPRs: {},
+            };
+
+            state.stats = {
+              totalSetsPlanned: 0,
+              totalSetsCompleted: 0,
+            };
+
+            state.currentState = {
+              currentBlockId: null,
+              currentExerciseInBlockId: null,
+              currentSetId: null,
+              currentRestTime: null,
+              currentRestTimeType: null,
+              currentSetType: null,
+              exerciseModalMode: null,
+              currentExercisesCount: null,
+              currentExerciseName: null,
+              isCurrentBlockMulti: false,
+            };
+
+            state.restTimer = null;
+          });
+
+          // 4. Retornar datos de la rutina para sync
+          return {
+            id: quickRoutine.id,
+            name: quickRoutine.name,
+            created_by_user_id: quickRoutine.created_by_user_id,
+            is_quick_workout: quickRoutine.is_quick_workout ?? true,
+            show_rpe: quickRoutine.show_rpe,
+            show_tempo: quickRoutine.show_tempo,
+          };
+        } catch (error) {
+          console.error("Error initializing quick workout:", error);
+          throw error;
+        }
       },
     },
 

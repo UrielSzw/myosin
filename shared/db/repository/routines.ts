@@ -14,6 +14,7 @@ import type {
   RoutineInsert,
   SetInsert,
 } from "../schema/routine";
+import { generateUUID } from "../utils/uuid";
 
 export type RoutineWithMetrics = BaseRoutine & {
   blocksCount: number;
@@ -52,6 +53,8 @@ export const routinesRepository = {
         and(
           // Solo rutinas NO eliminadas (soft delete)
           isNull(routines.deleted_at),
+          // Solo rutinas normales (no quick workouts)
+          eq(routines.is_quick_workout, false),
           folderId
             ? eq(routines.folder_id, folderId)
             : isNull(routines.folder_id)
@@ -276,10 +279,61 @@ export const routinesRepository = {
     const result = await db
       .select({ count: sql<number>`COUNT(*)` })
       .from(routines)
-      .where(isNull(routines.deleted_at)) // Solo rutinas NO eliminadas
+      .where(
+        and(
+          isNull(routines.deleted_at), // Solo rutinas NO eliminadas
+          eq(routines.is_quick_workout, false) // Solo rutinas normales
+        )
+      )
       .limit(1);
 
     return result[0].count;
+  },
+
+  /**
+   * Crea una rutina temporal para Quick Workout.
+   * Esta rutina tiene is_quick_workout=true y no aparece en la lista de rutinas.
+   * @param userId - ID del usuario
+   * @param options - Configuración opcional (show_rpe, show_tempo)
+   */
+  createQuickWorkoutRoutine: async (
+    userId: string,
+    options?: { show_rpe?: boolean; show_tempo?: boolean }
+  ): Promise<BaseRoutine> => {
+    const quickRoutine: RoutineInsert = {
+      id: generateUUID(),
+      name: "Quick Workout",
+      folder_id: null,
+      created_by_user_id: userId,
+      show_rpe: options?.show_rpe ?? false,
+      show_tempo: options?.show_tempo ?? false,
+      training_days: null,
+      is_quick_workout: true,
+    };
+
+    const [created] = await db
+      .insert(routines)
+      .values(quickRoutine)
+      .returning();
+
+    return created;
+  },
+
+  /**
+   * Convierte un Quick Workout en una rutina normal visible.
+   * Cambia is_quick_workout de true a false.
+   */
+  convertQuickWorkoutToRoutine: async (
+    routineId: string,
+    newName?: string
+  ): Promise<void> => {
+    await db
+      .update(routines)
+      .set({
+        is_quick_workout: false,
+        ...(newName && { name: newName }),
+      })
+      .where(eq(routines.id, routineId));
   },
 
   clearRoutineTrainingDays: async (routineId: string): Promise<void> => {

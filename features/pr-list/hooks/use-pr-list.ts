@@ -4,10 +4,12 @@ import { MUSCLE_CATEGORY_MAP, PRListItem, PRListStats } from "../types/pr-list";
 
 export const PR_LIST_QUERY_KEY = ["prList"];
 
-export const usePRList = (userId: string = "default-user") => {
+export const usePRList = (userId?: string) => {
   const query = useQuery<PRListItem[]>({
     queryKey: [...PR_LIST_QUERY_KEY, userId],
     queryFn: async () => {
+      if (!userId) return [];
+
       const rawPRs = await prRepository.getAllCurrentPRsWithExerciseInfo(
         userId
       );
@@ -36,6 +38,7 @@ export const usePRList = (userId: string = "default-user") => {
 
       return transformedPRs;
     },
+    enabled: !!userId,
     staleTime: 1000 * 60 * 2, // 2 minutos - PRs no cambian tan frecuentemente
     gcTime: 1000 * 60 * 5, // 5 minutos en cache
     refetchOnWindowFocus: false,

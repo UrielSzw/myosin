@@ -52,13 +52,13 @@ export type PRDetailData = {
 
 export const PR_DETAIL_QUERY_KEY = ["prDetail"];
 
-export const usePRDetail = (
-  exerciseId: string,
-  userId: string = "default-user"
-) => {
+export const usePRDetail = (exerciseId: string, userId?: string) => {
   const query = useQuery<PRDetailData>({
     queryKey: [...PR_DETAIL_QUERY_KEY, exerciseId, userId],
     queryFn: async (): Promise<PRDetailData> => {
+      if (!userId) {
+        throw new Error("userId is required");
+      }
       const repositoryData = await prRepository.getPRHistoryDetailed(
         userId,
         exerciseId
@@ -117,7 +117,7 @@ export const usePRDetail = (
         progressStats,
       };
     },
-    enabled: !!exerciseId,
+    enabled: !!exerciseId && !!userId,
     staleTime: 1000 * 60 * 2, // 2 minutos
     gcTime: 1000 * 60 * 5, // 5 minutos en cache
     refetchOnWindowFocus: false,

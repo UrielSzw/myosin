@@ -1,4 +1,5 @@
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { prListTranslations } from "@/shared/translations/pr-list";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
@@ -15,11 +16,12 @@ import { usePRList } from "./hooks/use-pr-list";
 
 export const PRListFeature: React.FC = () => {
   const router = useRouter();
+  const { user } = useAuth();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = prListTranslations;
 
-  const { data: allPRs, isLoading, error, stats } = usePRList();
+  const { data: allPRs, isLoading, error, stats } = usePRList(user?.id);
 
   const filtersHook = usePRFilters(allPRs);
   const { filteredPRs, filters, updateFilter, clearAllFilters } = filtersHook;

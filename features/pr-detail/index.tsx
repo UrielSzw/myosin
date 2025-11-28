@@ -1,4 +1,5 @@
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { Typography } from "@/shared/ui/typography";
@@ -14,11 +15,12 @@ type Props = {
 };
 
 export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
+  const { user } = useAuth();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = prDetailTranslations;
 
-  const { data, isLoading, error } = usePRDetail(exerciseId);
+  const { data, isLoading, error } = usePRDetail(exerciseId, user?.id);
 
   // Usar los progressStats que vienen del hook (ya calculados correctamente)
   const progressStats = React.useMemo(() => {

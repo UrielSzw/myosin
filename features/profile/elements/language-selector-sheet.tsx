@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useExercisesSync } from "@/shared/hooks/use-exercises-sync";
 import {
   useUserPreferences,
   useUserPreferencesActions,
@@ -22,6 +23,7 @@ export const LanguageSelectorSheet = forwardRef<BottomSheetModal>((_, ref) => {
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const { setLanguage } = useUserPreferencesActions();
+  const { syncExercises } = useExercisesSync();
   const lang = prefs?.language ?? "es";
   const t = profileTranslations;
 
@@ -29,15 +31,29 @@ export const LanguageSelectorSheet = forwardRef<BottomSheetModal>((_, ref) => {
   const currentLanguage = prefs?.language ?? "es";
 
   const handleSelectLanguage = useCallback(
-    (languageCode: "en" | "es") => {
-      if (user?.id) {
+    async (languageCode: "en" | "es") => {
+      if (user?.id && languageCode !== currentLanguage) {
+        // Primero actualizar la preferencia
         setLanguage(user.id, languageCode);
+
+        // Sincronizar ejercicios con el nuevo idioma (forzado)
+        // No esperamos el resultado, se ejecuta en background
+        syncExercises(languageCode, { force: true }).catch((error) => {
+          console.warn("⚠️ Error sincronizando ejercicios:", error);
+        });
+
+        // Cerrar el sheet
+        if (ref && typeof ref === "object" && ref.current) {
+          ref.current.close();
+        }
+      } else if (user?.id) {
+        // Si es el mismo idioma, solo cerrar
         if (ref && typeof ref === "object" && ref.current) {
           ref.current.close();
         }
       }
     },
-    [user?.id, setLanguage, ref]
+    [user?.id, setLanguage, ref, currentLanguage, syncExercises]
   );
 
   const renderBackdrop = useCallback(

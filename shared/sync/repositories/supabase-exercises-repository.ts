@@ -1,7 +1,57 @@
 import type { ExerciseInsert } from "../../db/schema";
 import { BaseSupabaseRepository } from "./base-supabase-repository";
 
+export type LanguageCode = "es" | "en";
+
 export class SupabaseExercisesRepository extends BaseSupabaseRepository {
+  /**
+   * Obtiene todos los ejercicios del sistema con traducciones en el idioma especificado
+   * Usa la función RPC get_exercises_with_translations de Supabase
+   */
+  async getSystemExercisesWithTranslations(
+    languageCode: LanguageCode = "es"
+  ): Promise<ExerciseInsert[]> {
+    try {
+      const { data, error } = await this.supabase.rpc(
+        "get_exercises_with_translations",
+        { p_language_code: languageCode }
+      );
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        throw new Error(
+          `No se encontraron ejercicios con traducciones para idioma: ${languageCode}`
+        );
+      }
+
+      // Filtrar solo ejercicios del sistema y mapear al formato ExerciseInsert
+      return data
+        .filter((ex: any) => ex.source === "system")
+        .map((ex: any) => ({
+          id: ex.id,
+          name: ex.name,
+          name_search: ex.name_search,
+          source: ex.source,
+          created_by_user_id: ex.created_by_user_id,
+          main_muscle_group: ex.main_muscle_group,
+          primary_equipment: ex.primary_equipment,
+          exercise_type: ex.exercise_type,
+          secondary_muscle_groups: ex.secondary_muscle_groups ?? [],
+          instructions: ex.instructions ?? [],
+          equipment: ex.equipment ?? [],
+          similar_exercises: ex.similar_exercises,
+          default_measurement_template:
+            ex.default_measurement_template ?? "weight_reps",
+        })) as ExerciseInsert[];
+    } catch (error) {
+      return await this.handleError(
+        error,
+        `get system exercises with translations (${languageCode})`
+      );
+    }
+  }
+
   async getAllSystemExercises(): Promise<ExerciseInsert[]> {
     try {
       const { data, error } = await this.supabase

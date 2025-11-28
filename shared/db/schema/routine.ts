@@ -23,6 +23,7 @@ export const exercises = sqliteTable(
   {
     id: text("id").primaryKey(), // UUID
     name: text("name").notNull(),
+    name_search: text("name_search"), // lowercase, sin acentos para búsqueda rápida
 
     source: text("source").$type<IExerciseSource>().notNull(),
     created_by_user_id: text("created_by_user_id"),
@@ -64,6 +65,7 @@ export const exercises = sqliteTable(
   },
   (t) => [
     index("idx_exercises_name").on(t.name),
+    index("idx_exercises_name_search").on(t.name_search),
     index("idx_exercises_main_muscle").on(t.main_muscle_group),
     index("idx_exercises_primary_equipment").on(t.primary_equipment),
   ]

@@ -87,6 +87,14 @@ export default function AuthenticatedLayout() {
         }}
       />
       <Stack.Screen
+        name="workout/summary"
+        options={{
+          presentation: "transparentModal",
+          gestureEnabled: false,
+          animation: "fade",
+        }}
+      />
+      <Stack.Screen
         name="folders/create"
         options={{
           presentation: "modal",

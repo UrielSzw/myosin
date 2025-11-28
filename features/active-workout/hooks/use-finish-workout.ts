@@ -1,4 +1,5 @@
 import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
+import { getSummaryStats } from "@/features/workout-summary/service/summary-stats";
 import { routinesRepository } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
@@ -7,14 +8,17 @@ import {
   prepareFinishData,
 } from "@/shared/services/finish-workout";
 import { useHaptic } from "@/shared/services/haptic-service";
+import TimerService from "@/shared/services/timer-service";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { fromKg } from "@/shared/utils/weight-conversion";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
 import {
   useActiveMainActions,
+  useActiveRestTimerActions,
   useActiveWorkout,
   useActiveWorkoutStats,
 } from "./use-active-workout-store";
@@ -22,8 +26,10 @@ import {
 export const useFinishWorkout = () => {
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
+  const weightUnit = prefs?.weight_unit ?? "kg";
   const t = activeWorkoutTranslations;
   const { clearWorkout, detectWorkoutChanges } = useActiveMainActions();
+  const { skipRestTimer } = useActiveRestTimerActions();
   const { totalSetsCompleted, totalSetsPlanned } = useActiveWorkoutStats();
   const activeWorkout = useActiveWorkout();
   const { user } = useAuth();
@@ -63,10 +69,44 @@ export const useFinishWorkout = () => {
         throw new Error(result.error || "Error al guardar el workout");
       }
 
-      // Success haptic feedback
-      haptic.success();
+      // Prepare summary data BEFORE clearing workout state
+      const routineName = activeWorkout.session?.routine?.name ?? "Workout";
+      const totalExercises = Object.keys(activeWorkout.exercises).length;
+      const sessionId = result.sessionId ?? "";
 
-      // Step 4: Clear state and navigate
+      // Calculate workout duration in seconds
+      const startedAt = activeWorkout.session?.started_at;
+      const durationSeconds = startedAt
+        ? Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000)
+        : 0;
+
+      // Get PRs from this session
+      const prs = Object.values(activeWorkout.sessionBestPRs || {}).map(
+        (pr) => {
+          const exercise = Object.values(activeWorkout.exercises).find(
+            (ex) => ex.exercise_id === pr.exercise_id
+          );
+          return {
+            exerciseName: exercise?.exercise?.name ?? "Exercise",
+            weight:
+              weightUnit === "kg"
+                ? pr.weight
+                : fromKg(pr.weight, weightUnit, 1),
+            reps: pr.reps,
+          };
+        }
+      );
+
+      // Get summary stats (workout number, streak)
+      const summaryStats = await getSummaryStats(user.id);
+
+      // Stop rest timer if running (prevents sound/vibration after leaving)
+      // Clear both Zustand state AND TimerService (singleton)
+      skipRestTimer();
+      await TimerService.getInstance().clearTimer();
+
+      // Clear workout state BEFORE navigation
+      // The summary screen has all data it needs via params
       clearWorkout();
 
       // Invalidate queries to refresh data
@@ -74,7 +114,22 @@ export const useFinishWorkout = () => {
       queryClient.invalidateQueries({ queryKey: ANALYTICS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ["workout-sessions"] });
 
-      router.back();
+      // Push summary screen on top of active workout
+      // The summary will dismiss the entire stack when closed
+      router.push({
+        pathname: "/workout/summary",
+        params: {
+          routineName,
+          workoutNumber: summaryStats.workoutNumber.toString(),
+          totalExercises: totalExercises.toString(),
+          totalSetsCompleted: totalSetsCompleted.toString(),
+          durationSeconds: durationSeconds.toString(),
+          currentStreak: summaryStats.currentStreak.toString(),
+          prs: JSON.stringify(prs),
+          improvements: JSON.stringify([]), // For future use
+          sessionId,
+        },
+      } as any);
     } catch (error) {
       console.error("Error finishing workout:", error);
       Alert.alert(
@@ -187,8 +242,11 @@ export const useFinishWorkout = () => {
       {
         text: t.yesDelete[lang],
         style: "destructive",
-        onPress: () => {
+        onPress: async () => {
           haptic.warning(); // Warning haptic for discarding
+          // Stop rest timer - both Zustand state AND TimerService
+          skipRestTimer();
+          await TimerService.getInstance().clearTimer();
           clearWorkout();
           router.back();
         },

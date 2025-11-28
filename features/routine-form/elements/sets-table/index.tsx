@@ -38,9 +38,10 @@ export const SetsTable: React.FC<Props> = ({
   const { addSet } = useSetActions();
   const { setCurrentState } = useMainActions();
 
-  // Get user's weight unit preference
+  // Get user's unit preferences
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
   const lang = prefs?.language ?? "es";
 
   const { show_rpe, show_tempo } = routine;
@@ -51,7 +52,8 @@ export const SetsTable: React.FC<Props> = ({
   const currentSet = sets[setId];
   const template = getMeasurementTemplate(
     currentSet?.measurement_template || getDefaultTemplate(),
-    weightUnit
+    weightUnit,
+    distanceUnit
   );
 
   const handleMeasurementTemplate = () => {
@@ -103,7 +105,10 @@ export const SetsTable: React.FC<Props> = ({
           accessible={true}
           accessibilityRole="button"
           accessibilityLabel={t.changeMeasurementTemplate[lang]}
-          accessibilityHint={t.currentTemplate[lang].replace("{template}", template.name)}
+          accessibilityHint={t.currentTemplate[lang].replace(
+            "{template}",
+            template.name
+          )}
           accessibilityValue={{ text: template.name }}
         >
           {template.fields.map((field, index) => (

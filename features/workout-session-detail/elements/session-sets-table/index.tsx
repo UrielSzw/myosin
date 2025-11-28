@@ -4,10 +4,11 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSessionDetailTranslations } from "@/shared/translations/workout-session-detail";
 import {
-    getMeasurementTemplate,
-    hasWeightMeasurement,
+  getMeasurementTemplate,
+  hasWeightMeasurement,
 } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
+import { fromKm, fromMeters } from "@/shared/utils/distance-conversion";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { Check, X } from "lucide-react-native";
 import React from "react";
@@ -24,12 +25,17 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe, lang }) => {
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
   const t = workoutSessionDetailTranslations;
 
   // Get measurement template for dynamic headers (assume all sets have same template)
   const measurementTemplate =
     sets.length > 0
-      ? getMeasurementTemplate(sets[0].measurement_template, weightUnit)
+      ? getMeasurementTemplate(
+          sets[0].measurement_template,
+          weightUnit,
+          distanceUnit
+        )
       : null;
 
   const formatValue = (value: number | null): string => {
@@ -43,14 +49,39 @@ export const SessionSetsTable: React.FC<Props> = ({ sets, showRpe, lang }) => {
     if (!measurementTemplate) return "-";
 
     let primaryValue = set.actual_primary_value;
-    const secondaryValue = set.actual_secondary_value;
+    let secondaryValue = set.actual_secondary_value;
 
-    // Convert weight values from kg to user's preferred unit
-    if (
-      hasWeightMeasurement(set.measurement_template) &&
-      primaryValue !== null
-    ) {
-      primaryValue = fromKg(primaryValue, weightUnit, 1);
+    // Get field types for conversion
+    const primaryFieldType = measurementTemplate.fields[0]?.type;
+    const secondaryFieldType = measurementTemplate.fields[1]?.type;
+
+    // Convert primary value based on field type
+    if (primaryValue !== null) {
+      if (primaryFieldType === "weight") {
+        primaryValue = fromKg(primaryValue, weightUnit, 1);
+      } else if (primaryFieldType === "distance") {
+        // Check if it's km or meters based on template
+        const primaryUnit = measurementTemplate.fields[0]?.unit;
+        if (primaryUnit === "km" || primaryUnit === "mi") {
+          primaryValue = fromKm(primaryValue, distanceUnit, 2);
+        } else {
+          primaryValue = fromMeters(primaryValue, distanceUnit, 0);
+        }
+      }
+    }
+
+    // Convert secondary value based on field type
+    if (secondaryValue !== null && secondaryFieldType) {
+      if (secondaryFieldType === "weight") {
+        secondaryValue = fromKg(secondaryValue, weightUnit, 1);
+      } else if (secondaryFieldType === "distance") {
+        const secondaryUnit = measurementTemplate.fields[1]?.unit;
+        if (secondaryUnit === "km" || secondaryUnit === "mi") {
+          secondaryValue = fromKm(secondaryValue, distanceUnit, 2);
+        } else {
+          secondaryValue = fromMeters(secondaryValue, distanceUnit, 0);
+        }
+      }
     }
 
     if (measurementTemplate.fields.length === 1) {

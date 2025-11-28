@@ -37,8 +37,9 @@ export const ActiveSetsTable: React.FC<Props> = ({
   const { getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();
 
-  // Get user's weight unit preference
+  // Get user's unit preferences
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const handleAddSet = () => {
     addSet(exerciseInBlockId);
@@ -50,7 +51,11 @@ export const ActiveSetsTable: React.FC<Props> = ({
     sets[setId]?.measurement_template || "weight_reps";
 
   // Obtener información del template para headers dinámicos
-  const template = getMeasurementTemplate(measurementTemplate, weightUnit);
+  const template = getMeasurementTemplate(
+    measurementTemplate,
+    weightUnit,
+    distanceUnit
+  );
 
   // Función para obtener los títulos de las columnas basado en el template
   const getTemplateHeaders = () => {

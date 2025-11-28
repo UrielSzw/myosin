@@ -14,6 +14,7 @@ import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
 import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
+import { fromKm, fromMeters } from "@/shared/utils/distance-conversion";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { Check, Timer, Trophy } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
@@ -50,11 +51,12 @@ export const ActiveSetRow: React.FC<Props> = ({
   const { setCurrentState } = useActiveMainActions();
   const { sets, exercisePreviousSets, session } = useActiveWorkout();
 
-  // Get user's weight unit preference
+  // Get user's unit preferences
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = activeWorkoutTranslations;
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   // Hook para indicador de próximo set (solo para superseries y circuitos)
   const nextSetIndicator = useNextSetIndicator(blockId);
@@ -177,7 +179,11 @@ export const ActiveSetRow: React.FC<Props> = ({
     setData.secondaryValue || set.actual_secondary_value || null;
 
   // Obtener información del template para renderizado condicional
-  const template = getMeasurementTemplate(set.measurement_template, weightUnit);
+  const template = getMeasurementTemplate(
+    set.measurement_template,
+    weightUnit,
+    distanceUnit
+  );
   const hasSecondaryField = template?.fields && template.fields.length > 1;
 
   // Helper para obtener placeholders basado en el template
@@ -193,37 +199,66 @@ export const ActiveSetRow: React.FC<Props> = ({
       ? prevSet?.actual_secondary_value
       : prevSet?.actual_primary_value;
 
-    // Check if this is a weight field
-    const isWeightField =
-      template.fields[isSecondary ? 1 : 0]?.type === "weight";
+    // Check field type
+    const fieldIndex = isSecondary ? 1 : 0;
+    const field = template.fields[fieldIndex];
+    const isWeightField = field?.type === "weight";
+    const isDistanceField = field?.type === "distance";
+
+    // Helper to format value based on field type
+    const formatFieldValue = (value: number): string => {
+      if (isWeightField) {
+        return fromKg(value, weightUnit, 1).toString();
+      }
+      if (isDistanceField) {
+        // Check if km or meters based on field unit
+        if (field?.unit === "km" || field?.unit === "mi") {
+          return fromKm(value, distanceUnit, 2).toString();
+        } else {
+          return fromMeters(value, distanceUnit, 0).toString();
+        }
+      }
+      return value.toString();
+    };
 
     // PRIORIDAD 1: Si hay un range planificado, mostrarlo como string (ej: "8-12")
     if (plannedRange) {
-      if (isWeightField && weightUnit) {
+      if (isWeightField) {
         const minFormatted = fromKg(plannedRange.min || 0, weightUnit, 1);
         const maxFormatted = fromKg(plannedRange.max || 0, weightUnit, 1);
         return `${minFormatted}-${maxFormatted}`;
+      }
+      if (isDistanceField) {
+        if (field?.unit === "km" || field?.unit === "mi") {
+          const minFormatted = fromKm(plannedRange.min || 0, distanceUnit, 2);
+          const maxFormatted = fromKm(plannedRange.max || 0, distanceUnit, 2);
+          return `${minFormatted}-${maxFormatted}`;
+        } else {
+          const minFormatted = fromMeters(
+            plannedRange.min || 0,
+            distanceUnit,
+            0
+          );
+          const maxFormatted = fromMeters(
+            plannedRange.max || 0,
+            distanceUnit,
+            0
+          );
+          return `${minFormatted}-${maxFormatted}`;
+        }
       }
       return `${plannedRange.min || 0}-${plannedRange.max || 0}`;
     }
 
     // PRIORIDAD 2: Valor planificado de la rutina
     if (plannedValue) {
-      if (isWeightField && weightUnit) {
-        const formatted = fromKg(plannedValue, weightUnit, 1);
-        return formatted.toString();
-      }
-      return plannedValue.toString();
+      return formatFieldValue(plannedValue);
     }
 
     // PRIORIDAD 3: Si NO hay valores planificados pero hay prev value, usarlo como placeholder
     // Esto permite que el auto-complete use el valor anterior cuando no hay plan
     if (prevValue) {
-      if (isWeightField && weightUnit) {
-        const formatted = fromKg(prevValue, weightUnit, 1);
-        return formatted.toString();
-      }
-      return prevValue.toString();
+      return formatFieldValue(prevValue);
     }
 
     // Fallback
@@ -409,6 +444,7 @@ export const ActiveSetRow: React.FC<Props> = ({
             setNumber={set.order_index + 1}
             activeWorkout={true}
             weightUnit={weightUnit}
+            distanceUnit={distanceUnit}
             disabled={isSetCompleted}
           />
         </View>
@@ -432,6 +468,7 @@ export const ActiveSetRow: React.FC<Props> = ({
               setNumber={set.order_index + 1}
               activeWorkout={true}
               weightUnit={weightUnit}
+              distanceUnit={distanceUnit}
               disabled={isSetCompleted}
             />
           </View>

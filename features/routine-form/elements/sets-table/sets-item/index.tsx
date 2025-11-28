@@ -35,15 +35,17 @@ export const SetsItem = React.memo<Props>(
     const { updateSet } = useSetActions();
     const { setCurrentState } = useMainActions();
 
-    // Get user's weight unit preference
+    // Get user's unit preferences
     const weightUnit = prefs?.weight_unit ?? "kg";
+    const distanceUnit = prefs?.distance_unit ?? "metric";
 
     const { show_rpe, show_tempo } = routine;
 
     const set = sets[setId];
     const template = getMeasurementTemplate(
       set.measurement_template || getDefaultTemplate(),
-      weightUnit
+      weightUnit,
+      distanceUnit
     );
 
     const handleSetType = useCallback(() => {
@@ -194,6 +196,7 @@ export const SetsItem = React.memo<Props>(
               }
               setNumber={setNumber}
               weightUnit={weightUnit}
+              distanceUnit={distanceUnit}
             />
           </View>
         ) : (
@@ -219,6 +222,7 @@ export const SetsItem = React.memo<Props>(
                 }
                 setNumber={setNumber}
                 weightUnit={weightUnit}
+                distanceUnit={distanceUnit}
               />
             </View>
           ))

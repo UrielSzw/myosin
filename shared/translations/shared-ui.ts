@@ -124,6 +124,30 @@ export const sharedUiTranslations = {
     es: "Seleccionar libras",
     en: "Select pounds",
   },
+  selectMetric: {
+    es: "Seleccionar métrico",
+    en: "Select metric",
+  },
+  selectImperial: {
+    es: "Seleccionar imperial",
+    en: "Select imperial",
+  },
+  metric: {
+    es: "Métrico",
+    en: "Metric",
+  },
+  imperial: {
+    es: "Imperial",
+    en: "Imperial",
+  },
+  feet: {
+    es: "PIES",
+    en: "FEET",
+  },
+  miles: {
+    es: "MI",
+    en: "MI",
+  },
 
   // Workout Session List
   clearSearch: {

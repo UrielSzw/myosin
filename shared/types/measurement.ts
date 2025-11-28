@@ -3,6 +3,7 @@
  * Supports up to 2 metrics per exercise
  */
 
+import type { DistanceUnit } from "../utils/distance-conversion";
 import type { WeightUnit } from "../utils/weight-conversion";
 
 export type MeasurementTemplateId =
@@ -134,25 +135,39 @@ export const MEASUREMENT_TEMPLATES: Record<
 
 export const getMeasurementTemplate = (
   templateId: MeasurementTemplateId,
-  weightUnit?: WeightUnit
+  weightUnit?: WeightUnit,
+  distanceUnit?: DistanceUnit
 ): MeasurementTemplate => {
   const template = MEASUREMENT_TEMPLATES[templateId];
 
-  // If no weightUnit provided or template has no weight fields, return as-is
-  if (!weightUnit || !hasWeightMeasurement(templateId)) {
-    return template;
-  }
-
-  // Clone template and update weight fields with user's preferred unit
+  // Clone template and update fields based on user preferences
   return {
     ...template,
     fields: template.fields.map((field) => {
-      if (field.type === "weight") {
+      if (field.type === "weight" && weightUnit) {
         return {
           ...field,
           unit: weightUnit,
           label: weightUnit.toUpperCase(),
         };
+      }
+      if (field.type === "distance" && distanceUnit) {
+        // distance_only: meters -> feet
+        // distance_time: km -> miles
+        if (field.unit === "km") {
+          return {
+            ...field,
+            unit: distanceUnit === "metric" ? "km" : "mi",
+            label: distanceUnit === "metric" ? "KM" : "MI",
+          };
+        } else {
+          // meters
+          return {
+            ...field,
+            unit: distanceUnit === "metric" ? "m" : "ft",
+            label: distanceUnit === "metric" ? "METROS" : "FEET",
+          };
+        }
       }
       return field;
     }) as [MeasurementField] | [MeasurementField, MeasurementField],

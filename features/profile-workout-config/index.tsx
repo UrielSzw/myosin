@@ -28,10 +28,16 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
   const t = profileTranslations;
   const tShared = sharedUiTranslations;
 
-  const { setUnit, setShowRpe, setShowTempo, setDefaultRestTime } =
-    useUserPreferencesActions();
+  const {
+    setUnit,
+    setDistanceUnit,
+    setShowRpe,
+    setShowTempo,
+    setDefaultRestTime,
+  } = useUserPreferencesActions();
 
   const unit = prefs?.weight_unit ?? "kg";
+  const distUnit = prefs?.distance_unit ?? "metric";
   const rpeEnabled = prefs?.show_rpe ?? false;
   const tempoEnabled = prefs?.show_tempo ?? false;
   const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
@@ -149,6 +155,89 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                       }}
                     >
                       lbs
+                    </Typography>
+                  </Pressable>
+                </View>
+              </View>
+            </View>
+          </Card>
+
+          <Card variant="outlined" padding="md" style={{ marginBottom: 12 }}>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <View style={{ flex: 1 }}>
+                <Typography variant="body1" weight="semibold">
+                  {t.distanceUnitTitle[lang]}
+                </Typography>
+                <Typography variant="body2" color="textMuted">
+                  {t.distanceUnitSubtitle[lang]}
+                </Typography>
+              </View>
+
+              {/* Segmented control: metric/imperial */}
+              <View style={{ width: 160 }}>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    borderRadius: 8,
+                    overflow: "hidden",
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}
+                >
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={tShared.selectMetric[lang]}
+                    onPress={() => {
+                      if (user?.id) setDistanceUnit(user.id, "metric");
+                    }}
+                    style={({ pressed }) => ({
+                      flex: 1,
+                      paddingVertical: 8,
+                      alignItems: "center",
+                      backgroundColor:
+                        distUnit === "metric"
+                          ? colors.primary[500]
+                          : colors.background,
+                      opacity: pressed ? 0.9 : 1,
+                    })}
+                  >
+                    <Typography
+                      variant="body2"
+                      weight="semibold"
+                      style={{
+                        color: distUnit === "metric" ? "#ffffff" : colors.text,
+                      }}
+                    >
+                      {tShared.metric[lang]}
+                    </Typography>
+                  </Pressable>
+
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel={tShared.selectImperial[lang]}
+                    onPress={() => {
+                      if (user?.id) setDistanceUnit(user.id, "imperial");
+                    }}
+                    style={({ pressed }) => ({
+                      flex: 1,
+                      paddingVertical: 8,
+                      alignItems: "center",
+                      backgroundColor:
+                        distUnit === "imperial"
+                          ? colors.primary[500]
+                          : colors.background,
+                      opacity: pressed ? 0.9 : 1,
+                    })}
+                  >
+                    <Typography
+                      variant="body2"
+                      weight="semibold"
+                      style={{
+                        color:
+                          distUnit === "imperial" ? "#ffffff" : colors.text,
+                      }}
+                    >
+                      {tShared.imperial[lang]}
                     </Typography>
                   </Pressable>
                 </View>

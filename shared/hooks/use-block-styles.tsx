@@ -5,6 +5,11 @@ import {
   getMeasurementTemplate,
 } from "../types/measurement";
 import { IBlockType } from "../types/workout";
+import {
+  fromKm,
+  fromMeters,
+  type DistanceUnit,
+} from "../utils/distance-conversion";
 import { fromKg, type WeightUnit } from "../utils/weight-conversion";
 import { useColorScheme } from "./use-color-scheme";
 import { useUserPreferences } from "./use-user-preferences-store";
@@ -13,9 +18,10 @@ export const useBlockStyles = () => {
   const { colors } = useColorScheme();
   const t = routineFormTranslations;
 
-  // Get user's weight unit preference
+  // Get user's unit preferences
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const getBlockColors = (blockType: IBlockType) => {
     switch (blockType) {
@@ -129,10 +135,12 @@ export const useBlockStyles = () => {
     range: { min: number; max: number } | null,
     templateId: MeasurementTemplateId,
     fieldId: "primary" | "secondary",
-    userWeightUnit?: WeightUnit
+    userWeightUnit?: WeightUnit,
+    userDistanceUnit?: DistanceUnit
   ) => {
-    const unit = userWeightUnit || weightUnit;
-    const template = getMeasurementTemplate(templateId, unit);
+    const wUnit = userWeightUnit || weightUnit;
+    const dUnit = userDistanceUnit || distanceUnit;
+    const template = getMeasurementTemplate(templateId, wUnit, dUnit);
     const field = template.fields.find((f) => f.id === fieldId);
 
     if (!field) return "";
@@ -144,9 +152,22 @@ export const useBlockStyles = () => {
 
       // Si es weight, formatear ambos valores
       if (field.type === "weight" && min && max) {
-        const minFormatted = fromKg(Number(min), unit, 1);
-        const maxFormatted = fromKg(Number(max), unit, 1);
+        const minFormatted = fromKg(Number(min), wUnit, 1);
+        const maxFormatted = fromKg(Number(max), wUnit, 1);
         return `${minFormatted}-${maxFormatted}`;
+      }
+
+      // Si es distance, formatear ambos valores
+      if (field.type === "distance" && min && max) {
+        if (field.unit === "km" || field.unit === "mi") {
+          const minFormatted = fromKm(Number(min), dUnit, 2);
+          const maxFormatted = fromKm(Number(max), dUnit, 2);
+          return `${minFormatted}-${maxFormatted}`;
+        } else {
+          const minFormatted = fromMeters(Number(min), dUnit, 0);
+          const maxFormatted = fromMeters(Number(max), dUnit, 0);
+          return `${minFormatted}-${maxFormatted}`;
+        }
       }
 
       if (min && max) {
@@ -176,15 +197,23 @@ export const useBlockStyles = () => {
           return `${value}s`;
         }
       case "distance":
-        if (field.unit === "km") {
-          return value % 1 === 0 ? `${value}` : `${value.toFixed(1)}`;
+        if (field.unit === "km" || field.unit === "mi") {
+          // Stored in km, convert if imperial
+          const displayValue = fromKm(value, dUnit, 2);
+          const unitLabel = dUnit === "metric" ? "km" : "mi";
+          return displayValue % 1 === 0
+            ? `${displayValue}${unitLabel}`
+            : `${displayValue.toFixed(1)}${unitLabel}`;
         } else {
-          return `${value}`;
+          // Stored in meters, convert if imperial
+          const displayValue = fromMeters(value, dUnit, 0);
+          const unitLabel = dUnit === "metric" ? "m" : "ft";
+          return `${displayValue}${unitLabel}`;
         }
       case "weight":
         // Convert from kg (stored) to user's preferred unit
-        const displayValue = fromKg(value, unit, 1);
-        return `${displayValue}${unit}`;
+        const displayValue = fromKg(value, wUnit, 1);
+        return `${displayValue}${wUnit}`;
       case "reps":
       default:
         return `${value}`;

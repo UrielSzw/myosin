@@ -40,6 +40,7 @@ type PrefsState = {
 
   updateActions: {
     setUnit: (userId: string, unit: "kg" | "lbs") => void;
+    setDistanceUnit: (userId: string, unit: "metric" | "imperial") => void;
     setShowRpe: (userId: string, show: boolean) => void;
     setShowTempo: (userId: string, show: boolean) => void;
     setDefaultRestTime: (userId: string, seconds: number) => void;
@@ -59,6 +60,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
 
       const updateData = {
         weight_unit: prefs.weight_unit,
+        distance_unit: prefs.distance_unit,
         show_rpe: prefs.show_rpe,
         show_tempo: prefs.show_tempo,
         default_rest_time_seconds: prefs.default_rest_time_seconds,
@@ -100,6 +102,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
             const defaults: BaseUserPreferences = {
               theme: "dark" as BaseUserPreferences["theme"],
               weight_unit: "kg",
+              distance_unit: "metric",
               language: "es",
               show_rpe: false,
               show_tempo: false,
@@ -127,6 +130,15 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
           prefs: {
             ...(s.prefs ?? ({} as BaseUserPreferences)),
             weight_unit: unit,
+          },
+        }));
+        schedulePersist(userId);
+      },
+      setDistanceUnit: (userId: string, unit: "metric" | "imperial") => {
+        set((s) => ({
+          prefs: {
+            ...(s.prefs ?? ({} as BaseUserPreferences)),
+            distance_unit: unit,
           },
         }));
         schedulePersist(userId);

@@ -154,6 +154,14 @@ export const profileTranslations = {
     es: "Kilogramos o libras",
     en: "Kilograms or pounds",
   },
+  distanceUnitTitle: {
+    es: "Unidad de Distancia",
+    en: "Distance Unit",
+  },
+  distanceUnitSubtitle: {
+    es: "Metros/Kilómetros o Pies/Millas",
+    en: "Meters/Kilometers or Feet/Miles",
+  },
   workoutPreferencesSection: {
     es: "Preferencias de Entrenamiento",
     en: "Workout Preferences",

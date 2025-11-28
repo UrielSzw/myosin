@@ -2,6 +2,13 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { MeasurementField } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import {
+  fromKm,
+  fromMeters,
+  toKm,
+  toMeters,
+  type DistanceUnit,
+} from "@/shared/utils/distance-conversion";
+import {
   fromKg,
   toKg,
   type WeightUnit,
@@ -38,6 +45,11 @@ type MeasurementInputProps = {
    */
   weightUnit?: WeightUnit;
   /**
+   * User's preferred distance unit (for conversion)
+   * Only used when field.type === "distance"
+   */
+  distanceUnit?: DistanceUnit;
+  /**
    * Disable input (e.g., when set is completed)
    */
   disabled?: boolean;
@@ -54,6 +66,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   setNumber = 1,
   activeWorkout = false,
   weightUnit = "kg",
+  distanceUnit = "metric",
   disabled = false,
 }) => {
   const { colors } = useColorScheme();
@@ -68,13 +81,22 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       if (field.type === "weight" && weightUnit) {
         const displayValue = fromKg(value, weightUnit, 1);
         setInputText(displayValue.toString());
+      } else if (field.type === "distance" && distanceUnit) {
+        // Distance conversion based on field unit (km or m)
+        if (field.unit === "km" || field.unit === "mi") {
+          const displayValue = fromKm(value, distanceUnit, 2);
+          setInputText(displayValue.toString());
+        } else {
+          const displayValue = fromMeters(value, distanceUnit, 0);
+          setInputText(displayValue.toString());
+        }
       } else {
         setInputText(value.toString());
       }
     } else {
       setInputText("");
     }
-  }, [value, field.type, weightUnit]);
+  }, [value, field.type, field.unit, weightUnit, distanceUnit]);
 
   // Format time for display (convert seconds to readable format)
   const formatTimeDisplay = (seconds: number): string => {
@@ -151,6 +173,15 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       if (field.type === "weight" && weightUnit) {
         const kgValue = toKg(numValue, weightUnit);
         onChange(kgValue);
+      } else if (field.type === "distance" && distanceUnit) {
+        // Distance conversion based on field unit (km or m)
+        if (field.unit === "km" || field.unit === "mi") {
+          const kmValue = toKm(numValue, distanceUnit);
+          onChange(kmValue);
+        } else {
+          const metersValue = toMeters(numValue, distanceUnit);
+          onChange(metersValue);
+        }
       } else {
         onChange(numValue);
       }
@@ -174,6 +205,17 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       if (field.type === "weight" && weightUnit) {
         finalMin = finalMin ? toKg(finalMin, weightUnit) : 0;
         finalMax = finalMax ? toKg(finalMax, weightUnit) : 0;
+      }
+
+      // Convert to meters/km if distance field
+      if (field.type === "distance" && distanceUnit) {
+        if (field.unit === "km" || field.unit === "mi") {
+          finalMin = finalMin ? toKm(finalMin, distanceUnit) : 0;
+          finalMax = finalMax ? toKm(finalMax, distanceUnit) : 0;
+        } else {
+          finalMin = finalMin ? toMeters(finalMin, distanceUnit) : 0;
+          finalMax = finalMax ? toMeters(finalMax, distanceUnit) : 0;
+        }
       }
 
       // Only create range object if we have at least one valid value
@@ -201,6 +243,17 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
       if (field.type === "weight" && weightUnit) {
         finalMin = finalMin ? toKg(finalMin, weightUnit) : 0;
         finalMax = finalMax ? toKg(finalMax, weightUnit) : 0;
+      }
+
+      // Convert to meters/km if distance field
+      if (field.type === "distance" && distanceUnit) {
+        if (field.unit === "km" || field.unit === "mi") {
+          finalMin = finalMin ? toKm(finalMin, distanceUnit) : 0;
+          finalMax = finalMax ? toKm(finalMax, distanceUnit) : 0;
+        } else {
+          finalMin = finalMin ? toMeters(finalMin, distanceUnit) : 0;
+          finalMax = finalMax ? toMeters(finalMax, distanceUnit) : 0;
+        }
       }
 
       // Only create range object if we have at least one valid value

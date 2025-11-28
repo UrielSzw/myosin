@@ -22,6 +22,8 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
   const { exercises } = useExercises();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
+  const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
   const muscleT = exerciseMuscleTranslations;
   const equipmentT = exerciseEquipmentTranslations;
 
@@ -62,7 +64,11 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
     const firstSet = sets[0];
     if (!firstSet.measurement_template) return "8-10 reps";
 
-    const template = getMeasurementTemplate(firstSet.measurement_template);
+    const template = getMeasurementTemplate(
+      firstSet.measurement_template,
+      weightUnit,
+      distanceUnit
+    );
 
     // Handle different measurement templates
     switch (firstSet.measurement_template) {

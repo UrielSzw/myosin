@@ -20,6 +20,10 @@ export const user_preferences = sqliteTable(
       .$type<"kg" | "lbs">()
       .default("kg")
       .notNull(),
+    distance_unit: text("distance_unit")
+      .$type<"metric" | "imperial">()
+      .default("metric")
+      .notNull(),
     language: text("language").$type<"en" | "es">().default("es").notNull(),
 
     // Feature toggles

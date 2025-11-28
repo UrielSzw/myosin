@@ -1,6 +1,8 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
-import React from "react";
+import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
+import React, { useEffect } from "react";
 import { KeyboardAvoidingView, Platform, ScrollView, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ActiveBlockItem } from "./elements/active-block-item";
@@ -16,6 +18,18 @@ import { useActiveWorkout } from "./hooks/use-active-workout-store";
 export const ActiveWorkoutFeature = () => {
   const { blocksBySession } = useActiveWorkout();
   const insets = useSafeAreaInsets();
+  const prefs = useUserPreferences();
+  const keepScreenAwake = prefs?.keep_screen_awake ?? true;
+
+  // Keep screen awake during workout based on user preference
+  useEffect(() => {
+    if (keepScreenAwake) {
+      activateKeepAwakeAsync();
+    }
+    return () => {
+      deactivateKeepAwake();
+    };
+  }, [keepScreenAwake]);
 
   const {
     handleToggleSheet,

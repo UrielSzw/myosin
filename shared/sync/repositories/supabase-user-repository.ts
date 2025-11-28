@@ -17,6 +17,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           language: data.language || "es",
           show_rpe: data.show_rpe ?? false,
           show_tempo: data.show_tempo ?? false,
+          keep_screen_awake: data.keep_screen_awake ?? true,
           default_rest_time_seconds: data.default_rest_time_seconds ?? 60,
         })
         .select()
@@ -43,6 +44,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           language: data.language,
           show_rpe: data.show_rpe,
           show_tempo: data.show_tempo,
+          keep_screen_awake: data.keep_screen_awake,
           default_rest_time_seconds: data.default_rest_time_seconds,
           updated_at: new Date().toISOString(),
         })

@@ -14,7 +14,13 @@ import { RestTimeBottomSheet } from "@/shared/ui/sheets/rest-time-sheet";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
-import { Activity, ArrowLeft, Clock, Timer } from "lucide-react-native";
+import {
+  Activity,
+  ArrowLeft,
+  Clock,
+  Smartphone,
+  Timer,
+} from "lucide-react-native";
 import React, { useRef } from "react";
 import { Pressable, ScrollView, Switch, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -33,6 +39,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
     setDistanceUnit,
     setShowRpe,
     setShowTempo,
+    setKeepScreenAwake,
     setDefaultRestTime,
   } = useUserPreferencesActions();
 
@@ -40,6 +47,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
   const distUnit = prefs?.distance_unit ?? "metric";
   const rpeEnabled = prefs?.show_rpe ?? false;
   const tempoEnabled = prefs?.show_tempo ?? false;
+  const keepScreenAwake = prefs?.keep_screen_awake ?? true;
   const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
 
   const restTimeSheetRef = useRef<BottomSheetModal>(null);
@@ -317,6 +325,30 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                   {formatRestTime(defaultRestTime)}
                 </Typography>
               </View>
+            }
+          />
+
+          <SettingItem
+            icon={
+              <Smartphone
+                size={20}
+                color={keepScreenAwake ? colors.primary[500] : colors.textMuted}
+              />
+            }
+            title={t.keepScreenAwakeTitle[lang]}
+            subtitle={t.keepScreenAwakeSubtitle[lang]}
+            rightElement={
+              <Switch
+                value={keepScreenAwake}
+                onValueChange={(v) => {
+                  if (user?.id) setKeepScreenAwake(user.id, v);
+                }}
+                trackColor={{
+                  false: colors.gray[300],
+                  true: colors.primary[500],
+                }}
+                thumbColor="#ffffff"
+              />
             }
           />
         </ProfileSection>

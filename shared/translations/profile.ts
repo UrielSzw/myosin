@@ -190,6 +190,14 @@ export const profileTranslations = {
     es: "Tiempo de descanso entre series",
     en: "Rest time between sets",
   },
+  keepScreenAwakeTitle: {
+    es: "Pantalla Siempre Encendida",
+    en: "Keep Screen On",
+  },
+  keepScreenAwakeSubtitle: {
+    es: "Evita que la pantalla se apague durante el entrenamiento",
+    en: "Prevent screen from turning off during workout",
+  },
 
   // Language Selector
   languageSelectorTitle: {

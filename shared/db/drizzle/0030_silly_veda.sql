@@ -1,0 +1,1 @@
+ALTER TABLE `user_preferences` ADD `keep_screen_awake` integer DEFAULT true NOT NULL;

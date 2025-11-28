@@ -33,6 +33,12 @@ export type MetricDisplayData = {
 /**
  * Helper principal para obtener datos de display de cualquier métrica
  * Optimizado para performance con cálculos eficientes
+ *
+ * DISEÑO UNIFICADO:
+ * - Cards neutras con fondo surface y borde subtle
+ * - Íconos con color de acento sutil (no backgrounds coloridos)
+ * - Sin cambios de color al completar (solo checkmark sutil)
+ * - Texto principal siempre en color primario de la app
  */
 export const getMetricDisplayData = (
   metric: TrackerMetricWithQuickActions,
@@ -85,6 +91,7 @@ export const getMetricDisplayData = (
 
 /**
  * Display data para métricas boolean (vitaminas, suplementos)
+ * Diseño neutro: fondo surface, ícono con color sutil
  */
 const getBooleanDisplayData = (
   metric: TrackerMetricWithQuickActions,
@@ -94,6 +101,9 @@ const getBooleanDisplayData = (
   lang: "es" | "en"
 ): MetricDisplayData => {
   const t = trackerTranslations;
+
+  // Color de acento basado en el color de la métrica (sutil)
+  const accentColor = metric.color || colors.primary[500];
 
   if (!hasEntry) {
     return {
@@ -105,7 +115,7 @@ const getBooleanDisplayData = (
       borderColor: colors.border,
       iconColor: colors.gray[400],
       textColor: colors.textMuted,
-      iconName: metric.icon, // Mostrar ícono de la métrica, no Circle genérico
+      iconName: metric.icon,
       showProgressRing: false,
       progressPercentage: null,
     };
@@ -131,11 +141,12 @@ const getBooleanDisplayData = (
     hasEntry: true,
     currentValue,
     displayText,
-    backgroundColor: isTrue ? "#10B98110" : "#EF444410",
-    borderColor: isTrue ? "#10B981" : "#EF4444",
-    iconColor: isTrue ? "#10B981" : "#EF4444",
-    textColor: isTrue ? "#10B981" : "#EF4444",
-    iconName: isTrue ? "CheckCircle" : "XCircle",
+    // Diseño neutro - sin cambios de background/border por estado
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    iconColor: isTrue ? accentColor : colors.gray[400],
+    textColor: isTrue ? accentColor : colors.textMuted,
+    iconName: isTrue ? "CheckCircle" : metric.icon,
     showProgressRing: false,
     progressPercentage: null,
   };
@@ -143,6 +154,7 @@ const getBooleanDisplayData = (
 
 /**
  * Display data para métricas de escala (humor, estrés, calidad sueño)
+ * Diseño neutro con indicador visual sutil del nivel
  */
 const getScaleDisplayData = (
   metric: TrackerMetricWithQuickActions,
@@ -152,6 +164,9 @@ const getScaleDisplayData = (
   lang: "es" | "en"
 ): MetricDisplayData => {
   const t = trackerTranslations;
+
+  // Color de acento basado en el color de la métrica
+  const accentColor = metric.color || colors.primary[500];
 
   if (!hasEntry) {
     return {
@@ -163,7 +178,7 @@ const getScaleDisplayData = (
       borderColor: colors.border,
       iconColor: colors.gray[400],
       textColor: colors.textMuted,
-      iconName: metric.icon, // Mostrar ícono de la métrica, no Circle genérico
+      iconName: metric.icon,
       showProgressRing: false,
       progressPercentage: null,
     };
@@ -186,11 +201,11 @@ const getScaleDisplayData = (
       hasEntry: true,
       currentValue,
       displayText: `${t.states.level[lang]} ${value}`,
-      backgroundColor: metric.color + "10",
-      borderColor: metric.color,
-      iconColor: metric.color,
-      textColor: metric.color,
-      iconName: metric.icon, // Usar ícono de la métrica como fallback
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+      iconColor: accentColor,
+      textColor: accentColor,
+      iconName: metric.icon,
       showProgressRing: false,
       progressPercentage: null,
     };
@@ -218,17 +233,18 @@ const getScaleDisplayData = (
   }
 
   const iconName =
-    isValidIndex && config.scaleIcons ? config.scaleIcons[index] : "Circle";
+    isValidIndex && config.scaleIcons ? config.scaleIcons[index] : metric.icon;
 
   return {
     state: "has_entry",
     hasEntry: true,
     currentValue,
     displayText,
-    backgroundColor: metric.color + "10",
-    borderColor: metric.color,
-    iconColor: metric.color,
-    textColor: metric.color,
+    // Diseño neutro - mismo look para todos los estados
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    iconColor: accentColor,
+    textColor: accentColor,
     iconName,
     showProgressRing: false,
     progressPercentage: null,
@@ -236,7 +252,8 @@ const getScaleDisplayData = (
 };
 
 /**
- * Display data para métricas numéricas (mantener comportamiento actual)
+ * Display data para métricas numéricas
+ * Diseño neutro con progress ring sutil
  */
 const getNumericDisplayData = (
   metric: TrackerMetricWithQuickActions,
@@ -246,7 +263,8 @@ const getNumericDisplayData = (
   colors: any,
   lang: "es" | "en"
 ): MetricDisplayData => {
-  const isCompleted = state === "completed";
+  // Color de acento basado en el color de la métrica
+  const accentColor = metric.color || colors.primary[500];
 
   // Calcular progreso para métricas con target
   let progressPercentage: number | null = null;
@@ -268,13 +286,11 @@ const getNumericDisplayData = (
     hasEntry,
     currentValue,
     displayText: `${formatValue(currentValue)} ${metric.unit}`,
+    // Diseño neutro y consistente
     backgroundColor: colors.surface,
-    borderColor: isCompleted ? metric.color : colors.border,
-    iconColor: metric.color,
-    // backgroundColor: isCompleted ? "#FFD70020" : colors.surface,
-    // borderColor: isCompleted ? "#FFD700" : colors.border,
-    // iconColor: isCompleted ? "#FFA500" : metric.color,
-    textColor: metric.color,
+    borderColor: colors.border,
+    iconColor: hasEntry ? accentColor : colors.gray[400],
+    textColor: hasEntry ? accentColor : colors.textMuted,
     iconName: metric.icon,
     showProgressRing: true,
     progressPercentage,

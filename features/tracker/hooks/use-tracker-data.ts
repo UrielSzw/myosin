@@ -453,13 +453,24 @@ export const useDeleteEntry = () => {
 
 /**
  * Hook para obtener datos de un día específico
+ * Optimizado con caché agresivo para días pasados
  */
 export const useDayData = (dayKey: string, userId: string) => {
+  const today = getDayKey();
+  const isToday = dayKey === today;
+  const isPast = dayKey < today;
+
   return useQuery({
     queryKey: trackerQueryKeys.dayData(userId, dayKey),
     queryFn: () => trackerService.getDayData(dayKey, userId),
-    staleTime: 1000 * 60 * 2, // 2 minutos (datos más dinámicos)
-    gcTime: 1000 * 60 * 5, // 5 minutos
+    // Días pasados: caché infinito (no cambian)
+    // Hoy: caché corto (cambia frecuentemente)
+    staleTime: isPast ? Infinity : isToday ? 1000 * 30 : 1000 * 60 * 2,
+    gcTime: isPast ? 1000 * 60 * 60 : 1000 * 60 * 5, // 1 hora para pasados, 5 min para otros
+    // Mantener datos anteriores mientras carga (evita flash)
+    placeholderData: (previousData) => previousData,
+    // Solo refetch en focus si es hoy
+    refetchOnWindowFocus: isToday,
   });
 };
 

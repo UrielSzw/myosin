@@ -15,7 +15,6 @@ export const MetricCardContainer: React.FC<MetricCardContainerProps> = ({
   onPress,
   backgroundColor,
   borderColor,
-  isCompleted = false,
 }) => {
   const { colors } = useColorScheme();
 
@@ -29,14 +28,13 @@ export const MetricCardContainer: React.FC<MetricCardContainerProps> = ({
         borderRadius: 16,
         padding: 16,
         borderWidth: 1,
-        // borderWidth: isCompleted ? 2 : 1,
         borderColor: borderColor || colors.border,
-        elevation: 2,
+        // Subtle shadow - consistent for all cards
+        elevation: 1,
         shadowColor: "#000",
-        // shadowColor: isCompleted ? "#FFD700" : "#000",
-        shadowOffset: { width: 0, height: isCompleted ? 2 : 1 },
-        shadowOpacity: isCompleted ? 0.3 : 0.1,
-        shadowRadius: isCompleted ? 8 : 3,
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 2,
         position: "relative",
       }}
       activeOpacity={0.7}

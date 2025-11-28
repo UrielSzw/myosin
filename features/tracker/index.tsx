@@ -10,14 +10,15 @@ import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { AlertCircle, Plus } from "lucide-react-native";
 import React, { useState } from "react";
-import { ScrollView, View } from "react-native";
+import { Animated, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { DatePicker } from "./elements/date-picker";
 import { EmptyMetrics } from "./elements/empty-metrics";
+import { MacroCard } from "./elements/macro-card";
 import { MetricCard } from "./elements/metric-card";
 import { MetricModal } from "./elements/metric-modal";
 import { MetricSelectorModal } from "./elements/metric-selector-modal";
 import { TrackerHeader } from "./elements/tracker-header";
+import { WeekStrip } from "./elements/week-strip";
 import { useDayData } from "./hooks/use-tracker-data";
 
 export const TrackerFeature = () => {
@@ -106,14 +107,30 @@ export const TrackerFeature = () => {
     <ScreenWrapper withGradient fullscreen>
       <TrackerHeader selectedDate={selectedDate} />
 
-      <ScrollView style={{ flex: 1, paddingHorizontal: 20, paddingTop: 20 }}>
-        <DatePicker
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: 100,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Week Strip - New date picker */}
+        <WeekStrip
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
+          userId={user.id}
           lang={lang}
         />
 
-        <View style={{ marginBottom: 32 }}>
+        {/* Macros Card */}
+        <View style={{ marginTop: 16 }}>
+          <MacroCard selectedDate={selectedDate} lang={lang} />
+        </View>
+
+        {/* Metrics Section */}
+        <View style={{ marginTop: 8 }}>
           <View
             style={{
               flexDirection: "row",
@@ -122,7 +139,7 @@ export const TrackerFeature = () => {
               marginBottom: 16,
             }}
           >
-            <Typography variant="h5" weight="semibold">
+            <Typography variant="h6" weight="semibold">
               {t.dailyMetrics[lang]}
             </Typography>
             <Button
@@ -135,32 +152,35 @@ export const TrackerFeature = () => {
             </Button>
           </View>
 
-          {/* Metrics Grid */}
-          {dayData && dayData.metrics.length > 0 ? (
-            <View
-              style={{
-                flexDirection: "row",
-                flexWrap: "wrap",
-                gap: 12,
-                marginBottom: 24,
-              }}
-            >
-              {dayData.metrics.map((metric) => (
-                <MetricCard
-                  key={metric.id}
-                  metric={metric}
-                  date={selectedDate}
-                  onPress={() => setSelectedMetric(metric)}
-                  lang={lang}
-                />
-              ))}
-            </View>
-          ) : (
-            <EmptyMetrics onAddMetric={handleAddMetric} lang={lang} />
-          )}
+          {/* Metrics Grid - with fade transition */}
+          <Animated.View
+            style={{
+              opacity: dayDataLoading ? 0.6 : 1,
+            }}
+          >
+            {dayData && dayData.metrics.length > 0 ? (
+              <View
+                style={{
+                  flexDirection: "row",
+                  flexWrap: "wrap",
+                  gap: 12,
+                }}
+              >
+                {dayData.metrics.map((metric) => (
+                  <MetricCard
+                    key={metric.id}
+                    metric={metric}
+                    date={selectedDate}
+                    onPress={() => setSelectedMetric(metric)}
+                    lang={lang}
+                  />
+                ))}
+              </View>
+            ) : (
+              <EmptyMetrics onAddMetric={handleAddMetric} lang={lang} />
+            )}
+          </Animated.View>
         </View>
-
-        <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Metric Input Modal */}

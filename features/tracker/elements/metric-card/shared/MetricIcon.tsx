@@ -2,7 +2,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import * as Icons from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
-import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
+import Svg, { Circle } from "react-native-svg";
 
 type MetricIconProps = {
   iconName: string;
@@ -18,7 +18,6 @@ export const MetricIcon: React.FC<MetricIconProps> = React.memo(
     iconColor,
     showProgressRing = false,
     progressPercentage = null,
-    isCompleted = false,
   }) => {
     const { colors } = useColorScheme();
 
@@ -37,6 +36,9 @@ export const MetricIcon: React.FC<MetricIconProps> = React.memo(
       const strokeDashoffset =
         circumference - (progressPercentage / 100) * circumference;
 
+      // Mantener el color del ícono siempre - sin cambio a verde
+      const progressColor = iconColor;
+
       return (
         <Svg
           width={size}
@@ -48,21 +50,12 @@ export const MetricIcon: React.FC<MetricIconProps> = React.memo(
             transform: [{ rotate: "-90deg" }],
           }}
         >
-          {/* Gradiente dorado para estado completado */}
-          <Defs>
-            <LinearGradient id="goldGradient" x1="0" y1="0" x2="1" y2="1">
-              <Stop offset="0" stopColor="#FFD700" stopOpacity="1" />
-              <Stop offset="0.5" stopColor="#FFA500" stopOpacity="1" />
-              <Stop offset="1" stopColor="#FF8C00" stopOpacity="1" />
-            </LinearGradient>
-          </Defs>
-
           {/* Background circle */}
           <Circle
             cx={size / 2}
             cy={size / 2}
             r={radius}
-            stroke={colors.gray[200]}
+            stroke={colors.border}
             strokeWidth={strokeWidth}
             fill="transparent"
           />
@@ -72,8 +65,7 @@ export const MetricIcon: React.FC<MetricIconProps> = React.memo(
               cx={size / 2}
               cy={size / 2}
               r={radius}
-              //   stroke={isCompleted ? "url(#goldGradient)" : iconColor}
-              stroke={iconColor}
+              stroke={progressColor}
               strokeWidth={strokeWidth}
               fill="transparent"
               strokeDasharray={strokeDasharray}
@@ -92,8 +84,7 @@ export const MetricIcon: React.FC<MetricIconProps> = React.memo(
             width: 48,
             height: 48,
             borderRadius: 24,
-            // backgroundColor: isCompleted ? "#FFD70020" : iconColor + "20",
-            backgroundColor: iconColor + "20",
+            backgroundColor: iconColor + "15", // Sutil - 15% opacity
             alignItems: "center",
             justifyContent: "center",
             position: "relative",

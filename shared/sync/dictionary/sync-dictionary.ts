@@ -1,4 +1,5 @@
 import { SupabaseFoldersRepository } from "../repositories/supabase-folders-repository";
+import { SupabaseMacrosRepository } from "../repositories/supabase-macros-repository";
 import { SupabasePRRepository } from "../repositories/supabase-pr-repository";
 import { SupabaseRoutinesRepository } from "../repositories/supabase-routines-repository";
 import { SupabaseTrackerRepository } from "../repositories/supabase-tracker-repository";
@@ -10,6 +11,7 @@ import type { MutationCode } from "../types/mutations";
 const foldersRepo = new SupabaseFoldersRepository();
 const routinesRepo = new SupabaseRoutinesRepository();
 const trackerRepo = new SupabaseTrackerRepository();
+const macrosRepo = new SupabaseMacrosRepository();
 const prRepo = new SupabasePRRepository();
 const workoutRepo = new SupabaseWorkoutRepository();
 const userRepo = new SupabaseUserRepository();
@@ -96,6 +98,27 @@ export const supabaseSyncDictionary: Record<MutationCode, Function> = {
     trackerRepo.createQuickAction(payload),
   TRACKER_QUICK_ACTION_DELETE: (payload: { quickActionId: string }) =>
     trackerRepo.deleteQuickAction(payload.quickActionId),
+
+  // Macro Targets
+  MACRO_TARGET_UPSERT: (payload: any) => macrosRepo.upsertTarget(payload),
+  MACRO_TARGET_UPDATE: (payload: any) =>
+    macrosRepo.updateTarget(payload.id, payload),
+
+  // Macro Entries
+  MACRO_ENTRY_CREATE: (payload: { entry: any; aggregate: any }) =>
+    macrosRepo.createEntryWithAggregate(payload),
+  MACRO_ENTRY_UPDATE: (payload: any) =>
+    macrosRepo.updateEntry(payload.id, payload),
+  MACRO_ENTRY_DELETE: (payload: { entryId: string; aggregate: any }) =>
+    macrosRepo.deleteEntryWithAggregate(payload),
+
+  // Macro Quick Actions
+  MACRO_QUICK_ACTIONS_INIT: (payload: any[]) =>
+    macrosRepo.createQuickActionsBulk(payload),
+  MACRO_QUICK_ACTION_CREATE: (payload: any) =>
+    macrosRepo.createQuickAction(payload),
+  MACRO_QUICK_ACTION_DELETE: (payload: { quickActionId: string }) =>
+    macrosRepo.deleteQuickAction(payload.quickActionId),
 
   // PR
   PR_CREATE: (payload: any) => prRepo.upsertCurrentPR(payload),

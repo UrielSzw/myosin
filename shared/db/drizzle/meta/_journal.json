@@ -225,6 +225,13 @@
       "when": 1764343615582,
       "tag": "0031_ambitious_metal_master",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "6",
+      "when": 1764369294120,
+      "tag": "0032_left_marvel_boy",
+      "breakpoints": true
     }
   ]
 }

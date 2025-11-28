@@ -2,11 +2,11 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { useQueryClient } from "@tanstack/react-query";
-import * as Haptics from "expo-haptics";
 import { Folder, FolderMinus, X } from "lucide-react-native";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
@@ -32,11 +32,12 @@ export const MoveRoutineModal: React.FC<Props> = ({
   const lang = prefs?.language ?? "es";
   const t = workoutsTranslations;
   const queryClient = useQueryClient();
+  const haptic = useHaptic();
 
   if (!routine) return null;
 
   const handleMoveToFolder = async (folderId: string | null) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.light();
     await routinesService.updateRoutineFolderId(routine.id, folderId);
     queryClient.invalidateQueries({
       queryKey: ["workouts"],

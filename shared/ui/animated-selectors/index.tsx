@@ -1,8 +1,8 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { Typography } from "@/shared/ui/typography";
-import * as Haptics from "expo-haptics";
 import React, { useCallback, useMemo } from "react";
 import { TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -35,6 +35,7 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = sharedUiTranslations;
+  const haptic = useHaptic();
 
   // Animated values
   const scale = useSharedValue(1);
@@ -52,7 +53,7 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
 
   const handlePress = useCallback(() => {
     // Haptic feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.light();
 
     // Press animation
     scale.value = withSequence(
@@ -61,7 +62,7 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
     );
 
     onPress(icon);
-  }, [icon, onPress, scale]);
+  }, [icon, onPress, scale, haptic]);
 
   const animatedStyle = useAnimatedStyle(() => {
     const bgColor = isSelected
@@ -117,6 +118,7 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = sharedUiTranslations;
+  const haptic = useHaptic();
 
   // Animated values
   const scale = useSharedValue(1);
@@ -132,7 +134,7 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
 
   const handlePress = useCallback(() => {
     // Haptic feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.light();
 
     // Press animation with bounce
     scale.value = withSequence(
@@ -142,7 +144,7 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
     );
 
     onPress(color);
-  }, [color, onPress, scale]);
+  }, [color, onPress, scale, haptic]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     borderColor: isSelected ? colors.text : colors.border,

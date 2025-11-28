@@ -2,6 +2,7 @@ import { useAddEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import {
@@ -30,6 +31,7 @@ export const ManualInput: React.FC<Props> = ({
 }) => {
   const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const { user } = useAuth();
   const t = trackerTranslations;
   const tUi = trackerUiTranslations;
@@ -66,6 +68,7 @@ export const ManualInput: React.FC<Props> = ({
           recordedAt: selectedDate,
           notes: tUi.manualEntry[lang],
         });
+        haptic.success();
         onCloseModal();
       } catch (error) {
         console.error("Error adding entry:", error);

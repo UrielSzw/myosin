@@ -44,6 +44,7 @@ type PrefsState = {
     setShowRpe: (userId: string, show: boolean) => void;
     setShowTempo: (userId: string, show: boolean) => void;
     setKeepScreenAwake: (userId: string, keep: boolean) => void;
+    setHapticFeedback: (userId: string, enabled: boolean) => void;
     setDefaultRestTime: (userId: string, seconds: number) => void;
     setColorScheme: (userId: string, scheme: ColorSchemeName) => void;
     setLanguage: (userId: string, language: "en" | "es") => void;
@@ -65,6 +66,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
         show_rpe: prefs.show_rpe,
         show_tempo: prefs.show_tempo,
         keep_screen_awake: prefs.keep_screen_awake,
+        haptic_feedback_enabled: prefs.haptic_feedback_enabled,
         default_rest_time_seconds: prefs.default_rest_time_seconds,
         theme: prefs.theme,
         language: prefs.language,
@@ -109,6 +111,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
               show_rpe: false,
               show_tempo: false,
               keep_screen_awake: true,
+              haptic_feedback_enabled: true,
               default_rest_time_seconds: 60,
             } as BaseUserPreferences;
 
@@ -169,6 +172,15 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
           prefs: {
             ...(s.prefs ?? ({} as BaseUserPreferences)),
             keep_screen_awake: value,
+          },
+        }));
+        schedulePersist(userId);
+      },
+      setHapticFeedback: (userId: string, value: boolean) => {
+        set((s) => ({
+          prefs: {
+            ...(s.prefs ?? ({} as BaseUserPreferences)),
+            haptic_feedback_enabled: value,
           },
         }));
         schedulePersist(userId);

@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
@@ -22,6 +23,7 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
   lang = "es",
 }) => {
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const t = trackerTranslations;
   const [selectedValue, setSelectedValue] = useState<number | null>(
     defaultValue || null
@@ -52,6 +54,7 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
   };
 
   const handleValueSelect = (index: number) => {
+    haptic.light();
     const value = min + index;
     setSelectedValue(value);
   };
@@ -59,6 +62,7 @@ export const DiscreteScaleInput: React.FC<DiscreteScaleInputProps> = ({
   const handleConfirm = () => {
     if (selectedValue === null) return;
 
+    haptic.success();
     const index = selectedValue - min;
     const iconName = scaleIcons[index] || "";
     const label = getTranslatedLabel(selectedValue);

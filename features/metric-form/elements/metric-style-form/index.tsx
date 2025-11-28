@@ -4,10 +4,10 @@ import {
   MetricIconKey,
 } from "@/shared/constants/metric-icons";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { metricFormTranslations } from "@/shared/translations/metric-form";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
-import * as Haptics from "expo-haptics";
 import * as Icons from "lucide-react-native";
 import React, { useCallback } from "react";
 import { ScrollView, TouchableOpacity, View } from "react-native";
@@ -35,17 +35,18 @@ const MetricIconButton: React.FC<{
   selectedColor: string;
 }> = ({ icon, isSelected, onPress, selectedColor }) => {
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const scale = useSharedValue(1);
 
   const IconComponent = (Icons as any)[icon];
 
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.light();
     scale.value = withSpring(0.95, { damping: 10 }, () => {
       scale.value = withSpring(1);
     });
     onPress(icon);
-  }, [icon, onPress, scale]);
+  }, [icon, onPress, scale, haptic]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
@@ -86,15 +87,16 @@ const MetricColorButton: React.FC<{
   onPress: (color: string) => void;
 }> = ({ color, isSelected, onPress }) => {
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const scale = useSharedValue(1);
 
   const handlePress = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    haptic.light();
     scale.value = withSpring(0.9, { damping: 10 }, () => {
       scale.value = withSpring(1);
     });
     onPress(color);
-  }, [color, onPress, scale]);
+  }, [color, onPress, scale, haptic]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

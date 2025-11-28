@@ -1,8 +1,9 @@
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { router } from "expo-router";
 import React from "react";
-import { TouchableOpacity, Vibration, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import { IToogleSheet } from "../../hooks/use-form-routine-sheets";
 import {
   useMainActions,
@@ -24,6 +25,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
   const { initializeReorder } = useReorderBlocks();
   const { getBlockColors } = useBlockStyles();
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
 
   const block = blocks[blockId];
   const exercisesInBlockIds = exercisesByBlock[blockId] || [];
@@ -31,7 +33,7 @@ export const BlockItem: React.FC<Props> = ({ blockId, onToggleSheet }) => {
   const blockColors = getBlockColors(block.type);
 
   const handleLongPress = () => {
-    Vibration.vibrate(50);
+    haptic.drag();
     initializeReorder();
     router.push("/routines/reorder-blocks");
   };

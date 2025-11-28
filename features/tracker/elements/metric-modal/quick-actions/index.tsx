@@ -6,6 +6,7 @@ import {
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import {
@@ -39,6 +40,7 @@ export const QuickActions: React.FC<Props> = ({
   const addQuickActionMutation = useAddEntryFromQuickAction();
   const addEntryMutation = useAddEntry();
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
@@ -60,6 +62,7 @@ export const QuickActions: React.FC<Props> = ({
   const quickActions = getQuickActions();
 
   const handleQuickActionIncrement = (actionIndex: number) => {
+    haptic.light();
     setQuickActionCounts((prev) => ({
       ...prev,
       [actionIndex]: (prev[actionIndex] || 0) + 1,
@@ -67,6 +70,7 @@ export const QuickActions: React.FC<Props> = ({
   };
 
   const handleQuickActionDecrement = (actionIndex: number) => {
+    haptic.light();
     setQuickActionCounts((prev) => ({
       ...prev,
       [actionIndex]: Math.max(0, (prev[actionIndex] || 0) - 1),
@@ -121,6 +125,7 @@ export const QuickActions: React.FC<Props> = ({
       }
 
       setQuickActionCounts({});
+      haptic.success();
       onCloseModal();
     } catch (error: any) {
       console.error("Error adding quick actions:", error);

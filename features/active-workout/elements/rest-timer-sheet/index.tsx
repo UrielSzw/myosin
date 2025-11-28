@@ -1,13 +1,14 @@
 /* eslint-disable import/no-named-as-default */
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
 import { Pause, Play, Timer } from "lucide-react-native";
 import React, { forwardRef, useCallback } from "react";
-import { TouchableOpacity, Vibration, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 import {
   useActiveRestTimer,
   useActiveRestTimerActions,
@@ -23,6 +24,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
     const { adjustRestTimer, skipRestTimer } = useActiveRestTimerActions();
     const restTimerStore = useActiveRestTimer();
     const { totalTime, startedAt } = restTimerStore || {};
+    const haptic = useHaptic();
 
     const audioPlayer = useAudioPlayer(
       require("@/assets/audio/timer_complete.wav")
@@ -44,7 +46,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
 
     const playCompletionAlert = useCallback(() => {
       // Vibración existente
-      Vibration.vibrate([100, 50, 500, 50, 100]);
+      haptic.timerComplete();
 
       // NUEVO: Sonido de completion
       try {
@@ -55,7 +57,7 @@ export const RestTimerBottomSheet = forwardRef<BottomSheetModal>(
       }
 
       console.log("🔔 Timer completed!");
-    }, [audioPlayer]);
+    }, [audioPlayer, haptic]);
 
     const restTimeSeconds = totalTime || 0;
 

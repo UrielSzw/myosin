@@ -1,4 +1,4 @@
-import * as Haptics from "expo-haptics";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { useCallback } from "react";
 import {
   useAnimatedStyle,
@@ -9,6 +9,8 @@ import {
 } from "react-native-reanimated";
 
 export const usePRCelebration = () => {
+  const haptic = useHaptic();
+
   // Animation values
   const glowPulse = useSharedValue(0);
   const borderSlide = useSharedValue(-100);
@@ -29,8 +31,8 @@ export const usePRCelebration = () => {
     borderSlide.value = withTiming(0, { duration: 400 });
 
     // Haptic feedback
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  }, [glowPulse, borderSlide]);
+    haptic.success();
+  }, [glowPulse, borderSlide, haptic]);
 
   // Reset all animations
   const resetCelebration = useCallback(() => {

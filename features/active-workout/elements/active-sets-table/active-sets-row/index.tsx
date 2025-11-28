@@ -9,6 +9,7 @@ import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
@@ -57,6 +58,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   const t = activeWorkoutTranslations;
   const weightUnit = prefs?.weight_unit ?? "kg";
   const distanceUnit = prefs?.distance_unit ?? "metric";
+  const haptic = useHaptic();
 
   // Hook para indicador de próximo set (solo para superseries y circuitos)
   const nextSetIndicator = useNextSetIndicator(blockId);
@@ -96,6 +98,7 @@ export const ActiveSetRow: React.FC<Props> = ({
     if (completed) {
       uncompleteSet(setId);
       resetCelebration();
+      haptic.light(); // Light haptic for uncomplete
     } else {
       // Prioridad: 1) Input del usuario (local state), 2) Valor autocompletado del store
       const userPrimaryInput =
@@ -152,6 +155,11 @@ export const ActiveSetRow: React.FC<Props> = ({
         isPR: prValidation.isPR,
       });
 
+      // Haptic feedback for completing set (PR has its own haptic in celebration)
+      if (!prValidation.isPR) {
+        haptic.medium();
+      }
+
       if (prValidation.isPR) {
         triggerCelebration();
       }
@@ -159,6 +167,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   };
 
   const handleSetType = useCallback(() => {
+    haptic.light();
     onToggleSheet("setType");
     setCurrentState({
       currentSetId: set.tempId,
@@ -171,6 +180,7 @@ export const ActiveSetRow: React.FC<Props> = ({
     set.tempId,
     set.set_type,
     setCurrentState,
+    haptic,
   ]);
 
   const renderPrimaryValue =
@@ -274,6 +284,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   };
 
   const handleOpenRpeSelector = () => {
+    haptic.light();
     onToggleSheet("rpeSelector");
     setCurrentState({
       currentSetId: set.tempId,
@@ -282,6 +293,7 @@ export const ActiveSetRow: React.FC<Props> = ({
   };
 
   const handleSeeTempo = () => {
+    haptic.light();
     onToggleSheet("tempoMetronome");
     setCurrentState({
       currentTempo: set.planned_tempo || null,

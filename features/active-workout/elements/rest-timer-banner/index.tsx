@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { Typography } from "@/shared/ui/typography";
 import { setAudioModeAsync, useAudioPlayer } from "expo-audio";
@@ -16,7 +17,6 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
-  Vibration,
   View,
 } from "react-native";
 import Animated, {
@@ -41,6 +41,7 @@ export const RestTimerBanner: React.FC = () => {
   const { skipRestTimer } = useActiveRestTimerActions();
   const restTimerStore = useActiveRestTimer();
   const { totalTime, startedAt } = restTimerStore || {};
+  const haptic = useHaptic();
 
   const audioPlayer = useAudioPlayer(
     require("@/assets/audio/timer_complete.wav")
@@ -77,14 +78,14 @@ export const RestTimerBanner: React.FC = () => {
   }, []);
 
   const playCompletionAlert = useCallback(() => {
-    Vibration.vibrate([100, 50, 500, 50, 100]);
+    haptic.timerComplete();
     try {
       audioPlayer.seekTo(0);
       audioPlayer.play();
     } catch (error) {
       console.log("Error playing completion sound:", error);
     }
-  }, [audioPlayer]);
+  }, [audioPlayer, haptic]);
 
   const dismissBanner = useCallback(() => {
     translateY.value = withTiming(BANNER_HEIGHT + PROGRESS_HEIGHT, {

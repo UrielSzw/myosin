@@ -1,9 +1,10 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { ReorderExercise } from "@/shared/types/reorder";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { Dumbbell, GripVertical } from "lucide-react-native";
-import { TouchableOpacity, Vibration, View } from "react-native";
+import { TouchableOpacity, View } from "react-native";
 
 type Props = {
   exercise: ReorderExercise;
@@ -21,6 +22,7 @@ export const ReorderExerciseItem: React.FC<Props> = ({
   blockType,
 }) => {
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
 
   const getBlockTypeColor = (type: IBlockType) => {
     switch (type) {
@@ -38,7 +40,7 @@ export const ReorderExerciseItem: React.FC<Props> = ({
   return (
     <TouchableOpacity
       onLongPress={() => {
-        Vibration.vibrate(50); // Haptic feedback
+        haptic.drag();
         drag();
       }}
       delayLongPress={300}

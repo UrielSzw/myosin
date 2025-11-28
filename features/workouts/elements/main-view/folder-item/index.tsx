@@ -1,11 +1,12 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { ChevronRight } from "lucide-react-native";
-import { StyleSheet, TouchableOpacity, Vibration, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 type Props = {
   folder: FolderWithMetrics;
@@ -24,11 +25,12 @@ export const FolderItem: React.FC<Props> = ({
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = workoutsTranslations;
+  const haptic = useHaptic();
 
   return (
     <TouchableOpacity
       onLongPress={() => {
-        Vibration.vibrate(50);
+        haptic.drag();
         drag();
       }}
       onPress={onSelect}
@@ -60,11 +62,7 @@ export const FolderItem: React.FC<Props> = ({
 
           {/* Info */}
           <View style={styles.info}>
-            <Typography
-              variant="body1"
-              weight="semibold"
-              numberOfLines={1}
-            >
+            <Typography variant="body1" weight="semibold" numberOfLines={1}>
               {folder.name}
             </Typography>
             <Typography variant="caption" color="textMuted">

@@ -34,6 +34,11 @@ export const user_preferences = sqliteTable(
     keep_screen_awake: integer("keep_screen_awake", { mode: "boolean" })
       .default(true)
       .notNull(),
+    haptic_feedback_enabled: integer("haptic_feedback_enabled", {
+      mode: "boolean",
+    })
+      .default(true)
+      .notNull(),
 
     // Workout defaults
     default_rest_time_seconds: integer("default_rest_time_seconds")

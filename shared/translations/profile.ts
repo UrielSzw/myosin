@@ -198,6 +198,14 @@ export const profileTranslations = {
     es: "Evita que la pantalla se apague durante el entrenamiento",
     en: "Prevent screen from turning off during workout",
   },
+  hapticFeedbackTitle: {
+    es: "Vibración y Feedback Táctil",
+    en: "Haptic Feedback",
+  },
+  hapticFeedbackSubtitle: {
+    es: "Vibración al completar series, ejercicios y acciones",
+    en: "Vibrate when completing sets, exercises and actions",
+  },
 
   // Language Selector
   languageSelectorTitle: {

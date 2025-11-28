@@ -1,5 +1,6 @@
 import { MainMetric } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { trackerTranslations } from "@/shared/translations/tracker";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
@@ -20,6 +21,7 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
   lang = "es",
 }) => {
   const { colors } = useColorScheme();
+  const haptic = useHaptic();
   const t = trackerTranslations;
   const [selectedValue, setSelectedValue] = useState<boolean | null>(null);
 
@@ -49,12 +51,14 @@ export const BooleanToggleInput: React.FC<BooleanToggleInputProps> = ({
   };
 
   const handleValueSelect = (value: boolean) => {
+    haptic.light();
     setSelectedValue(value);
   };
 
   const handleConfirm = () => {
     if (selectedValue === null) return;
 
+    haptic.success();
     const displayValue = selectedValue
       ? `✓ ${getTrueLabel()}`
       : `✗ ${getFalseLabel()}`;

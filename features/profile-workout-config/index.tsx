@@ -20,6 +20,7 @@ import {
   Clock,
   Smartphone,
   Timer,
+  Vibrate,
 } from "lucide-react-native";
 import React, { useRef } from "react";
 import { Pressable, ScrollView, Switch, View } from "react-native";
@@ -40,6 +41,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
     setShowRpe,
     setShowTempo,
     setKeepScreenAwake,
+    setHapticFeedback,
     setDefaultRestTime,
   } = useUserPreferencesActions();
 
@@ -48,6 +50,7 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
   const rpeEnabled = prefs?.show_rpe ?? false;
   const tempoEnabled = prefs?.show_tempo ?? false;
   const keepScreenAwake = prefs?.keep_screen_awake ?? true;
+  const hapticEnabled = prefs?.haptic_feedback_enabled ?? true;
   const defaultRestTime = prefs?.default_rest_time_seconds ?? 60;
 
   const restTimeSheetRef = useRef<BottomSheetModal>(null);
@@ -342,6 +345,30 @@ export const ProfileWorkoutConfigFeature: React.FC = () => {
                 value={keepScreenAwake}
                 onValueChange={(v) => {
                   if (user?.id) setKeepScreenAwake(user.id, v);
+                }}
+                trackColor={{
+                  false: colors.gray[300],
+                  true: colors.primary[500],
+                }}
+                thumbColor="#ffffff"
+              />
+            }
+          />
+
+          <SettingItem
+            icon={
+              <Vibrate
+                size={20}
+                color={hapticEnabled ? colors.primary[500] : colors.textMuted}
+              />
+            }
+            title={t.hapticFeedbackTitle[lang]}
+            subtitle={t.hapticFeedbackSubtitle[lang]}
+            rightElement={
+              <Switch
+                value={hapticEnabled}
+                onValueChange={(v) => {
+                  if (user?.id) setHapticFeedback(user.id, v);
                 }}
                 trackColor={{
                   false: colors.gray[300],

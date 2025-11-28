@@ -6,6 +6,7 @@ import {
   finishWorkout,
   prepareFinishData,
 } from "@/shared/services/finish-workout";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,6 +30,7 @@ export const useFinishWorkout = () => {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const { sync } = useSyncEngine();
+  const haptic = useHaptic();
 
   /**
    * Executes the complete finish workout flow:
@@ -60,6 +62,9 @@ export const useFinishWorkout = () => {
       if (!result.success) {
         throw new Error(result.error || "Error al guardar el workout");
       }
+
+      // Success haptic feedback
+      haptic.success();
 
       // Step 4: Clear state and navigate
       clearWorkout();
@@ -183,6 +188,7 @@ export const useFinishWorkout = () => {
         text: t.yesDelete[lang],
         style: "destructive",
         onPress: () => {
+          haptic.warning(); // Warning haptic for discarding
           clearWorkout();
           router.back();
         },

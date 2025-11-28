@@ -18,6 +18,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           show_rpe: data.show_rpe ?? false,
           show_tempo: data.show_tempo ?? false,
           keep_screen_awake: data.keep_screen_awake ?? true,
+          haptic_feedback_enabled: data.haptic_feedback_enabled ?? true,
           default_rest_time_seconds: data.default_rest_time_seconds ?? 60,
         })
         .select()
@@ -45,6 +46,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           show_rpe: data.show_rpe,
           show_tempo: data.show_tempo,
           keep_screen_awake: data.keep_screen_awake,
+          haptic_feedback_enabled: data.haptic_feedback_enabled,
           default_rest_time_seconds: data.default_rest_time_seconds,
           updated_at: new Date().toISOString(),
         })

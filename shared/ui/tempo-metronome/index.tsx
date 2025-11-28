@@ -1,9 +1,9 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { tempoMetronomeTranslations } from "@/shared/translations/tempo-metronome";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
-import * as Haptics from "expo-haptics";
 import { Pause, Play, RotateCcw, X } from "lucide-react-native";
 import React, {
   forwardRef,
@@ -241,6 +241,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = tempoMetronomeTranslations;
+    const haptic = useHaptic();
 
     // State management
     const [state, dispatch] = useReducer(timerReducer, initialState);
@@ -261,20 +262,12 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
     // ============================================================================
 
     const playTickHaptic = useCallback(async () => {
-      try {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      } catch (error) {
-        console.log("Haptic failed:", error);
-      }
-    }, []);
+      haptic.light();
+    }, [haptic]);
 
     const playPhaseChangeHaptic = useCallback(async () => {
-      try {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      } catch (error) {
-        console.log("Haptic failed:", error);
-      }
-    }, []);
+      haptic.medium();
+    }, [haptic]);
 
     // ============================================================================
     // ANIMATIONS
@@ -376,23 +369,23 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
 
     const handleStart = useCallback(() => {
       dispatch({ type: "START_COUNTDOWN" });
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-    }, []);
+      haptic.heavy();
+    }, [haptic]);
 
     const handlePause = useCallback(() => {
       dispatch({ type: "PAUSE" });
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }, []);
+      haptic.medium();
+    }, [haptic]);
 
     const handleResume = useCallback(() => {
       dispatch({ type: "RESUME" });
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    }, []);
+      haptic.medium();
+    }, [haptic]);
 
     const handleReset = useCallback(() => {
       dispatch({ type: "RESET" });
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }, []);
+      haptic.light();
+    }, [haptic]);
 
     const handleClose = useCallback(() => {
       // Close immediately as requested

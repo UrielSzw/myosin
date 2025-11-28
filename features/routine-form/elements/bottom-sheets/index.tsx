@@ -1,3 +1,4 @@
+import { useHaptic } from "@/shared/services/haptic-service";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import { RPESelector } from "@/shared/ui/rpe-selector";
 import { BlockOptionsBottomSheet } from "@/shared/ui/sheets/block-options-sheet";
@@ -8,7 +9,6 @@ import { TempoSelector } from "@/shared/ui/tempo-selector";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useCallback } from "react";
-import { Vibration } from "react-native";
 import {
   useBlockActions,
   useExerciseActions,
@@ -61,6 +61,7 @@ export const BottomSheets: React.FC<Props> = ({
 
   const { initializeReorder } = useReorderExercises();
   const { initializeReorder: initializeReorderBlocks } = useReorderBlocks();
+  const haptic = useHaptic();
 
   const handleUpdateSetType = useCallback(
     (type: ISetType) => {
@@ -167,12 +168,12 @@ export const BottomSheets: React.FC<Props> = ({
     if (!currentBlockId) return;
     blockOptionsBottomSheetRef.current?.dismiss();
 
-    Vibration.vibrate(50);
+    haptic.drag();
     initializeReorderBlocks();
     router.push("/routines/reorder-blocks");
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentBlockId, initializeReorderBlocks]);
+  }, [currentBlockId, initializeReorderBlocks, haptic]);
 
   return (
     <>

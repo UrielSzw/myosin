@@ -9,9 +9,8 @@ import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { Check, Info, Plus, Star } from "lucide-react-native";
 import { memo, useCallback } from "react";
-import { View } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
-import { Button } from "../../button";
+import { Pressable, View } from "react-native";
+import Animated, { FadeIn } from "react-native-reanimated";
 import { Card } from "../../card";
 import { ExerciseMedia } from "../../exercise-media";
 import { Typography } from "../../typography";
@@ -29,6 +28,8 @@ type Props = {
     text: string;
     primary: { [key: string]: string };
     gray: { [key: string]: string };
+    success: { [key: string]: string };
+    warning: { [key: string]: string };
     textMuted: string;
   };
   exerciseModalMode?: "add-new" | "add-to-block" | "replace" | null;
@@ -62,118 +63,167 @@ export const ExerciseCard: React.FC<Props> = memo(
       onSeeMoreInfo(exercise);
     }, [onSeeMoreInfo, exercise]);
 
+    // Determinar colores según estado
+    const getStateColors = () => {
+      if (isSelected) {
+        return {
+          border: colors.primary[500],
+          bg: colors.primary[500] + "10",
+          icon: colors.primary[500],
+        };
+      }
+      if (isRecommended) {
+        return {
+          border: colors.warning[500],
+          bg: colors.warning[500] + "10",
+          icon: colors.warning[500],
+        };
+      }
+      return {
+        border: colors.border,
+        bg: "transparent",
+        icon: colors.textMuted,
+      };
+    };
+
+    const stateColors = getStateColors();
+
     return (
-      <Animated.View entering={FadeInDown.delay(index * 100).duration(600)}>
-        <Card
-          key={exercise.id}
-          variant="outlined"
-          padding="md"
-          style={{
-            opacity: isSelected ? 0.6 : 1,
-            marginTop: 16,
-            borderColor: isRecommended ? colors.primary[100] : undefined,
-            borderWidth: isRecommended ? 1 : 0,
-          }}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "flex-start",
-              gap: 12,
-            }}
-          >
-            {/* Exercise Image */}
-            <ExerciseMedia
-              primaryMediaUrl={exercise.primary_media_url || undefined}
-              primaryMediaType={exercise.primary_media_type || undefined}
-              variant="thumbnail"
-              exerciseName={exercise.name}
-            />
-
-            <View style={{ flex: 1 }}>
+      <Animated.View
+        entering={FadeIn.delay(Math.min(index * 50, 300)).duration(300)}
+      >
+        <Pressable onPress={handleSelectExercise}>
+          {({ pressed }) => (
+            <Card
+              variant="outlined"
+              padding="none"
+              style={{
+                marginTop: 12,
+                borderColor: stateColors.border,
+                backgroundColor: stateColors.bg,
+                opacity: pressed ? 0.8 : 1,
+              }}
+            >
               <View
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
-                  marginBottom: 4,
+                  padding: 12,
                 }}
               >
-                <Typography
-                  variant="h6"
-                  weight="semibold"
+                {/* Selection indicator */}
+                <View
                   style={{
-                    flex: 1,
-                    color: colors.text,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: isSelected
+                      ? colors.primary[500]
+                      : isRecommended
+                      ? colors.warning[500] + "20"
+                      : colors.gray[100],
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginRight: 12,
                   }}
                 >
-                  {exercise.name}
-                </Typography>
-              </View>
+                  {isSelected ? (
+                    <Check size={20} color="#FFFFFF" />
+                  ) : isRecommended ? (
+                    <Star
+                      size={18}
+                      color={colors.warning[500]}
+                      fill={colors.warning[500]}
+                    />
+                  ) : (
+                    <Plus size={20} color={colors.textMuted} />
+                  )}
+                </View>
 
-              <Typography
-                variant="body2"
-                color="textMuted"
-                style={{ marginBottom: 8 }}
-              >
-                {
-                  equipmentT[
-                    exercise.primary_equipment as IExerciseEquipment
-                  ]?.[lang]
-                }{" "}
-                •{" "}
-                {muscleT[exercise.main_muscle_group as IExerciseMuscle]?.[lang]}
-              </Typography>
+                {/* Exercise Image */}
+                <ExerciseMedia
+                  primaryMediaUrl={exercise.primary_media_url || undefined}
+                  primaryMediaType={exercise.primary_media_type || undefined}
+                  variant="thumbnail"
+                  exerciseName={exercise.name}
+                />
 
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: 12,
-                }}
-              >
-                <Button
-                  variant={isSelected ? "secondary" : "primary"}
-                  style={{
-                    paddingVertical: isSelected ? 10 : 8,
-                  }}
-                  size="sm"
-                  onPress={handleSelectExercise}
-                  icon={
-                    isSelected ? (
-                      <Check size={16} color="#ffffff" />
-                    ) : isRecommended ? (
-                      <Star size={16} color="#ffffff" fill="#ffffff" />
-                    ) : (
-                      <Plus size={16} color="#ffffff" />
-                    )
-                  }
-                >
-                  {exerciseModalMode !== "replace"
-                    ? isSelected
-                      ? t.added[lang]
-                      : t.add[lang]
-                    : isSelected
-                    ? t.selected[lang]
-                    : isRecommended
-                    ? t.recommended[lang]
-                    : sharedT.select[lang]}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  icon={<Info size={16} color={colors.primary[500]} />}
+                {/* Content */}
+                <View style={{ flex: 1, marginLeft: 12 }}>
+                  {/* Name + Recommended badge */}
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 8,
+                      marginBottom: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="body1"
+                      weight="semibold"
+                      numberOfLines={1}
+                      style={{ flex: 1 }}
+                    >
+                      {exercise.name}
+                    </Typography>
+                    {isRecommended && !isSelected && (
+                      <View
+                        style={{
+                          backgroundColor: colors.warning[500] + "20",
+                          paddingHorizontal: 8,
+                          paddingVertical: 2,
+                          borderRadius: 10,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          style={{
+                            color: colors.warning[600],
+                            fontSize: 10,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {t.recommended[lang]}
+                        </Typography>
+                      </View>
+                    )}
+                  </View>
+
+                  {/* Equipment • Muscle */}
+                  <Typography variant="caption" color="textMuted">
+                    {
+                      equipmentT[
+                        exercise.primary_equipment as IExerciseEquipment
+                      ]?.[lang]
+                    }{" "}
+                    •{" "}
+                    {
+                      muscleT[exercise.main_muscle_group as IExerciseMuscle]?.[
+                        lang
+                      ]
+                    }
+                  </Typography>
+                </View>
+
+                {/* Info button */}
+                <Pressable
                   onPress={handleSeeMoreInfo}
+                  style={({ pressed }) => ({
+                    padding: 8,
+                    opacity: pressed ? 0.6 : 1,
+                  })}
+                  hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                 >
-                  Info
-                </Button>
+                  <Info size={20} color={colors.primary[500]} />
+                </Pressable>
               </View>
-            </View>
-          </View>
-        </Card>
+            </Card>
+          )}
+        </Pressable>
       </Animated.View>
     );
   },
-  // Optimización de memoization: solo re-render cuando cambien estas props críticas
   (prevProps, nextProps) => {
     return (
       prevProps.exercise.id === nextProps.exercise.id &&

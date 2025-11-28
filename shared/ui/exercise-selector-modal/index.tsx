@@ -56,8 +56,6 @@ export const ExerciseSelectorModal: React.FC<Props> = ({
     clearSelectedExercises,
   } = useExerciseSelector(exerciseModalMode === "replace");
 
-  // Aplicar filtros a los ejercicios
-
   // Fix para el bug de layout inicial (similar a WorkoutsFeature)
   const [isInitialMount, setIsInitialMount] = useState(true);
 

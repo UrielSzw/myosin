@@ -1,46 +1,15 @@
 import { BaseExercise } from "@/shared/db/schema";
-import { IExerciseMuscle } from "@/shared/types/workout";
 import { useCallback, useMemo, useState } from "react";
 
+/**
+ * Hook para manejar la selección de ejercicios y navegación al detalle.
+ * Los filtros se manejan en useExerciseFilters (shared/hooks).
+ */
 export const useExerciseSelector = (isReplaceMode: boolean) => {
   const [selectedExercises, setSelectedExercises] = useState<
     Record<string, BaseExercise>
   >({});
   const [infoExercise, setInfoExercise] = useState<BaseExercise | null>(null);
-
-  // Estados para búsqueda y filtros
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedCategory, setSelectedCategory] =
-    useState<IExerciseMuscle | null>(null);
-
-  // Función para filtrar ejercicios en memoria
-  const getFilteredExercises = useCallback(
-    (exercises: BaseExercise[]) => {
-      let filtered = exercises;
-
-      // Filtro por búsqueda de texto
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        filtered = filtered.filter(
-          (exercise) =>
-            exercise.name.toLowerCase().includes(query) ||
-            exercise.instructions?.some((instruction) =>
-              instruction.toLowerCase().includes(query)
-            )
-        );
-      }
-
-      // Filtro por categoría
-      if (selectedCategory) {
-        filtered = filtered.filter(
-          (exercise) => exercise.main_muscle_group === selectedCategory
-        );
-      }
-
-      return filtered;
-    },
-    [searchQuery, selectedCategory]
-  );
 
   // Computaciones memoizadas
   const selectedExercisesArray = useMemo(
@@ -53,7 +22,7 @@ export const useExerciseSelector = (isReplaceMode: boolean) => {
     [selectedExercises]
   );
 
-  // Handlers
+  // Handlers de selección
   const handleSelectExercise = useCallback(
     (exercise: BaseExercise) => {
       setSelectedExercises((prev) => {
@@ -67,7 +36,6 @@ export const useExerciseSelector = (isReplaceMode: boolean) => {
             // En modo replace, solo permitimos uno
             return { [exercise.id]: exercise };
           }
-
           // Si no está seleccionado, lo agregamos
           return { ...prev, [exercise.id]: exercise };
         }
@@ -76,6 +44,7 @@ export const useExerciseSelector = (isReplaceMode: boolean) => {
     [isReplaceMode]
   );
 
+  // Handlers de navegación al detalle
   const handleSeeMoreInfo = useCallback((exercise: BaseExercise) => {
     setInfoExercise(exercise);
   }, []);
@@ -84,45 +53,24 @@ export const useExerciseSelector = (isReplaceMode: boolean) => {
     setInfoExercise(null);
   }, []);
 
+  // Reset de selección
   const clearSelectedExercises = useCallback(() => {
     setSelectedExercises({});
   }, []);
 
-  // Handlers para búsqueda y filtros
-  const handleSearchQueryChange = useCallback((query: string) => {
-    setSearchQuery(query);
-  }, []);
-
-  const handleCategoryPress = useCallback((category: IExerciseMuscle) => {
-    setSelectedCategory((prev) => (prev === category ? null : category));
-  }, []);
-
-  const clearSearchAndFilters = useCallback(() => {
-    setSearchQuery("");
-    setSelectedCategory(null);
-  }, []);
-
   return {
-    // Estado
+    // Estado de selección
     selectedExercises,
     selectedExercisesArray,
     selectedExercisesLength,
-    infoExercise,
 
-    // Estados de búsqueda y filtros
-    searchQuery,
-    selectedCategory,
+    // Estado de navegación
+    infoExercise,
 
     // Handlers
     handleSelectExercise,
     handleSeeMoreInfo,
     handleCloseExerciseDetail,
     clearSelectedExercises,
-
-    // Handlers de búsqueda y filtros
-    handleSearchQueryChange,
-    handleCategoryPress,
-    clearSearchAndFilters,
-    getFilteredExercises,
   };
 };

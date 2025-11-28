@@ -8,13 +8,95 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { Typography } from "@/shared/ui/typography";
 import { LayoutGrid, MoreHorizontal } from "lucide-react-native";
-import React from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import React, { memo, useCallback } from "react";
+import { Pressable, ScrollView, View } from "react-native";
+import Animated, {
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 interface Props {
   selectedCategory: MainCategory;
   onCategorySelect: (category: MainCategory) => void;
 }
+
+interface CategoryTabProps {
+  category: MainCategory;
+  isSelected: boolean;
+  label: string;
+  icon: React.ReactNode;
+  onPress: () => void;
+  colors: any;
+  isDarkMode: boolean;
+}
+
+const CategoryTab = memo<CategoryTabProps>(
+  ({ category, isSelected, label, icon, onPress, colors, isDarkMode }) => {
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [
+        {
+          scale: withSpring(isSelected ? 1 : 0.98, {
+            damping: 15,
+            stiffness: 300,
+          }),
+        },
+      ],
+    }));
+
+    return (
+      <AnimatedPressable
+        onPress={onPress}
+        style={[
+          {
+            flexDirection: "row",
+            alignItems: "center",
+            paddingHorizontal: 18,
+            paddingVertical: 10,
+            borderRadius: 24,
+            backgroundColor: isSelected
+              ? colors.primary[500]
+              : isDarkMode
+              ? colors.gray[800]
+              : colors.gray[50],
+            borderWidth: 1.5,
+            borderColor: isSelected
+              ? colors.primary[600]
+              : isDarkMode
+              ? colors.gray[700]
+              : colors.gray[200],
+            minWidth: 90,
+            justifyContent: "center",
+            // Subtle shadow for selected state
+            ...(isSelected && {
+              shadowColor: colors.primary[500],
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.3,
+              shadowRadius: 4,
+              elevation: 3,
+            }),
+          },
+          animatedStyle,
+        ]}
+        accessibilityRole="tab"
+        accessibilityState={{ selected: isSelected }}
+        accessibilityLabel={`Categoría ${label}`}
+      >
+        {icon && <View style={{ marginRight: 8 }}>{icon}</View>}
+        <Typography
+          variant="body2"
+          weight={isSelected ? "semibold" : "medium"}
+          color={isSelected ? "white" : "text"}
+        >
+          {label}
+        </Typography>
+      </AnimatedPressable>
+    );
+  }
+);
+
+CategoryTab.displayName = "CategoryTab";
 
 export const CategoryTabs: React.FC<Props> = ({
   selectedCategory,
@@ -26,78 +108,60 @@ export const CategoryTabs: React.FC<Props> = ({
   const t = exerciseSelectorTranslations;
 
   // Helper para obtener el label traducido
-  const getCategoryLabel = (category: MainCategory): string => {
-    const key = `category${
-      category.charAt(0).toUpperCase() + category.slice(1)
-    }` as keyof typeof t;
-    return t[key]?.[lang] || category;
-  };
+  const getCategoryLabel = useCallback(
+    (category: MainCategory): string => {
+      const key = `category${
+        category.charAt(0).toUpperCase() + category.slice(1)
+      }` as keyof typeof t;
+      return t[key]?.[lang] || category;
+    },
+    [lang, t]
+  );
 
   // Helper para obtener el icono correcto
-  const getIcon = (category: MainCategory) => {
-    const iconName = MAIN_CATEGORY_ICONS[category];
-    const iconColor = selectedCategory === category ? "#FFFFFF" : colors.text;
-    const size = 16;
+  const getIcon = useCallback(
+    (category: MainCategory, isSelected: boolean) => {
+      const iconName = MAIN_CATEGORY_ICONS[category];
+      const iconColor = isSelected ? "#FFFFFF" : colors.textMuted;
+      const size = 18;
 
-    switch (iconName) {
-      case "LayoutGrid":
-        return <LayoutGrid size={size} color={iconColor} />;
-      case "MoreHorizontal":
-        return <MoreHorizontal size={size} color={iconColor} />;
-      default:
-        return null;
-    }
-  };
+      switch (iconName) {
+        case "LayoutGrid":
+          return <LayoutGrid size={size} color={iconColor} strokeWidth={2.5} />;
+        case "MoreHorizontal":
+          return (
+            <MoreHorizontal size={size} color={iconColor} strokeWidth={2.5} />
+          );
+        default:
+          return null;
+      }
+    },
+    [colors.textMuted]
+  );
 
   return (
     <View style={{ paddingHorizontal: 20, marginBottom: 16 }}>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ gap: 12 }}
+        contentContainerStyle={{ gap: 10, paddingRight: 8 }}
       >
         {MAIN_CATEGORIES.map((category) => {
           const isSelected = selectedCategory === category;
           const label = getCategoryLabel(category);
-          const icon = getIcon(category);
+          const icon = getIcon(category, isSelected);
 
           return (
-            <TouchableOpacity
+            <CategoryTab
               key={category}
+              category={category}
+              isSelected={isSelected}
+              label={label}
+              icon={icon}
               onPress={() => onCategorySelect(category)}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                borderRadius: 20,
-                backgroundColor: isSelected
-                  ? colors.primary[500]
-                  : isDarkMode
-                  ? colors.gray[800]
-                  : colors.gray[100],
-                borderWidth: isSelected ? 0 : 1,
-                borderColor: isSelected
-                  ? "transparent"
-                  : isDarkMode
-                  ? colors.gray[700]
-                  : colors.gray[200],
-                minWidth: 80,
-                justifyContent: "center",
-              }}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isSelected }}
-              accessibilityLabel={`Categoría ${label}`}
-            >
-              {icon && <View style={{ marginRight: 6 }}>{icon}</View>}
-              <Typography
-                variant="body2"
-                weight="medium"
-                color={isSelected ? "white" : "text"}
-              >
-                {label}
-              </Typography>
-            </TouchableOpacity>
+              colors={colors}
+              isDarkMode={isDarkMode}
+            />
           );
         })}
       </ScrollView>

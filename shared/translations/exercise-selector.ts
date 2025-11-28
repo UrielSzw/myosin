@@ -50,6 +50,10 @@ export const exerciseSelectorTranslations = {
     es: "ejercicio",
     en: "exercise",
   },
+  exerciseSelected: {
+    es: "ejercicio seleccionado",
+    en: "exercise selected",
+  },
   exercisesSelected: {
     es: "ejercicios seleccionados",
     en: "exercises selected",

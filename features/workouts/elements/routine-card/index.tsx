@@ -7,9 +7,9 @@ import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { router } from "expo-router";
-import { Calendar, ChevronRight, Dumbbell, Hash, Play } from "lucide-react-native";
+import { Calendar, Play } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 type Props = {
   routine: RoutineWithMetrics;
@@ -29,7 +29,8 @@ export const RoutineCard: React.FC<Props> = ({
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 
-  const hasTrainingDays = routine.training_days && routine.training_days.length > 0;
+  const hasTrainingDays =
+    routine.training_days && routine.training_days.length > 0;
 
   const handleSelectRoutine = () => {
     onPress(routine);
@@ -57,22 +58,25 @@ export const RoutineCard: React.FC<Props> = ({
       .join(" · ");
   };
 
+  // Texto de stats: "3 bloques · 8 ejercicios"
+  const statsText = `${routine.blocksCount} ${
+    routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]
+  } · ${routine.exercisesCount} ${
+    routine.exercisesCount === 1 ? t.exercise[lang] : t.exercises[lang]
+  }`;
+
   return (
-    <TouchableOpacity
+    <Pressable
       onLongPress={onLongPress ? () => onLongPress(routine) : undefined}
       delayLongPress={500}
-      activeOpacity={0.7}
       onPress={handleSelectRoutine}
+      style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
     >
-      <Card
-        variant="outlined"
-        padding="md"
-        style={styles.card}
-      >
+      <Card variant="outlined" padding="md" style={styles.card}>
         <View style={styles.content}>
           {/* Left: Info */}
           <View style={styles.info}>
-            {/* Title row */}
+            {/* Title row with scheduled indicator */}
             <View style={styles.titleRow}>
               <Typography
                 variant="body1"
@@ -85,59 +89,60 @@ export const RoutineCard: React.FC<Props> = ({
               {hasTrainingDays && (
                 <View
                   style={[
-                    styles.scheduledDot,
-                    { backgroundColor: colors.primary[500] },
+                    styles.scheduledBadge,
+                    { backgroundColor: colors.primary[500] + "20" },
                   ]}
-                />
-              )}
-            </View>
-
-            {/* Stats row */}
-            <View style={styles.statsRow}>
-              <View style={styles.stat}>
-                <Hash size={12} color={colors.textMuted} />
-                <Typography variant="caption" color="textMuted">
-                  {routine.blocksCount}
-                </Typography>
-              </View>
-
-              <View style={styles.stat}>
-                <Dumbbell size={12} color={colors.textMuted} />
-                <Typography variant="caption" color="textMuted">
-                  {routine.exercisesCount}
-                </Typography>
-              </View>
-
-              {hasTrainingDays && (
-                <View style={styles.stat}>
-                  <Calendar size={12} color={colors.textMuted} />
-                  <Typography variant="caption" color="textMuted">
-                    {formatDays(routine.training_days!)}
-                  </Typography>
+                >
+                  <View
+                    style={[
+                      styles.scheduledDot,
+                      { backgroundColor: colors.primary[500] },
+                    ]}
+                  />
                 </View>
               )}
             </View>
+
+            {/* Stats: bloques · ejercicios */}
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={styles.statsText}
+            >
+              {statsText}
+            </Typography>
+
+            {/* Training days row (if scheduled) */}
+            {hasTrainingDays && (
+              <View style={styles.daysRow}>
+                <Calendar size={12} color={colors.primary[500]} />
+                <Typography
+                  variant="caption"
+                  style={{ color: colors.primary[500], marginLeft: 4 }}
+                >
+                  {formatDays(routine.training_days!)}
+                </Typography>
+              </View>
+            )}
           </View>
 
           {/* Right: Play button */}
-          <TouchableOpacity
+          <Pressable
             onPress={handleStartRoutine}
-            activeOpacity={0.8}
-            style={[styles.playButton, { backgroundColor: colors.primary[500] }]}
+            style={({ pressed }) => [
+              styles.playButton,
+              {
+                backgroundColor: colors.primary[500],
+                opacity: pressed ? 0.8 : 1,
+                transform: [{ scale: pressed ? 0.95 : 1 }],
+              },
+            ]}
           >
             <Play size={18} color="#ffffff" fill="#ffffff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Tap hint */}
-        <View style={styles.tapHint}>
-          <Typography variant="caption" color="textMuted" style={styles.tapHintText}>
-            {t.routineOptions[lang]}
-          </Typography>
-          <ChevronRight size={12} color={colors.textMuted} />
+          </Pressable>
         </View>
       </Card>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -157,49 +162,41 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    marginBottom: 6,
+    marginBottom: 4,
   },
   title: {
     flex: 1,
   },
+  scheduledBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   scheduledDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
-  statsRow: {
+  statsText: {
+    marginBottom: 2,
+  },
+  daysRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
-  },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
+    marginTop: 4,
   },
   playButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.15,
     shadowRadius: 4,
     elevation: 3,
-  },
-  tapHint: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 12,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "rgba(128,128,128,0.1)",
-    gap: 4,
-  },
-  tapHintText: {
-    fontSize: 11,
   },
 });

@@ -1,5 +1,4 @@
 import { BaseFolder } from "@/shared/db/schema";
-import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { workoutsTranslations } from "@/shared/translations/workouts";
@@ -10,21 +9,20 @@ import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store"
 import { ExpandableCreateButton } from "./expandable-create-button";
 
 /**
- * Get time-based greeting key
+ * Get formatted date string
  */
-const getGreetingKey = (): "greetingMorning" | "greetingAfternoon" | "greetingEvening" => {
-  const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return "greetingMorning";
-  if (hour >= 12 && hour < 19) return "greetingAfternoon";
-  return "greetingEvening";
-};
-
-/**
- * Get a random motivational subtitle
- */
-const getRandomMotivational = (subtitles: string[]): string => {
-  const index = Math.floor(Math.random() * subtitles.length);
-  return subtitles[index];
+const getFormattedDate = (lang: "es" | "en"): string => {
+  const now = new Date();
+  const options: Intl.DateTimeFormatOptions = {
+    weekday: "long",
+    day: "numeric",
+  };
+  const formatted = now.toLocaleDateString(
+    lang === "es" ? "es-ES" : "en-US",
+    options
+  );
+  // Capitalize first letter
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
 };
 
 type Props = {
@@ -32,7 +30,6 @@ type Props = {
 };
 
 export const Header: React.FC<Props> = ({ selectedFolder }) => {
-  const { colors } = useColorScheme();
   const { user } = useAuth();
   const totalRoutines = useWorkoutsMetricsStore((state) => state.totalRoutines);
   const prefs = useUserPreferences();
@@ -45,17 +42,10 @@ export const Header: React.FC<Props> = ({ selectedFolder }) => {
   // Get display name from user metadata
   const displayName = user?.user_metadata?.display_name;
 
-  // Memoize greeting and motivational to avoid recalculating on every render
-  const greetingKey = useMemo(() => getGreetingKey(), []);
-  const subtitles = t.motivationalSubtitles[lang];
-  const motivational = useMemo(
-    () => getRandomMotivational(subtitles),
-    [subtitles]
-  );
+  // Memoize date to avoid recalculating on every render
+  const formattedDate = useMemo(() => getFormattedDate(lang), [lang]);
 
-  const greeting = t[greetingKey][lang];
-
-  // Vista principal: Greeting + botón
+  // Vista principal: Fecha + nombre · rutinas
   if (!selectedFolder) {
     return (
       <View
@@ -67,26 +57,17 @@ export const Header: React.FC<Props> = ({ selectedFolder }) => {
         }}
       >
         <View style={{ flex: 1, marginRight: 12 }}>
-          <View>
-            <Typography variant="h2" weight="bold">
-              {greeting},{" "} 
-            </Typography>
-            {displayName && (
-              <Typography
-                variant="h2"
-                weight="bold"
-                style={{ color: colors.primary[500] }}
-              >
-              {displayName}
-              </Typography>
-            )}
-          </View>
+          <Typography variant="h2" weight="bold">
+            {formattedDate}
+          </Typography>
           <Typography
             variant="body2"
             color="textMuted"
             style={{ marginTop: 2 }}
           >
-            {motivational}
+            {displayName
+              ? `${displayName} · ${totalRoutines} ${routineWord}`
+              : `${totalRoutines} ${routineWord}`}
           </Typography>
         </View>
 

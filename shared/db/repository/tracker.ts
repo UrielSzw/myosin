@@ -869,6 +869,7 @@ export const trackerRepository = {
   /**
    * Obtiene todas las métricas que estaban activas en una fecha específica
    * (no eliminadas o eliminadas después de esa fecha)
+   * Las métricas aparecen en todos los días pasados para permitir cargar datos históricos
    */
   getActiveMetricsForDate: async (
     userId: string,
@@ -880,8 +881,8 @@ export const trackerRepository = {
       .where(
         and(
           eq(tracker_metrics.user_id, userId),
-          // Métrica activa en la fecha: created_at <= dayKey Y (deleted_at IS NULL O deleted_at > dayKey)
-          sql`${tracker_metrics.created_at} <= ${dayKey + "T23:59:59"}`,
+          // Métrica activa: no eliminada O eliminada después de esa fecha
+          // Removimos la restricción de created_at para permitir cargar datos históricos
           sql`(${tracker_metrics.deleted_at} IS NULL OR ${
             tracker_metrics.deleted_at
           } > ${dayKey + "T23:59:59"})`

@@ -226,4 +226,84 @@ export const analyticsTranslations = {
       en: "Other",
     },
   },
+
+  // Tracker Analytics
+  trackerInsights: {
+    es: "Métricas del Tracker",
+    en: "Tracker Metrics",
+  },
+  trackerInsightsSubtitle: {
+    es: "Tus métricas personales de los últimos 30 días",
+    en: "Your personal metrics from the last 30 days",
+  },
+  avg7days: {
+    es: "Promedio 7 días",
+    en: "7-day average",
+  },
+  target: {
+    es: "Meta",
+    en: "Target",
+  },
+  ofTarget: {
+    es: "de meta",
+    en: "of target",
+  },
+  noTrackerData: {
+    es: "Sin datos del tracker",
+    en: "No tracker data",
+  },
+  startTrackingMetrics: {
+    es: "Comienza a registrar métricas para ver insights",
+    en: "Start tracking metrics to see insights",
+  },
+
+  // Streaks
+  consistencyStreaks: {
+    es: "Rachas de Consistencia",
+    en: "Consistency Streaks",
+  },
+  currentStreak: {
+    es: "Racha actual",
+    en: "Current streak",
+  },
+  bestStreak: {
+    es: "Mejor racha",
+    en: "Best streak",
+  },
+  day: {
+    es: "día",
+    en: "day",
+  },
+  daysStreak: {
+    es: "días",
+    en: "days",
+  },
+  consistency: {
+    es: "consistencia",
+    en: "consistency",
+  },
+
+  // Weight Progress
+  weightProgress: {
+    es: "Progreso de Peso",
+    en: "Weight Progress",
+  },
+  currentWeight: {
+    es: "Peso actual",
+    en: "Current weight",
+  },
+  last30Days: {
+    es: "Últimos 30 días",
+    en: "Last 30 days",
+  },
+
+  // Habits Completion
+  habitsCompletion: {
+    es: "Hábitos Diarios",
+    en: "Daily Habits",
+  },
+  pending: {
+    es: "pendientes",
+    en: "pending",
+  },
 };

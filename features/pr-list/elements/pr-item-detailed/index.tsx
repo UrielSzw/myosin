@@ -3,9 +3,9 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Card } from "@/shared/ui/card";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
-import { Calendar } from "lucide-react-native";
+import { ChevronRight, Trophy } from "lucide-react-native";
 import React from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
 import { PRListItem } from "../../types/pr-list";
 
 type Props = {
@@ -19,6 +19,7 @@ export const PRItemDetailed: React.FC<Props> = ({ pr, onPress }) => {
   // Get user's weight unit preference
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const lang = prefs?.language ?? "es";
 
   const achievedDate = new Date(pr.achieved_at);
   const isRecent = pr.is_recent;
@@ -27,129 +28,130 @@ export const PRItemDetailed: React.FC<Props> = ({ pr, onPress }) => {
   const bestWeightFormatted = fromKg(pr.best_weight, weightUnit, 1);
   const estimated1RMFormatted = fromKg(pr.estimated_1rm, weightUnit, 1);
 
+  const formatDate = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    };
+    return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", options);
+  };
+
   return (
-    <Card variant="outlined" padding="md">
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [
-          {
-            opacity: pressed ? 0.7 : 1,
-          },
-        ]}
+    <Card variant="outlined" padding="none" pressable onPress={onPress}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingVertical: 14,
+          paddingHorizontal: 16,
+        }}
       >
+        {/* Trophy/Recent indicator */}
         <View
           style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: isRecent
+              ? colors.success[500] + "15"
+              : colors.primary[500] + "15",
+            alignItems: "center",
+            justifyContent: "center",
+            marginRight: 12,
           }}
         >
-          <View style={{ flex: 1, marginRight: 12 }}>
-            {/* Exercise Name and Muscle Group */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 8,
-              }}
-            >
-              {isRecent && (
-                <View
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: 3,
-                    backgroundColor: colors.success[500],
-                  }}
-                />
-              )}
-              <Typography
-                variant="body1"
-                weight="semibold"
-                numberOfLines={1}
-                style={{ flex: 1 }}
-              >
-                {pr.exercise_name}
-              </Typography>
-            </View>
+          <Trophy
+            size={18}
+            color={isRecent ? colors.success[500] : colors.primary[500]}
+          />
+        </View>
 
-            {/* Muscle Group Badge */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
+        {/* Content */}
+        <View style={{ flex: 1 }}>
+          {/* Exercise name + recent badge */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 8,
+              marginBottom: 2,
+            }}
+          >
+            <Typography
+              variant="body1"
+              weight="semibold"
+              numberOfLines={1}
+              style={{ flex: 1 }}
             >
-              {pr.source === "manual" && (
-                <View
+              {pr.exercise_name}
+            </Typography>
+            {isRecent && (
+              <View
+                style={{
+                  backgroundColor: colors.success[500] + "20",
+                  paddingHorizontal: 8,
+                  paddingVertical: 2,
+                  borderRadius: 10,
+                }}
+              >
+                <Typography
+                  variant="caption"
                   style={{
-                    backgroundColor: colors.gray[200],
-                    paddingHorizontal: 6,
-                    paddingVertical: 2,
-                    borderRadius: 8,
+                    color: colors.success[600],
+                    fontSize: 10,
+                    fontWeight: "600",
                   }}
                 >
-                  <Typography
-                    variant="caption"
-                    style={{ color: colors.gray[700], fontSize: 9 }}
-                  >
-                    MANUAL
-                  </Typography>
-                </View>
-              )}
-            </View>
-
-            {/* PR Details */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 12,
-                marginBottom: 4,
-              }}
-            >
-              <Typography variant="body2" color="textMuted">
-                {bestWeightFormatted} {weightUnit} × {pr.best_reps} reps
-              </Typography>
-              <Typography variant="caption" color="textMuted">
-                •
-              </Typography>
-              <Typography variant="caption" color="textMuted">
-                1RM: {estimated1RMFormatted} {weightUnit}
-              </Typography>
-            </View>
-
-            {/* Date */}
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 4,
-              }}
-            >
-              <Calendar size={12} color={colors.textMuted} />
-              <Typography variant="caption" color="textMuted">
-                {achievedDate.toLocaleDateString("es-ES", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                })}
-              </Typography>
-              {isRecent && (
-                <>
-                  <Typography variant="caption" color="textMuted">
-                    •
-                  </Typography>
-                  <Typography variant="caption" color="success">
-                    Reciente
-                  </Typography>
-                </>
-              )}
-            </View>
+                  {lang === "es" ? "NUEVO" : "NEW"}
+                </Typography>
+              </View>
+            )}
           </View>
+
+          {/* Weight x Reps */}
+          <View style={{ flexDirection: "row", alignItems: "baseline" }}>
+            <Typography variant="body2" weight="medium">
+              {bestWeightFormatted} {weightUnit}
+            </Typography>
+            <Typography
+              variant="body2"
+              color="textMuted"
+              style={{ marginLeft: 4 }}
+            >
+              × {pr.best_reps} reps
+            </Typography>
+          </View>
+
+          {/* Date */}
+          <Typography
+            variant="caption"
+            color="textMuted"
+            style={{ marginTop: 2 }}
+          >
+            {formatDate(achievedDate)}
+          </Typography>
         </View>
-      </Pressable>
+
+        {/* 1RM + Chevron */}
+        <View style={{ alignItems: "flex-end", marginLeft: 12 }}>
+          <Typography variant="caption" color="textMuted">
+            1RM
+          </Typography>
+          <Typography
+            variant="body1"
+            weight="bold"
+            style={{ color: colors.primary[500] }}
+          >
+            {estimated1RMFormatted}
+          </Typography>
+          <ChevronRight
+            size={16}
+            color={colors.textMuted}
+            style={{ marginTop: 4 }}
+          />
+        </View>
+      </View>
     </Card>
   );
 };

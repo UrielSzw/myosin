@@ -2,9 +2,9 @@ import { useAddEntry } from "@/features/tracker/hooks/use-tracker-data";
 import { formatValue } from "@/features/tracker/utils/helpers";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useHaptic } from "@/shared/services/haptic-service";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { useHaptic } from "@/shared/services/haptic-service";
 import {
   trackerTranslations,
   trackerUiTranslations,

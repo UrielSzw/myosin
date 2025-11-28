@@ -20,7 +20,11 @@ export const PRChartSection: React.FC<Props> = ({ history, lang }) => {
   // Si hay pocos datos, mostrar estado reducido
   if (history.length < 2) {
     return (
-      <Card variant="outlined" padding="lg" style={{ marginHorizontal: 16 }}>
+      <Card
+        variant="outlined"
+        padding="lg"
+        style={{ marginHorizontal: 16, marginBottom: 20 }}
+      >
         <View style={{ alignItems: "center", paddingVertical: 20 }}>
           <View
             style={{
@@ -49,82 +53,31 @@ export const PRChartSection: React.FC<Props> = ({ history, lang }) => {
   }
 
   return (
-    <Card variant="outlined" padding="lg" style={{ marginHorizontal: 16 }}>
-      {/* Header */}
+    <Card
+      variant="outlined"
+      padding="md"
+      style={{ marginHorizontal: 16, marginBottom: 20 }}
+    >
+      {/* Header simplificado */}
       <View
         style={{
           flexDirection: "row",
           alignItems: "center",
-          marginBottom: 16,
+          marginBottom: 12,
         }}
       >
-        <View
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 16,
-            backgroundColor: colors.primary[100],
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: 12,
-          }}
-        >
-          <TrendingUp size={16} color={colors.primary[500]} />
-        </View>
-        <View style={{ flex: 1 }}>
-          <Typography variant="h6">{t.prProgression[lang]}</Typography>
-          <Typography variant="caption" color="textMuted">
-            {t.recordsEstimated1RM[lang]
-              .replace("{count}", history.length.toString())
-              .replace("{plural}", history.length !== 1 ? "s" : "")}
-          </Typography>
-        </View>
+        <TrendingUp
+          size={18}
+          color={colors.primary[500]}
+          style={{ marginRight: 8 }}
+        />
+        <Typography variant="body1" weight="semibold">
+          {t.prProgression[lang]}
+        </Typography>
       </View>
 
-      {/* Chart */}
-      <PRProgressChart history={history} height={220} />
-
-      {/* Footer con info adicional */}
-      <View
-        style={{
-          marginTop: 16,
-          paddingTop: 16,
-          borderTopWidth: 1,
-          borderTopColor: colors.border,
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <View>
-          <Typography variant="caption" color="textMuted">
-            {t.bestPR[lang]}
-          </Typography>
-          <Typography variant="body2" weight="medium">
-            {Math.max(...history.map((h) => h.estimated_1rm)).toFixed(1)}kg
-          </Typography>
-        </View>
-        <View style={{ alignItems: "center" }}>
-          <Typography variant="caption" color="textMuted">
-            {t.totalProgress[lang]}
-          </Typography>
-          <Typography variant="body2" weight="medium">
-            +
-            {(
-              Math.max(...history.map((h) => h.estimated_1rm)) -
-              Math.min(...history.map((h) => h.estimated_1rm))
-            ).toFixed(1)}
-            kg
-          </Typography>
-        </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Typography variant="caption" color="textMuted">
-            {t.lastPRChart[lang]}
-          </Typography>
-          <Typography variant="body2" weight="medium">
-            {history[0]?.estimated_1rm.toFixed(1)}kg
-          </Typography>
-        </View>
-      </View>
+      {/* Chart - más compacto */}
+      <PRProgressChart history={history} height={180} />
     </Card>
   );
 };

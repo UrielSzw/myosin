@@ -260,11 +260,6 @@ export const WorkoutSummaryFeature: React.FC = () => {
     router.dismissAll();
   };
 
-  const handleViewDetails = () => {
-    // Replace summary with session detail
-    router.replace(`/workout-session/${sessionId}` as any);
-  };
-
   const hasHighlights = prs.length > 0 || improvementsCount > 0;
 
   return (

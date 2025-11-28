@@ -1,63 +1,96 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { prDetailTranslations } from "@/shared/translations/pr-detail";
-import { StatCard } from "@/shared/ui/stat-card";
-import { Calendar, TrendingUp } from "lucide-react-native";
+import { Card } from "@/shared/ui/card";
+import { Typography } from "@/shared/ui/typography";
+import { Clock, Flame, TrendingUp } from "lucide-react-native";
 import React from "react";
 import { View } from "react-native";
-import { CurrentPR, PRHistoryItem } from "../../hooks/use-pr-detail";
 
 type Props = {
-  firstPR: PRHistoryItem | null;
-  lastPR: CurrentPR | null;
-  totalProgress: number; // Diferencia en kg
-  timeSpan: string; // "8 meses", "1 año", etc.
+  totalProgress: number;
+  timeSpan: string;
+  totalPRs: number;
   lang: "es" | "en";
 };
 
 export const PRStatsCards: React.FC<Props> = ({
-  firstPR,
-  lastPR,
   totalProgress,
   timeSpan,
+  totalPRs,
   lang,
 }) => {
   const { colors } = useColorScheme();
-  const t = prDetailTranslations;
-
-  if (!firstPR || !lastPR) {
-    return null;
-  }
 
   const progressText =
-    totalProgress > 0 ? `+${totalProgress}kg` : `${totalProgress}kg`;
+    totalProgress > 0
+      ? `+${totalProgress.toFixed(1)}kg`
+      : `${totalProgress.toFixed(1)}kg`;
 
   const progressColor =
     totalProgress >= 0 ? colors.success[500] : colors.warning[500];
+
+  const stats = [
+    {
+      icon: <TrendingUp size={18} color={progressColor} />,
+      label: lang === "es" ? "Progreso" : "Progress",
+      value: progressText,
+      color: progressColor,
+    },
+    {
+      icon: <Clock size={18} color={colors.primary[500]} />,
+      label: lang === "es" ? "Período" : "Period",
+      value: timeSpan,
+      color: colors.primary[500],
+    },
+    {
+      icon: <Flame size={18} color={colors.warning[500]} />,
+      label: lang === "es" ? "Records" : "Records",
+      value: totalPRs.toString(),
+      color: colors.warning[500],
+    },
+  ];
 
   return (
     <View
       style={{
         flexDirection: "row",
-        gap: 12,
+        gap: 10,
         paddingHorizontal: 16,
-        marginBottom: 16,
+        marginBottom: 20,
       }}
     >
-      <StatCard
-        icon={<Calendar size={20} color={colors.textMuted} />}
-        title={t.firstPR[lang]}
-        value={`${firstPR.weight}kg`}
-        color={colors.textMuted}
-        subtitle={t.ago[lang].replace("{timeSpan}", timeSpan)}
-      />
-
-      <StatCard
-        icon={<TrendingUp size={20} color={progressColor} />}
-        title={t.lastPR[lang]}
-        value={`${lastPR.best_weight}kg`}
-        color={progressColor}
-        subtitle={progressText}
-      />
+      {stats.map((stat, index) => (
+        <Card key={index} variant="outlined" padding="md" style={{ flex: 1 }}>
+          <View style={{ alignItems: "center" }}>
+            <View
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: stat.color + "15",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 8,
+              }}
+            >
+              {stat.icon}
+            </View>
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={{ marginBottom: 2 }}
+            >
+              {stat.label}
+            </Typography>
+            <Typography
+              variant="body1"
+              weight="bold"
+              style={{ color: stat.color }}
+            >
+              {stat.value}
+            </Typography>
+          </View>
+        </Card>
+      ))}
     </View>
   );
 };

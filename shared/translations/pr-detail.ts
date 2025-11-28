@@ -21,6 +21,12 @@ export const prDetailTranslations = {
     en: "Could not load PR data",
   },
 
+  // Hero Card
+  currentPR: {
+    es: "PR Actual",
+    en: "Current PR",
+  },
+
   // Stats Cards
   firstPR: {
     es: "Primer PR",
@@ -63,5 +69,11 @@ export const prDetailTranslations = {
   lastPRChart: {
     es: "Último PR",
     en: "Last PR",
+  },
+
+  // History List
+  recordsHistory: {
+    es: "Historial de Records",
+    en: "Records History",
   },
 } as const;

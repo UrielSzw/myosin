@@ -7,6 +7,8 @@ import React from "react";
 import { ScrollView, View } from "react-native";
 import { PRChartSection } from "./elements/pr-chart-section";
 import { PRDetailHeader } from "./elements/pr-detail-header";
+import { PRHeroCard } from "./elements/pr-hero-card";
+import { PRHistoryList } from "./elements/pr-history-list";
 import { PRStatsCards } from "./elements/pr-stats-cards";
 import { usePRDetail } from "./hooks/use-pr-detail";
 
@@ -21,23 +23,6 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
   const t = prDetailTranslations;
 
   const { data, isLoading, error } = usePRDetail(exerciseId, user?.id);
-
-  // Usar los progressStats que vienen del hook (ya calculados correctamente)
-  const progressStats = React.useMemo(() => {
-    if (!data || data.history.length < 2) {
-      return null;
-    }
-
-    const firstPR = data.history[data.history.length - 1]; // Más antiguo
-    const lastPR = data.currentPR; // El current PR es el más reciente
-
-    return {
-      firstPR,
-      lastPR,
-      totalProgress: data.progressStats.totalProgress,
-      timeSpan: data.progressStats.timeSpan,
-    };
-  }, [data]);
 
   if (error) {
     console.error("[PRDetailFeature] Error loading data:", error);
@@ -78,19 +63,24 @@ export const PRDetailFeature: React.FC<Props> = ({ exerciseId }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100, paddingTop: 20 }}
       >
-        {/* Stats Cards */}
-        {progressStats && (
+        {/* Hero Card - PR Actual destacado */}
+        <PRHeroCard currentPR={data.currentPR} lang={lang} />
+
+        {/* Stats Cards - Progreso, Período, Total Records */}
+        {data.history.length >= 2 && (
           <PRStatsCards
-            firstPR={progressStats.firstPR}
-            lastPR={progressStats.lastPR}
-            totalProgress={progressStats.totalProgress}
-            timeSpan={progressStats.timeSpan}
+            totalProgress={data.progressStats.totalProgress}
+            timeSpan={data.progressStats.timeSpan}
+            totalPRs={data.history.length}
             lang={lang}
           />
         )}
 
-        {/* Chart Section */}
+        {/* Chart Section - Gráfico de progresión */}
         <PRChartSection history={data.history} lang={lang} />
+
+        {/* History List - Lista de todos los PRs */}
+        <PRHistoryList history={data.history} lang={lang} />
       </ScrollView>
     </ScreenWrapper>
   );

@@ -12,8 +12,8 @@ export type CurrentPR = {
   estimated_1rm: number;
   achieved_at: string;
   source: "auto" | "manual";
-  created_at: Date | null;
-  updated_at: Date | null;
+  created_at: string | null;
+  updated_at: string | null;
   exercise_name: string;
   exercise_muscle: IExerciseMuscle;
 };
@@ -28,8 +28,8 @@ export type PRHistoryItem = {
   workout_session_id: string | null;
   workout_set_id: string | null;
   source: "auto" | "manual" | "import";
-  created_at: Date | null;
-  updated_at: Date | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type ExerciseInfo = {

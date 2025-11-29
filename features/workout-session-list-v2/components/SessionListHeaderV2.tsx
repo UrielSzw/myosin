@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -11,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   totalSessions: number;
   recentSessionsCount: number;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionListHeaderV2: React.FC<Props> = ({
@@ -57,7 +58,7 @@ export const SessionListHeaderV2: React.FC<Props> = ({
         {/* Title */}
         <View style={styles.titleContainer}>
           <Typography variant="h4" weight="bold" style={{ color: colors.text }}>
-            {lang === "es" ? "Historial" : "History"}
+            {t.history[lang]}
           </Typography>
         </View>
 
@@ -108,14 +109,7 @@ export const SessionListHeaderV2: React.FC<Props> = ({
               weight="semibold"
               style={{ color: colors.success[500] }}
             >
-              {recentSessionsCount}{" "}
-              {lang === "es"
-                ? recentSessionsCount === 1
-                  ? "esta semana"
-                  : "esta semana"
-                : recentSessionsCount === 1
-                ? "this week"
-                : "this week"}
+              {recentSessionsCount} {t.thisWeek[lang]}
             </Typography>
           </View>
         </Animated.View>

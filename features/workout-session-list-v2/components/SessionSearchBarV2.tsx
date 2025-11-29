@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { BlurView } from "expo-blur";
 import { Search, X } from "lucide-react-native";
 import React from "react";
@@ -8,7 +9,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionSearchBarV2: React.FC<Props> = ({
@@ -48,9 +49,7 @@ export const SessionSearchBarV2: React.FC<Props> = ({
         <View style={styles.content}>
           <Search size={18} color={colors.textMuted} />
           <TextInput
-            placeholder={
-              lang === "es" ? "Buscar por rutina..." : "Search by routine..."
-            }
+            placeholder={t.searchPlaceholder[lang]}
             value={searchQuery}
             onChangeText={onSearchChange}
             placeholderTextColor={colors.textMuted}

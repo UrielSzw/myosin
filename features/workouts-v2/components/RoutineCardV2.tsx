@@ -3,6 +3,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -18,7 +19,7 @@ type Props = {
 export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 
@@ -36,34 +37,14 @@ export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
   };
 
   const formatDays = (days: string[]) => {
-    const dayMap: Record<string, string> = {
-      monday: lang === "es" ? "Lun" : "Mon",
-      tuesday: lang === "es" ? "Mar" : "Tue",
-      wednesday: lang === "es" ? "Mié" : "Wed",
-      thursday: lang === "es" ? "Jue" : "Thu",
-      friday: lang === "es" ? "Vie" : "Fri",
-      saturday: lang === "es" ? "Sáb" : "Sat",
-      sunday: lang === "es" ? "Dom" : "Sun",
-    };
-    return days.map((d) => dayMap[d] || d).join(" · ");
+    const dayMap = t.weekDaysShort[lang];
+    return days.map((d) => dayMap[d as keyof typeof dayMap] || d).join(" · ");
   };
 
   const statsText = `${routine.blocksCount} ${
-    routine.blocksCount === 1
-      ? lang === "es"
-        ? "bloque"
-        : "block"
-      : lang === "es"
-      ? "bloques"
-      : "blocks"
+    routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]
   } · ${routine.exercisesCount} ${
-    routine.exercisesCount === 1
-      ? lang === "es"
-        ? "ejercicio"
-        : "exercise"
-      : lang === "es"
-      ? "ejercicios"
-      : "exercises"
+    routine.exercisesCount === 1 ? t.exercise[lang] : t.exercises[lang]
   }`;
 
   return (

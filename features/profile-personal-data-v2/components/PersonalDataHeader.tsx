@@ -1,20 +1,22 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
-import { profileTranslations as t } from "@/shared/translations/profile";
+import { personalDataTranslations as t } from "@/shared/translations/personal-data";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import { ArrowLeft, Settings } from "lucide-react-native";
+import { ArrowLeft, User } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-export const WorkoutConfigHeader = () => {
+export const PersonalDataHeader = () => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = (prefs?.language ?? "es") as "es" | "en";
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={[styles.header, { paddingTop: 8 }]}>
+    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
       {Platform.OS === "ios" && (
         <BlurView
           intensity={isDarkMode ? 25 : 40}
@@ -43,7 +45,7 @@ export const WorkoutConfigHeader = () => {
         {/* Title */}
         <View style={styles.titleContainer}>
           <Typography variant="h5" weight="bold" style={{ color: colors.text }}>
-            {t.configTitle[lang]}
+            {t.title[lang]}
           </Typography>
         </View>
 
@@ -58,7 +60,7 @@ export const WorkoutConfigHeader = () => {
             },
           ]}
         >
-          <Settings size={18} color={colors.textMuted} />
+          <User size={18} color={colors.textMuted} />
         </View>
       </View>
     </View>

@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -295,7 +296,7 @@ export const VictoryBadgeV2: React.FC<Props> = ({
             align="center"
             style={{ color: colors.text, marginHorizontal: 8 }}
           >
-            {lang === "es" ? "¡Completado!" : "Completed!"}
+            {t.completed[lang]}
           </Typography>
           <Sparkles size={20} color={successColor} />
         </View>

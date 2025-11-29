@@ -142,6 +142,10 @@ export const profileTranslations = {
     es: "Configuración de Entrenamiento",
     en: "Workout Configuration",
   },
+  configTitle: {
+    es: "Configuración",
+    en: "Configuration",
+  },
   unitsSection: {
     es: "Unidades",
     en: "Units",
@@ -162,6 +166,10 @@ export const profileTranslations = {
     es: "Metros/Kilómetros o Pies/Millas",
     en: "Meters/Kilometers or Feet/Miles",
   },
+  metricLabel: {
+    es: "Métrico",
+    en: "Metric",
+  },
   workoutPreferencesSection: {
     es: "Preferencias de Entrenamiento",
     en: "Workout Preferences",
@@ -171,16 +179,16 @@ export const profileTranslations = {
     en: "RPE (Rate of Perceived Exertion)",
   },
   rpeSubtitle: {
-    es: "Mide la intensidad del esfuerzo",
-    en: "Measure intensity of effort",
+    es: "Mide la intensidad del esfuerzo en cada serie",
+    en: "Measure the intensity of effort in each set",
   },
   tempoTitle: {
     es: "Tempo",
     en: "Tempo",
   },
   tempoSubtitle: {
-    es: "Velocidad de las repeticiones",
-    en: "Speed of repetitions",
+    es: "Controla la velocidad de cada fase del movimiento",
+    en: "Control the speed of each movement phase",
   },
   defaultRestTimeTitle: {
     es: "Descanso por Defecto",
@@ -189,6 +197,10 @@ export const profileTranslations = {
   defaultRestTimeSubtitle: {
     es: "Tiempo de descanso entre series",
     en: "Rest time between sets",
+  },
+  deviceSection: {
+    es: "Dispositivo",
+    en: "Device",
   },
   keepScreenAwakeTitle: {
     es: "Pantalla Siempre Encendida",
@@ -205,6 +217,46 @@ export const profileTranslations = {
   hapticFeedbackSubtitle: {
     es: "Vibración al completar series, ejercicios y acciones",
     en: "Vibrate when completing sets, exercises and actions",
+  },
+
+  // Rest Time Sheet
+  restTimeSheetTitle: {
+    es: "Tiempo de Descanso",
+    en: "Rest Time",
+  },
+  restTimeSheetSubtitle: {
+    es: "Ajusta el tiempo entre series",
+    en: "Adjust time between sets",
+  },
+  noRest: {
+    es: "Sin descanso",
+    en: "No rest",
+  },
+  customTime: {
+    es: "Tiempo personalizado",
+    en: "Custom time",
+  },
+  quickOptions: {
+    es: "Opciones rápidas",
+    en: "Quick options",
+  },
+  applyTime: {
+    es: "Aplicar Tiempo",
+    en: "Apply Time",
+  },
+
+  // Language
+  language: {
+    es: "Idioma",
+    en: "Language",
+  },
+  languageEs: {
+    es: "Español",
+    en: "Spanish",
+  },
+  languageEn: {
+    es: "Inglés",
+    en: "English",
   },
 
   // Language Selector

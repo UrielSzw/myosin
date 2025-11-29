@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -12,7 +13,7 @@ type Props = {
   totalProgress: number;
   timeSpan: string;
   totalPRs: number;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const PRStatsCardsV2: React.FC<Props> = ({
@@ -34,7 +35,7 @@ export const PRStatsCardsV2: React.FC<Props> = ({
   const stats = [
     {
       icon: TrendingUp,
-      label: lang === "es" ? "Progreso" : "Progress",
+      label: t.progress[lang],
       value: progressText,
       unit: weightUnit,
       color: progressColor,
@@ -42,7 +43,7 @@ export const PRStatsCardsV2: React.FC<Props> = ({
     },
     {
       icon: Clock,
-      label: lang === "es" ? "Período" : "Period",
+      label: t.period[lang],
       value: timeSpan,
       unit: "",
       color: colors.primary[500],
@@ -50,7 +51,7 @@ export const PRStatsCardsV2: React.FC<Props> = ({
     },
     {
       icon: Flame,
-      label: lang === "es" ? "Records" : "Records",
+      label: t.records[lang],
       value: totalPRs.toString(),
       unit: "",
       color: "#f59e0b",

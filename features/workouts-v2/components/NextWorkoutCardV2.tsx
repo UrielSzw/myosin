@@ -3,6 +3,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,7 +26,7 @@ type Props = {
 export const NextWorkoutCardV2 = ({ routines }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 
@@ -52,7 +53,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
       return {
         routine: todayRoutine,
         isToday: true,
-        dayLabel: lang === "es" ? "Hoy" : "Today",
+        dayLabel: t.today[lang],
       };
     }
 
@@ -82,7 +83,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
       return {
         routine: routines[0],
         isToday: false,
-        dayLabel: lang === "es" ? "Entrena cuando quieras" : "Train anytime",
+        dayLabel: t.trainAnytime[lang],
       };
     }
 
@@ -268,7 +269,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
                 color="textMuted"
                 style={{ marginBottom: 4 }}
               >
-                {lang === "es" ? "Próximo entrenamiento" : "Next workout"}
+                {t.nextWorkout[lang]}
               </Typography>
               <Typography
                 variant="h4"
@@ -283,13 +284,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
               <View style={styles.statsRow}>
                 <Typography variant="caption" color="textMuted">
                   {routine.blocksCount}{" "}
-                  {routine.blocksCount === 1
-                    ? lang === "es"
-                      ? "bloque"
-                      : "block"
-                    : lang === "es"
-                    ? "bloques"
-                    : "blocks"}
+                  {routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]}
                 </Typography>
                 <View
                   style={[

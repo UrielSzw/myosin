@@ -348,6 +348,22 @@ export const trackerTranslations = {
     es: "Ingresa un valor",
     en: "Enter a value",
   },
+  selectAValue: {
+    es: "Selecciona un valor",
+    en: "Select a value",
+  },
+  howDidItGoToday: {
+    es: "¿Cómo te fue hoy?",
+    en: "How did it go today?",
+  },
+  yes: {
+    es: "Sí",
+    en: "Yes",
+  },
+  confirm: {
+    es: "Confirmar",
+    en: "Confirm",
+  },
   notes: {
     es: "Notas",
     en: "Notes",
@@ -389,6 +405,18 @@ export const trackerTranslations = {
   addMetrics: {
     es: "Agregar Métricas",
     en: "Add Metrics",
+  },
+  customizeYourTracking: {
+    es: "Personaliza tu seguimiento",
+    en: "Customize your tracking",
+  },
+  deletedMetricSingle: {
+    es: "métrica eliminada",
+    en: "deleted metric",
+  },
+  deletedMetricPlural: {
+    es: "métricas eliminadas",
+    en: "deleted metrics",
   },
   noTemplatesAvailable: {
     es: "No hay templates disponibles para agregar",

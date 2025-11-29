@@ -1,6 +1,7 @@
 import { WEEK_DAYS, WeekDay } from "@/shared/constants/analytics";
 import type { RoutineFull } from "@/shared/db/schema/routine";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { CalendarDays, Check } from "lucide-react-native";
@@ -98,7 +99,7 @@ export const WeeklyScheduleV2: React.FC<Props> = ({ activeRoutines, lang }) => {
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Horario Semanal" : "Weekly Schedule"}
+            {t.weeklySchedule[lang]}
           </Typography>
         </View>
         <View
@@ -231,9 +232,7 @@ export const WeeklyScheduleV2: React.FC<Props> = ({ activeRoutines, lang }) => {
             ]}
           >
             <Typography variant="caption" color="textMuted" align="center">
-              {lang === "es"
-                ? "Asigna días de entrenamiento a tus rutinas"
-                : "Assign training days to your routines"}
+              {t.assignTrainingDays[lang]}
             </Typography>
           </View>
         )}

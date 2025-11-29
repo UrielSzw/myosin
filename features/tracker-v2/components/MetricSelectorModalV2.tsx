@@ -139,7 +139,7 @@ export const MetricSelectorModalV2: React.FC<Props> = ({
               intensity={80}
               tint={isDarkMode ? "dark" : "light"}
               style={{
-                paddingTop: 8,
+                paddingTop: 16,
                 paddingBottom: 16,
                 paddingHorizontal: 20,
                 borderBottomWidth: 1,
@@ -156,7 +156,7 @@ export const MetricSelectorModalV2: React.FC<Props> = ({
           ) : (
             <View
               style={{
-                paddingTop: 8,
+                paddingTop: 16,
                 paddingBottom: 16,
                 paddingHorizontal: 20,
                 backgroundColor: colors.background,
@@ -527,9 +527,7 @@ const HeaderContent: React.FC<{
             {t.addMetrics[lang]}
           </Typography>
           <Typography variant="caption" color="textMuted">
-            {lang === "es"
-              ? "Personaliza tu seguimiento"
-              : "Customize your tracking"}
+            {t.customizeYourTracking[lang]}
           </Typography>
         </View>
       </View>
@@ -645,13 +643,9 @@ const DeletedHeaderContent: React.FC<{
           </Typography>
           <Typography variant="caption" color="textMuted">
             {count}{" "}
-            {lang === "es"
-              ? count === 1
-                ? "métrica eliminada"
-                : "métricas eliminadas"
-              : count === 1
-              ? "deleted metric"
-              : "deleted metrics"}
+            {count === 1
+              ? t.deletedMetricSingle[lang]
+              : t.deletedMetricPlural[lang]}
           </Typography>
         </View>
       </View>

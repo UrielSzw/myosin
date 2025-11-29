@@ -1,8 +1,16 @@
 export const prDetailTranslations = {
   // Header
   prHistory: {
-    es: "Historial de Records Personales",
-    en: "Personal Records History",
+    es: "Historial de PR",
+    en: "PR History",
+  },
+  prHistoryFull: {
+    es: "Historial de PRs",
+    en: "PR History",
+  },
+  yourBestLifts: {
+    es: "Tus mejores marcas",
+    en: "Your best lifts",
   },
   loading: {
     es: "Cargando...",
@@ -23,11 +31,67 @@ export const prDetailTranslations = {
 
   // Hero Card
   currentPR: {
-    es: "PR Actual",
-    en: "Current PR",
+    es: "PR ACTUAL",
+    en: "CURRENT PR",
+  },
+  new: {
+    es: "NUEVO",
+    en: "NEW",
+  },
+  estimated1RM: {
+    es: "1RM estimado",
+    en: "1RM estimated",
+  },
+  today: {
+    es: "Hoy",
+    en: "Today",
+  },
+  yesterday: {
+    es: "Ayer",
+    en: "Yesterday",
+  },
+  daysAgo: {
+    es: "Hace {days} días",
+    en: "{days} days ago",
+  },
+  weeksAgoSingular: {
+    es: "Hace {weeks} semana",
+    en: "{weeks} week ago",
+  },
+  weeksAgoPlural: {
+    es: "Hace {weeks} semanas",
+    en: "{weeks} weeks ago",
+  },
+  monthsAgoSingular: {
+    es: "Hace {months} mes",
+    en: "{months} month ago",
+  },
+  monthsAgoPlural: {
+    es: "Hace {months} meses",
+    en: "{months} months ago",
+  },
+  yearsAgoSingular: {
+    es: "Hace {years} año",
+    en: "{years} year ago",
+  },
+  yearsAgoPlural: {
+    es: "Hace {years} años",
+    en: "{years} years ago",
   },
 
   // Stats Cards
+  progress: {
+    es: "Progreso",
+    en: "Progress",
+  },
+  period: {
+    es: "Período",
+    en: "Period",
+  },
+  records: {
+    es: "Records",
+    en: "Records",
+  },
   firstPR: {
     es: "Primer PR",
     en: "First PR",
@@ -42,6 +106,10 @@ export const prDetailTranslations = {
   },
 
   // Chart Section
+  progression1RM: {
+    es: "Progresión 1RM",
+    en: "1RM Progression",
+  },
   prProgression: {
     es: "Progresión de PRs",
     en: "PR Progression",

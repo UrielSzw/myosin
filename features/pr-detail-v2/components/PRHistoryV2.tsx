@@ -1,6 +1,7 @@
 import type { PRHistoryItem } from "@/features/pr-detail-v2/hooks/use-pr-detail";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -11,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface Props {
   history: PRHistoryItem[];
-  lang: string;
+  lang: "es" | "en";
 }
 
 const getMedalIcon = (position: number) => {
@@ -77,10 +78,10 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
         </View>
         <View>
           <Typography variant="body1" weight="semibold">
-            {lang === "es" ? "Historial de PRs" : "PR History"}
+            {t.prHistoryFull[lang]}
           </Typography>
           <Typography variant="caption" color="textMuted">
-            {lang === "es" ? "Tus mejores marcas" : "Your best lifts"}
+            {t.yourBestLifts[lang]}
           </Typography>
         </View>
       </Animated.View>

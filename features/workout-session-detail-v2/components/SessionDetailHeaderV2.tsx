@@ -6,7 +6,6 @@ import { ArrowLeft, Calendar } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
   routineName: string;
@@ -19,7 +18,6 @@ export const SessionDetailHeaderV2: React.FC<Props> = ({
   date,
   lang,
 }) => {
-  const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const router = useRouter();
 
@@ -41,7 +39,7 @@ export const SessionDetailHeaderV2: React.FC<Props> = ({
   };
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.header, { paddingTop: 8 }]}>
       {Platform.OS === "ios" && (
         <BlurView
           intensity={isDarkMode ? 25 : 40}

@@ -4,6 +4,7 @@ import {
   useUserPreferencesActions,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations as t } from "@/shared/translations/profile";
 import { Typography } from "@/shared/ui/typography";
 import {
   Activity,
@@ -27,7 +28,7 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const {
     setUnit,
@@ -89,15 +90,13 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
               letterSpacing: 1,
             }}
           >
-            {lang === "es" ? "Unidades" : "Units"}
+            {t.unitsSection[lang]}
           </Typography>
         </Animated.View>
 
         <SegmentedControlCard
-          title={lang === "es" ? "Unidad de Peso" : "Weight Unit"}
-          subtitle={
-            lang === "es" ? "Kilogramos o libras" : "Kilograms or pounds"
-          }
+          title={t.weightUnitTitle[lang]}
+          subtitle={t.weightUnitSubtitle[lang]}
           options={[
             { value: "kg", label: "kg" },
             { value: "lbs", label: "lbs" },
@@ -110,14 +109,10 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
         />
 
         <SegmentedControlCard
-          title={lang === "es" ? "Unidad de Distancia" : "Distance Unit"}
-          subtitle={
-            lang === "es"
-              ? "Metros/Kilómetros o Pies/Millas"
-              : "Meters/Kilometers or Feet/Miles"
-          }
+          title={t.distanceUnitTitle[lang]}
+          subtitle={t.distanceUnitSubtitle[lang]}
           options={[
-            { value: "metric", label: lang === "es" ? "Métrico" : "Metric" },
+            { value: "metric", label: t.metricLabel[lang] },
             { value: "imperial", label: "Imperial" },
           ]}
           selectedValue={distUnit}
@@ -144,9 +139,7 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
               letterSpacing: 1,
             }}
           >
-            {lang === "es"
-              ? "Preferencias de Entrenamiento"
-              : "Workout Preferences"}
+            {t.workoutPreferencesSection[lang]}
           </Typography>
         </Animated.View>
 
@@ -154,16 +147,8 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
           icon={Activity}
           iconColor="#10b981"
           iconBgColor="rgba(16, 185, 129, 0.15)"
-          title={
-            lang === "es"
-              ? "RPE (Esfuerzo Percibido)"
-              : "RPE (Perceived Exertion)"
-          }
-          subtitle={
-            lang === "es"
-              ? "Mide la intensidad del esfuerzo en cada serie"
-              : "Measure the intensity of effort in each set"
-          }
+          title={t.rpeTitle[lang]}
+          subtitle={t.rpeSubtitle[lang]}
           value={rpeEnabled}
           onValueChange={(v) => {
             if (user?.id) setShowRpe(user.id, v);
@@ -175,12 +160,8 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
           icon={Timer}
           iconColor="#8b5cf6"
           iconBgColor="rgba(139, 92, 246, 0.15)"
-          title="Tempo"
-          subtitle={
-            lang === "es"
-              ? "Controla la velocidad de cada fase del movimiento"
-              : "Control the speed of each movement phase"
-          }
+          title={t.tempoTitle[lang]}
+          subtitle={t.tempoSubtitle[lang]}
           value={tempoEnabled}
           onValueChange={(v) => {
             if (user?.id) setShowTempo(user.id, v);
@@ -192,12 +173,8 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
           icon={Clock}
           iconColor="#f59e0b"
           iconBgColor="rgba(245, 158, 11, 0.15)"
-          title={lang === "es" ? "Descanso por Defecto" : "Default Rest Time"}
-          subtitle={
-            lang === "es"
-              ? "Tiempo de descanso entre series"
-              : "Rest time between sets"
-          }
+          title={t.defaultRestTimeTitle[lang]}
+          subtitle={t.defaultRestTimeSubtitle[lang]}
           onPress={() => setShowRestTimeSheet(true)}
           rightLabel={formatRestTime(defaultRestTime)}
           delay={400}
@@ -219,7 +196,7 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
               letterSpacing: 1,
             }}
           >
-            {lang === "es" ? "Dispositivo" : "Device"}
+            {t.deviceSection[lang]}
           </Typography>
         </Animated.View>
 
@@ -227,14 +204,8 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
           icon={Smartphone}
           iconColor="#0ea5e9"
           iconBgColor="rgba(14, 165, 233, 0.15)"
-          title={
-            lang === "es" ? "Pantalla Siempre Encendida" : "Keep Screen On"
-          }
-          subtitle={
-            lang === "es"
-              ? "Evita que la pantalla se apague durante el entrenamiento"
-              : "Prevent screen from turning off during workout"
-          }
+          title={t.keepScreenAwakeTitle[lang]}
+          subtitle={t.keepScreenAwakeSubtitle[lang]}
           value={keepScreenAwake}
           onValueChange={(v) => {
             if (user?.id) setKeepScreenAwake(user.id, v);
@@ -246,14 +217,8 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
           icon={Vibrate}
           iconColor="#ec4899"
           iconBgColor="rgba(236, 72, 153, 0.15)"
-          title={
-            lang === "es" ? "Vibración y Feedback Táctil" : "Haptic Feedback"
-          }
-          subtitle={
-            lang === "es"
-              ? "Vibración al completar series, ejercicios y acciones"
-              : "Vibrate when completing sets, exercises and actions"
-          }
+          title={t.hapticFeedbackTitle[lang]}
+          subtitle={t.hapticFeedbackSubtitle[lang]}
           value={hapticEnabled}
           onValueChange={(v) => {
             if (user?.id) setHapticFeedback(user.id, v);

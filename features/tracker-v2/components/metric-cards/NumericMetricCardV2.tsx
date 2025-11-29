@@ -2,7 +2,10 @@ import type { MetricDisplayData } from "@/features/tracker/types/visual-states";
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
-import { getMetricName } from "@/shared/translations/tracker";
+import {
+  getMetricName,
+  trackerTranslations as t,
+} from "@/shared/translations/tracker";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -188,7 +191,7 @@ export const NumericMetricCardV2: React.FC<NumericMetricCardV2Props> =
                   weight="semibold"
                   style={{ color: metric.color, fontSize: 10 }}
                 >
-                  {lang === "es" ? "Meta" : "Goal"}
+                  {t.goal[lang]}
                 </Typography>
               </View>
             )}

@@ -174,7 +174,7 @@ const GlowingLogo = ({ size }: { size: number }) => {
 export default function WelcomeScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = onboardingTranslations.welcome;
   const { nextStep, reset } = useOnboardingStore();
 
@@ -361,7 +361,7 @@ export default function WelcomeScreen() {
             {/* Progress Indicator Preview */}
             <View style={styles.stepsPreview}>
               <Typography variant="caption" color="textMuted">
-                5 {lang === "es" ? "pasos rápidos" : "quick steps"}
+                5 {t.quickSteps[lang]}
               </Typography>
             </View>
           </Animated.View>

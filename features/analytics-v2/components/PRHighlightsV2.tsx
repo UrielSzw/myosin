@@ -1,5 +1,6 @@
 import { AnalyticsPRData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -60,7 +61,7 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Récords Personales" : "Personal Records"}
+            {t.personalRecords[lang]}
           </Typography>
         </View>
 
@@ -76,7 +77,7 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
             weight="semibold"
             style={{ color: colors.primary[500] }}
           >
-            {lang === "es" ? "Ver todos" : "View all"}
+            {t.viewAll[lang]}
           </Typography>
           <ChevronRight size={14} color={colors.primary[500]} />
         </Pressable>

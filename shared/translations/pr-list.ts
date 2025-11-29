@@ -1,7 +1,7 @@
 export const prListTranslations = {
   // Header
   personalRecords: {
-    es: "Records Personales",
+    es: "Récords Personales",
     en: "Personal Records",
   },
   newThisWeek: {
@@ -15,8 +15,8 @@ export const prListTranslations = {
 
   // Search
   searchPlaceholder: {
-    es: "Buscar ejercicios...",
-    en: "Search exercises...",
+    es: "Buscar ejercicio...",
+    en: "Search exercise...",
   },
 
   // Filters
@@ -48,6 +48,10 @@ export const prListTranslations = {
     es: "Recientes",
     en: "Recent",
   },
+  clear: {
+    es: "Limpiar",
+    en: "Clear",
+  },
   viewMore: {
     es: "Ver más",
     en: "View more",
@@ -59,8 +63,20 @@ export const prListTranslations = {
 
   // Content
   loadingPRs: {
-    es: "Cargando PRs...",
-    en: "Loading PRs...",
+    es: "Cargando récords...",
+    en: "Loading records...",
+  },
+  signInRequired: {
+    es: "Inicia sesión",
+    en: "Sign in required",
+  },
+  errorLoading: {
+    es: "Error al cargar",
+    en: "Error loading",
+  },
+  new: {
+    es: "NUEVO",
+    en: "NEW",
   },
 
   // Empty States

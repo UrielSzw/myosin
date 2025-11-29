@@ -113,7 +113,7 @@ const FloatingOrb = ({
 export default function BirthdateScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = onboardingTranslations.birthdate;
   const tCommon = onboardingTranslations.common;
   const { birthDate, setBirthDate, getAge, nextStep } = useOnboardingStore();
@@ -319,11 +319,7 @@ export default function BirthdateScreen() {
                     marginTop: 16,
                   }}
                 >
-                  {birthDate
-                    ? formatDate(tempDate)
-                    : lang === "es"
-                    ? "Selecciona tu fecha"
-                    : "Select your date"}
+                  {birthDate ? formatDate(tempDate) : t.selectYourDate[lang]}
                 </Typography>
 
                 <View

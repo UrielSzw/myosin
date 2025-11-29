@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, X } from "lucide-react-native";
@@ -17,7 +18,7 @@ type Props = {
   onShowRecentToggle: () => void;
   activeFiltersCount: number;
   onClearAll: () => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionFiltersV2: React.FC<Props> = ({
@@ -80,7 +81,7 @@ export const SessionFiltersV2: React.FC<Props> = ({
                 marginLeft: 6,
               }}
             >
-              {lang === "es" ? "Esta semana" : "This week"}
+              {t.thisWeekFilter[lang]}
             </Typography>
           </View>
         </Pressable>
@@ -104,7 +105,7 @@ export const SessionFiltersV2: React.FC<Props> = ({
               weight="semibold"
               style={{ color: colors.error[500], marginLeft: 4 }}
             >
-              {lang === "es" ? "Limpiar" : "Clear"}
+              {t.clear[lang]}
             </Typography>
           </Pressable>
         )}

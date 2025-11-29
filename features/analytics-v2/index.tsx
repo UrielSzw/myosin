@@ -3,6 +3,7 @@ import { useTrackerAnalytics } from "@/features/analytics-v2/hooks/use-tracker-a
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { AlertCircle, BarChart3 } from "lucide-react-native";
@@ -24,7 +25,7 @@ export const AnalyticsFeatureV2 = () => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   // Data fetching
   const {
@@ -57,7 +58,7 @@ export const AnalyticsFeatureV2 = () => {
             <AlertCircle size={32} color={colors.primary[500]} />
           </View>
           <Typography variant="h6" weight="semibold" align="center">
-            {lang === "es" ? "Inicia sesión" : "Sign in required"}
+            {t.signInRequired[lang]}
           </Typography>
           <Typography
             variant="body2"
@@ -65,9 +66,7 @@ export const AnalyticsFeatureV2 = () => {
             align="center"
             style={{ marginTop: 8 }}
           >
-            {lang === "es"
-              ? "Necesitas iniciar sesión para ver tus estadísticas"
-              : "You need to sign in to view your analytics"}
+            {t.signInRequiredDescription[lang]}
           </Typography>
         </View>
       </View>
@@ -109,9 +108,7 @@ export const AnalyticsFeatureV2 = () => {
               weight="medium"
               style={{ color: colors.text }}
             >
-              {lang === "es"
-                ? "Cargando estadísticas..."
-                : "Loading analytics..."}
+              {t.loadingAnalytics[lang]}
             </Typography>
           </Animated.View>
         </View>
@@ -135,7 +132,7 @@ export const AnalyticsFeatureV2 = () => {
             <AlertCircle size={32} color={colors.error[500]} />
           </View>
           <Typography variant="h6" weight="semibold" align="center">
-            {lang === "es" ? "Error al cargar" : "Error loading"}
+            {t.errorLoading[lang]}
           </Typography>
           <Typography
             variant="body2"
@@ -143,10 +140,7 @@ export const AnalyticsFeatureV2 = () => {
             align="center"
             style={{ marginTop: 8 }}
           >
-            {analyticsError?.message ||
-              (lang === "es"
-                ? "No se pudieron cargar las estadísticas"
-                : "Failed to load analytics")}
+            {analyticsError?.message || t.errorLoadingDescription[lang]}
           </Typography>
         </View>
       </View>
@@ -206,7 +200,7 @@ export const AnalyticsFeatureV2 = () => {
                 align="center"
                 style={{ color: colors.text, marginTop: 20 }}
               >
-                {lang === "es" ? "Aún no hay datos" : "No data yet"}
+                {t.noDataYet[lang]}
               </Typography>
               <Typography
                 variant="body2"
@@ -214,9 +208,7 @@ export const AnalyticsFeatureV2 = () => {
                 align="center"
                 style={{ marginTop: 8, paddingHorizontal: 20 }}
               >
-                {lang === "es"
-                  ? "Completa entrenamientos y registra métricas para ver tus estadísticas aquí"
-                  : "Complete workouts and track metrics to see your analytics here"}
+                {t.noDataYetDescription[lang]}
               </Typography>
             </View>
           </Animated.View>

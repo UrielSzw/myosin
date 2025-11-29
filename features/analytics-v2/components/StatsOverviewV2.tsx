@@ -1,5 +1,6 @@
 import { AnalyticsDashboardData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Flame, Sparkles, Target, Trophy } from "lucide-react-native";
@@ -140,8 +141,8 @@ export const StatsOverviewV2: React.FC<Props> = ({ data, lang }) => {
         <StatCard
           icon={<Target size={22} color={colors.primary[500]} />}
           value={stats.workoutsThisWeek}
-          label={lang === "es" ? "Entrenamientos" : "Workouts"}
-          sublabel={lang === "es" ? "Esta semana" : "This week"}
+          label={t.workouts[lang]}
+          sublabel={t.heroThisWeek[lang]}
           color={colors.primary[500]}
           delay={100}
           isDarkMode={isDarkMode}
@@ -149,8 +150,8 @@ export const StatsOverviewV2: React.FC<Props> = ({ data, lang }) => {
         <StatCard
           icon={<Trophy size={22} color="#f59e0b" />}
           value={stats.prsThisMonth}
-          label={lang === "es" ? "Récords" : "PRs"}
-          sublabel={lang === "es" ? "Este mes" : "This month"}
+          label={t.records[lang]}
+          sublabel={t.thisMonth[lang]}
           color="#f59e0b"
           delay={150}
           isDarkMode={isDarkMode}
@@ -161,16 +162,8 @@ export const StatsOverviewV2: React.FC<Props> = ({ data, lang }) => {
         <StatCard
           icon={<Flame size={22} color="#ef4444" />}
           value={stats.weeklyStreak}
-          label={lang === "es" ? "Racha" : "Streak"}
-          sublabel={
-            stats.weeklyStreak === 1
-              ? lang === "es"
-                ? "semana"
-                : "week"
-              : lang === "es"
-              ? "semanas"
-              : "weeks"
-          }
+          label={t.streak[lang]}
+          sublabel={stats.weeklyStreak === 1 ? t.week[lang] : t.weeks[lang]}
           color="#ef4444"
           delay={200}
           isDarkMode={isDarkMode}
@@ -178,8 +171,8 @@ export const StatsOverviewV2: React.FC<Props> = ({ data, lang }) => {
         <StatCard
           icon={<Sparkles size={22} color="#10b981" />}
           value={stats.activeDays}
-          label={lang === "es" ? "Días activos" : "Active days"}
-          sublabel={lang === "es" ? "por semana" : "per week"}
+          label={t.activeDays[lang]}
+          sublabel={t.perWeek[lang]}
           color="#10b981"
           delay={250}
           isDarkMode={isDarkMode}

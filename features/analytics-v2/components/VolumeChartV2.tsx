@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { WeeklyVolumeMap } from "@/shared/utils/volume-calculator";
 import { BlurView } from "expo-blur";
@@ -82,7 +83,7 @@ export const VolumeChartV2: React.FC<Props> = ({ weeklyVolume, lang }) => {
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Volumen Semanal" : "Weekly Volume"}
+            {t.weeklyVolume[lang]}
           </Typography>
         </View>
         <View
@@ -100,7 +101,7 @@ export const VolumeChartV2: React.FC<Props> = ({ weeklyVolume, lang }) => {
             weight="semibold"
             style={{ color: colors.primary[500] }}
           >
-            {totalSets} {lang === "es" ? "series" : "sets"}
+            {totalSets} {t.series[lang]}
           </Typography>
         </View>
       </View>

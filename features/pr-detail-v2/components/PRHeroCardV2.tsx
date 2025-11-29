@@ -1,6 +1,7 @@
 import { CurrentPR } from "@/features/pr-detail-v2/hooks/use-pr-detail";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -11,36 +12,36 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   currentPR: CurrentPR;
-  lang: string;
+  lang: "es" | "en";
 };
 
-const formatRelativeDate = (dateString: string, lang: string): string => {
+const formatRelativeDate = (dateString: string, lang: "es" | "en"): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return lang === "es" ? "Hoy" : "Today";
+    return t.today[lang];
   } else if (diffDays === 1) {
-    return lang === "es" ? "Ayer" : "Yesterday";
+    return t.yesterday[lang];
   } else if (diffDays < 7) {
-    return lang === "es" ? `Hace ${diffDays} días` : `${diffDays} days ago`;
+    return t.daysAgo[lang].replace("{days}", String(diffDays));
   } else if (diffDays < 30) {
     const weeks = Math.floor(diffDays / 7);
-    return lang === "es"
-      ? `Hace ${weeks} ${weeks === 1 ? "semana" : "semanas"}`
-      : `${weeks} ${weeks === 1 ? "week" : "weeks"} ago`;
+    return weeks === 1
+      ? t.weeksAgoSingular[lang].replace("{weeks}", String(weeks))
+      : t.weeksAgoPlural[lang].replace("{weeks}", String(weeks));
   } else if (diffDays < 365) {
     const months = Math.floor(diffDays / 30);
-    return lang === "es"
-      ? `Hace ${months} ${months === 1 ? "mes" : "meses"}`
-      : `${months} ${months === 1 ? "month" : "months"} ago`;
+    return months === 1
+      ? t.monthsAgoSingular[lang].replace("{months}", String(months))
+      : t.monthsAgoPlural[lang].replace("{months}", String(months));
   } else {
     const years = Math.floor(diffDays / 365);
-    return lang === "es"
-      ? `Hace ${years} ${years === 1 ? "año" : "años"}`
-      : `${years} ${years === 1 ? "year" : "years"} ago`;
+    return years === 1
+      ? t.yearsAgoSingular[lang].replace("{years}", String(years))
+      : t.yearsAgoPlural[lang].replace("{years}", String(years));
   }
 };
 
@@ -114,7 +115,7 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
             style={styles.labelContainer}
           >
             <Typography variant="caption" weight="bold" style={styles.label}>
-              {lang === "es" ? "PR ACTUAL" : "CURRENT PR"}
+              {t.currentPR[lang]}
             </Typography>
             {isRecent && (
               <View style={styles.newBadge}>
@@ -124,7 +125,7 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
                   weight="bold"
                   style={styles.newText}
                 >
-                  {lang === "es" ? "NUEVO" : "NEW"}
+                  {t.new[lang]}
                 </Typography>
               </View>
             )}
@@ -163,7 +164,7 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
               weight="medium"
               style={{ color: colors.primary[500] }}
             >
-              1RM {lang === "es" ? "estimado" : "estimated"}:
+              {t.estimated1RM[lang]}:
             </Typography>
             <Typography
               variant="body1"

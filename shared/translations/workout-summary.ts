@@ -1,16 +1,16 @@
 export const workoutSummaryTranslations = {
   // Main
   completed: {
-    es: "Completado",
-    en: "Completed",
+    es: "¡Completado!",
+    en: "Completed!",
   },
   workout: {
     es: "Entrenamiento",
     en: "Workout",
   },
   streak: {
-    es: "Racha",
-    en: "Streak",
+    es: "RACHA",
+    en: "STREAK",
   },
   days: {
     es: "días",
@@ -18,6 +18,10 @@ export const workoutSummaryTranslations = {
   },
 
   // Stats
+  exercisesLabel: {
+    es: "Ejercicios",
+    en: "Exercises",
+  },
   exercises: {
     es: "ejercicios",
     en: "exercises",
@@ -25,6 +29,10 @@ export const workoutSummaryTranslations = {
   sets: {
     es: "sets",
     en: "sets",
+  },
+  durationLabel: {
+    es: "Duración",
+    en: "Duration",
   },
   duration: {
     es: "duración",
@@ -37,8 +45,16 @@ export const workoutSummaryTranslations = {
     en: "Highlights",
   },
   newPR: {
-    es: "¡Nuevo PR!",
-    en: "New PR!",
+    es: "¡NUEVO PR!",
+    en: "NEW PR!",
+  },
+  personalRecords: {
+    es: "Records Personales",
+    en: "Personal Records",
+  },
+  youImproved: {
+    es: "¡Mejoraste!",
+    en: "You improved!",
   },
   improved: {
     es: "Mejoraste en",
@@ -59,8 +75,8 @@ export const workoutSummaryTranslations = {
 
   // Actions
   done: {
-    es: "Listo",
-    en: "Done",
+    es: "¡Listo!",
+    en: "Done!",
   },
 
   // Empty states

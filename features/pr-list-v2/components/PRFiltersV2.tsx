@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, X } from "lucide-react-native";
@@ -19,7 +20,7 @@ type Props = {
   onShowRecentToggle: () => void;
   activeFiltersCount: number;
   onClearAll: () => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 const MUSCLE_CATEGORIES = [
@@ -97,7 +98,7 @@ export const PRFiltersV2: React.FC<Props> = ({
                 marginLeft: 6,
               }}
             >
-              {lang === "es" ? "Recientes" : "Recent"}
+              {t.recent[lang]}
             </Typography>
           </View>
         </Pressable>
@@ -178,7 +179,7 @@ export const PRFiltersV2: React.FC<Props> = ({
               weight="semibold"
               style={{ color: colors.error[500], marginLeft: 4 }}
             >
-              {lang === "es" ? "Limpiar" : "Clear"}
+              {t.clear[lang]}
             </Typography>
           </Pressable>
         )}

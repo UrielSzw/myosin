@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -186,7 +187,7 @@ export const WorkoutStatsCounterV2: React.FC<Props> = ({
     {
       icon: <Dumbbell size={20} color={colors.primary[500]} />,
       targetValue: totalExercises,
-      label: lang === "es" ? "Ejercicios" : "Exercises",
+      label: t.exercisesLabel[lang],
       color: colors.primary[500],
     },
     {
@@ -198,7 +199,7 @@ export const WorkoutStatsCounterV2: React.FC<Props> = ({
     {
       icon: <Clock size={20} color="#8b5cf6" />,
       targetValue: durationSeconds,
-      label: lang === "es" ? "Duración" : "Duration",
+      label: t.durationLabel[lang],
       color: "#8b5cf6",
       formatValue: formatDuration,
     },

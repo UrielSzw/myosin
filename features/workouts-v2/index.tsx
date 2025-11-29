@@ -4,6 +4,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
@@ -37,7 +38,7 @@ export const WorkoutsFeatureV2 = () => {
   const { folders } = useMainWorkoutsData();
   const queryClient = useQueryClient();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const { handleDeleteRoutine, handleEditRoutine, handleRemoveTrainingDays } =
     useRoutineOptions();
 
@@ -77,17 +78,18 @@ export const WorkoutsFeatureV2 = () => {
     if (!selectedFolderForOptions) return;
 
     Alert.alert(
-      lang === "es" ? "Eliminar Carpeta" : "Delete Folder",
-      lang === "es"
-        ? "¿Estás seguro de que quieres eliminar esta carpeta? Las rutinas dentro de ella se moverán a la vista principal."
-        : "Are you sure you want to delete this folder? Routines inside will be moved to the main view.",
+      t.deleteFolderTitle[lang],
+      t.deleteFolderMessage[lang].replace(
+        "{name}",
+        selectedFolderForOptions.name
+      ),
       [
         {
-          text: lang === "es" ? "Cancelar" : "Cancel",
+          text: t.cancel[lang],
           style: "cancel",
         },
         {
-          text: lang === "es" ? "Eliminar" : "Delete",
+          text: t.deleteButton[lang],
           style: "destructive",
           onPress: async () => {
             try {
@@ -97,12 +99,7 @@ export const WorkoutsFeatureV2 = () => {
               setSelectedFolderForOptions(null);
             } catch (error) {
               console.error("Error deleting folder:", error);
-              Alert.alert(
-                lang === "es" ? "Error" : "Error",
-                lang === "es"
-                  ? "No se pudo eliminar la carpeta"
-                  : "Could not delete the folder"
-              );
+              Alert.alert(t.errorTitle[lang], t.errorDeletingRoutine[lang]);
             }
           },
         },

@@ -2,6 +2,7 @@ import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { ChevronLeft, FolderOpen, Plus } from "lucide-react-native";
@@ -21,7 +22,7 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
     (state) => state.setSelectedFolder
   );
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const handleBack = () => {
     setSelectedFolder(null);
@@ -95,7 +96,7 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
               weight="bold"
               style={{ color: colors.text }}
             >
-              {lang === "es" ? "Rutinas" : "Routines"}
+              {t.routines[lang]}
             </Typography>
           )}
         </View>

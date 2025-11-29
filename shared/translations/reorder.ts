@@ -8,6 +8,18 @@ export const reorderTranslations = {
     es: "Mantén presionado un bloque por 300ms para arrastrarlo y reordenar",
     en: "Press and hold a block for 300ms to drag and reorder",
   },
+  block: {
+    es: "Bloque",
+    en: "Block",
+  },
+  exercise: {
+    es: "ejercicio",
+    en: "exercise",
+  },
+  exercises: {
+    es: "ejercicios",
+    en: "exercises",
+  },
 
   // Reorder Exercises
   reorderExercises: {

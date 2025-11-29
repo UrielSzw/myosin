@@ -1,6 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
+import { folderFormTranslations as t } from "@/shared/translations/folder-form";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -187,7 +188,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
       {/* Header */}
       <Animated.View
         entering={FadeIn.duration(300)}
-        style={[styles.header, { paddingTop: insets.top }]}
+        style={[styles.header, { paddingTop: 8 }]}
       >
         {Platform.OS === "ios" && (
           <BlurView
@@ -237,13 +238,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
               weight="bold"
               style={{ color: colors.text }}
             >
-              {isEditMode
-                ? lang === "es"
-                  ? "Editar Carpeta"
-                  : "Edit Folder"
-                : lang === "es"
-                ? "Nueva Carpeta"
-                : "New Folder"}
+              {isEditMode ? t.editFolder[lang] : t.newFolder[lang]}
             </Typography>
           </View>
 
@@ -323,7 +318,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 style={{ color: colors.text, marginTop: 16 }}
                 numberOfLines={1}
               >
-                {folderName || (lang === "es" ? "Mi Carpeta" : "My Folder")}
+                {folderName || t.myFolder[lang]}
               </Typography>
               <Typography
                 variant="body2"
@@ -331,7 +326,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 align="center"
                 style={{ marginTop: 4 }}
               >
-                {lang === "es" ? "0 rutinas" : "0 routines"}
+                {t.routinesCount[lang]}
               </Typography>
             </View>
           </View>
@@ -347,7 +342,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 weight="semibold"
                 style={{ color: colors.text, marginLeft: 10 }}
               >
-                {lang === "es" ? "Nombre" : "Name"}
+                {t.name[lang]}
               </Typography>
             </View>
 
@@ -379,9 +374,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 ref={inputRef}
                 value={folderName}
                 onChangeText={setFolderName}
-                placeholder={
-                  lang === "es" ? "Nombre de la carpeta" : "Folder name"
-                }
+                placeholder={t.folderNameLabel[lang]}
                 placeholderTextColor={colors.textMuted}
                 style={[styles.input, { color: colors.text }]}
                 maxLength={50}
@@ -423,7 +416,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 weight="semibold"
                 style={{ color: colors.text, marginLeft: 10 }}
               >
-                {lang === "es" ? "Color" : "Color"}
+                {t.color[lang]}
               </Typography>
             </View>
 
@@ -475,13 +468,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                 weight="semibold"
                 style={{ color: colors.error[500], marginLeft: 10 }}
               >
-                {isDeleting
-                  ? lang === "es"
-                    ? "Eliminando..."
-                    : "Deleting..."
-                  : lang === "es"
-                  ? "Eliminar Carpeta"
-                  : "Delete Folder"}
+                {isDeleting ? t.deleting[lang] : t.deleteFolder[lang]}
               </Typography>
             </Pressable>
           </Animated.View>

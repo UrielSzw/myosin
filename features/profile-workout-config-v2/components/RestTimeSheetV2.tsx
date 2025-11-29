@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { profileTranslations as t } from "@/shared/translations/profile";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, Minus, Plus, X } from "lucide-react-native";
@@ -17,18 +18,18 @@ import {
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-// Opciones rápidas de tiempo
+// Quick time options (labels are translation keys or literal values)
 const QUICK_OPTIONS = [
-  { label: { es: "Sin descanso", en: "No rest" }, value: 0 },
-  { label: { es: "30s", en: "30s" }, value: 30 },
-  { label: { es: "45s", en: "45s" }, value: 45 },
-  { label: { es: "1 min", en: "1 min" }, value: 60 },
-  { label: { es: "1:30", en: "1:30" }, value: 90 },
-  { label: { es: "2 min", en: "2 min" }, value: 120 },
-  { label: { es: "2:30", en: "2:30" }, value: 150 },
-  { label: { es: "3 min", en: "3 min" }, value: 180 },
-  { label: { es: "4 min", en: "4 min" }, value: 240 },
-  { label: { es: "5 min", en: "5 min" }, value: 300 },
+  { labelKey: "noRest", value: 0 },
+  { label: "30s", value: 30 },
+  { label: "45s", value: 45 },
+  { label: "1 min", value: 60 },
+  { label: "1:30", value: 90 },
+  { label: "2 min", value: 120 },
+  { label: "2:30", value: 150 },
+  { label: "3 min", value: 180 },
+  { label: "4 min", value: 240 },
+  { label: "5 min", value: 300 },
 ];
 
 type Props = {
@@ -46,7 +47,7 @@ export const RestTimeSheetV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const [selectedTime, setSelectedTime] = useState<number>(currentValue);
 
@@ -94,7 +95,7 @@ export const RestTimeSheetV2 = ({
   }, [visible]);
 
   const formatTime = (seconds: number) => {
-    if (seconds === 0) return lang === "es" ? "Sin descanso" : "No rest";
+    if (seconds === 0) return t.noRest[lang];
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -203,16 +204,14 @@ export const RestTimeSheetV2 = ({
                   weight="bold"
                   style={{ color: colors.text }}
                 >
-                  {lang === "es" ? "Tiempo de Descanso" : "Rest Time"}
+                  {t.restTimeSheetTitle[lang]}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="textMuted"
                   style={{ marginTop: 4 }}
                 >
-                  {lang === "es"
-                    ? "Ajusta el tiempo entre series"
-                    : "Adjust time between sets"}
+                  {t.restTimeSheetSubtitle[lang]}
                 </Typography>
               </View>
             </View>
@@ -240,7 +239,7 @@ export const RestTimeSheetV2 = ({
               color="textMuted"
               style={{ marginBottom: 12, marginLeft: 4 }}
             >
-              {lang === "es" ? "Tiempo personalizado" : "Custom time"}
+              {t.customTime[lang]}
             </Typography>
 
             <View
@@ -310,7 +309,7 @@ export const RestTimeSheetV2 = ({
               color="textMuted"
               style={{ marginBottom: 12, marginLeft: 4 }}
             >
-              {lang === "es" ? "Opciones rápidas" : "Quick options"}
+              {t.quickOptions[lang]}
             </Typography>
 
             <ScrollView
@@ -320,6 +319,9 @@ export const RestTimeSheetV2 = ({
             >
               {QUICK_OPTIONS.map((option) => {
                 const isSelected = selectedTime === option.value;
+                const displayLabel = option.labelKey
+                  ? t[option.labelKey as keyof typeof t][lang]
+                  : option.label;
 
                 return (
                   <Pressable
@@ -350,7 +352,7 @@ export const RestTimeSheetV2 = ({
                         color: isSelected ? "#fff" : colors.text,
                       }}
                     >
-                      {option.label[lang as "es" | "en"]}
+                      {displayLabel}
                     </Typography>
                   </Pressable>
                 );
@@ -376,7 +378,7 @@ export const RestTimeSheetV2 = ({
                 weight="semibold"
                 style={{ color: "#fff" }}
               >
-                {lang === "es" ? "Aplicar Tiempo" : "Apply Time"}
+                {t.applyTime[lang]}
               </Typography>
             </Pressable>
           </View>

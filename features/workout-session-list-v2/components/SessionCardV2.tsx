@@ -1,5 +1,6 @@
 import { SessionListItem } from "@/features/workout-session-list-v2/types/session-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -17,7 +18,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   session: SessionListItem;
   index: number;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
@@ -37,7 +38,7 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
       return {
         color: colors.success[500],
         bgColor: `${colors.success[500]}15`,
-        label: lang === "es" ? "Completado" : "Completed",
+        label: t.completed[lang],
         Icon: CheckCircle2,
       };
     } else if (session.completion_rate >= 80) {
@@ -145,7 +146,7 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
                       marginLeft: 3,
                     }}
                   >
-                    {lang === "es" ? "NUEVO" : "NEW"}
+                    {t.new[lang]}
                   </Typography>
                 </View>
               )}
@@ -202,7 +203,7 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
                 variant="caption"
                 style={{ color: statusInfo.color, fontSize: 10 }}
               >
-                {isCompleted ? "✓" : lang === "es" ? "Progreso" : "Progress"}
+                {isCompleted ? "✓" : t.progress[lang]}
               </Typography>
               <Typography
                 variant="h6"

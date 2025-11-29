@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -12,7 +13,7 @@ type Props = {
   duration: string;
   totalSets: number;
   totalVolume: number;
-  lang: string;
+  lang: "es" | "en";
 };
 
 type StatCardProps = {
@@ -103,19 +104,19 @@ export const SessionQuickStatsV2: React.FC<Props> = ({
     {
       icon: <Clock size={20} color={colors.primary[500]} />,
       value: duration,
-      label: lang === "es" ? "Duración" : "Duration",
+      label: t.duration[lang],
       color: colors.primary[500],
     },
     {
       icon: <Dumbbell size={20} color={colors.success[500]} />,
       value: totalSets.toString(),
-      label: lang === "es" ? "Sets" : "Sets",
+      label: t.setsLabel[lang],
       color: colors.success[500],
     },
     {
       icon: <Flame size={20} color="#f59e0b" />,
       value: `${formatVolume(displayVolume)}`,
-      label: `${lang === "es" ? "Volumen" : "Volume"} (${weightUnit})`,
+      label: `${t.volume[lang]} (${weightUnit})`,
       color: "#f59e0b",
     },
   ];

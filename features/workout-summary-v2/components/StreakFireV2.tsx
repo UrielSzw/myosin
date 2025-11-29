@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -203,7 +204,7 @@ export const StreakFireV2: React.FC<Props> = ({
                   weight="semibold"
                   style={{ color: "#f59e0b", marginLeft: 4 }}
                 >
-                  {lang === "es" ? "RACHA" : "STREAK"}
+                  {t.streak[lang]}
                 </Typography>
               </View>
             </Animated.View>
@@ -232,7 +233,7 @@ export const StreakFireV2: React.FC<Props> = ({
                 color="textMuted"
                 style={{ marginTop: 2 }}
               >
-                {lang === "es" ? "Sigue así 💪" : "Keep it up 💪"}
+                {t.keepItUp[lang]}
               </Typography>
             </Animated.View>
           </View>

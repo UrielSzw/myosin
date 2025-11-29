@@ -2,6 +2,7 @@ import { useSessionDetail } from "@/features/workout-session-detail-v2/hooks/use
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Layers } from "lucide-react-native";
@@ -29,7 +30,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const {
     data: sessionData,
@@ -40,7 +41,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
 
   // Calculate header height for scroll padding
   const headerHeight = useMemo(() => {
-    return insets.top + 8 + 64;
+    return insets.top + 64;
   }, [insets.top]);
 
   // Format duration
@@ -59,7 +60,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
       <View style={styles.container}>
         <AuroraBackground />
         <SessionDetailHeaderV2
-          routineName={lang === "es" ? "Cargando..." : "Loading..."}
+          routineName={t.loading[lang]}
           date={new Date().toISOString()}
           lang={lang}
         />
@@ -70,7 +71,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
             color="textMuted"
             style={{ marginTop: 12 }}
           >
-            {lang === "es" ? "Cargando sesión..." : "Loading session..."}
+            {t.loadingSession[lang]}
           </Typography>
         </View>
       </View>
@@ -83,7 +84,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
       <View style={styles.container}>
         <AuroraBackground />
         <SessionDetailHeaderV2
-          routineName={lang === "es" ? "Error" : "Error"}
+          routineName={t.error[lang]}
           date={new Date().toISOString()}
           lang={lang}
         />
@@ -155,7 +156,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
         contentContainerStyle={[
           styles.scrollContent,
           {
-            paddingTop: headerHeight + 20,
+            paddingTop: headerHeight,
             paddingBottom: insets.bottom + 40,
           },
         ]}
@@ -198,7 +199,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
             weight="semibold"
             style={{ color: colors.text, marginLeft: 8 }}
           >
-            {lang === "es" ? "Ejercicios" : "Exercises"}
+            {t.exercisesSection[lang]}
           </Typography>
           <Typography
             variant="caption"

@@ -118,9 +118,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
                   color="textMuted"
                   style={{ marginTop: 4 }}
                 >
-                  {lang === "es"
-                    ? "Opciones avanzadas de la rutina"
-                    : "Advanced routine options"}
+                  {t.advancedRoutineOptions[lang]}
                 </Typography>
               </View>
             </View>

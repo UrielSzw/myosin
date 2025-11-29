@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -172,7 +173,7 @@ const PRCardAnimated: React.FC<{
               weight="bold"
               style={{ color: accentColor, marginLeft: 4 }}
             >
-              {lang === "es" ? "¡NUEVO PR!" : "NEW PR!"}
+              {t.newPR[lang]}
             </Typography>
           </View>
           <Typography
@@ -224,7 +225,7 @@ export const PRShowcaseV2: React.FC<Props> = ({
           weight="bold"
           style={{ color: colors.text, marginLeft: 8 }}
         >
-          {lang === "es" ? "Records Personales" : "Personal Records"}
+          {t.personalRecords[lang]}
         </Typography>
         {displayPrs.length > 0 && (
           <View

@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Search, Trophy } from "lucide-react-native";
@@ -9,7 +10,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   variant: "no-prs" | "no-results";
   onClearFilters?: () => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const EmptyStateV2: React.FC<Props> = ({
@@ -110,7 +111,7 @@ export const EmptyStateV2: React.FC<Props> = ({
                 weight="semibold"
                 style={{ color: "#fff" }}
               >
-                {lang === "es" ? "Limpiar filtros" : "Clear filters"}
+                {t.clearFilters[lang]}
               </Typography>
             </Pressable>
           )}

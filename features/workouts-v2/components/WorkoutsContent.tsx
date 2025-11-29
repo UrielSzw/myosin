@@ -3,6 +3,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { Folder } from "lucide-react-native";
 import React from "react";
@@ -32,7 +33,7 @@ export const WorkoutsContent = ({
   const insets = useSafeAreaInsets();
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   // Calculate header height to match TrackerFeatureV2
   const headerHeight = insets.top + 8 + 60 + 20;
@@ -99,7 +100,7 @@ export const WorkoutsContent = ({
                 align="center"
                 style={{ marginTop: 16 }}
               >
-                {lang === "es" ? "Carpeta vacía" : "Empty folder"}
+                {t.emptyFolder[lang]}
               </Typography>
               <Typography
                 variant="caption"
@@ -107,9 +108,7 @@ export const WorkoutsContent = ({
                 align="center"
                 style={{ marginTop: 4, opacity: 0.7 }}
               >
-                {lang === "es"
-                  ? "Mueve rutinas aquí para organizarlas"
-                  : "Move routines here to organize them"}
+                {t.moveRoutinesHere[lang]}
               </Typography>
             </View>
           )}
@@ -144,10 +143,7 @@ export const WorkoutsContent = ({
           {/* Folders Section */}
           {folders.length > 0 && (
             <View style={styles.section}>
-              <SectionHeader
-                title={lang === "es" ? "Carpetas" : "Folders"}
-                count={folders.length}
-              />
+              <SectionHeader title={t.folders[lang]} count={folders.length} />
               <View style={styles.foldersGrid}>
                 {folders.map((folder) => (
                   <FolderCardV2
@@ -164,7 +160,7 @@ export const WorkoutsContent = ({
           {routines.length > 0 && (
             <View style={styles.section}>
               <SectionHeader
-                title={lang === "es" ? "Mis Rutinas" : "My Routines"}
+                title={t.myRoutines[lang]}
                 count={routines.length}
               />
               <View style={styles.routinesList}>

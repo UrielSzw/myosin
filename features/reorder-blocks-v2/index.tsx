@@ -281,7 +281,7 @@ const ReorderBlockItemV2: React.FC<BlockItemProps> = ({
             {/* Header Row */}
             <View style={styles.blockHeader}>
               <Typography variant="body1" weight="semibold">
-                {lang === "es" ? "Bloque" : "Block"} {index + 1}
+                {t.block[lang]} {index + 1}
               </Typography>
               <View
                 style={[
@@ -324,12 +324,8 @@ const ReorderBlockItemV2: React.FC<BlockItemProps> = ({
                 <Typography variant="caption" color="textMuted">
                   {exercisesIds.length}{" "}
                   {exercisesIds.length === 1
-                    ? lang === "es"
-                      ? "ejercicio"
-                      : "exercise"
-                    : lang === "es"
-                    ? "ejercicios"
-                    : "exercises"}
+                    ? t.exercise[lang]
+                    : t.exercises[lang]}
                 </Typography>
               </View>
             </View>

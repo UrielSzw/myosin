@@ -325,7 +325,7 @@ export const MetricModalV2: React.FC<Props> = ({
               intensity={80}
               tint={isDarkMode ? "dark" : "light"}
               style={{
-                paddingTop: 8,
+                paddingTop: 16,
                 paddingBottom: 16,
                 paddingHorizontal: 20,
                 borderBottomWidth: 1,
@@ -349,7 +349,7 @@ export const MetricModalV2: React.FC<Props> = ({
           ) : (
             <View
               style={{
-                paddingTop: 8,
+                paddingTop: 16,
                 paddingBottom: 16,
                 paddingHorizontal: 20,
                 backgroundColor: colors.background,
@@ -1054,7 +1054,7 @@ const ScaleInputSection: React.FC<{
       style={{ marginBottom: 24 }}
     >
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        {lang === "es" ? "Selecciona un valor" : "Select a value"}
+        {trackerTranslations.selectAValue[lang]}
       </Typography>
 
       <View style={{ gap: 10 }}>
@@ -1210,15 +1210,15 @@ const BooleanInputSection: React.FC<{
   const getTrueLabel = () => {
     if (inputConfig && "booleanLabels" in inputConfig) {
       const labels = (inputConfig as any).booleanLabels;
-      return labels?.true || (lang === "es" ? "Sí" : "Yes");
+      return labels?.true || trackerTranslations.yes[lang];
     }
     if (metric.slug && (t.booleanLabels as any)[metric.slug]) {
       return (
         (t.booleanLabels as any)[metric.slug].true?.[lang] ||
-        (lang === "es" ? "Sí" : "Yes")
+        trackerTranslations.yes[lang]
       );
     }
-    return lang === "es" ? "Sí" : "Yes";
+    return trackerTranslations.yes[lang];
   };
 
   const getFalseLabel = () => {
@@ -1249,7 +1249,7 @@ const BooleanInputSection: React.FC<{
       style={{ marginBottom: 24 }}
     >
       <Typography variant="h6" weight="semibold" style={{ marginBottom: 16 }}>
-        {lang === "es" ? "¿Cómo te fue hoy?" : "How did it go today?"}
+        {trackerTranslations.howDidItGoToday[lang]}
       </Typography>
 
       <View style={{ flexDirection: "row", gap: 12 }}>
@@ -1359,7 +1359,7 @@ const BooleanInputSection: React.FC<{
               weight="bold"
               style={{ color: "#ffffff" }}
             >
-              {lang === "es" ? "Confirmar" : "Confirm"}
+              {trackerTranslations.confirm[lang]}
             </Typography>
           </TouchableOpacity>
         </Animated.View>

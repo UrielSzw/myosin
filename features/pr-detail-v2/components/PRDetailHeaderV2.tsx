@@ -1,19 +1,18 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
 import { ArrowLeft, Trophy } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
   exerciseName: string;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const PRDetailHeaderV2: React.FC<Props> = ({ exerciseName, lang }) => {
-  const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const router = useRouter();
 
@@ -22,7 +21,7 @@ export const PRDetailHeaderV2: React.FC<Props> = ({ exerciseName, lang }) => {
   };
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.header, { paddingTop: 8 }]}>
       {Platform.OS === "ios" && (
         <BlurView
           intensity={isDarkMode ? 25 : 40}
@@ -59,7 +58,7 @@ export const PRDetailHeaderV2: React.FC<Props> = ({ exerciseName, lang }) => {
             {exerciseName}
           </Typography>
           <Typography variant="caption" color="textMuted">
-            {lang === "es" ? "Historial de PR" : "PR History"}
+            {t.prHistory[lang]}
           </Typography>
         </View>
 

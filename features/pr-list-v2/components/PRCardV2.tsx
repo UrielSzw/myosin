@@ -1,6 +1,7 @@
 import { PRListItem } from "@/features/pr-list-v2/types/pr-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -13,7 +14,7 @@ type Props = {
   pr: PRListItem;
   index: number;
   onPress?: () => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 const getMedalInfo = (
@@ -118,7 +119,7 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
                       marginLeft: 3,
                     }}
                   >
-                    {lang === "es" ? "NUEVO" : "NEW"}
+                    {t.new[lang]}
                   </Typography>
                 </View>
               )}

@@ -1,6 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations as t } from "@/shared/translations/profile";
 import { router } from "expo-router";
 import {
   Globe,
@@ -26,7 +27,7 @@ export const ProfileFeatureV2 = () => {
   const { user, signOut } = useAuth();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
 
@@ -37,27 +38,25 @@ export const ProfileFeatureV2 = () => {
   };
 
   const handleLogout = () => {
-    Alert.alert(
-      lang === "es" ? "Cerrar Sesión" : "Sign Out",
-      lang === "es"
-        ? "¿Estás seguro que quieres cerrar sesión?"
-        : "Are you sure you want to sign out?",
-      [
-        {
-          text: lang === "es" ? "Cancelar" : "Cancel",
-          style: "cancel",
-        },
-        {
-          text: lang === "es" ? "Cerrar Sesión" : "Sign Out",
-          style: "destructive",
-          onPress: signOut,
-        },
-      ]
-    );
+    Alert.alert(t.logoutAlertTitle[lang], t.logoutAlertMessage[lang], [
+      {
+        text: t.logoutAlertCancel[lang],
+        style: "cancel",
+      },
+      {
+        text: t.logoutAlertConfirm[lang],
+        style: "destructive",
+        onPress: signOut,
+      },
+    ]);
   };
 
   const handleNavigateWorkoutConfig = () => {
     router.push("/profile/workout-config");
+  };
+
+  const handleNavigatePersonalData = () => {
+    router.push("/profile/personal-data" as never);
   };
 
   // Calculate header height for padding
@@ -85,16 +84,13 @@ export const ProfileFeatureV2 = () => {
         {/* Settings Sections */}
         <View style={styles.sectionsContainer}>
           {/* Preferences */}
-          <SettingSectionV2
-            title={lang === "es" ? "Preferencias" : "Preferences"}
-            delay={600}
-          >
+          <SettingSectionV2 title={t.preferencesSection[lang]} delay={600}>
             <SettingItemV2
               icon={Globe}
               iconColor="#8b5cf6"
               iconBgColor="rgba(139, 92, 246, 0.15)"
-              title={lang === "es" ? "Idioma" : "Language"}
-              subtitle={lang === "es" ? "Español" : "English"}
+              title={t.language[lang]}
+              subtitle={lang === "es" ? t.languageEs[lang] : t.languageEn[lang]}
               onPress={() => setShowLanguageSheet(true)}
               delay={650}
             />
@@ -102,12 +98,8 @@ export const ProfileFeatureV2 = () => {
               icon={isDarkMode ? Moon : Sun}
               iconColor="#f59e0b"
               iconBgColor="rgba(245, 158, 11, 0.15)"
-              title={lang === "es" ? "Modo Oscuro" : "Dark Mode"}
-              subtitle={
-                lang === "es"
-                  ? "Cambia el tema de la aplicación"
-                  : "Change the app theme"
-              }
+              title={t.darkMode[lang]}
+              subtitle={t.darkModeSubtitle[lang]}
               rightElement={
                 <Switch
                   value={isDarkMode}
@@ -124,22 +116,13 @@ export const ProfileFeatureV2 = () => {
           </SettingSectionV2>
 
           {/* Training */}
-          <SettingSectionV2
-            title={lang === "es" ? "Entrenamiento" : "Training"}
-            delay={750}
-          >
+          <SettingSectionV2 title={t.trainingSection[lang]} delay={750}>
             <SettingItemV2
               icon={Settings}
               iconColor="#10b981"
               iconBgColor="rgba(16, 185, 129, 0.15)"
-              title={
-                lang === "es"
-                  ? "Configuración de Entrenamiento"
-                  : "Workout Configuration"
-              }
-              subtitle={
-                lang === "es" ? "Unidades, RPE, Tempo" : "Units, RPE, Tempo"
-              }
+              title={t.workoutConfig[lang]}
+              subtitle={t.workoutConfigSubtitle[lang]}
               onPress={handleNavigateWorkoutConfig}
               delay={800}
             />
@@ -147,34 +130,21 @@ export const ProfileFeatureV2 = () => {
               icon={User}
               iconColor="#0ea5e9"
               iconBgColor="rgba(14, 165, 233, 0.15)"
-              title={lang === "es" ? "Datos Personales" : "Personal Data"}
-              subtitle={
-                lang === "es"
-                  ? "Peso, altura, nivel de experiencia"
-                  : "Weight, height, experience level"
-              }
-              onPress={() => {}}
+              title={t.personalData[lang]}
+              subtitle={t.personalDataSubtitle[lang]}
+              onPress={handleNavigatePersonalData}
               delay={850}
             />
           </SettingSectionV2>
 
           {/* Support */}
-          <SettingSectionV2
-            title={lang === "es" ? "Soporte" : "Support"}
-            delay={900}
-          >
+          <SettingSectionV2 title={t.supportSection[lang]} delay={900}>
             <SettingItemV2
               icon={HelpCircle}
               iconColor="#6366f1"
               iconBgColor="rgba(99, 102, 241, 0.15)"
-              title={
-                lang === "es" ? "Ayuda y Preguntas Frecuentes" : "Help & FAQ"
-              }
-              subtitle={
-                lang === "es"
-                  ? "¿Necesitas ayuda? Encuentra respuestas aquí"
-                  : "Need help? Find answers here"
-              }
+              title={t.helpFaq[lang]}
+              subtitle={t.helpFaqSubtitle[lang]}
               onPress={() => {}}
               delay={950}
             />
@@ -182,14 +152,8 @@ export const ProfileFeatureV2 = () => {
               icon={Shield}
               iconColor="#ec4899"
               iconBgColor="rgba(236, 72, 153, 0.15)"
-              title={
-                lang === "es" ? "Privacidad y Seguridad" : "Privacy & Security"
-              }
-              subtitle={
-                lang === "es"
-                  ? "Gestiona tu privacidad y datos"
-                  : "Manage your privacy and data"
-              }
+              title={t.privacy[lang]}
+              subtitle={t.privacySubtitle[lang]}
               onPress={() => {}}
               delay={1000}
             />
@@ -201,7 +165,7 @@ export const ProfileFeatureV2 = () => {
               icon={LogOut}
               iconColor={colors.error[500]}
               iconBgColor={`${colors.error[500]}15`}
-              title={lang === "es" ? "Cerrar Sesión" : "Sign Out"}
+              title={t.logout[lang]}
               onPress={handleLogout}
               isDestructive
               delay={1050}

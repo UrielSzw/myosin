@@ -1,5 +1,6 @@
 import { AnalyticsSessionData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -29,18 +30,15 @@ const formatDuration = (seconds: number): string => {
   return `${minutes}m`;
 };
 
-const formatRelativeDate = (dateStr: string, lang: string): string => {
+const formatRelativeDate = (dateStr: string, lang: "es" | "en"): string => {
   const date = new Date(dateStr);
   const now = new Date();
   const diffTime = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return lang === "es" ? "Hoy" : "Today";
-  if (diffDays === 1) return lang === "es" ? "Ayer" : "Yesterday";
-  if (diffDays < 7)
-    return `${diffDays} ${lang === "es" ? "días" : "days"} ${
-      lang === "es" ? "atrás" : "ago"
-    }`;
+  if (diffDays === 0) return t.today[lang];
+  if (diffDays === 1) return t.yesterday[lang];
+  if (diffDays < 7) return `${diffDays} ${t.daysAgo[lang]}`;
 
   return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
     weekday: "short",
@@ -76,7 +74,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
               weight="semibold"
               style={{ color: colors.text }}
             >
-              {lang === "es" ? "Actividad Reciente" : "Recent Activity"}
+              {t.recentActivity[lang]}
             </Typography>
           </View>
         </View>
@@ -108,9 +106,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
             align="center"
             style={{ marginTop: 12 }}
           >
-            {lang === "es"
-              ? "Aún no tienes entrenamientos completados"
-              : "No workouts completed yet"}
+            {t.noWorkoutsYet[lang]}
           </Typography>
           <Typography
             variant="caption"
@@ -118,9 +114,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
             align="center"
             style={{ marginTop: 4 }}
           >
-            {lang === "es"
-              ? "Completa tu primer entrenamiento para ver tu progreso"
-              : "Complete your first workout to see your progress"}
+            {t.completeFirstWorkoutProgress[lang]}
           </Typography>
         </View>
       </Animated.View>
@@ -144,7 +138,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Actividad Reciente" : "Recent Activity"}
+            {t.recentActivity[lang]}
           </Typography>
         </View>
 
@@ -160,7 +154,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
             weight="semibold"
             style={{ color: colors.primary[500] }}
           >
-            {lang === "es" ? "Ver historial" : "View history"}
+            {t.viewHistory[lang]}
           </Typography>
           <ChevronRight size={14} color={colors.primary[500]} />
         </Pressable>
@@ -274,8 +268,7 @@ export const RecentActivityV2: React.FC<Props> = ({ sessions, lang }) => {
                       />
                       <Typography variant="caption" color="textMuted">
                         {session.total_sets_completed}/
-                        {session.total_sets_planned}{" "}
-                        {lang === "es" ? "series" : "sets"}
+                        {session.total_sets_planned} {t.series[lang]}
                       </Typography>
                       {isComplete && (
                         <View

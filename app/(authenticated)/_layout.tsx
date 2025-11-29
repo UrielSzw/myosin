@@ -119,13 +119,6 @@ export default function AuthenticatedLayout() {
         }}
       />
       <Stack.Screen
-        name="metric/create"
-        options={{
-          presentation: "modal",
-          gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
         name="workout-session/[id]"
         options={{
           presentation: "modal",

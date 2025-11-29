@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import React from "react";
@@ -10,7 +11,7 @@ export const AnalyticsHeaderV2 = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   return (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
@@ -24,7 +25,7 @@ export const AnalyticsHeaderV2 = () => {
 
       <View style={styles.headerContent}>
         <Typography variant="h4" weight="bold" style={{ color: colors.text }}>
-          {lang === "es" ? "Estadísticas" : "Analytics"}
+          {t.statistics[lang]}
         </Typography>
       </View>
     </View>

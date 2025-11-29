@@ -254,8 +254,9 @@ const StatCard = ({
 export default function CompleteScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = onboardingTranslations.complete;
+  const goalT = onboardingTranslations.goal;
   const { user } = useAuth();
 
   const {
@@ -300,19 +301,19 @@ export default function CompleteScreen() {
       case "lose_weight":
         return {
           icon: <Flame size={20} color="#EF4444" />,
-          label: lang === "es" ? "Perder peso" : "Lose weight",
+          label: goalT.lose_weight.title[lang],
           color: "#EF4444",
         };
       case "maintain":
         return {
           icon: <Scale size={20} color="#3B82F6" />,
-          label: lang === "es" ? "Mantener" : "Maintain",
+          label: goalT.maintain.title[lang],
           color: "#3B82F6",
         };
       case "build_muscle":
         return {
           icon: <TrendingUp size={20} color="#10B981" />,
-          label: lang === "es" ? "Ganar músculo" : "Build muscle",
+          label: goalT.build_muscle.title[lang],
           color: "#10B981",
         };
       default:
@@ -322,7 +323,7 @@ export default function CompleteScreen() {
           color: colors.primary[500],
         };
     }
-  }, [fitnessGoal, lang, colors]);
+  }, [fitnessGoal, lang, colors, goalT]);
 
   const handleComplete = async () => {
     if (!user?.id) return;
@@ -528,11 +529,7 @@ export default function CompleteScreen() {
                   weight="bold"
                   style={{ color: "#fff" }}
                 >
-                  {isCompleting
-                    ? lang === "es"
-                      ? "Guardando..."
-                      : "Saving..."
-                    : t.button[lang]}
+                  {isCompleting ? t.saving[lang] : t.button[lang]}
                 </Typography>
               </View>
             </Button>

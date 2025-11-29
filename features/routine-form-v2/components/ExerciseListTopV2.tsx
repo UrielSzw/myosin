@@ -63,13 +63,7 @@ export const ExerciseListTopV2: React.FC<Props> = ({ exercisesCount }) => {
           </Typography>
         </View>
         <Typography variant="body2" weight="semibold" color="textMuted">
-          {exercisesCount === 1
-            ? lang === "es"
-              ? "ejercicio"
-              : "exercise"
-            : lang === "es"
-            ? "ejercicios"
-            : "exercises"}
+          {exercisesCount === 1 ? t.exercise[lang] : t.exercises[lang]}
         </Typography>
       </View>
 

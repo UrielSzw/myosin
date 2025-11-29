@@ -30,6 +30,18 @@ export const workoutsTranslations = {
     ],
   },
   // Next workout
+  today: {
+    es: "Hoy",
+    en: "Today",
+  },
+  tomorrow: {
+    es: "Mañana",
+    en: "Tomorrow",
+  },
+  trainAnytime: {
+    es: "Entrena cuando quieras",
+    en: "Train anytime",
+  },
   nextWorkout: {
     es: "Próximo entrenamiento",
     en: "Next workout",
@@ -52,6 +64,10 @@ export const workoutsTranslations = {
   },
 
   // Header
+  routines: {
+    es: "Rutinas",
+    en: "Routines",
+  },
   myRoutines: {
     es: "Mis Rutinas",
     en: "My Routines",
@@ -104,6 +120,30 @@ export const workoutsTranslations = {
   },
 
   // Routine Card
+  scheduled: {
+    es: "Programada",
+    en: "Scheduled",
+  },
+  weekDaysShort: {
+    es: {
+      monday: "Lun",
+      tuesday: "Mar",
+      wednesday: "Mié",
+      thursday: "Jue",
+      friday: "Vie",
+      saturday: "Sáb",
+      sunday: "Dom",
+    },
+    en: {
+      monday: "Mon",
+      tuesday: "Tue",
+      wednesday: "Wed",
+      thursday: "Thu",
+      friday: "Fri",
+      saturday: "Sat",
+      sunday: "Sun",
+    },
+  },
   block: {
     es: "bloque",
     en: "block",
@@ -143,14 +183,70 @@ export const workoutsTranslations = {
     en: "Delete routine",
   },
 
-  // Empty state
+  // Create Sheet
+  create: {
+    es: "Crear",
+    en: "Create",
+  },
+  quickWorkoutLabel: {
+    es: "Entrenamiento Rápido",
+    en: "Quick Workout",
+  },
+  quickWorkoutDescription: {
+    es: "Empieza a entrenar sin rutina",
+    en: "Start training without a routine",
+  },
+  createRoutineLabel: {
+    es: "Crear Rutina",
+    en: "Create Routine",
+  },
+  createRoutineDescription: {
+    es: "Diseña tu rutina personalizada",
+    en: "Design your custom routine",
+  },
+  useTemplateLabel: {
+    es: "Usar Template",
+    en: "Use Template",
+  },
+  useTemplateDescription: {
+    es: "Comienza con una rutina probada",
+    en: "Start with a proven routine",
+  },
+  newFolderLabel: {
+    es: "Nueva Carpeta",
+    en: "New Folder",
+  },
+  newFolderDescription: {
+    es: "Organiza tus rutinas",
+    en: "Organize your routines",
+  },
+
+  // Folder Options
+  editFolder: {
+    es: "Editar Carpeta",
+    en: "Edit Folder",
+  },
+  deleteFolder: {
+    es: "Eliminar Carpeta",
+    en: "Delete Folder",
+  },
+  folderDeleteWarning: {
+    es: "Al eliminar una carpeta, las rutinas dentro de ella se moverán a la vista principal.",
+    en: "When you delete a folder, routines inside will be moved to the main view.",
+  },
+
+  // Empty State
   emptyStateTitle: {
-    es: "¡Tu espacio de entrenamiento te espera!",
-    en: "Your training space awaits!",
+    es: "Tu viaje comienza aquí",
+    en: "Your journey starts here",
   },
   emptyStateSubtitle: {
-    es: "Diseña rutinas personalizadas y lleva tu progreso al siguiente nivel",
-    en: "Design custom routines and take your progress to the next level",
+    es: "Crea tu primera rutina y empieza a transformar tu entrenamiento",
+    en: "Create your first routine and start transforming your training",
+  },
+  emptyStateHint: {
+    es: "O toca el + en la parte superior",
+    en: "Or tap + at the top",
   },
   createFirstRoutine: {
     es: "Crear Primera Rutina",
@@ -161,6 +257,14 @@ export const workoutsTranslations = {
   folders: {
     es: "Carpetas",
     en: "Folders",
+  },
+  emptyFolder: {
+    es: "Carpeta vacía",
+    en: "Empty folder",
+  },
+  moveRoutinesHere: {
+    es: "Mueve rutinas aquí para organizarlas",
+    en: "Move routines here to organize them",
   },
   newFolder: {
     es: "Nueva",
@@ -229,6 +333,16 @@ export const workoutsTranslations = {
   errorStartingWorkout: {
     es: "Error iniciando workout:",
     en: "Error starting workout:",
+  },
+
+  // Delete Folder Alert
+  deleteFolderTitle: {
+    es: "Eliminar Carpeta",
+    en: "Delete Folder",
+  },
+  deleteFolderMessage: {
+    es: '¿Eliminar "{name}"? Las rutinas se moverán fuera de la carpeta.',
+    en: 'Delete "{name}"? Routines will be moved out of the folder.',
   },
 
   // Delete Routine Alert

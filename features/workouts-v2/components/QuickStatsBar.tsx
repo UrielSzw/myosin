@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Dumbbell, FolderOpen } from "lucide-react-native";
@@ -14,7 +15,7 @@ type Props = {
 export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   return (
     <View style={styles.container}>
@@ -57,7 +58,7 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
               {routinesCount}
             </Typography>
             <Typography variant="caption" color="textMuted">
-              {lang === "es" ? "Rutinas" : "Routines"}
+              {t.routines[lang]}
             </Typography>
           </View>
         </View>
@@ -102,7 +103,7 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
               {foldersCount}
             </Typography>
             <Typography variant="caption" color="textMuted">
-              {lang === "es" ? "Carpetas" : "Folders"}
+              {t.folders[lang]}
             </Typography>
           </View>
         </View>

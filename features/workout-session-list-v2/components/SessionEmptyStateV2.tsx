@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Calendar, Search } from "lucide-react-native";
@@ -9,7 +10,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   variant: "no-sessions" | "no-results";
   onClearFilters?: () => void;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionEmptyStateV2: React.FC<Props> = ({
@@ -67,13 +68,7 @@ export const SessionEmptyStateV2: React.FC<Props> = ({
             align="center"
             style={{ color: colors.text, marginTop: 20 }}
           >
-            {isNoSessions
-              ? lang === "es"
-                ? "Sin sesiones aún"
-                : "No sessions yet"
-              : lang === "es"
-              ? "Sin resultados"
-              : "No results"}
+            {isNoSessions ? t.noSessionsTitle[lang] : t.noResultsTitle[lang]}
           </Typography>
 
           {/* Description */}
@@ -84,12 +79,8 @@ export const SessionEmptyStateV2: React.FC<Props> = ({
             style={{ marginTop: 8, paddingHorizontal: 20 }}
           >
             {isNoSessions
-              ? lang === "es"
-                ? "Completa tu primer entrenamiento para ver tu historial"
-                : "Complete your first workout to see your history"
-              : lang === "es"
-              ? "No se encontraron sesiones con los filtros actuales"
-              : "No sessions found with current filters"}
+              ? t.noSessionsDescription[lang]
+              : t.noResultsDescription[lang]}
           </Typography>
 
           {/* Action button for no results */}
@@ -110,7 +101,7 @@ export const SessionEmptyStateV2: React.FC<Props> = ({
                 weight="semibold"
                 style={{ color: "#fff" }}
               >
-                {lang === "es" ? "Limpiar filtros" : "Clear filters"}
+                {t.clearFilters[lang]}
               </Typography>
             </Pressable>
           )}

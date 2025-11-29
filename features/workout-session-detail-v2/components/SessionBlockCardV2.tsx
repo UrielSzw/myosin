@@ -1,6 +1,7 @@
 import { WorkoutBlockWithExercises } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { ChevronDown, ChevronRight, Layers } from "lucide-react-native";
@@ -18,7 +19,7 @@ type Props = {
   block: WorkoutBlockWithExercises;
   index: number;
   showRpe: boolean;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionBlockCardV2: React.FC<Props> = ({
@@ -61,11 +62,11 @@ export const SessionBlockCardV2: React.FC<Props> = ({
   const getBlockTypeLabel = () => {
     switch (block.type) {
       case "superset":
-        return lang === "es" ? "Superserie" : "Superset";
+        return t.superset[lang];
       case "circuit":
-        return lang === "es" ? "Circuito" : "Circuit";
+        return t.circuit[lang];
       default:
-        return lang === "es" ? "Individual" : "Individual";
+        return t.individual[lang];
     }
   };
 
@@ -123,8 +124,7 @@ export const SessionBlockCardV2: React.FC<Props> = ({
                 numberOfLines={1}
               >
                 {block.type === "individual"
-                  ? block.exercises[0]?.exercise?.name ||
-                    (lang === "es" ? "Ejercicio" : "Exercise")
+                  ? block.exercises[0]?.exercise?.name || t.exerciseLabel[lang]
                   : block.name}
               </Typography>
               {block.type !== "individual" && (

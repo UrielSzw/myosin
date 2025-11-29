@@ -1,6 +1,7 @@
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import React, { useMemo } from "react";
@@ -29,7 +30,7 @@ export const WorkoutSessionListV2: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   // Fetch sessions data
   const { data: sessions, isLoading, isError, stats } = useSessionList();
@@ -76,7 +77,7 @@ export const WorkoutSessionListV2: React.FC = () => {
             color="textMuted"
             style={{ marginTop: 12 }}
           >
-            {lang === "es" ? "Cargando sesiones..." : "Loading sessions..."}
+            {t.loadingSessions[lang]}
           </Typography>
         </View>
       </View>

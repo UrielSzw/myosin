@@ -3,6 +3,7 @@ import { usePRList } from "@/features/pr-list-v2/hooks/use-pr-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -24,7 +25,7 @@ export const PRListFeatureV2: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const { data: allPRs, isLoading, error, stats } = usePRList(user?.id);
 
@@ -60,7 +61,7 @@ export const PRListFeatureV2: React.FC = () => {
             <AlertCircle size={32} color={colors.primary[500]} />
           </View>
           <Typography variant="h6" weight="semibold" align="center">
-            {lang === "es" ? "Inicia sesión" : "Sign in required"}
+            {t.signInRequired[lang]}
           </Typography>
           <Typography
             variant="body2"
@@ -108,7 +109,7 @@ export const PRListFeatureV2: React.FC = () => {
               weight="medium"
               style={{ color: colors.text }}
             >
-              {lang === "es" ? "Cargando récords..." : "Loading records..."}
+              {t.loadingPRs[lang]}
             </Typography>
           </Animated.View>
         </View>
@@ -132,7 +133,7 @@ export const PRListFeatureV2: React.FC = () => {
             <AlertCircle size={32} color={colors.error[500]} />
           </View>
           <Typography variant="h6" weight="semibold" align="center">
-            {lang === "es" ? "Error al cargar" : "Error loading"}
+            {t.errorLoading[lang]}
           </Typography>
           <Typography
             variant="body2"

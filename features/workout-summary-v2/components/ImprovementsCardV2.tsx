@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -148,7 +149,7 @@ export const ImprovementsCardV2: React.FC<Props> = ({
               weight="semibold"
               style={{ color: colors.text }}
             >
-              {lang === "es" ? "¡Mejoraste!" : "You improved!"}
+              {t.youImproved[lang]}
             </Typography>
             <Typography
               variant="caption"
@@ -157,10 +158,14 @@ export const ImprovementsCardV2: React.FC<Props> = ({
             >
               {lang === "es"
                 ? `En ${improvementsCount} ${
-                    improvementsCount === 1 ? "ejercicio" : "ejercicios"
+                    improvementsCount === 1
+                      ? t.exercisesCount[lang]
+                      : t.exercisesCountPlural[lang]
                   } vs la última vez`
                 : `In ${improvementsCount} ${
-                    improvementsCount === 1 ? "exercise" : "exercises"
+                    improvementsCount === 1
+                      ? t.exercisesCount[lang]
+                      : t.exercisesCountPlural[lang]
                   } vs last time`}
             </Typography>
 

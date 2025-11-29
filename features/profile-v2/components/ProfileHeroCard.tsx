@@ -2,10 +2,11 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useUserProfile } from "@/shared/hooks/use-user-profile";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations as t } from "@/shared/translations/profile";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import { Calendar, Edit3, Sparkles } from "lucide-react-native";
+import { Calendar, Edit3 } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
@@ -15,48 +16,19 @@ export const ProfileHeroCard = () => {
   const { user } = useAuth();
   const { profile } = useUserProfile(user);
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const displayName =
     profile.displayName ||
     user?.email?.split("@")[0] ||
-    (lang === "es" ? "Usuario" : "User");
+    t.defaultUserName[lang];
   const initial = displayName.charAt(0).toUpperCase();
 
   const getMemberSince = () => {
-    if (!user?.created_at) return lang === "es" ? "2025" : "2025";
+    if (!user?.created_at) return "2025";
     const date = new Date(user.created_at);
-    const monthNames =
-      lang === "es"
-        ? [
-            "Ene",
-            "Feb",
-            "Mar",
-            "Abr",
-            "May",
-            "Jun",
-            "Jul",
-            "Ago",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dic",
-          ]
-        : [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec",
-          ];
-    return `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+    const monthNames = t.monthNames[lang];
+    return `${monthNames[date.getMonth()].slice(0, 3)} ${date.getFullYear()}`;
   };
 
   const handleEditProfile = () => {
@@ -162,8 +134,7 @@ export const ProfileHeroCard = () => {
               color="textMuted"
               style={{ marginTop: 4, textAlign: "center", opacity: 0.7 }}
             >
-              {user?.email ||
-                (lang === "es" ? "usuario@ejemplo.com" : "user@example.com")}
+              {user?.email || t.defaultEmail[lang]}
             </Typography>
           </Animated.View>
 
@@ -188,53 +159,8 @@ export const ProfileHeroCard = () => {
                 fontSize: 11,
               }}
             >
-              {lang === "es" ? "Miembro desde" : "Member since"}{" "}
-              {getMemberSince()}
+              {t.memberSince[lang]} {getMemberSince()}
             </Typography>
-          </Animated.View>
-
-          {/* Quick stats */}
-          <Animated.View
-            entering={FadeInDown.duration(400).delay(500)}
-            style={styles.statsContainer}
-          >
-            <View
-              style={[
-                styles.statDivider,
-                {
-                  backgroundColor: isDarkMode
-                    ? "rgba(255,255,255,0.08)"
-                    : "rgba(0,0,0,0.06)",
-                },
-              ]}
-            />
-
-            <View style={styles.statsRow}>
-              <View style={styles.statItem}>
-                <View
-                  style={[
-                    styles.statIcon,
-                    { backgroundColor: `${colors.primary[500]}15` },
-                  ]}
-                >
-                  <Sparkles size={16} color={colors.primary[500]} />
-                </View>
-                <Typography
-                  variant="caption"
-                  color="textMuted"
-                  style={{ marginTop: 6 }}
-                >
-                  {lang === "es" ? "Nivel" : "Level"}
-                </Typography>
-                <Typography
-                  variant="body1"
-                  weight="bold"
-                  style={{ color: colors.text }}
-                >
-                  {lang === "es" ? "Intermedio" : "Intermediate"}
-                </Typography>
-              </View>
-            </View>
           </Animated.View>
         </View>
       </View>

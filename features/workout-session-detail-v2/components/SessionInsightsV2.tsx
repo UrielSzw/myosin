@@ -1,6 +1,7 @@
 import { SessionAnalytics } from "@/features/workout-session-detail-v2/hooks/use-session-detail";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -11,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   analytics: SessionAnalytics;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
@@ -44,7 +45,7 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
           weight="semibold"
           style={{ color: colors.text, marginLeft: 8 }}
         >
-          {lang === "es" ? "Destacados" : "Highlights"}
+          {t.highlights[lang]}
         </Typography>
       </View>
 
@@ -83,7 +84,7 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
               </View>
               <View style={styles.insightInfo}>
                 <Typography variant="caption" color="textMuted">
-                  {lang === "es" ? "RPE Promedio" : "Average RPE"}
+                  {t.averageRPE[lang]}
                 </Typography>
                 <Typography
                   variant="h5"
@@ -104,8 +105,7 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
                   weight="semibold"
                   style={{ color: colors.primary[500], fontSize: 10 }}
                 >
-                  {analytics.plannedVsActual.rpeUsage}%{" "}
-                  {lang === "es" ? "uso" : "usage"}
+                  {analytics.plannedVsActual.rpeUsage}% {t.usage[lang]}
                 </Typography>
               </View>
             </View>
@@ -138,7 +138,7 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
               </View>
               <View style={[styles.insightInfo, { flex: 1 }]}>
                 <Typography variant="caption" color="textMuted">
-                  {lang === "es" ? "Mejor Set" : "Best Set"}
+                  {t.bestSet[lang]}
                 </Typography>
                 <Typography
                   variant="body1"

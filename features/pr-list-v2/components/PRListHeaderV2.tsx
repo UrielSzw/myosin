@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -11,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   totalPRs: number;
   recentPRsCount: number;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const PRListHeaderV2: React.FC<Props> = ({
@@ -57,7 +58,7 @@ export const PRListHeaderV2: React.FC<Props> = ({
         {/* Title */}
         <View style={styles.titleContainer}>
           <Typography variant="h4" weight="bold" style={{ color: colors.text }}>
-            {lang === "es" ? "Récords Personales" : "Personal Records"}
+            {t.personalRecords[lang]}
           </Typography>
         </View>
 

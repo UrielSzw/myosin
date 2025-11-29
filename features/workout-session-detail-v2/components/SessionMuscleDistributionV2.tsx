@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -16,7 +17,7 @@ type MuscleGroupData = {
 
 type Props = {
   muscleGroups: MuscleGroupData[];
-  lang: string;
+  lang: "es" | "en";
 };
 
 // Muscle group colors
@@ -73,7 +74,7 @@ export const SessionMuscleDistributionV2: React.FC<Props> = ({
           weight="semibold"
           style={{ color: colors.text, marginLeft: 8 }}
         >
-          {lang === "es" ? "Grupos Musculares" : "Muscle Groups"}
+          {t.muscleGroups[lang]}
         </Typography>
       </View>
 
@@ -183,7 +184,7 @@ export const SessionMuscleDistributionV2: React.FC<Props> = ({
             ]}
           >
             <Typography variant="caption" color="textMuted">
-              {lang === "es" ? "Total de sets" : "Total sets"}
+              {t.totalSets[lang]}
             </Typography>
             <Typography
               variant="body2"

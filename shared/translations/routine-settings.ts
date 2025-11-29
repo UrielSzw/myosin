@@ -3,6 +3,10 @@ export const routineSettingsTranslations = {
     es: "Configuración de la rutina",
     en: "Routine Settings",
   },
+  advancedRoutineOptions: {
+    es: "Opciones avanzadas de la rutina",
+    en: "Advanced routine options",
+  },
   showRpe: {
     es: "Mostrar RPE",
     en: "Show RPE",

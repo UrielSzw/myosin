@@ -60,7 +60,7 @@ export const RoutineOptionsSheet = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = workoutsTranslations;
 
   // Animations
@@ -126,7 +126,7 @@ export const RoutineOptionsSheet = ({
     {
       id: "start",
       icon: <Play size={22} color="#fff" fill="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Iniciar Entrenamiento" : "Start Workout",
+      label: t.startWorkout[lang],
       color: "#10b981", // emerald
       onPress: () => {
         onClose();
@@ -148,7 +148,7 @@ export const RoutineOptionsSheet = ({
     {
       id: "move",
       icon: <FolderInput size={22} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Mover a Carpeta" : "Move to Folder",
+      label: t.moveRoutine[lang],
       color: "#8b5cf6", // violet
       onPress: () => {
         onClose();
@@ -267,22 +267,12 @@ export const RoutineOptionsSheet = ({
                 <View style={styles.routineMeta}>
                   <Typography variant="caption" color="textMuted">
                     {routine.blocksCount}{" "}
-                    {routine.blocksCount === 1
-                      ? lang === "es"
-                        ? "bloque"
-                        : "block"
-                      : lang === "es"
-                      ? "bloques"
-                      : "blocks"}
+                    {routine.blocksCount === 1 ? t.block[lang] : t.blocks[lang]}
                     {" · "}
                     {routine.exercisesCount}{" "}
                     {routine.exercisesCount === 1
-                      ? lang === "es"
-                        ? "ejercicio"
-                        : "exercise"
-                      : lang === "es"
-                      ? "ejercicios"
-                      : "exercises"}
+                      ? t.exercise[lang]
+                      : t.exercises[lang]}
                   </Typography>
                   {hasTrainingDays && (
                     <View style={styles.scheduledBadge}>
@@ -296,7 +286,7 @@ export const RoutineOptionsSheet = ({
                         weight="medium"
                         style={{ color: colors.primary[500], fontSize: 11 }}
                       >
-                        {lang === "es" ? "Programada" : "Scheduled"}
+                        {t.scheduled[lang]}
                       </Typography>
                     </View>
                   )}

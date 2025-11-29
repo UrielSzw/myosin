@@ -1,5 +1,6 @@
 import { TrackerAnalyticsData } from "@/features/analytics-v2/service/trackerAnalyticsService";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -84,7 +85,7 @@ export const TrackerInsightsV2: React.FC<Props> = ({ data, lang }) => {
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Métricas de Salud" : "Health Metrics"}
+            {t.healthMetrics[lang]}
           </Typography>
         </View>
       </View>
@@ -201,7 +202,7 @@ const WeightProgressCard: React.FC<{
               <Scale size={14} color={colors.primary[500]} />
             </View>
             <Typography variant="caption" color="textMuted">
-              {lang === "es" ? "Peso" : "Weight"}
+              {t.weight[lang]}
             </Typography>
           </View>
 
@@ -333,7 +334,7 @@ const StreaksCard: React.FC<{
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Rachas Activas" : "Active Streaks"}
+            {t.activeStreaks[lang]}
           </Typography>
         </View>
 
@@ -422,7 +423,7 @@ const HabitsCard: React.FC<{
             weight="semibold"
             style={{ color: colors.text }}
           >
-            {lang === "es" ? "Hábitos de la Semana" : "This Week's Habits"}
+            {t.weekHabits[lang]}
           </Typography>
         </View>
 

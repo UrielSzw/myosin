@@ -4,12 +4,50 @@ export const analyticsTranslations = {
     es: "Analíticas",
     en: "Analytics",
   },
+  statistics: {
+    es: "Estadísticas",
+    en: "Analytics",
+  },
   insightsSubtitle: {
     es: "Insights útiles sobre tu entrenamiento",
     en: "Useful insights about your training",
   },
 
+  // Auth/Error/Empty states
+  signInRequired: {
+    es: "Inicia sesión",
+    en: "Sign in required",
+  },
+  signInRequiredDescription: {
+    es: "Necesitas iniciar sesión para ver tus estadísticas",
+    en: "You need to sign in to view your analytics",
+  },
+  loadingAnalytics: {
+    es: "Cargando estadísticas...",
+    en: "Loading analytics...",
+  },
+  errorLoading: {
+    es: "Error al cargar",
+    en: "Error loading",
+  },
+  errorLoadingDescription: {
+    es: "No se pudieron cargar las estadísticas",
+    en: "Failed to load analytics",
+  },
+  noDataYet: {
+    es: "Aún no hay datos",
+    en: "No data yet",
+  },
+  noDataYetDescription: {
+    es: "Completa entrenamientos y registra métricas para ver tus estadísticas aquí",
+    en: "Complete workouts and track metrics to see your analytics here",
+  },
+
   // Weekly Routine Schedule
+  weeklySchedule: {
+    es: "Horario Semanal",
+    en: "Weekly Schedule",
+  },
   weeklyRoutines: {
     es: "Rutinas de la Semana",
     en: "Weekly Routines",
@@ -51,6 +89,10 @@ export const analyticsTranslations = {
   weeklyVolume: {
     es: "Volumen Semanal",
     en: "Weekly Volume",
+  },
+  series: {
+    es: "series",
+    en: "sets",
   },
   setsPerWeek: {
     es: "sets/semana",
@@ -99,8 +141,12 @@ export const analyticsTranslations = {
 
   // Smart PR Display
   personalRecords: {
-    es: "Records Personales",
+    es: "Récords Personales",
     en: "Personal Records",
+  },
+  viewAll: {
+    es: "Ver todos",
+    en: "View all",
   },
   total: {
     es: "total",
@@ -128,6 +174,22 @@ export const analyticsTranslations = {
   },
 
   // Recent Sessions List
+  recentActivity: {
+    es: "Actividad Reciente",
+    en: "Recent Activity",
+  },
+  viewHistory: {
+    es: "Ver historial",
+    en: "View history",
+  },
+  noWorkoutsYet: {
+    es: "Aún no tienes entrenamientos completados",
+    en: "No workouts completed yet",
+  },
+  completeFirstWorkoutProgress: {
+    es: "Completa tu primer entrenamiento para ver tu progreso",
+    en: "Complete your first workout to see your progress",
+  },
   recentSessions: {
     es: "Sesiones Recientes",
     en: "Recent Sessions",
@@ -164,9 +226,41 @@ export const analyticsTranslations = {
   },
 
   // Hero Stats
+  workouts: {
+    es: "Entrenamientos",
+    en: "Workouts",
+  },
+  records: {
+    es: "Récords",
+    en: "PRs",
+  },
+  streak: {
+    es: "Racha",
+    en: "Streak",
+  },
+  activeDays: {
+    es: "Días activos",
+    en: "Active days",
+  },
   heroThisWeek: {
     es: "Esta semana",
     en: "This week",
+  },
+  thisMonth: {
+    es: "Este mes",
+    en: "This month",
+  },
+  week: {
+    es: "semana",
+    en: "week",
+  },
+  weeks: {
+    es: "semanas",
+    en: "weeks",
+  },
+  perWeek: {
+    es: "por semana",
+    en: "per week",
   },
   heroPrsMonth: {
     es: "PRs del mes",
@@ -178,6 +272,18 @@ export const analyticsTranslations = {
   },
 
   // Time ago (for session items)
+  today: {
+    es: "Hoy",
+    en: "Today",
+  },
+  yesterday: {
+    es: "Ayer",
+    en: "Yesterday",
+  },
+  daysAgo: {
+    es: "días atrás",
+    en: "days ago",
+  },
   timeAgoMinutes: {
     es: "Hace unos minutos",
     en: "A few minutes ago",
@@ -228,6 +334,22 @@ export const analyticsTranslations = {
   },
 
   // Tracker Analytics
+  healthMetrics: {
+    es: "Métricas de Salud",
+    en: "Health Metrics",
+  },
+  weight: {
+    es: "Peso",
+    en: "Weight",
+  },
+  activeStreaks: {
+    es: "Rachas Activas",
+    en: "Active Streaks",
+  },
+  weekHabits: {
+    es: "Hábitos de la Semana",
+    en: "This Week's Habits",
+  },
   trackerInsights: {
     es: "Métricas del Tracker",
     en: "Tracker Metrics",

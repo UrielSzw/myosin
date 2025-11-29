@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { LinearGradient } from "expo-linear-gradient";
 import { ChevronRight } from "lucide-react-native";
@@ -124,7 +125,7 @@ export const ActionButtonV2: React.FC<Props> = ({
               weight="bold"
               style={{ color: "#ffffff" }}
             >
-              {lang === "es" ? "¡Listo!" : "Done!"}
+              {t.done[lang]}
             </Typography>
 
             <Animated.View style={arrowStyle}>

@@ -92,6 +92,10 @@ export const routineFormTranslations = {
     es: "Ajustes de la rutina",
     en: "Routine settings",
   },
+  advancedRoutineOptions: {
+    es: "Opciones avanzadas de la rutina",
+    en: "Advanced routine options",
+  },
   routineName: {
     es: "Nombre de la rutina",
     en: "Routine name",
@@ -137,6 +141,10 @@ export const routineFormTranslations = {
   volumeEmpty: {
     es: "Agrega bloques y ejercicios para ver el análisis de volumen por grupo muscular",
     en: "Add blocks and exercises to see volume analysis by muscle group",
+  },
+  week: {
+    es: "semana",
+    en: "week",
   },
   distributionByMuscle: {
     es: "Distribución por Grupo Muscular",

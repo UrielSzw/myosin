@@ -1,7 +1,17 @@
 export const workoutSessionDetailTranslations = {
-  // Header - none needed, uses dynamic data
-
-  // Error States
+  // Loading & Error states
+  loading: {
+    es: "Cargando...",
+    en: "Loading...",
+  },
+  loadingSession: {
+    es: "Cargando sesión...",
+    en: "Loading session...",
+  },
+  error: {
+    es: "Error",
+    en: "Error",
+  },
   errorLoadingSession: {
     es: "Error al cargar sesión",
     en: "Error loading session",
@@ -10,9 +20,67 @@ export const workoutSessionDetailTranslations = {
     es: "No se pudo cargar la información de esta sesión de entrenamiento",
     en: "Could not load this training session information",
   },
-  loadingSession: {
-    es: "Cargando sesión...",
-    en: "Loading session...",
+
+  // Sections
+  exercisesSection: {
+    es: "Ejercicios",
+    en: "Exercises",
+  },
+  highlights: {
+    es: "Destacados",
+    en: "Highlights",
+  },
+  muscleGroups: {
+    es: "Grupos Musculares",
+    en: "Muscle Groups",
+  },
+  totalSets: {
+    es: "Total de sets",
+    en: "Total sets",
+  },
+
+  // Block types
+  superset: {
+    es: "Superserie",
+    en: "Superset",
+  },
+  circuit: {
+    es: "Circuito",
+    en: "Circuit",
+  },
+  individual: {
+    es: "Individual",
+    en: "Individual",
+  },
+  exerciseLabel: {
+    es: "Ejercicio",
+    en: "Exercise",
+  },
+
+  // Stats
+  duration: {
+    es: "Duración",
+    en: "Duration",
+  },
+  setsLabel: {
+    es: "Sets",
+    en: "Sets",
+  },
+  volume: {
+    es: "Volumen",
+    en: "Volume",
+  },
+  averageRPE: {
+    es: "RPE Promedio",
+    en: "Average RPE",
+  },
+  usage: {
+    es: "uso",
+    en: "usage",
+  },
+  bestSet: {
+    es: "Mejor Set",
+    en: "Best Set",
   },
 
   // Session Analytics
@@ -20,17 +88,9 @@ export const workoutSessionDetailTranslations = {
     es: "Resumen de Sesión",
     en: "Session Summary",
   },
-  averageRPE: {
-    es: "RPE Promedio",
-    en: "Average RPE",
-  },
   setsWithRPE: {
     es: "{percentage}% sets con RPE",
     en: "{percentage}% sets with RPE",
-  },
-  bestSet: {
-    es: "Mejor Set",
-    en: "Best Set",
   },
   reps: {
     es: "reps",
@@ -82,7 +142,7 @@ export const workoutSessionDetailTranslations = {
     es: "No completado",
     en: "Not completed",
   },
-  volume: {
+  vol: {
     es: "Vol",
     en: "Vol",
   },

@@ -72,6 +72,10 @@ export const folderFormTranslations = {
     es: "Vista Previa",
     en: "Preview",
   },
+  myFolder: {
+    es: "Mi Carpeta",
+    en: "My Folder",
+  },
   folderNameDefault: {
     es: "Nombre de la carpeta",
     en: "Folder name",
@@ -79,6 +83,10 @@ export const folderFormTranslations = {
   routinesCount: {
     es: "0 rutinas",
     en: "0 routines",
+  },
+  name: {
+    es: "Nombre",
+    en: "Name",
   },
 
   // Delete

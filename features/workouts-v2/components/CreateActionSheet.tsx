@@ -46,7 +46,7 @@ type ActionOption = {
 export const CreateActionSheet = ({ visible, onClose }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = workoutsTranslations;
 
   const { initializeQuickWorkout } = useActiveMainActions();
@@ -166,42 +166,32 @@ export const CreateActionSheet = ({ visible, onClose }: Props) => {
     {
       id: "quick",
       icon: <Dumbbell size={24} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Entrenamiento Rápido" : "Quick Workout",
-      description:
-        lang === "es"
-          ? "Empieza a entrenar sin rutina"
-          : "Start training without a routine",
+      label: t.quickWorkoutLabel[lang],
+      description: t.quickWorkoutDescription[lang],
       color: "#10b981", // emerald
       onPress: handleQuickWorkout,
     },
     {
       id: "scratch",
       icon: <PenTool size={24} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Crear Rutina" : "Create Routine",
-      description:
-        lang === "es"
-          ? "Diseña tu rutina personalizada"
-          : "Design your custom routine",
+      label: t.createRoutineLabel[lang],
+      description: t.createRoutineDescription[lang],
       color: colors.primary[500],
       onPress: handleCreateFromScratch,
     },
     {
       id: "template",
       icon: <Zap size={24} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Usar Template" : "Use Template",
-      description:
-        lang === "es"
-          ? "Comienza con una rutina probada"
-          : "Start with a proven routine",
+      label: t.useTemplateLabel[lang],
+      description: t.useTemplateDescription[lang],
       color: "#f59e0b", // amber
       onPress: handleCreateFromTemplate,
     },
     {
       id: "folder",
       icon: <FolderPlus size={24} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Nueva Carpeta" : "New Folder",
-      description:
-        lang === "es" ? "Organiza tus rutinas" : "Organize your routines",
+      label: t.newFolderLabel[lang],
+      description: t.newFolderDescription[lang],
       color: "#8b5cf6", // violet
       onPress: handleCreateFolder,
     },
@@ -278,7 +268,7 @@ export const CreateActionSheet = ({ visible, onClose }: Props) => {
                 weight="bold"
                 style={{ color: colors.text, marginLeft: 10 }}
               >
-                {lang === "es" ? "Crear" : "Create"}
+                {t.create[lang]}
               </Typography>
             </View>
             <Pressable

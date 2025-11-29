@@ -141,6 +141,10 @@ export const onboardingTranslations = {
       en: "Let's start",
       es: "Empecemos",
     },
+    quickSteps: {
+      en: "quick steps",
+      es: "pasos rápidos",
+    },
   },
   sex: {
     title: {
@@ -172,6 +176,10 @@ export const onboardingTranslations = {
     yearsOld: {
       en: "years old",
       es: "años",
+    },
+    selectYourDate: {
+      en: "Select your date",
+      es: "Selecciona tu fecha",
     },
   },
   measurements: {
@@ -324,6 +332,10 @@ export const onboardingTranslations = {
     button: {
       en: "Start training",
       es: "Empezar a entrenar",
+    },
+    saving: {
+      en: "Saving...",
+      es: "Guardando...",
     },
   },
   common: {

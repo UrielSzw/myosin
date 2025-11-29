@@ -1,6 +1,7 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Folder, Pen, Trash2, X } from "lucide-react-native";
@@ -42,7 +43,7 @@ export const FolderOptionsSheet = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   // Animations
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -119,7 +120,7 @@ export const FolderOptionsSheet = ({
     {
       id: "edit",
       icon: <Pen size={22} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Editar Carpeta" : "Edit Folder",
+      label: t.editFolder[lang],
       color: colors.primary[500],
       onPress: () => {
         onClose();
@@ -129,7 +130,7 @@ export const FolderOptionsSheet = ({
     {
       id: "delete",
       icon: <Trash2 size={22} color="#fff" strokeWidth={2} />,
-      label: lang === "es" ? "Eliminar Carpeta" : "Delete Folder",
+      label: t.deleteFolder[lang],
       color: colors.error[500],
       onPress: () => {
         onClose();
@@ -232,12 +233,8 @@ export const FolderOptionsSheet = ({
                   <Typography variant="caption" color="textMuted">
                     {folder.routineCount}{" "}
                     {folder.routineCount === 1
-                      ? lang === "es"
-                        ? "rutina"
-                        : "routine"
-                      : lang === "es"
-                      ? "rutinas"
-                      : "routines"}
+                      ? t.routinesSingular[lang]
+                      : t.routinesPlural[lang]}
                   </Typography>
                 </View>
               </View>
@@ -372,9 +369,7 @@ export const FolderOptionsSheet = ({
               align="center"
               style={{ lineHeight: 18 }}
             >
-              {lang === "es"
-                ? "Al eliminar una carpeta, las rutinas dentro de ella se moverán a la vista principal."
-                : "When you delete a folder, routines inside will be moved to the main view."}
+              {t.folderDeleteWarning[lang]}
             </Typography>
           </View>
 

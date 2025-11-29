@@ -2,6 +2,7 @@ import { BaseWorkoutSet } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import {
   getMeasurementTemplate,
   hasWeightMeasurement,
@@ -17,7 +18,7 @@ type Props = {
   set: BaseWorkoutSet;
   index: number;
   showRpe: boolean;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionSetRowV2: React.FC<Props> = ({
@@ -44,8 +45,7 @@ export const SessionSetRowV2: React.FC<Props> = ({
   };
 
   const formatActualValues = (): string => {
-    if (!set.completed)
-      return lang === "es" ? "No completado" : "Not completed";
+    if (!set.completed) return t.notCompleted[lang];
 
     if (!measurementTemplate) return "-";
 

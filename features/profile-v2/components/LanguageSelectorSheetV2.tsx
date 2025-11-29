@@ -5,6 +5,7 @@ import {
   useUserPreferencesActions,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { profileTranslations as t } from "@/shared/translations/profile";
 import { AVAILABLE_LANGUAGES } from "@/shared/ui/language-selector-sheet";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -33,7 +34,7 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
   const prefs = useUserPreferences();
   const { setLanguage } = useUserPreferencesActions();
   const { syncExercises } = useExercisesSync();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
   const currentLanguage = prefs?.language ?? "es";
 
   // Animations
@@ -177,16 +178,14 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
                   weight="bold"
                   style={{ color: colors.text }}
                 >
-                  {lang === "es" ? "Seleccionar Idioma" : "Select Language"}
+                  {t.languageSelectorTitle[lang]}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="textMuted"
                   style={{ marginTop: 4 }}
                 >
-                  {lang === "es"
-                    ? "Elige tu idioma preferido"
-                    : "Choose your preferred language"}
+                  {t.languageSelectorSubtitle[lang]}
                 </Typography>
               </View>
             </View>

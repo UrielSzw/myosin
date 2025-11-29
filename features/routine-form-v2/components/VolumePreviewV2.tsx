@@ -211,7 +211,7 @@ export const VolumePreviewV2: React.FC<Props> = ({
                   style={{ color: colors.primary[500] }}
                 >
                   {Math.round(volumeData.totalSets)} {t.sets[lang]}/
-                  {lang === "es" ? "semana" : "week"}
+                  {t.week[lang]}
                 </Typography>
               ) : (
                 <Typography variant="caption" color="textMuted">

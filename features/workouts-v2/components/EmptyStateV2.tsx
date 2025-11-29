@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -18,7 +19,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const EmptyStateV2 = () => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = (prefs?.language ?? "es") as "es" | "en";
 
   const handleCreateRoutine = () => {
     router.push("/routines/create" as any);
@@ -69,18 +70,14 @@ export const EmptyStateV2 = () => {
           align="center"
           style={{ color: colors.text }}
         >
-          {lang === "es"
-            ? "Tu viaje comienza aquí"
-            : "Your journey starts here"}
+          {t.emptyStateTitle[lang]}
         </Typography>
         <Typography
           variant="body1"
           align="center"
           style={{ color: colors.textMuted, marginTop: 8, lineHeight: 24 }}
         >
-          {lang === "es"
-            ? "Crea tu primera rutina y empieza a transformar tu entrenamiento"
-            : "Create your first routine and start transforming your training"}
+          {t.emptyStateSubtitle[lang]}
         </Typography>
       </View>
 
@@ -102,7 +99,7 @@ export const EmptyStateV2 = () => {
         >
           <Sparkles size={20} color="#fff" style={{ marginRight: 8 }} />
           <Typography variant="body1" weight="bold" style={{ color: "#fff" }}>
-            {lang === "es" ? "Crear Rutina" : "Create Routine"}
+            {t.createRoutineLabel[lang]}
           </Typography>
         </Pressable>
       </View>
@@ -114,9 +111,7 @@ export const EmptyStateV2 = () => {
         color="textMuted"
         style={{ marginTop: 16, opacity: 0.7 }}
       >
-        {lang === "es"
-          ? "O toca el + en la parte superior"
-          : "Or tap + at the top"}
+        {t.emptyStateHint[lang]}
       </Typography>
     </View>
   );

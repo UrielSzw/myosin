@@ -38,22 +38,8 @@ export const FolderCardV2 = ({ folder, onLongPress }: Props) => {
     onLongPress?.(folder);
   };
 
-  // Generate a color based on folder name (consistent per folder)
-  const folderColors = [
-    "#A855F7", // Purple
-    "#EC4899", // Pink
-    "#F97316", // Orange
-    "#10B981", // Emerald
-    "#6366F1", // Indigo
-    "#EAB308", // Yellow
-  ];
-
-  const colorIndex =
-    folder.name
-      .split("")
-      .reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0) %
-    folderColors.length;
-  const folderColor = folderColors[colorIndex];
+  // Use folder's saved color, fallback to primary
+  const folderColor = folder.color || colors.primary[500];
 
   return (
     <Pressable

@@ -1,9 +1,3 @@
-import { IToogleSheet } from "@/features/routine-form/hooks/use-form-routine-sheets";
-import {
-  useMainActions,
-  useRoutineFormState,
-  useSetActions,
-} from "@/features/routine-form/hooks/use-routine-form-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -19,6 +13,12 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { IToogleSheet } from "../hooks/use-form-routine-sheets";
+import {
+  useMainActions,
+  useRoutineFormState,
+  useSetActions,
+} from "../hooks/use-routine-form-store";
 
 type Props = {
   setId: string;

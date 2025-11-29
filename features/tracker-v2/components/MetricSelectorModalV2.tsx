@@ -3,7 +3,7 @@ import {
   useAvailableTemplates,
   useDeletedMetrics,
   useRestoreMetric,
-} from "@/features/tracker/hooks/use-tracker-data";
+} from "@/features/tracker-v2/hooks/use-tracker-data";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";

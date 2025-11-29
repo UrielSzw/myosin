@@ -1,5 +1,3 @@
-import { IToogleSheet } from "@/features/routine-form/hooks/use-form-routine-sheets";
-import { useMainActions } from "@/features/routine-form/hooks/use-routine-form-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -16,6 +14,8 @@ import {
 } from "lucide-react-native";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { IToogleSheet } from "../hooks/use-form-routine-sheets";
+import { useMainActions } from "../hooks/use-routine-form-store";
 
 type BlockData = {
   tempId: string;

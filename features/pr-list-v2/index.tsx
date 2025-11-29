@@ -1,5 +1,5 @@
-import { usePRFilters } from "@/features/pr-list/hooks/use-pr-filters";
-import { usePRList } from "@/features/pr-list/hooks/use-pr-list";
+import { usePRFilters } from "@/features/pr-list-v2/hooks/use-pr-filters";
+import { usePRList } from "@/features/pr-list-v2/hooks/use-pr-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";

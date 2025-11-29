@@ -1,9 +1,5 @@
-import { IToogleSheet } from "@/features/routine-form/hooks/use-form-routine-sheets";
-import {
-  useMainActions,
-  useRoutineFormState,
-} from "@/features/routine-form/hooks/use-routine-form-store";
-import { useReorderExercises } from "@/features/routine-form/shared/use-reorder-exercises";
+import { useReorderExercises } from "@/features/routine-form-v2/shared/use-reorder-exercises";
+
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
@@ -14,6 +10,11 @@ import { router } from "expo-router";
 import { EllipsisVertical } from "lucide-react-native";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
+import { IToogleSheet } from "../hooks/use-form-routine-sheets";
+import {
+  useMainActions,
+  useRoutineFormState,
+} from "../hooks/use-routine-form-store";
 import { SetsTableV2 } from "./SetsTableV2";
 
 type BlockData = {

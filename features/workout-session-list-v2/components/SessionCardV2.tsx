@@ -1,4 +1,4 @@
-import { SessionListItem } from "@/features/workout-session-list/types/session-list";
+import { SessionListItem } from "@/features/workout-session-list-v2/types/session-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";

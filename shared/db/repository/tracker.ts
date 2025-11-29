@@ -1,10 +1,9 @@
-import { and, desc, eq, sql } from "drizzle-orm";
 import {
+  getQuickActionTemplates,
   PREDEFINED_METRIC_TEMPLATES,
   PREDEFINED_QUICK_ACTION_TEMPLATES,
-  getQuickActionTemplates,
-} from "../../../features/tracker/constants/templates";
-
+} from "@/features/tracker-v2/constants/templates";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { getDayKey, getFullTimestamp } from "../../utils/date-utils";
 import { combineSelectedDateWithCurrentTime } from "../../utils/timezone";
 import { db } from "../client";
@@ -13,16 +12,16 @@ import {
   BaseTrackerEntry,
   BaseTrackerMetric,
   BaseTrackerQuickAction,
+  tracker_daily_aggregates,
+  tracker_entries,
+  tracker_metrics,
+  tracker_quick_actions,
   TrackerDailyAggregateInsert,
   TrackerDayData,
   TrackerEntryInsert,
   TrackerMetricInsert,
   TrackerMetricWithQuickActions,
   TrackerQuickActionInsert,
-  tracker_daily_aggregates,
-  tracker_entries,
-  tracker_metrics,
-  tracker_quick_actions,
 } from "../schema/tracker";
 import { generateUUID } from "../utils/uuid";
 

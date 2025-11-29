@@ -18,7 +18,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import {
   useInitializeMacroQuickActions,
   useMacroCardData,
-} from "../../tracker/hooks/use-macro-data";
+} from "../hooks/use-macro-data";
 import { MacroEntryModalV2 } from "./MacroEntryModalV2";
 import { MacroHistorySheetV2 } from "./MacroHistorySheetV2";
 import { MacroQuickActionsSheetV2 } from "./MacroQuickActionsSheetV2";

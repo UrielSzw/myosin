@@ -25,7 +25,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   useSetMacroTargets,
   useUpdateMacroTargets,
-} from "../../tracker/hooks/use-macro-data";
+} from "../hooks/use-macro-data";
 
 type MacroSetupModalProps = {
   visible: boolean;

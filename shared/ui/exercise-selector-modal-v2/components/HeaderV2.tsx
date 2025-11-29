@@ -6,7 +6,6 @@ import { BlurView } from "expo-blur";
 import { ChevronLeft } from "lucide-react-native";
 import React from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Typography } from "../../typography";
 
 type Props = {
@@ -24,7 +23,6 @@ export const HeaderV2: React.FC<Props> = ({
   exerciseModalMode,
   exerciseToReplace,
 }) => {
-  const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
   const t = exerciseSelectorTranslations;

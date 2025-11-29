@@ -34,46 +34,20 @@ import Animated, {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFolderForm } from "./hooks/use-folder-form";
 
-// Premium icons selection
-const FOLDER_ICONS = [
-  "📁",
-  "📂",
-  "🗂️",
-  "💪",
-  "🏋️",
-  "⚡",
-  "🔥",
-  "💯",
-  "🎯",
-  "⭐",
-  "🚀",
-  "💎",
-  "🏆",
-  "💼",
-  "📊",
-  "🧘",
-  "🏃",
-  "🚴",
-  "🥇",
-  "✨",
-  "💫",
-  "🌟",
-  "⚙️",
-  "🎨",
-];
-
-// Premium colors palette
+// Modern muted color palette - sophisticated and cohesive
 const FOLDER_COLORS = [
-  "#0ea5e9", // cyan (primary)
-  "#10b981", // emerald
-  "#8b5cf6", // violet
-  "#f59e0b", // amber
-  "#ec4899", // pink
-  "#f97316", // orange
-  "#06b6d4", // teal
-  "#84cc16", // lime
-  "#ef4444", // red
-  "#6366f1", // indigo
+  "#6366f1", // Indigo (primary feel)
+  "#8b5cf6", // Violet
+  "#a855f7", // Purple
+  "#ec4899", // Pink
+  "#f43f5e", // Rose
+  "#f97316", // Orange
+  "#eab308", // Amber
+  "#22c55e", // Green
+  "#14b8a6", // Teal
+  "#0ea5e9", // Sky
+  "#64748b", // Slate
+  "#78716c", // Stone
 ];
 
 type Props = {
@@ -98,14 +72,12 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
 
   const {
     folderName,
-    folderIcon,
     folderColor,
     isDeleting,
     isSaving,
     nameValidation,
     isFormValid,
     setFolderName,
-    setFolderIcon,
     setFolderColor,
     handleSaveFolder,
     handleDeleteFolder,
@@ -144,17 +116,6 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
     return () => animation.stop();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleIconSelect = useCallback(
-    (icon: string) => {
-      haptic.light();
-      setFolderIcon(icon);
-      previewScale.value = withSpring(1.05, { damping: 10 }, () => {
-        previewScale.value = withSpring(1);
-      });
-    },
-    [setFolderIcon, haptic, previewScale]
-  );
 
   const handleColorSelect = useCallback(
     (color: string) => {
@@ -350,12 +311,10 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
               <View
                 style={[
                   styles.previewIcon,
-                  { backgroundColor: `${folderColor}20`, overflow: "visible" },
+                  { backgroundColor: `${folderColor}20` },
                 ]}
               >
-                <Typography style={{ fontSize: 44 }}>
-                  {folderIcon || "📁"}
-                </Typography>
+                <Folder size={48} color={folderColor} />{" "}
               </View>
               <Typography
                 variant="h3"
@@ -454,53 +413,8 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
           </View>
         </Animated.View>
 
-        {/* Icon Selection */}
-        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Folder size={18} color={colors.primary[500]} />
-              <Typography
-                variant="body1"
-                weight="semibold"
-                style={{ color: colors.text, marginLeft: 10 }}
-              >
-                {lang === "es" ? "Ícono" : "Icon"}
-              </Typography>
-            </View>
-
-            <View style={styles.iconsGrid}>
-              {FOLDER_ICONS.map((icon) => (
-                <Pressable
-                  key={icon}
-                  onPress={() => handleIconSelect(icon)}
-                  style={({ pressed }) => [
-                    styles.iconButton,
-                    {
-                      backgroundColor:
-                        folderIcon === icon
-                          ? `${folderColor}20`
-                          : isDarkMode
-                          ? "rgba(255,255,255,0.04)"
-                          : "rgba(0,0,0,0.02)",
-                      borderColor:
-                        folderIcon === icon
-                          ? folderColor
-                          : isDarkMode
-                          ? "rgba(255,255,255,0.08)"
-                          : "rgba(0,0,0,0.06)",
-                      transform: [{ scale: pressed ? 0.95 : 1 }],
-                    },
-                  ]}
-                >
-                  <Typography style={{ fontSize: 24 }}>{icon}</Typography>
-                </Pressable>
-              ))}
-            </View>
-          </View>
-        </Animated.View>
-
         {/* Color Selection */}
-        <Animated.View entering={FadeInDown.delay(400).duration(400)}>
+        <Animated.View entering={FadeInDown.delay(300).duration(400)}>
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Palette size={18} color={colors.primary[500]} />
@@ -540,7 +454,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
 
         {/* Delete Button (Edit Mode) */}
         {isEditMode && (
-          <Animated.View entering={FadeInDown.delay(500).duration(400)}>
+          <Animated.View entering={FadeInDown.delay(400).duration(400)}>
             <Pressable
               onPress={handleDeleteFolder}
               disabled={isSaving || isDeleting}
@@ -673,20 +587,6 @@ const styles = StyleSheet.create({
   },
   charCount: {
     paddingRight: 16,
-  },
-  iconsGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
-  iconButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 14,
-    borderWidth: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "visible",
   },
   colorsGrid: {
     flexDirection: "row",

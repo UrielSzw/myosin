@@ -1,4 +1,4 @@
-import type { ActiveWorkoutSet } from "@/features/active-workout/hooks/use-active-workout-store";
+import type { ActiveWorkoutSet } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,

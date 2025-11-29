@@ -1,4 +1,4 @@
-import { AnalyticsPRData } from "@/features/analytics/types/dashboard";
+import { AnalyticsPRData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -35,6 +35,10 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
     router.push("/pr-list" as any);
   };
 
+  const handlePRPress = (exerciseId: string) => {
+    router.push(`/pr-detail/${exerciseId}` as any);
+  };
+
   if (displayPRs.length === 0) {
     return null;
   }
@@ -60,24 +64,22 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
           </Typography>
         </View>
 
-        {prs.length > 3 && (
-          <Pressable
-            onPress={handleViewAll}
-            style={({ pressed }) => [
-              styles.viewAllButton,
-              { opacity: pressed ? 0.7 : 1 },
-            ]}
+        <Pressable
+          onPress={handleViewAll}
+          style={({ pressed }) => [
+            styles.viewAllButton,
+            { opacity: pressed ? 0.7 : 1 },
+          ]}
+        >
+          <Typography
+            variant="caption"
+            weight="semibold"
+            style={{ color: colors.primary[500] }}
           >
-            <Typography
-              variant="caption"
-              weight="semibold"
-              style={{ color: colors.primary[500] }}
-            >
-              {lang === "es" ? "Ver todos" : "View all"}
-            </Typography>
-            <ChevronRight size={14} color={colors.primary[500]} />
-          </Pressable>
-        )}
+            {lang === "es" ? "Ver todos" : "View all"}
+          </Typography>
+          <ChevronRight size={14} color={colors.primary[500]} />
+        </Pressable>
       </View>
 
       <View style={styles.cardsContainer}>
@@ -95,7 +97,7 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
               entering={FadeInDown.duration(300).delay(550 + index * 80)}
             >
               <Pressable
-                onPress={handleViewAll}
+                onPress={() => handlePRPress(pr.exercise_id)}
                 style={({ pressed }) => [
                   styles.prCard,
                   {

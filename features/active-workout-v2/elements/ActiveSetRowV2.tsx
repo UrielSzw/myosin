@@ -3,9 +3,9 @@ import {
   useActiveMainActions,
   useActiveSetActions,
   useActiveWorkout,
-} from "@/features/active-workout/hooks/use-active-workout-store";
-import { useNextSetIndicator } from "@/features/active-workout/hooks/use-next-set-indicator";
-import { usePRLogic } from "@/features/active-workout/hooks/use-pr-logic";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import { useNextSetIndicator } from "@/features/active-workout-v2/hooks/use-next-set-indicator";
+import { usePRLogic } from "@/features/active-workout-v2/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";

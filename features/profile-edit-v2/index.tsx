@@ -78,14 +78,14 @@ export const ProfileEditFeatureV2 = () => {
     .toUpperCase();
 
   // Calculate header height
-  const headerHeight = insets.top + 8 + 40 + 24;
+  const headerHeight = insets.top + 8 + 30;
 
   return (
     <View style={styles.container}>
       <AuroraBackground />
 
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+      <View style={[styles.header, { paddingTop: 8 }]}>
         {Platform.OS === "ios" && (
           <BlurView
             intensity={isDarkMode ? 25 : 40}

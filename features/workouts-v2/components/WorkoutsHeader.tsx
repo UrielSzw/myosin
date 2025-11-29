@@ -65,16 +65,26 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
         <View style={styles.centerSection}>
           {selectedFolder ? (
             <View style={styles.folderTitle}>
-              <FolderOpen
-                size={18}
-                color={colors.primary[500]}
-                style={{ marginRight: 8 }}
-              />
+              <View
+                style={[
+                  styles.folderIconContainer,
+                  {
+                    backgroundColor: `${
+                      selectedFolder.color || colors.primary[500]
+                    }20`,
+                  },
+                ]}
+              >
+                <FolderOpen
+                  size={16}
+                  color={selectedFolder.color || colors.primary[500]}
+                />
+              </View>
               <Typography
                 variant="body1"
                 weight="semibold"
                 numberOfLines={1}
-                style={{ color: colors.text, maxWidth: 200 }}
+                style={{ color: colors.text, maxWidth: 180 }}
               >
                 {selectedFolder.name}
               </Typography>
@@ -154,6 +164,14 @@ const styles = StyleSheet.create({
   folderTitle: {
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
+  },
+  folderIconContainer: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
   addButton: {
     width: 36,

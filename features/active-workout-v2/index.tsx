@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Elements
 import {
@@ -36,7 +35,7 @@ import {
   useActiveMainActions,
   useActiveWorkout,
   useActiveWorkoutState,
-} from "@/features/active-workout/hooks/use-active-workout-store";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
 
 export const ActiveWorkoutV2Feature: React.FC = () => {
   const { blocksBySession } = useActiveWorkout();
@@ -46,7 +45,6 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
     useActiveBlockActions();
   const { replaceExercise } = useActiveExerciseActions();
 
-  const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
   const keepScreenAwake = prefs?.keep_screen_awake ?? true;
 

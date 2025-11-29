@@ -1,4 +1,4 @@
-import { TrackerAnalyticsData } from "@/features/analytics/service/trackerAnalyticsService";
+import { TrackerAnalyticsData } from "@/features/analytics-v2/service/trackerAnalyticsService";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";

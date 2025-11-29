@@ -58,7 +58,7 @@ export const ProfileWorkoutConfigFeatureV2 = () => {
   };
 
   // Calculate header height for padding
-  const headerHeight = insets.top + 8 + 40 + 24;
+  const headerHeight = insets.top + 8 + 24;
 
   return (
     <View style={styles.container}>

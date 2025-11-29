@@ -1,5 +1,5 @@
 import { ReorderExercisesV2Feature } from "@/features/reorder-exercises-v2";
-import { useRoutineSharedActions } from "@/features/routine-form/hooks/use-routine-form-store";
+import { useRoutineSharedActions } from "@/features/routine-form-v2/hooks/use-routine-form-store";
 import {
   useReorderBlockActions,
   useReorderBlocksState,

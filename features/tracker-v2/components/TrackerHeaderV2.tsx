@@ -1,5 +1,4 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import React from "react";
@@ -13,8 +12,6 @@ type Props = {
 export const TrackerHeaderV2: React.FC<Props> = ({ selectedDate }) => {
   const { colors, isDarkMode } = useColorScheme();
   const insets = useSafeAreaInsets();
-  const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
 
   return (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>

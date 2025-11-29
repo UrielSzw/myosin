@@ -1,4 +1,4 @@
-import { ActiveWorkoutBlock } from "@/features/active-workout/hooks/use-active-workout-store";
+import { ActiveWorkoutBlock } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";

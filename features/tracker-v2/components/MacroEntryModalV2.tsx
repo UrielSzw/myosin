@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAddMacroEntry } from "../../tracker/hooks/use-macro-data";
+import { useAddMacroEntry } from "../hooks/use-macro-data";
 
 type MacroEntryModalProps = {
   visible: boolean;

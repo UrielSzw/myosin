@@ -1,7 +1,7 @@
 import {
   useActiveSetActions,
   useActiveWorkout,
-} from "@/features/active-workout/hooks/use-active-workout-store";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";

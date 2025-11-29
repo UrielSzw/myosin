@@ -1,8 +1,8 @@
 import {
   useActiveRestTimer,
   useActiveRestTimerActions,
-} from "@/features/active-workout/hooks/use-active-workout-store";
-import { useTimer } from "@/features/active-workout/hooks/use-timer";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import { useTimer } from "@/features/active-workout-v2/hooks/use-timer";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";

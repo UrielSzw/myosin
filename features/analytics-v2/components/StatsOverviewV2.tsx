@@ -1,4 +1,4 @@
-import { AnalyticsDashboardData } from "@/features/analytics/types/dashboard";
+import { AnalyticsDashboardData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";

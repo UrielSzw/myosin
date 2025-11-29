@@ -1,4 +1,4 @@
-import { useSessionDetail } from "@/features/workout-session-detail/hooks/use-session-detail";
+import { useSessionDetail } from "@/features/workout-session-detail-v2/hooks/use-session-detail";
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";

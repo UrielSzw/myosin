@@ -5,7 +5,6 @@ import {
   exerciseMuscleTranslations,
 } from "@/shared/translations/exercise-labels";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
-import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { Check, Info, Plus, Star } from "lucide-react-native";
 import { memo, useCallback } from "react";
@@ -51,7 +50,6 @@ export const ExerciseCard: React.FC<Props> = memo(
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = exerciseSelectorTranslations;
-    const sharedT = sharedUiTranslations;
     const muscleT = exerciseMuscleTranslations;
     const equipmentT = exerciseEquipmentTranslations;
 

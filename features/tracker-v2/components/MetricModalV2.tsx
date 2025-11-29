@@ -1,15 +1,10 @@
 import {
-  getInputConfig,
-  PREDEFINED_QUICK_ACTION_TEMPLATES,
-} from "@/features/tracker/constants/templates";
-import {
   useAddEntry,
   useDayData,
   useDeleteEntry,
   useDeleteMetric,
   useUpdateMetric,
-} from "@/features/tracker/hooks/use-tracker-data";
-import { formatTime, formatValue } from "@/features/tracker/utils/helpers";
+} from "@/features/tracker-v2/hooks/use-tracker-data";
 import { MainMetric } from "@/shared/db/schema";
 import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -52,6 +47,11 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from "react-native-reanimated";
+import {
+  getInputConfig,
+  PREDEFINED_QUICK_ACTION_TEMPLATES,
+} from "../constants/templates";
+import { formatTime, formatValue } from "../utils/helpers";
 
 type Props = {
   selectedMetric: MainMetric | null;

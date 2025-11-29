@@ -30,7 +30,7 @@ export const WorkoutsContent = ({
   onFolderLongPress,
 }: Props) => {
   const insets = useSafeAreaInsets();
-  const { colors, isDarkMode } = useColorScheme();
+  const { colors } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
 
@@ -53,6 +53,8 @@ export const WorkoutsContent = ({
 
   // Folder view content
   if (selectedFolder) {
+    const folderColor = selectedFolder.color || colors.primary[500];
+
     return (
       <ScrollView
         style={styles.container}
@@ -66,66 +68,6 @@ export const WorkoutsContent = ({
           entering={FadeIn.duration(300)}
           exiting={FadeOut.duration(200)}
         >
-          {/* Folder info header */}
-          <View
-            style={[
-              styles.folderInfoCard,
-              {
-                backgroundColor: isDarkMode
-                  ? "rgba(255,255,255,0.04)"
-                  : "rgba(255,255,255,0.8)",
-                borderColor: isDarkMode
-                  ? "rgba(255,255,255,0.08)"
-                  : "rgba(0,0,0,0.06)",
-              },
-            ]}
-          >
-            <View
-              style={[
-                styles.folderIconLarge,
-                {
-                  backgroundColor: `${
-                    selectedFolder.color || colors.primary[500]
-                  }20`,
-                },
-              ]}
-            >
-              {selectedFolder.icon ? (
-                <Typography style={{ fontSize: 28 }}>
-                  {selectedFolder.icon}
-                </Typography>
-              ) : (
-                <Folder
-                  size={28}
-                  color={selectedFolder.color || colors.primary[500]}
-                />
-              )}
-            </View>
-            <View style={styles.folderInfoText}>
-              <Typography
-                variant="h4"
-                weight="bold"
-                style={{ color: colors.text }}
-              >
-                {selectedFolder.name}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="textMuted"
-                style={{ marginTop: 4 }}
-              >
-                {folderRoutines.length}{" "}
-                {folderRoutines.length === 1
-                  ? lang === "es"
-                    ? "rutina"
-                    : "routine"
-                  : lang === "es"
-                  ? "rutinas"
-                  : "routines"}
-              </Typography>
-            </View>
-          </View>
-
           {/* Routines in folder */}
           {folderRoutines.length > 0 ? (
             <View style={styles.section}>
@@ -145,13 +87,11 @@ export const WorkoutsContent = ({
                 style={[
                   styles.emptyFolderIcon,
                   {
-                    backgroundColor: isDarkMode
-                      ? "rgba(255,255,255,0.05)"
-                      : "rgba(0,0,0,0.03)",
+                    backgroundColor: `${folderColor}15`,
                   },
                 ]}
               >
-                <Folder size={40} color={colors.textMuted} />
+                <Folder size={40} color={folderColor} />
               </View>
               <Typography
                 variant="body1"
@@ -263,25 +203,6 @@ const styles = StyleSheet.create({
   routinesList: {
     gap: 12,
     marginTop: 12,
-  },
-  folderInfoCard: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 20,
-    borderRadius: 20,
-    borderWidth: 1,
-    marginBottom: 8,
-  },
-  folderIconLarge: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  folderInfoText: {
-    flex: 1,
-    marginLeft: 16,
   },
   emptyFolderState: {
     alignItems: "center",

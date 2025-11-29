@@ -1,8 +1,3 @@
-import { ExerciseModal } from "@/features/routine-form/elements/exercise-modal";
-import {
-  useMainActions,
-  useRoutineFormState,
-} from "@/features/routine-form/hooks/use-routine-form-store";
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
@@ -16,6 +11,7 @@ import { BlockItemV2 } from "./components/BlockItemV2";
 import { BlocksListV2 } from "./components/BlocksListV2";
 import { BottomSheetsV2 } from "./components/BottomSheetsV2";
 import { ExerciseListTopV2 } from "./components/ExerciseListTopV2";
+import { ExerciseModal } from "./components/ExerciseModal";
 import { FormHeaderV2 } from "./components/FormHeaderV2";
 import { ListHintV2 } from "./components/ListHintV2";
 import { RoutineInfoV2 } from "./components/RoutineInfoV2";
@@ -24,6 +20,10 @@ import {
   SheetTypeV2,
   useFormRoutineSheetsV2,
 } from "./hooks/use-form-routine-sheets-v2";
+import {
+  useMainActions,
+  useRoutineFormState,
+} from "./hooks/use-routine-form-store";
 
 export const RoutineFormV2Feature = () => {
   const { blocksByRoutine, exercisesInBlock, sets, exercisesByBlock, routine } =

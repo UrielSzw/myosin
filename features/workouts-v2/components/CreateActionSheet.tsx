@@ -1,4 +1,4 @@
-import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
+import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";

@@ -4,7 +4,7 @@ import {
   useActiveMainActions,
   useActiveSetActions,
   useActiveWorkoutState,
-} from "@/features/active-workout/hooks/use-active-workout-store";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import {
   BlockOptionsSheetV2,

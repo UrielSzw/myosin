@@ -2,7 +2,7 @@ import {
   ActiveWorkoutBlock,
   useActiveMainActions,
   useActiveWorkout,
-} from "@/features/active-workout/hooks/use-active-workout-store";
+} from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import React from "react";
 import { View } from "react-native";
 import { ActiveExerciseHeaderV2 } from "./ActiveExerciseHeaderV2";

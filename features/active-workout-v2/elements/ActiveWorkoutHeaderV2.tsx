@@ -1,5 +1,5 @@
-import { useActiveWorkout } from "@/features/active-workout/hooks/use-active-workout-store";
-import { useFinishWorkout } from "@/features/active-workout/hooks/use-finish-workout";
+import { useActiveWorkout } from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import { useFinishWorkout } from "@/features/active-workout-v2/hooks/use-finish-workout";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";

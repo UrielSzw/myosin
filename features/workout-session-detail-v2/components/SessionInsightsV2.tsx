@@ -1,4 +1,4 @@
-import { SessionAnalytics } from "@/features/workout-session-detail/hooks/use-session-detail";
+import { SessionAnalytics } from "@/features/workout-session-detail-v2/hooks/use-session-detail";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";

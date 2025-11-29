@@ -153,6 +153,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
         validationTimeoutRef.current = null;
       }, 500); // Increased delay to reduce API calls
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [setName, validateFolderName, isCurrentlyValid, lastValidatedName]
   );
 

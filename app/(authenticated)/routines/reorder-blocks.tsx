@@ -1,5 +1,5 @@
 import { ReorderBlocksV2Feature } from "@/features/reorder-blocks-v2";
-import { useRoutineSharedActions } from "@/features/routine-form/hooks/use-routine-form-store";
+import { useRoutineSharedActions } from "@/features/routine-form-v2/hooks/use-routine-form-store";
 import { BlockInsert } from "@/shared/db/schema";
 import {
   useReorderBlockActions,

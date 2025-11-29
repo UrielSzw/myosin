@@ -1,4 +1,4 @@
-import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
+import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";

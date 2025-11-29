@@ -6,16 +6,14 @@ import { router } from "expo-router";
 import { ArrowLeft, Settings } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export const WorkoutConfigHeader = () => {
-  const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
 
   return (
-    <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+    <View style={[styles.header, { paddingTop: 8 }]}>
       {Platform.OS === "ios" && (
         <BlurView
           intensity={isDarkMode ? 25 : 40}

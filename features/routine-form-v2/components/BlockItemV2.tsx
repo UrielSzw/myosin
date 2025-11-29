@@ -1,9 +1,4 @@
-import { IToogleSheet } from "@/features/routine-form/hooks/use-form-routine-sheets";
-import {
-  useMainActions,
-  useRoutineFormState,
-} from "@/features/routine-form/hooks/use-routine-form-store";
-import { useReorderBlocks } from "@/features/routine-form/shared/use-reorder-blocks";
+import { useReorderBlocks } from "@/features/routine-form-v2/shared/use-reorder-blocks";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useHaptic } from "@/shared/services/haptic-service";
@@ -12,6 +7,11 @@ import { router } from "expo-router";
 import React from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { IToogleSheet } from "../hooks/use-form-routine-sheets";
+import {
+  useMainActions,
+  useRoutineFormState,
+} from "../hooks/use-routine-form-store";
 import { BlockHeaderV2 } from "./BlockHeaderV2";
 import { ExerciseCardV2 } from "./ExerciseCardV2";
 

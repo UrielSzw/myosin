@@ -1,10 +1,4 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
-import {
-  useMainActions,
-  useRoutineFormState,
-} from "@/features/routine-form/hooks/use-routine-form-store";
-import { useRoutineValidation } from "@/features/routine-form/hooks/use-routine-validation";
-import { useSaveRoutine } from "@/features/routine-form/hooks/use-save-routine";
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
@@ -25,6 +19,12 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  useMainActions,
+  useRoutineFormState,
+} from "../hooks/use-routine-form-store";
+import { useRoutineValidation } from "../hooks/use-routine-validation";
+import { useSaveRoutine } from "../hooks/use-save-routine";
 
 export const FormHeaderV2: React.FC = () => {
   const { colors, isDarkMode } = useColorScheme();

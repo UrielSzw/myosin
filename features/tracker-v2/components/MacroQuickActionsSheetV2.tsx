@@ -18,7 +18,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAddMacroFromQuickAction } from "../../tracker/hooks/use-macro-data";
+import { useAddMacroFromQuickAction } from "../hooks/use-macro-data";
 
 type MacroQuickActionsSheetProps = {
   visible: boolean;

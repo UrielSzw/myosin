@@ -23,10 +23,7 @@ import {
 } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  useDeleteMacroEntry,
-  useMacroDayData,
-} from "../../tracker/hooks/use-macro-data";
+import { useDeleteMacroEntry, useMacroDayData } from "../hooks/use-macro-data";
 
 type MacroHistorySheetProps = {
   visible: boolean;

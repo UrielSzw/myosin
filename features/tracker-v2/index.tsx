@@ -17,7 +17,6 @@ import {
 } from "react-native";
 import Animated, { FadeIn, FadeInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useDayData } from "../tracker/hooks/use-tracker-data";
 import { AuroraBackground } from "../workouts-v2/components/AuroraBackground";
 import { EmptyMetricsV2 } from "./components/EmptyMetricsV2";
 import { MacroCardV2 } from "./components/MacroCardV2";
@@ -26,6 +25,7 @@ import { MetricModalV2 } from "./components/MetricModalV2";
 import { MetricSelectorModalV2 } from "./components/MetricSelectorModalV2";
 import { TrackerHeaderV2 } from "./components/TrackerHeaderV2";
 import { WeekStripV2 } from "./components/WeekStripV2";
+import { useDayData } from "./hooks/use-tracker-data";
 
 export const TrackerFeatureV2 = () => {
   const { colors, isDarkMode } = useColorScheme();

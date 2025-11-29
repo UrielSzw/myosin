@@ -1,5 +1,5 @@
-import { useAnalyticsData } from "@/features/analytics/hooks/use-analytics-data";
-import { useTrackerAnalytics } from "@/features/analytics/hooks/use-tracker-analytics";
+import { useAnalyticsData } from "@/features/analytics-v2/hooks/use-analytics-data";
+import { useTrackerAnalytics } from "@/features/analytics-v2/hooks/use-tracker-analytics";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";

@@ -13,8 +13,8 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { trackerQueryKeys } from "../../tracker/hooks/use-tracker-data";
-import { trackerService } from "../../tracker/service/tracker";
+import { trackerQueryKeys } from "../hooks/use-tracker-data";
+import { trackerService } from "../service/tracker";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DAY_WIDTH = (SCREEN_WIDTH - 40 - 24) / 7; // 7 days, 20px padding each side, 24px internal padding

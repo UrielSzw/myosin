@@ -1,4 +1,4 @@
-import { usePRDetail } from "@/features/pr-detail/hooks/use-pr-detail";
+import { usePRDetail } from "@/features/pr-detail-v2/hooks/use-pr-detail";
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";

@@ -2,7 +2,7 @@
 // ROUTINE TEMPLATES - SERVICE
 // ================================================================================
 
-import { createRoutineService } from "@/features/routine-form/service/routine";
+import { createRoutineService } from "@/features/routine-form-v2/service/routine";
 import type { CreateRoutineData } from "@/shared/db/repository/routines";
 import type {
   BlockInsert,

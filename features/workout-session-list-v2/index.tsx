@@ -15,8 +15,8 @@ import Animated, { FadeIn } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Re-use hooks from v1
-import { useSessionFilters } from "../workout-session-list/hooks/use-session-filters";
-import { useSessionList } from "../workout-session-list/hooks/use-session-list";
+import { useSessionFilters } from "./hooks/use-session-filters";
+import { useSessionList } from "./hooks/use-session-list";
 
 // V2 Components
 import { SessionCardV2 } from "./components/SessionCardV2";

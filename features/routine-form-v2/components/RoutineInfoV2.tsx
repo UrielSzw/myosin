@@ -1,7 +1,3 @@
-import {
-  useMainActions,
-  useRoutineInfoState,
-} from "@/features/routine-form/hooks/use-routine-form-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
@@ -12,6 +8,10 @@ import { FileText, Settings } from "lucide-react-native";
 import React, { useCallback, useMemo, useState } from "react";
 import { Platform, Pressable, StyleSheet, TextInput, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import {
+  useMainActions,
+  useRoutineInfoState,
+} from "../hooks/use-routine-form-store";
 
 type Props = {
   onOpenSettings?: () => void;

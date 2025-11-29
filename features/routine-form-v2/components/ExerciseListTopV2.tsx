@@ -1,4 +1,3 @@
-import { useMainActions } from "@/features/routine-form/hooks/use-routine-form-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
@@ -13,6 +12,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from "react-native-reanimated";
+import { useMainActions } from "../hooks/use-routine-form-store";
 
 type Props = {
   exercisesCount: number;

@@ -319,6 +319,7 @@ export const RPESelectorV2: React.FC<Props> = ({
         }).start();
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, selectedRPE]);
 
   const handleClose = useCallback(() => {
@@ -457,21 +458,11 @@ export const RPESelectorV2: React.FC<Props> = ({
                   style={[
                     styles.iconContainer,
                     {
-                      backgroundColor:
-                        viewMode === "detail" && detailOption
-                          ? detailOption.color + "20"
-                          : colors.primary[500] + "20",
+                      backgroundColor: colors.primary[500] + "20",
                     },
                   ]}
                 >
-                  <Activity
-                    size={22}
-                    color={
-                      viewMode === "detail" && detailOption
-                        ? detailOption.color
-                        : colors.primary[500]
-                    }
-                  />
+                  <Activity size={22} color={colors.primary[500]} />
                 </View>
 
                 {/* Title & Subtitle */}

@@ -1,4 +1,4 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics/hooks/use-analytics-data";
+import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useSyncEngine } from "@/shared/sync/sync-engine";

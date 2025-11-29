@@ -1,13 +1,5 @@
-import { RoutineSettingsBottomSheet } from "@/features/routine-form/elements/routine-settings-sheet";
-import {
-  useBlockActions,
-  useExerciseActions,
-  useMainActions,
-  useRoutineFormCurrentState,
-  useSetActions,
-} from "@/features/routine-form/hooks/use-routine-form-store";
-import { useReorderBlocks } from "@/features/routine-form/shared/use-reorder-blocks";
-import { useReorderExercises } from "@/features/routine-form/shared/use-reorder-exercises";
+import { useReorderBlocks } from "@/features/routine-form-v2/shared/use-reorder-blocks";
+import { useReorderExercises } from "@/features/routine-form-v2/shared/use-reorder-exercises";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { MeasurementTemplateId } from "@/shared/types/measurement";
 import { ISetType, RPEValue } from "@/shared/types/workout";
@@ -24,6 +16,14 @@ import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { router } from "expo-router";
 import React, { useCallback } from "react";
 import { SheetTypeV2 } from "../hooks/use-form-routine-sheets-v2";
+import {
+  useBlockActions,
+  useExerciseActions,
+  useMainActions,
+  useRoutineFormCurrentState,
+  useSetActions,
+} from "../hooks/use-routine-form-store";
+import { RoutineSettingsBottomSheet } from "./RoutineSettingsBottomSheet";
 
 type Props = {
   activeSheet: SheetTypeV2;
@@ -226,7 +226,6 @@ export const BottomSheetsV2: React.FC<Props> = ({
       />
 
       {/* Legacy BottomSheetModal components (to be converted later) */}
-
       <RoutineSettingsBottomSheet ref={routineSettingsBottomSheetRef} />
     </>
   );

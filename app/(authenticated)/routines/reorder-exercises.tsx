@@ -1,4 +1,4 @@
-import { ReorderExercisesFeature } from "@/features/reorder-exercises";
+import { ReorderExercisesV2Feature } from "@/features/reorder-exercises-v2";
 import { useRoutineSharedActions } from "@/features/routine-form/hooks/use-routine-form-store";
 import {
   useReorderBlockActions,
@@ -56,7 +56,7 @@ export default function ReorderExercisesScreen() {
   if (!block) return null;
 
   return (
-    <ReorderExercisesFeature
+    <ReorderExercisesV2Feature
       block={block}
       exercises={reorderExercises}
       onCancel={handleCancel}

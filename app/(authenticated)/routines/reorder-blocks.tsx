@@ -1,4 +1,4 @@
-import { ReorderBlocksFeature } from "@/features/reorder-blocks";
+import { ReorderBlocksV2Feature } from "@/features/reorder-blocks-v2";
 import { useRoutineSharedActions } from "@/features/routine-form/hooks/use-routine-form-store";
 import { BlockInsert } from "@/shared/db/schema";
 import {
@@ -49,7 +49,7 @@ export default function ReorderBlocksScreen() {
   };
 
   return (
-    <ReorderBlocksFeature
+    <ReorderBlocksV2Feature
       blocks={Object.values(blocks)}
       onReorder={handleReorder}
       onCancel={handleCancel}

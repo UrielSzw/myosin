@@ -1,5 +1,11 @@
 import { InferSelectModel } from "drizzle-orm";
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+  index,
+  integer,
+  real,
+  sqliteTable,
+  text,
+} from "drizzle-orm/sqlite-core";
 import { timestamps } from "../utils/schema-utils";
 import { generateUUID } from "../utils/uuid";
 
@@ -44,6 +50,22 @@ export const user_preferences = sqliteTable(
     default_rest_time_seconds: integer("default_rest_time_seconds")
       .default(60)
       .notNull(),
+
+    // Onboarding data
+    biological_sex: text("biological_sex").$type<"male" | "female">(),
+    birth_date: text("birth_date"), // ISO date YYYY-MM-DD
+    height_cm: real("height_cm"), // Always stored in cm
+    initial_weight_kg: real("initial_weight_kg"), // Always stored in kg
+    fitness_goal: text("fitness_goal").$type<
+      "lose_fat" | "maintain" | "gain_muscle"
+    >(),
+    activity_level: text("activity_level").$type<
+      "sedentary" | "light" | "moderate" | "active" | "very_active"
+    >(),
+    onboarding_completed: integer("onboarding_completed", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+    onboarding_completed_at: text("onboarding_completed_at"),
 
     ...timestamps,
   },

@@ -232,6 +232,13 @@
       "when": 1764369294120,
       "tag": "0032_left_marvel_boy",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "6",
+      "when": 1764374032449,
+      "tag": "0033_bitter_switch",
+      "breakpoints": true
     }
   ]
 }

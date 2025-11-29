@@ -19,20 +19,20 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="tracker"
-        options={{
-          title: "Tracker",
-          tabBarIcon: ({ color, size }) => (
-            <Activity size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="index"
         options={{
           title: "Rutinas",
           tabBarIcon: ({ color, size }) => (
             <Dumbbell size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="tracker"
+        options={{
+          title: "Tracker",
+          tabBarIcon: ({ color, size }) => (
+            <Activity size={size} color={color} />
           ),
         }}
       />

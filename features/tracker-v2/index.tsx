@@ -149,7 +149,7 @@ export const TrackerFeatureV2 = () => {
   }
 
   // Calculate header height
-  const headerHeight = insets.top + 8 + 60 + 12;
+  const headerHeight = insets.top + 8 + 60 + 20;
 
   return (
     <View style={styles.container}>

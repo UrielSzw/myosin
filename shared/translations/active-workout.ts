@@ -10,6 +10,10 @@ export const activeWorkoutTranslations = {
     es: "Ejercicio",
     en: "Exercise",
   },
+  exercises: {
+    es: "ejercicios",
+    en: "exercises",
+  },
   sets: {
     es: "Sets:",
     en: "Sets:",

@@ -25,11 +25,6 @@ export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
   const hasTrainingDays =
     routine.training_days && routine.training_days.length > 0;
 
-  const handlePress = () => {
-    // TODO: Open routine details
-    console.log("Open routine:", routine.id);
-  };
-
   const handleStartWorkout = async () => {
     try {
       if (!user?.id) return;
@@ -73,8 +68,7 @@ export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
 
   return (
     <Pressable
-      onPress={handlePress}
-      onLongPress={() => onLongPress(routine)}
+      onPress={() => onLongPress(routine)}
       delayLongPress={300}
       style={({ pressed }) => ({ opacity: pressed ? 0.8 : 1 })}
     >

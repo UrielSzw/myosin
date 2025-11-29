@@ -4,7 +4,7 @@ import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
-import { ChevronLeft, Dumbbell, FolderOpen, Plus } from "lucide-react-native";
+import { ChevronLeft, FolderOpen, Plus } from "lucide-react-native";
 import React from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -28,30 +28,18 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top + 8 }]}>
       {/* Glass effect background */}
       {Platform.OS === "ios" && (
         <BlurView
-          intensity={isDarkMode ? 40 : 60}
+          intensity={isDarkMode ? 25 : 40}
           tint={isDarkMode ? "dark" : "light"}
           style={StyleSheet.absoluteFill}
         />
       )}
-      {Platform.OS === "android" && (
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: isDarkMode
-                ? "rgba(3, 5, 8, 0.85)"
-                : "rgba(248, 250, 252, 0.9)",
-            },
-          ]}
-        />
-      )}
 
       <View style={styles.content}>
-        {/* Left: Back button or Logo */}
+        {/* Left: Back button or empty space */}
         <View style={styles.leftSection}>
           {selectedFolder ? (
             <Pressable
@@ -66,19 +54,10 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
                 },
               ]}
             >
-              <ChevronLeft size={22} color={colors.text} />
+              <ChevronLeft size={20} color={colors.text} />
             </Pressable>
           ) : (
-            <View
-              style={[
-                styles.logoContainer,
-                {
-                  backgroundColor: `${colors.primary[500]}15`,
-                },
-              ]}
-            >
-              <Dumbbell size={22} color={colors.primary[500]} />
-            </View>
+            <View style={styles.placeholder} />
           )}
         </View>
 
@@ -124,7 +103,7 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
               },
             ]}
           >
-            <Plus size={20} color="#fff" strokeWidth={2.5} />
+            <Plus size={18} color="#fff" strokeWidth={2.5} />
           </Pressable>
         </View>
       </View>
@@ -134,20 +113,23 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
 
 const styles = StyleSheet.create({
   container: {
-    position: "relative",
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "rgba(128, 128, 128, 0.1)",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(255,255,255,0.05)",
   },
   content: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    minHeight: 56,
+    paddingHorizontal: 20,
+    height: 56,
   },
   leftSection: {
-    width: 44,
+    width: 40,
     alignItems: "flex-start",
   },
   centerSection: {
@@ -155,20 +137,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   rightSection: {
-    width: 44,
+    width: 40,
     alignItems: "flex-end",
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
+  placeholder: {
+    width: 36,
+    height: 36,
   },
-  logoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+  backButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -177,9 +156,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   addButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 12,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#0ea5e9",

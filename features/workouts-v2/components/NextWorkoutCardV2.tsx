@@ -1,11 +1,22 @@
+import { useActiveMainActions } from "@/features/active-workout/hooks/use-active-workout-store";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { Calendar, Play, Sparkles } from "lucide-react-native";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
+import Animated, {
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from "react-native-reanimated";
 
 type Props = {
   routines: RoutineWithMetrics[];
@@ -15,6 +26,8 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
+  const { initializeWorkout } = useActiveMainActions();
+  const { user } = useAuth();
 
   // Find next scheduled workout
   const nextWorkout = useMemo(() => {
@@ -76,20 +89,73 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
     return null;
   }, [routines, lang]);
 
+  const isToday = nextWorkout?.isToday ?? false;
+
+  // Aurora animation - MUST be before any early returns
+  const glowProgress = useSharedValue(0);
+
+  useEffect(() => {
+    if (isToday) {
+      glowProgress.value = withRepeat(
+        withTiming(1, { duration: 3000, easing: Easing.inOut(Easing.ease) }),
+        -1,
+        true
+      );
+    }
+  }, [isToday, glowProgress]);
+
+  const auroraStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: glowProgress.value * 40 - 20 },
+      { translateY: glowProgress.value * 15 - 8 },
+      { scale: 1 + glowProgress.value * 0.15 },
+    ],
+    opacity: 0.4 + glowProgress.value * 0.3,
+  }));
+
+  const aurora2Style = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: -glowProgress.value * 30 + 15 },
+      { translateY: -glowProgress.value * 12 + 6 },
+      { scale: 1.1 - glowProgress.value * 0.1 },
+    ],
+    opacity: 0.3 + (1 - glowProgress.value) * 0.25,
+  }));
+
+  // Animated glowing border for "Today" card
+  const animatedCardStyle = useAnimatedStyle(() => {
+    if (!isToday) return {};
+
+    const borderOpacity = 0.4 + glowProgress.value * 0.3;
+
+    return {
+      borderColor: `rgba(14, 165, 233, ${borderOpacity})`,
+      shadowOpacity: 0.2 + glowProgress.value * 0.15,
+      shadowRadius: 16 + glowProgress.value * 8,
+    };
+  });
+
+  // Early return AFTER all hooks
   if (!nextWorkout) {
     return null;
   }
 
-  const { routine, isToday, dayLabel } = nextWorkout;
+  const { routine, dayLabel } = nextWorkout;
 
-  const handleStartWorkout = () => {
-    console.log("Start workout:", routine.id);
+  const handleStartWorkout = async () => {
+    try {
+      if (!user?.id) return;
+      await initializeWorkout(routine.id, user.id);
+      router.push("/workout/active");
+    } catch (error) {
+      console.error("Error starting workout:", error);
+    }
   };
 
   return (
     <View style={styles.container}>
       {/* Glass card */}
-      <View
+      <Animated.View
         style={[
           styles.card,
           {
@@ -99,11 +165,47 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
               ? "rgba(255,255,255,0.08)"
               : "rgba(0,0,0,0.06)",
             backgroundColor: isDarkMode
-              ? "rgba(255,255,255,0.03)"
-              : "rgba(255,255,255,0.7)",
+              ? "rgba(255,255,255,0.04)"
+              : "rgba(255,255,255,0.8)",
+            shadowColor: isToday ? colors.primary[500] : "transparent",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: isToday ? 0.2 : 0,
+            shadowRadius: 16,
+            elevation: isToday ? 6 : 0,
           },
+          isToday && animatedCardStyle,
         ]}
       >
+        {/* Subtle aurora glow - only when isToday */}
+        {isToday && (
+          <View style={styles.auroraContainer}>
+            <Animated.View style={[styles.aurora1, auroraStyle]}>
+              <LinearGradient
+                colors={[
+                  `${colors.primary[500]}25`,
+                  `${colors.primary[400]}10`,
+                  "transparent",
+                ]}
+                style={styles.auroraGradient}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              />
+            </Animated.View>
+            <Animated.View style={[styles.aurora2, aurora2Style]}>
+              <LinearGradient
+                colors={[
+                  `${colors.primary[600]}20`,
+                  `${colors.primary[500]}08`,
+                  "transparent",
+                ]}
+                style={styles.auroraGradient}
+                start={{ x: 1, y: 0 }}
+                end={{ x: 0, y: 1 }}
+              />
+            </Animated.View>
+          </View>
+        )}
+
         {Platform.OS === "ios" && (
           <BlurView
             intensity={isDarkMode ? 20 : 40}
@@ -114,7 +216,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
 
         {/* Content */}
         <View style={styles.content}>
-          {/* Header row */}
+          {/* Header row with badge */}
           <View style={styles.headerRow}>
             <View
               style={[
@@ -144,6 +246,18 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
                 {dayLabel}
               </Typography>
             </View>
+
+            {/* Ready indicator - only when isToday */}
+            {isToday && (
+              <View style={styles.readyIndicator}>
+                <View
+                  style={[
+                    styles.readyDot,
+                    { backgroundColor: colors.primary[500] },
+                  ]}
+                />
+              </View>
+            )}
           </View>
 
           {/* Main content */}
@@ -167,24 +281,32 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
 
               {/* Stats row */}
               <View style={styles.statsRow}>
-                <View style={styles.stat}>
-                  <Typography variant="caption" color="textMuted">
-                    {routine.blocksCount}{" "}
-                    {routine.blocksCount === 1 ? "bloque" : "bloques"}
-                  </Typography>
-                </View>
+                <Typography variant="caption" color="textMuted">
+                  {routine.blocksCount}{" "}
+                  {routine.blocksCount === 1
+                    ? lang === "es"
+                      ? "bloque"
+                      : "block"
+                    : lang === "es"
+                    ? "bloques"
+                    : "blocks"}
+                </Typography>
                 <View
                   style={[
                     styles.statDot,
                     { backgroundColor: colors.textMuted },
                   ]}
                 />
-                <View style={styles.stat}>
-                  <Typography variant="caption" color="textMuted">
-                    {routine.exercisesCount}{" "}
-                    {routine.exercisesCount === 1 ? "ejercicio" : "ejercicios"}
-                  </Typography>
-                </View>
+                <Typography variant="caption" color="textMuted">
+                  {routine.exercisesCount}{" "}
+                  {routine.exercisesCount === 1
+                    ? lang === "es"
+                      ? "ejercicio"
+                      : "exercise"
+                    : lang === "es"
+                    ? "ejercicios"
+                    : "exercises"}
+                </Typography>
               </View>
             </View>
 
@@ -200,18 +322,11 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
                 },
               ]}
             >
-              <Play size={26} color="#fff" fill="#fff" />
+              <Play size={24} color="#fff" fill="#fff" />
             </Pressable>
           </View>
         </View>
-
-        {/* Subtle glow for today's workout */}
-        {isToday && (
-          <View
-            style={[styles.glow, { backgroundColor: colors.primary[500] }]}
-          />
-        )}
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -221,17 +336,42 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   card: {
-    borderRadius: 24,
+    borderRadius: 20,
     borderWidth: 1,
     overflow: "hidden",
     position: "relative",
   },
+  auroraContainer: {
+    ...StyleSheet.absoluteFillObject,
+    overflow: "hidden",
+  },
+  aurora1: {
+    position: "absolute",
+    top: -30,
+    right: -30,
+    width: 150,
+    height: 150,
+  },
+  aurora2: {
+    position: "absolute",
+    bottom: -40,
+    left: -30,
+    width: 120,
+    height: 120,
+  },
+  auroraGradient: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 100,
+  },
   content: {
-    padding: 20,
+    padding: 18,
   },
   headerRow: {
     flexDirection: "row",
-    marginBottom: 16,
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 14,
   },
   badge: {
     flexDirection: "row",
@@ -239,6 +379,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
+  },
+  readyIndicator: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  readyDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   mainContent: {
     flexDirection: "row",
@@ -251,11 +400,7 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
-  },
-  stat: {
-    flexDirection: "row",
-    alignItems: "center",
+    marginTop: 6,
   },
   statDot: {
     width: 3,
@@ -265,24 +410,15 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   playButton: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 18,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#0ea5e9",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 10,
-  },
-  glow: {
-    position: "absolute",
-    bottom: -20,
-    left: "20%",
-    right: "20%",
-    height: 40,
-    borderRadius: 20,
-    opacity: 0.15,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    elevation: 8,
   },
 });

@@ -30,15 +30,11 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
     // Si es el tab activo, actualizar inmediatamente
     if (index === state.index) {
       translateX.value = centerX;
-      console.log(
-        `Setting initial position for active tab ${index}: ${centerX}`
-      );
     }
   };
 
   React.useEffect(() => {
     const targetX = tabPositions.current[state.index];
-    console.log(`Switching to tab ${state.index}, targetX: ${targetX}`);
     if (targetX !== undefined) {
       translateX.value = withSpring(targetX, {
         damping: 60,

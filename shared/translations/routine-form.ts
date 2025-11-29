@@ -169,8 +169,8 @@ export const routineFormTranslations = {
     en: "+ Add Exercise",
   },
   listHint: {
-    es: "💡 Consejo: Mantén presionado cualquier bloque para reordenar los ejercicios",
-    en: "💡 Tip: Long press any block to reorder exercises",
+    es: "Consejo: Mantén presionado cualquier bloque para reordenar los ejercicios",
+    en: "Tip: Long press any block to reorder exercises",
   },
 
   // Empty State

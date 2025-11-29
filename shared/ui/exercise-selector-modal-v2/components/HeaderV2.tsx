@@ -3,7 +3,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
 import { BlurView } from "expo-blur";
-import { ChevronLeft, Dumbbell, RotateCcw } from "lucide-react-native";
+import { ChevronLeft } from "lucide-react-native";
 import React from "react";
 import { Platform, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -41,7 +41,6 @@ export const HeaderV2: React.FC<Props> = ({
       return {
         title: t.replace[lang],
         subtitle: exerciseToReplace?.name || t.selectExerciseToReplace[lang],
-        icon: <RotateCcw size={20} color={colors.primary[500]} />,
       };
     }
     if (exerciseModalMode === "add-to-block") {
@@ -49,7 +48,6 @@ export const HeaderV2: React.FC<Props> = ({
         title: lang === "es" ? "Agregar al Superset" : "Add to Superset",
         subtitle:
           lang === "es" ? "Selecciona un ejercicio" : "Select an exercise",
-        icon: <Dumbbell size={20} color={colors.primary[500]} />,
       };
     }
     return {
@@ -64,7 +62,6 @@ export const HeaderV2: React.FC<Props> = ({
           : lang === "es"
           ? "Selecciona uno o más ejercicios"
           : "Select one or more exercises",
-      icon: <Dumbbell size={20} color={colors.primary[500]} />,
     };
   };
 
@@ -75,8 +72,8 @@ export const HeaderV2: React.FC<Props> = ({
       intensity={Platform.OS === "ios" ? 80 : 0}
       tint={isDark ? "dark" : "light"}
       style={{
-        paddingTop: insets.top + 8,
-        paddingBottom: 16,
+        paddingTop: 16,
+        paddingBottom: 12,
         paddingHorizontal: 20,
         backgroundColor: Platform.OS === "android" ? headerBg : "transparent",
         borderBottomWidth: 1,
@@ -89,6 +86,7 @@ export const HeaderV2: React.FC<Props> = ({
         style={{
           flexDirection: "row",
           alignItems: "center",
+          gap: 12,
         }}
       >
         {/* Close Button */}
@@ -97,41 +95,27 @@ export const HeaderV2: React.FC<Props> = ({
           style={{
             width: 40,
             height: 40,
-            borderRadius: 20,
+            borderRadius: 12,
             backgroundColor: isDark
               ? "rgba(255, 255, 255, 0.08)"
-              : "rgba(0, 0, 0, 0.05)",
+              : "rgba(0, 0, 0, 0.04)",
             alignItems: "center",
             justifyContent: "center",
           }}
           activeOpacity={0.7}
         >
-          <ChevronLeft size={22} color={colors.text} />
+          <ChevronLeft size={20} color={colors.text} />
         </TouchableOpacity>
 
         {/* Title Section */}
-        <View style={{ flex: 1, marginLeft: 12 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-            <View
-              style={{
-                width: 28,
-                height: 28,
-                borderRadius: 8,
-                backgroundColor: colors.primary[500] + "20",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {headerContent.icon}
-            </View>
-            <Typography variant="h5" weight="bold">
-              {headerContent.title}
-            </Typography>
-          </View>
+        <View style={{ flex: 1 }}>
+          <Typography variant="h4" weight="bold">
+            {headerContent.title}
+          </Typography>
           <Typography
             variant="caption"
             color="textMuted"
-            style={{ marginTop: 2, marginLeft: 36 }}
+            style={{ marginTop: 2 }}
             numberOfLines={1}
           >
             {headerContent.subtitle}
@@ -142,16 +126,16 @@ export const HeaderV2: React.FC<Props> = ({
         {selectedExercisesLength > 0 && exerciseModalMode === "add-new" && (
           <View
             style={{
-              width: 32,
-              height: 32,
-              borderRadius: 16,
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 12,
               backgroundColor: colors.primary[500],
               alignItems: "center",
               justifyContent: "center",
             }}
           >
             <Typography
-              variant="body2"
+              variant="caption"
               weight="bold"
               style={{ color: "#FFFFFF" }}
             >

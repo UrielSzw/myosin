@@ -34,6 +34,9 @@ export const WorkoutsContent = ({
   const prefs = useUserPreferences();
   const lang = prefs?.language ?? "es";
 
+  // Calculate header height to match TrackerFeatureV2
+  const headerHeight = insets.top + 8 + 60 + 20;
+
   // Main data (when no folder is selected)
   const { routines: mainRoutines, folders } = useMainWorkoutsData();
 
@@ -55,7 +58,7 @@ export const WorkoutsContent = ({
         style={styles.container}
         contentContainerStyle={[
           styles.content,
-          { paddingBottom: insets.bottom + 100 },
+          { paddingTop: headerHeight, paddingBottom: insets.bottom + 100 },
         ]}
         showsVerticalScrollIndicator={false}
       >
@@ -181,7 +184,7 @@ export const WorkoutsContent = ({
       style={styles.container}
       contentContainerStyle={[
         styles.content,
-        { paddingBottom: insets.bottom + 100 },
+        { paddingTop: headerHeight, paddingBottom: insets.bottom + 100 },
       ]}
       showsVerticalScrollIndicator={false}
     >
@@ -247,7 +250,6 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    paddingTop: 16,
   },
   section: {
     marginTop: 24,

@@ -1,6 +1,6 @@
-import { ActiveWorkoutFeature } from "@/features/active-workout";
+import { ActiveWorkoutV2Feature } from "@/features/active-workout-v2";
 import React from "react";
 
 export default function ActiveWorkoutScreen() {
-  return <ActiveWorkoutFeature />;
+  return <ActiveWorkoutV2Feature />;
 }

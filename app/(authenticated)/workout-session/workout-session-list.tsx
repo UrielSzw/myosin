@@ -1,6 +1,6 @@
-import { WorkoutSessionListFeature } from "@/features/workout-session-list";
+import { WorkoutSessionListV2 } from "@/features/workout-session-list-v2";
 import React from "react";
 
 export default function WorkoutSessionListScreen() {
-  return <WorkoutSessionListFeature />;
+  return <WorkoutSessionListV2 />;
 }

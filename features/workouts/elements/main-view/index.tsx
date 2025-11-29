@@ -14,7 +14,7 @@ import DraggableFlatList, {
   RenderItemParams,
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
-import { routinesService } from "../../service/routines";
+import { routinesService } from "../../../workouts-v2/service/routines";
 import { FolderItem } from "./folder-item";
 
 type Props = {

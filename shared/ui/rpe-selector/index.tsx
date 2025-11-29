@@ -4,8 +4,11 @@ import { rpeSelectorTranslations } from "@/shared/translations/rpe-selector";
 import { RPEValue } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
+import { Activity, X } from "lucide-react-native";
 import React, { forwardRef, useCallback } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Platform, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface RPEOption {
   value: RPEValue;
@@ -81,7 +84,8 @@ const RPE_OPTIONS: RPEOption[] = [
 
 export const RPESelector = forwardRef<BottomSheetModal, Props>(
   ({ plannedRPE, selectedRPE, onSelect, onDismiss, mode = "workout" }, ref) => {
-    const { colors } = useColorScheme();
+    const { colors, colorScheme } = useColorScheme();
+    const isDark = colorScheme === "dark";
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = rpeSelectorTranslations;
@@ -101,33 +105,91 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
       onDismiss?.();
     }, [onDismiss]);
 
+    // V2 Glassmorphism colors
+    const sheetBg = isDark
+      ? "rgba(20, 20, 25, 0.98)"
+      : "rgba(255, 255, 255, 0.98)";
+    const cardBg = isDark ? "rgba(255, 255, 255, 0.06)" : "rgba(0, 0, 0, 0.03)";
+
     return (
       <BottomSheetModal
         ref={ref}
         snapPoints={["75%"]}
         onDismiss={handleDismiss}
         backgroundStyle={{
-          backgroundColor: colors.background,
+          backgroundColor: sheetBg,
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
         }}
         handleIndicatorStyle={{
-          backgroundColor: colors.border,
+          backgroundColor: isDark
+            ? "rgba(255, 255, 255, 0.3)"
+            : "rgba(0, 0, 0, 0.2)",
+          width: 40,
+          height: 4,
         }}
       >
         <BottomSheetScrollView
           style={{
             flex: 1,
-            paddingHorizontal: 20,
-            paddingBottom: 20,
           }}
+          showsVerticalScrollIndicator={false}
         >
-          {/* Header */}
-          <View style={{ paddingBottom: 20 }}>
+          {/* Premium Header with Blur */}
+          <BlurView
+            intensity={Platform.OS === "ios" ? 60 : 0}
+            tint={isDark ? "dark" : "light"}
+            style={{
+              paddingTop: 8,
+              paddingBottom: 20,
+              paddingHorizontal: 20,
+              backgroundColor:
+                Platform.OS === "android" ? sheetBg : "transparent",
+            }}
+          >
+            {/* Close Button */}
+            <TouchableOpacity
+              onPress={handleDismiss}
+              style={{
+                position: "absolute",
+                top: 8,
+                right: 16,
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: cardBg,
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 10,
+              }}
+              activeOpacity={0.7}
+            >
+              <X size={18} color={colors.textMuted} />
+            </TouchableOpacity>
+
+            {/* Icon Badge */}
+            <Animated.View
+              entering={FadeInDown.duration(400).springify()}
+              style={{
+                alignSelf: "center",
+                width: 56,
+                height: 56,
+                borderRadius: 28,
+                backgroundColor: colors.primary[500] + "20",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: 12,
+              }}
+            >
+              <Activity size={28} color={colors.primary[500]} />
+            </Animated.View>
+
             <Typography
               variant="h3"
               weight="bold"
               style={{
                 textAlign: "center",
-                marginBottom: 8,
+                marginBottom: 4,
                 color: colors.text,
               }}
             >
@@ -139,11 +201,12 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
             {mode === "workout" && plannedRPE && (
               <View
                 style={{
-                  backgroundColor: colors.border + "20",
+                  backgroundColor: cardBg,
                   paddingHorizontal: 16,
-                  paddingVertical: 8,
+                  paddingVertical: 10,
                   borderRadius: 12,
                   alignItems: "center",
+                  marginTop: 12,
                 }}
               >
                 <Typography
@@ -172,129 +235,131 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 {t.configureTargetIntensity[lang]}
               </Typography>
             )}
-          </View>
+          </BlurView>
 
           {/* RPE Scale */}
-          <View style={{ flex: 1 }}>
+          <View style={{ flex: 1, paddingHorizontal: 20, gap: 10 }}>
             {RPE_OPTIONS.map((option, index) => {
               const isSelected = selectedRPE === option.value;
               const isPlanned =
                 mode === "workout" && plannedRPE === option.value;
 
               return (
-                <TouchableOpacity
+                <Animated.View
                   key={option.value}
-                  onPress={() => handleSelect(option.value)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    paddingVertical: 16,
-                    paddingHorizontal: 20,
-                    marginBottom: 8,
-                    borderRadius: 16,
-                    backgroundColor: isSelected
-                      ? option.color + "20"
-                      : isPlanned
-                      ? colors.border + "15"
-                      : colors.background,
-                    borderWidth: isSelected ? 2 : isPlanned ? 1 : 1,
-                    borderColor: isSelected
-                      ? option.color
-                      : isPlanned
-                      ? colors.primary[500] + "40"
-                      : colors.border + "30",
-                    shadowColor: isSelected ? option.color : "transparent",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: isSelected ? 0.2 : 0,
-                    shadowRadius: 8,
-                    elevation: isSelected ? 4 : 0,
-                  }}
-                  activeOpacity={0.7}
+                  entering={FadeInDown.duration(300)
+                    .delay(index * 30)
+                    .springify()}
                 >
-                  {/* RPE Number Circle */}
-                  <View
+                  <TouchableOpacity
+                    onPress={() => handleSelect(option.value)}
                     style={{
-                      width: 56,
-                      height: 56,
-                      borderRadius: 28,
-                      backgroundColor: isSelected
-                        ? option.color
-                        : isPlanned
-                        ? colors.primary[500] + "20"
-                        : colors.border + "30",
+                      flexDirection: "row",
                       alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 16,
+                      paddingVertical: 14,
+                      paddingHorizontal: 16,
+                      borderRadius: 16,
+                      backgroundColor: isSelected
+                        ? option.color + "15"
+                        : cardBg,
+                      borderWidth: isSelected ? 1.5 : 1,
+                      borderColor: isSelected
+                        ? option.color + "60"
+                        : isPlanned
+                        ? colors.primary[500] + "40"
+                        : isDark
+                        ? "rgba(255, 255, 255, 0.08)"
+                        : "rgba(0, 0, 0, 0.06)",
                     }}
+                    activeOpacity={0.7}
                   >
-                    <Typography
-                      variant="h3"
-                      weight="bold"
-                      style={{
-                        color: isSelected
-                          ? "white"
-                          : isPlanned
-                          ? colors.primary[500]
-                          : colors.text,
-                        fontSize: 18,
-                      }}
-                    >
-                      {option.label}
-                    </Typography>
-                  </View>
-
-                  {/* Content */}
-                  <View style={{ flex: 1 }}>
-                    <Typography
-                      variant="body1"
-                      weight="semibold"
-                      style={{
-                        color: isSelected ? option.color : colors.text,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {t[option.description as keyof typeof t][lang]}
-                    </Typography>
-
-                    {mode === "workout" && isPlanned && (
-                      <Typography
-                        variant="caption"
-                        style={{
-                          color: colors.primary[500] as string,
-                          fontSize: 11,
-                          fontWeight: "600",
-                        }}
-                      >
-                        {t.plannedIntensity[lang]}
-                      </Typography>
-                    )}
-                  </View>
-
-                  {/* Selection Indicator */}
-                  {isSelected && (
+                    {/* RPE Number Circle */}
                     <View
                       style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: 12,
-                        backgroundColor: option.color,
+                        width: 52,
+                        height: 52,
+                        borderRadius: 26,
+                        backgroundColor: isSelected
+                          ? option.color
+                          : isPlanned
+                          ? colors.primary[500] + "20"
+                          : isDark
+                          ? "rgba(255, 255, 255, 0.08)"
+                          : "rgba(0, 0, 0, 0.05)",
                         alignItems: "center",
                         justifyContent: "center",
+                        marginRight: 14,
                       }}
                     >
                       <Typography
-                        variant="caption"
+                        variant="h3"
                         weight="bold"
                         style={{
-                          color: "white",
-                          fontSize: 12,
+                          color: isSelected
+                            ? "white"
+                            : isPlanned
+                            ? colors.primary[500]
+                            : colors.text,
+                          fontSize: 17,
                         }}
                       >
-                        ✓
+                        {option.label}
                       </Typography>
                     </View>
-                  )}
-                </TouchableOpacity>
+
+                    {/* Content */}
+                    <View style={{ flex: 1 }}>
+                      <Typography
+                        variant="body1"
+                        weight="semibold"
+                        style={{
+                          color: isSelected ? option.color : colors.text,
+                          marginBottom: 2,
+                        }}
+                      >
+                        {t[option.description as keyof typeof t][lang]}
+                      </Typography>
+
+                      {mode === "workout" && isPlanned && (
+                        <Typography
+                          variant="caption"
+                          style={{
+                            color: colors.primary[500] as string,
+                            fontSize: 11,
+                            fontWeight: "600",
+                          }}
+                        >
+                          {t.plannedIntensity[lang]}
+                        </Typography>
+                      )}
+                    </View>
+
+                    {/* Selection Indicator */}
+                    {isSelected && (
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          backgroundColor: option.color,
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          weight="bold"
+                          style={{
+                            color: "white",
+                            fontSize: 12,
+                          }}
+                        >
+                          ✓
+                        </Typography>
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                </Animated.View>
               );
             })}
           </View>
@@ -304,27 +369,11 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
             style={{
               flexDirection: "row",
               gap: 12,
-              paddingTop: 20,
-              borderTopWidth: 1,
-              borderTopColor: colors.border + "30",
+              paddingTop: 24,
+              paddingHorizontal: 20,
+              marginTop: 8,
             }}
           >
-            <TouchableOpacity
-              onPress={handleDismiss}
-              style={{
-                flex: 1,
-                paddingVertical: 16,
-                borderRadius: 12,
-                backgroundColor: colors.border + "20",
-                alignItems: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Typography variant="body1" weight="semibold" color="textMuted">
-                {t.cancel[lang]}
-              </Typography>
-            </TouchableOpacity>
-
             {/* Clear Button - Only in form mode */}
             {mode === "form" && (
               <TouchableOpacity
@@ -335,10 +384,12 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 style={{
                   flex: 1,
                   paddingVertical: 16,
-                  borderRadius: 12,
-                  backgroundColor: "#fee2e2",
+                  borderRadius: 14,
+                  backgroundColor: isDark
+                    ? "rgba(239, 68, 68, 0.15)"
+                    : "#fee2e2",
                   borderWidth: 1,
-                  borderColor: "#fecaca",
+                  borderColor: isDark ? "rgba(239, 68, 68, 0.3)" : "#fecaca",
                   alignItems: "center",
                 }}
                 activeOpacity={0.7}
@@ -346,7 +397,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 <Typography
                   variant="body1"
                   weight="semibold"
-                  style={{ color: "#dc2626" }}
+                  style={{ color: "#ef4444" }}
                 >
                   {t.clear[lang]}
                 </Typography>
@@ -361,13 +412,15 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
                 }
               }}
               style={{
-                flex: 2,
+                flex: mode === "form" ? 1 : 2,
                 paddingVertical: 16,
-                borderRadius: 12,
+                borderRadius: 14,
                 backgroundColor: selectedRPE
                   ? RPE_OPTIONS.find((o) => o.value === selectedRPE)?.color ||
                     colors.primary[500]
-                  : colors.border + "40",
+                  : isDark
+                  ? "rgba(255, 255, 255, 0.1)"
+                  : "rgba(0, 0, 0, 0.1)",
                 alignItems: "center",
                 opacity: selectedRPE ? 1 : 0.5,
               }}

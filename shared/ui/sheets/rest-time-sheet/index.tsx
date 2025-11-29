@@ -7,9 +7,16 @@ import {
   BottomSheetModal,
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
-import { Minus, Plus, Timer } from "lucide-react-native";
+import { BlurView } from "expo-blur";
+import { Check, Minus, Plus, Timer, X } from "lucide-react-native";
 import React, { forwardRef, useCallback, useState } from "react";
-import { ScrollView, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { Typography } from "../../typography";
 
 type Props = {
@@ -19,7 +26,7 @@ type Props = {
 
 export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ currentRestTime, onSelectRestTime }, ref) => {
-    const { colors } = useColorScheme();
+    const { colors, isDarkMode } = useColorScheme();
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = routineFormTranslations;
@@ -32,37 +39,36 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
     // Predefined rest time options (in seconds)
     const quickOptions = [
       { label: t.noRest[lang], value: 0 },
-      { label: "30 seg", value: 30 },
-      { label: "45 seg", value: 45 },
-      { label: "1 min", value: 60 },
-      { label: "1:30 min", value: 90 },
-      { label: "2 min", value: 120 },
-      { label: "2:30 min", value: 150 },
-      { label: "3 min", value: 180 },
-      { label: "4 min", value: 240 },
-      { label: "5 min", value: 300 },
+      { label: "30s", value: 30 },
+      { label: "45s", value: 45 },
+      { label: "1:00", value: 60 },
+      { label: "1:30", value: 90 },
+      { label: "2:00", value: 120 },
+      { label: "2:30", value: 150 },
+      { label: "3:00", value: 180 },
+      { label: "4:00", value: 240 },
+      { label: "5:00", value: 300 },
     ];
 
     const formatTime = (seconds: number) => {
-      if (seconds === 0) return "Sin descanso";
+      if (seconds === 0) return lang === "es" ? "Sin descanso" : "No rest";
       if (seconds < 60) return `${seconds}s`;
       const mins = Math.floor(seconds / 60);
       const secs = seconds % 60;
       return secs > 0
-        ? `${mins}:${secs.toString().padStart(2, "0")} min`
-        : `${mins} min`;
+        ? `${mins}:${secs.toString().padStart(2, "0")}`
+        : `${mins}:00`;
     };
 
     const handleIncrease = () => {
-      const newTime = showSelectedTime + 5; // Increment by 5 seconds
+      const newTime = showSelectedTime + 5;
       if (newTime <= 600) {
-        // Max 10 minutes
         setSelectedTime(newTime);
       }
     };
 
     const handleDecrease = () => {
-      const newTime = showSelectedTime - 5; // Decrement by 5 seconds
+      const newTime = showSelectedTime - 5;
       if (newTime >= 0) {
         setSelectedTime(newTime);
       }
@@ -73,6 +79,12 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
       setSelectedTime(null);
     };
 
+    const handleDismiss = useCallback(() => {
+      if (ref && "current" in ref && ref.current) {
+        ref.current.dismiss();
+      }
+    }, [ref]);
+
     const renderBackdrop = useCallback(
       (props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop
@@ -80,6 +92,7 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
           appearsOnIndex={0}
           disappearsOnIndex={-1}
           pressBehavior="close"
+          style={[props.style, { backgroundColor: "rgba(0,0,0,0.6)" }]}
         />
       ),
       []
@@ -88,173 +101,283 @@ export const RestTimeBottomSheet = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={["60%"]}
+        snapPoints={["65%"]}
         enablePanDownToClose
         backgroundStyle={{
-          backgroundColor: colors.surface,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: -4,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 8, // Para Android
+          backgroundColor: isDarkMode
+            ? "rgba(20, 20, 25, 0.95)"
+            : "rgba(255, 255, 255, 0.98)",
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
         }}
-        handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        handleIndicatorStyle={{
+          backgroundColor: isDarkMode
+            ? "rgba(255,255,255,0.2)"
+            : "rgba(0,0,0,0.15)",
+          width: 40,
+          height: 4,
+        }}
         backdropComponent={renderBackdrop}
       >
-        <BottomSheetView style={{ padding: 16, paddingBottom: 40 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginBottom: 24,
-            }}
-          >
-            <Timer size={20} color={colors.primary[500]} />
-            <Typography
-              variant="h3"
-              weight="semibold"
-              style={{ marginLeft: 8 }}
-            >
-              {t.restTime[lang]}
-            </Typography>
-          </View>
+        <BottomSheetView style={styles.container}>
+          {Platform.OS === "ios" && (
+            <BlurView
+              intensity={isDarkMode ? 40 : 60}
+              tint={isDarkMode ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
 
-          {/* Custom Time Selector */}
-          <View style={{ marginBottom: 24 }}>
-            <Typography
-              variant="body2"
-              color="textMuted"
-              style={{ marginBottom: 12 }}
-            >
-              {t.customTime[lang]}
-            </Typography>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: colors.background,
-                borderRadius: 12,
-                padding: 16,
-                borderWidth: 2,
-                borderColor: colors.primary[500] + "30",
-              }}
-            >
-              <TouchableOpacity
-                onPress={handleDecrease}
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: colors.primary[500],
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Minus size={20} color="white" />
-              </TouchableOpacity>
-
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerInfo}>
               <View
-                style={{ flex: 1, alignItems: "center", marginHorizontal: 24 }}
+                style={[
+                  styles.headerIcon,
+                  { backgroundColor: `${colors.primary[500]}20` },
+                ]}
               >
+                <Timer size={22} color={colors.primary[500]} />
+              </View>
+              <View style={styles.headerText}>
+                <Typography variant="h4" weight="bold">
+                  {t.restTime[lang]}
+                </Typography>
                 <Typography
-                  variant="h2"
-                  weight="bold"
-                  style={{ color: colors.primary[500] }}
+                  variant="caption"
+                  color="textMuted"
+                  style={{ marginTop: 4 }}
                 >
-                  {formatTime(showSelectedTime)}
+                  {t.customTime[lang]}
                 </Typography>
               </View>
-
-              <TouchableOpacity
-                onPress={handleIncrease}
-                style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 22,
-                  backgroundColor: colors.primary[500],
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Plus size={20} color="white" />
-              </TouchableOpacity>
             </View>
+            <Pressable
+              onPress={handleDismiss}
+              style={({ pressed }) => [
+                styles.closeButton,
+                {
+                  backgroundColor: isDarkMode
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.05)",
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <X size={20} color={colors.textMuted} />
+            </Pressable>
+          </View>
+
+          {/* Time Display */}
+          <View
+            style={[
+              styles.timeDisplay,
+              {
+                backgroundColor: isDarkMode
+                  ? "rgba(255,255,255,0.04)"
+                  : "rgba(0,0,0,0.02)",
+                borderColor: `${colors.primary[500]}30`,
+              },
+            ]}
+          >
+            <Pressable
+              onPress={handleDecrease}
+              style={({ pressed }) => [
+                styles.timeButton,
+                {
+                  backgroundColor: colors.primary[500],
+                  opacity: pressed ? 0.8 : 1,
+                  transform: [{ scale: pressed ? 0.95 : 1 }],
+                },
+              ]}
+            >
+              <Minus size={22} color="#fff" strokeWidth={2.5} />
+            </Pressable>
+
+            <View style={styles.timeValue}>
+              <Typography
+                variant="h1"
+                weight="bold"
+                style={{ color: colors.primary[500], fontSize: 48 }}
+              >
+                {formatTime(showSelectedTime)}
+              </Typography>
+            </View>
+
+            <Pressable
+              onPress={handleIncrease}
+              style={({ pressed }) => [
+                styles.timeButton,
+                {
+                  backgroundColor: colors.primary[500],
+                  opacity: pressed ? 0.8 : 1,
+                  transform: [{ scale: pressed ? 0.95 : 1 }],
+                },
+              ]}
+            >
+              <Plus size={22} color="#fff" strokeWidth={2.5} />
+            </Pressable>
           </View>
 
           {/* Quick Options */}
           <Typography
-            variant="body2"
+            variant="caption"
             color="textMuted"
-            style={{ marginBottom: 12 }}
+            style={{ marginLeft: 20, marginBottom: 12 }}
           >
-            Opciones rápidas
+            {lang === "es" ? "Opciones rápidas" : "Quick options"}
           </Typography>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={{ marginBottom: 24 }}
-            contentContainerStyle={{ paddingHorizontal: 4 }}
+            style={styles.quickScroll}
+            contentContainerStyle={styles.quickContent}
           >
-            {quickOptions.map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                onPress={() => setSelectedTime(option.value)}
-                style={{
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  marginRight: 8,
-                  borderRadius: 20,
-                  backgroundColor:
-                    selectedTime === option.value
-                      ? colors.primary[500]
-                      : colors.border + "40",
-                  borderWidth: 1,
-                  borderColor:
-                    selectedTime === option.value
-                      ? colors.primary[500]
-                      : colors.border,
-                }}
-              >
-                <Typography
-                  variant="caption"
-                  weight="medium"
-                  style={{
-                    color:
-                      selectedTime === option.value ? "white" : colors.text,
-                  }}
+            {quickOptions.map((option) => {
+              const isSelected = showSelectedTime === option.value;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => setSelectedTime(option.value)}
+                  style={({ pressed }) => [
+                    styles.quickOption,
+                    {
+                      backgroundColor: isSelected
+                        ? colors.primary[500]
+                        : isDarkMode
+                        ? "rgba(255,255,255,0.06)"
+                        : "rgba(0,0,0,0.04)",
+                      borderColor: isSelected
+                        ? colors.primary[500]
+                        : isDarkMode
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.08)",
+                      opacity: pressed ? 0.8 : 1,
+                      transform: [{ scale: pressed ? 0.95 : 1 }],
+                    },
+                  ]}
                 >
-                  {option.label}
-                </Typography>
-              </TouchableOpacity>
-            ))}
+                  <Typography
+                    variant="body2"
+                    weight={isSelected ? "bold" : "medium"}
+                    style={{ color: isSelected ? "#fff" : colors.text }}
+                  >
+                    {option.label}
+                  </Typography>
+                </Pressable>
+              );
+            })}
           </ScrollView>
 
           {/* Save Button */}
-          <TouchableOpacity
-            onPress={handleSave}
-            style={{
-              backgroundColor: colors.primary[500],
-              paddingVertical: 16,
-              borderRadius: 12,
-              alignItems: "center",
-            }}
-          >
-            <Typography
-              variant="body1"
-              weight="semibold"
-              style={{ color: "white" }}
+          <View style={styles.footer}>
+            <Pressable
+              onPress={handleSave}
+              style={({ pressed }) => [
+                styles.saveButton,
+                {
+                  backgroundColor: colors.primary[500],
+                  opacity: pressed ? 0.9 : 1,
+                  transform: [{ scale: pressed ? 0.98 : 1 }],
+                },
+              ]}
             >
-              Aplicar Tiempo
-            </Typography>
-          </TouchableOpacity>
+              <Check size={20} color="#fff" strokeWidth={2.5} />
+              <Typography
+                variant="body1"
+                weight="semibold"
+                style={{ color: "#fff", marginLeft: 8 }}
+              >
+                {lang === "es" ? "Aplicar" : "Apply"}
+              </Typography>
+            </Pressable>
+          </View>
         </BottomSheetView>
       </BottomSheetModal>
     );
   }
 );
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 24,
+  },
+  headerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerText: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  timeDisplay: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginHorizontal: 20,
+    marginBottom: 24,
+    padding: 20,
+    borderRadius: 20,
+    borderWidth: 2,
+  },
+  timeButton: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  timeValue: {
+    flex: 1,
+    alignItems: "center",
+  },
+  quickScroll: {
+    marginBottom: 24,
+  },
+  quickContent: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  quickOption: {
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  footer: {
+    paddingHorizontal: 20,
+    paddingBottom: 34,
+  },
+  saveButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    borderRadius: 16,
+  },
+});
 
 RestTimeBottomSheet.displayName = "RestTimeBottomSheet";

@@ -8,9 +8,9 @@ import Animated, {
   SlideOutLeft,
   SlideOutRight,
 } from "react-native-reanimated";
+import { useWorkouts } from "../workouts-v2/hooks/use-workouts";
 import { Header } from "./elements/header";
 import { RoutineOptionsBottomSheet } from "./elements/routine-options-sheet";
-import { useWorkouts } from "./hooks/use-workouts";
 import { FolderDetailView } from "./views/folder-detail-view";
 import { MainWorkoutsView } from "./views/main-workouts-view";
 

@@ -5,7 +5,7 @@ import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
 import React, { useMemo } from "react";
 import { View } from "react-native";
-import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store";
+import { useWorkoutsMetricsStore } from "../../../workouts-v2/hooks/use-workouts-metrics-store";
 import { ExpandableCreateButton } from "./expandable-create-button";
 
 /**

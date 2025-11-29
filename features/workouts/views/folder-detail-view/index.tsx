@@ -1,11 +1,11 @@
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import React, { useEffect } from "react";
+import { useFolderDetailData } from "../../../workouts-v2/hooks/use-folder-detail-data";
+import { useWorkoutsMetricsStore } from "../../../workouts-v2/hooks/use-workouts-metrics-store";
 import { FoldersBody } from "../../elements/folders-view";
 import { MoveRoutineModal } from "../../elements/move-routine-modal";
 import { RoutineList } from "../../elements/routine-list";
-import { useFolderDetailData } from "../../hooks/use-folder-detail-data";
-import { useWorkoutsMetricsStore } from "../../hooks/use-workouts-metrics-store";
 
 type Props = {
   selectedFolder: BaseFolder;

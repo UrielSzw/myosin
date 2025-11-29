@@ -10,7 +10,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Folder, FolderMinus, X } from "lucide-react-native";
 import React from "react";
 import { Modal, ScrollView, TouchableOpacity, View } from "react-native";
-import { routinesService } from "../../service/routines";
+import { routinesService } from "../../../workouts-v2/service/routines";
 
 type Props = {
   visible: boolean;

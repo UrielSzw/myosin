@@ -1,5 +1,5 @@
 import { BaseExercise } from "@/shared/db/schema";
-import { ExerciseSelectorModal } from "@/shared/ui/exercise-selector-modal";
+import { ExerciseSelectorModalV2 } from "@/shared/ui/exercise-selector-modal-v2";
 import React from "react";
 import { IToogleSheet } from "../../hooks/use-form-routine-sheets";
 import {
@@ -50,7 +50,7 @@ export const ExerciseModal: React.FC<Props> = ({ onToggleSheet }) => {
   };
 
   return (
-    <ExerciseSelectorModal
+    <ExerciseSelectorModalV2
       visible={isExerciseModalOpen}
       onClose={handleCloseModal}
       onAddAsIndividual={handleAddAsIndividual}

@@ -8,9 +8,10 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
-import { InfoIcon } from "lucide-react-native";
+import { BlurView } from "expo-blur";
+import { Check, ChevronRight, Layers, Trash2, X } from "lucide-react-native";
 import React, { forwardRef, useCallback, useState } from "react";
-import { TouchableOpacity, View } from "react-native";
+import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   Easing,
   SlideInLeft,
@@ -29,12 +30,11 @@ type Props = {
 
 export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
   ({ onSelectSetType, onDeleteSet, currentSetType }, ref) => {
-    const { colors } = useColorScheme();
+    const { colors, isDarkMode } = useColorScheme();
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = setTypeTranslations;
 
-    // Estados para la navegación
     const [viewMode, setViewMode] = useState<"selection" | "info">("selection");
     const [selectedInfoType, setSelectedInfoType] = useState<ISetType | null>(
       null
@@ -53,25 +53,26 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
       { type: "isometric" as const, label: "isometric" },
     ];
 
-    // Función para mostrar información
     const handleShowInfo = (setType: ISetType, event: any) => {
-      event.stopPropagation(); // Evitar que se seleccione el tipo
+      event.stopPropagation();
       setSelectedInfoType(setType);
       setViewMode("info");
     };
 
-    // Función para volver a la selección
     const handleBackToSelection = () => {
       setViewMode("selection");
     };
 
-    // Función para seleccionar desde la vista de info
     const handleSelectFromInfo = (setType: ISetType) => {
       onSelectSetType(setType);
-      // El sheet se cerrará automáticamente por el componente padre
     };
 
-    // Configuración de animaciones
+    const handleDismiss = useCallback(() => {
+      if (ref && "current" in ref && ref.current) {
+        ref.current.dismiss();
+      }
+    }, [ref]);
+
     const slideInFromRight = SlideInRight.duration(300).easing(
       Easing.bezier(0.25, 0.1, 0.25, 1)
     );
@@ -92,6 +93,7 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
           appearsOnIndex={0}
           disappearsOnIndex={-1}
           pressBehavior="close"
+          style={[props.style, { backgroundColor: "rgba(0,0,0,0.6)" }]}
         />
       ),
       []
@@ -100,94 +102,194 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={viewMode === "selection" ? ["50%"] : ["75%"]}
+        snapPoints={viewMode === "selection" ? ["60%"] : ["80%"]}
         enablePanDownToClose
         onDismiss={handleBackToSelection}
         backgroundStyle={{
-          backgroundColor: colors.surface,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: -4,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 8,
+          backgroundColor: isDarkMode
+            ? "rgba(20, 20, 25, 0.95)"
+            : "rgba(255, 255, 255, 0.98)",
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
         }}
-        handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        handleIndicatorStyle={{
+          backgroundColor: isDarkMode
+            ? "rgba(255,255,255,0.2)"
+            : "rgba(0,0,0,0.15)",
+          width: 40,
+          height: 4,
+        }}
         backdropComponent={renderBackdrop}
       >
-        <BottomSheetScrollView
-          style={{ padding: 16, paddingBottom: 60, flex: 1 }}
-        >
+        <BottomSheetScrollView style={styles.container}>
+          {Platform.OS === "ios" && (
+            <BlurView
+              intensity={isDarkMode ? 40 : 60}
+              tint={isDarkMode ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
+            />
+          )}
+
           {viewMode === "selection" ? (
             <Animated.View
               key="selection-view"
               entering={slideInFromLeft}
               exiting={slideOutToLeft}
-              style={{ flex: 1 }}
             >
-              <Typography
-                variant="h3"
-                weight="semibold"
-                style={{ marginBottom: 16 }}
-              >
-                Tipo de Serie
-              </Typography>
-
-              {setTypes.map((option) => (
-                <TouchableOpacity
-                  key={option.type}
-                  onPress={() => onSelectSetType(option.type)}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    paddingVertical: 16,
-                    paddingHorizontal: 16,
-                    borderBottomWidth: 1,
-                    borderBottomColor: colors.border,
-                    backgroundColor:
-                      currentSetType === option.type
-                        ? colors.primary[500] + "20"
-                        : "transparent",
-                  }}
-                >
-                  <Typography variant="body1">
-                    {t.types[option.label as keyof typeof t.types].label[lang]}
-                  </Typography>
-
-                  <TouchableOpacity
-                    onPress={(event) => handleShowInfo(option.type, event)}
-                    style={{
-                      padding: 4,
-                      borderRadius: 12,
-                      backgroundColor: colors.primary[500] + "20",
-                    }}
+              {/* Header */}
+              <View style={styles.header}>
+                <View style={styles.headerInfo}>
+                  <View
+                    style={[
+                      styles.headerIcon,
+                      { backgroundColor: `${colors.primary[500]}20` },
+                    ]}
                   >
-                    <InfoIcon size={16} color={colors.primary[500]} />
-                  </TouchableOpacity>
-                </TouchableOpacity>
-              ))}
-
-              <TouchableOpacity
-                onPress={onDeleteSet}
-                style={{ paddingVertical: 16, paddingHorizontal: 16 }}
-              >
-                <Typography
-                  variant="body1"
-                  style={{ color: colors.error[500] }}
+                    <Layers size={22} color={colors.primary[500]} />
+                  </View>
+                  <View style={styles.headerText}>
+                    <Typography variant="h4" weight="bold">
+                      {lang === "es" ? "Tipo de Serie" : "Set Type"}
+                    </Typography>
+                    <Typography
+                      variant="caption"
+                      color="textMuted"
+                      style={{ marginTop: 4 }}
+                    >
+                      {lang === "es"
+                        ? "Selecciona el método de entrenamiento"
+                        : "Select training method"}
+                    </Typography>
+                  </View>
+                </View>
+                <Pressable
+                  onPress={handleDismiss}
+                  style={({ pressed }) => [
+                    styles.closeButton,
+                    {
+                      backgroundColor: isDarkMode
+                        ? "rgba(255,255,255,0.1)"
+                        : "rgba(0,0,0,0.05)",
+                      opacity: pressed ? 0.7 : 1,
+                    },
+                  ]}
                 >
-                  {t.deleteSet[lang]}
-                </Typography>
-              </TouchableOpacity>
+                  <X size={20} color={colors.textMuted} />
+                </Pressable>
+              </View>
+
+              {/* Set Types Grid */}
+              <View style={styles.optionsContainer}>
+                {setTypes.map((option) => {
+                  const isSelected = currentSetType === option.type;
+                  return (
+                    <Pressable
+                      key={option.type}
+                      onPress={() => onSelectSetType(option.type)}
+                      style={({ pressed }) => [
+                        styles.optionCard,
+                        {
+                          backgroundColor: isSelected
+                            ? `${colors.primary[500]}15`
+                            : isDarkMode
+                            ? "rgba(255,255,255,0.04)"
+                            : "rgba(0,0,0,0.02)",
+                          borderColor: isSelected
+                            ? colors.primary[500]
+                            : isDarkMode
+                            ? "rgba(255,255,255,0.08)"
+                            : "rgba(0,0,0,0.06)",
+                          opacity: pressed ? 0.7 : 1,
+                          transform: [{ scale: pressed ? 0.98 : 1 }],
+                        },
+                      ]}
+                    >
+                      <View style={styles.optionContent}>
+                        {isSelected && (
+                          <View
+                            style={[
+                              styles.checkIcon,
+                              { backgroundColor: colors.primary[500] },
+                            ]}
+                          >
+                            <Check size={12} color="#fff" strokeWidth={3} />
+                          </View>
+                        )}
+                        <Typography
+                          variant="body1"
+                          weight={isSelected ? "semibold" : "medium"}
+                          style={{
+                            color: isSelected
+                              ? colors.primary[500]
+                              : colors.text,
+                            flex: 1,
+                          }}
+                        >
+                          {
+                            t.types[option.label as keyof typeof t.types].label[
+                              lang
+                            ]
+                          }
+                        </Typography>
+                      </View>
+                      <Pressable
+                        onPress={(event) => handleShowInfo(option.type, event)}
+                        hitSlop={8}
+                        style={({ pressed }) => [
+                          styles.infoButton,
+                          {
+                            backgroundColor: isDarkMode
+                              ? "rgba(255,255,255,0.08)"
+                              : "rgba(0,0,0,0.05)",
+                            opacity: pressed ? 0.6 : 1,
+                          },
+                        ]}
+                      >
+                        <ChevronRight size={16} color={colors.textMuted} />
+                      </Pressable>
+                    </Pressable>
+                  );
+                })}
+
+                {/* Delete Option */}
+                <Pressable
+                  onPress={onDeleteSet}
+                  style={({ pressed }) => [
+                    styles.optionCard,
+                    styles.deleteCard,
+                    {
+                      backgroundColor: `${colors.error[500]}10`,
+                      borderColor: `${colors.error[500]}30`,
+                      opacity: pressed ? 0.7 : 1,
+                      transform: [{ scale: pressed ? 0.98 : 1 }],
+                    },
+                  ]}
+                >
+                  <View style={styles.optionContent}>
+                    <View
+                      style={[
+                        styles.deleteIcon,
+                        { backgroundColor: `${colors.error[500]}20` },
+                      ]}
+                    >
+                      <Trash2 size={18} color={colors.error[500]} />
+                    </View>
+                    <Typography
+                      variant="body1"
+                      weight="medium"
+                      style={{ color: colors.error[500] }}
+                    >
+                      {t.deleteSet[lang]}
+                    </Typography>
+                  </View>
+                </Pressable>
+              </View>
             </Animated.View>
           ) : (
             <Animated.View
               key="info-view"
               entering={slideInFromRight}
               exiting={slideOutToRight}
-              style={{ flex: 1 }}
             >
               <SetTypeDetail
                 setType={selectedInfoType!}
@@ -197,11 +299,90 @@ export const SetTypeBottomSheet = forwardRef<BottomSheetModal, Props>(
             </Animated.View>
           )}
 
-          <View style={{ height: 100 }} />
+          <View style={{ height: 50 }} />
         </BottomSheetScrollView>
       </BottomSheetModal>
     );
   }
 );
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 20,
+  },
+  headerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerText: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  optionsContainer: {
+    paddingHorizontal: 16,
+    gap: 8,
+  },
+  optionCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 14,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  optionContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+    gap: 10,
+  },
+  checkIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  infoButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  deleteCard: {
+    marginTop: 12,
+  },
+  deleteIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});
 
 SetTypeBottomSheet.displayName = "SetTypeBottomSheet";

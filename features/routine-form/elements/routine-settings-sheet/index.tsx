@@ -8,8 +8,10 @@ import {
   BottomSheetModal,
   BottomSheetScrollView,
 } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
+import { Settings, X } from "lucide-react-native";
 import React, { forwardRef, useCallback, useState } from "react";
-import { StyleSheet, Switch, View } from "react-native";
+import { Platform, Pressable, StyleSheet, Switch, View } from "react-native";
 import {
   useMainActions,
   useRoutineFormState,
@@ -18,7 +20,7 @@ import {
 export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
   // eslint-disable-next-line no-empty-pattern
   ({}, ref) => {
-    const { colors } = useColorScheme();
+    const { colors, isDarkMode } = useColorScheme();
     const prefs = useUserPreferences();
     const lang = prefs?.language ?? "es";
     const t = routineSettingsTranslations;
@@ -31,7 +33,6 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
     const renderShowRpe = showRpe ?? routine?.show_rpe ?? false;
     const renderShowTempo = showTempo ?? routine?.show_tempo ?? false;
 
-    // Apply changes immediately when switch values change
     const handleRpeChange = useCallback(
       (value: boolean) => {
         setShowRpe(value);
@@ -48,6 +49,12 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
       [setRoutineFlags, renderShowRpe]
     );
 
+    const handleDismiss = useCallback(() => {
+      if (ref && "current" in ref && ref.current) {
+        ref.current.dismiss();
+      }
+    }, [ref]);
+
     const renderBackdrop = useCallback(
       (props: BottomSheetBackdropProps) => (
         <BottomSheetBackdrop
@@ -55,6 +62,7 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
           appearsOnIndex={0}
           disappearsOnIndex={-1}
           pressBehavior="close"
+          style={[props.style, { backgroundColor: "rgba(0,0,0,0.6)" }]}
         />
       ),
       []
@@ -63,68 +71,165 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={["50%", "90%"]}
+        snapPoints={["45%"]}
         backgroundStyle={{
-          backgroundColor: colors.surface,
-          shadowColor: "#000",
-          shadowOffset: {
-            width: 0,
-            height: -4,
-          },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 8, // Para Android
+          backgroundColor: isDarkMode
+            ? "rgba(20, 20, 25, 0.95)"
+            : "rgba(255, 255, 255, 0.98)",
+          borderTopLeftRadius: 28,
+          borderTopRightRadius: 28,
         }}
-        handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        handleIndicatorStyle={{
+          backgroundColor: isDarkMode
+            ? "rgba(255,255,255,0.2)"
+            : "rgba(0,0,0,0.15)",
+          width: 40,
+          height: 4,
+        }}
         enablePanDownToClose
         backdropComponent={renderBackdrop}
       >
-        <BottomSheetScrollView contentContainerStyle={{ padding: 16 }}>
-          <Typography
-            variant="h6"
-            weight="semibold"
-            style={{ marginBottom: 12 }}
-          >
-            {t.title[lang]}
-          </Typography>
-
-          <View style={styles.row}>
-            <View style={styles.rowLeft}>
-              <Typography variant="body1">{t.showRpe[lang]}</Typography>
-              <Typography variant="caption" color="textMuted">
-                {t.rpeDescription[lang]}
-              </Typography>
-            </View>
-            <Switch
-              value={renderShowRpe}
-              onValueChange={handleRpeChange}
-              accessibilityLabel={t.showRpe[lang]}
-              trackColor={{
-                false: colors.gray[300],
-                true: colors.primary[500],
-              }}
-              thumbColor="#ffffff"
+        <BottomSheetScrollView style={styles.container}>
+          {Platform.OS === "ios" && (
+            <BlurView
+              intensity={isDarkMode ? 40 : 60}
+              tint={isDarkMode ? "dark" : "light"}
+              style={StyleSheet.absoluteFill}
             />
+          )}
+
+          {/* Header */}
+          <View style={styles.header}>
+            <View style={styles.headerInfo}>
+              <View
+                style={[
+                  styles.headerIcon,
+                  { backgroundColor: `${colors.primary[500]}20` },
+                ]}
+              >
+                <Settings size={22} color={colors.primary[500]} />
+              </View>
+              <View style={styles.headerText}>
+                <Typography variant="h4" weight="bold">
+                  {t.title[lang]}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="textMuted"
+                  style={{ marginTop: 4 }}
+                >
+                  {lang === "es"
+                    ? "Opciones avanzadas de la rutina"
+                    : "Advanced routine options"}
+                </Typography>
+              </View>
+            </View>
+            <Pressable
+              onPress={handleDismiss}
+              style={({ pressed }) => [
+                styles.closeButton,
+                {
+                  backgroundColor: isDarkMode
+                    ? "rgba(255,255,255,0.1)"
+                    : "rgba(0,0,0,0.05)",
+                  opacity: pressed ? 0.7 : 1,
+                },
+              ]}
+            >
+              <X size={20} color={colors.textMuted} />
+            </Pressable>
           </View>
 
-          <View style={styles.row}>
-            <View style={styles.rowLeft}>
-              <Typography variant="body1">{t.showTempo[lang]}</Typography>
-              <Typography variant="caption" color="textMuted">
-                {t.tempoDescription[lang]}
-              </Typography>
+          {/* Settings Cards */}
+          <View style={styles.settingsContainer}>
+            {/* RPE Setting */}
+            <View
+              style={[
+                styles.settingCard,
+                {
+                  backgroundColor: isDarkMode
+                    ? "rgba(255,255,255,0.04)"
+                    : "rgba(0,0,0,0.02)",
+                  borderColor: isDarkMode
+                    ? "rgba(255,255,255,0.08)"
+                    : "rgba(0,0,0,0.06)",
+                },
+              ]}
+            >
+              <View style={styles.settingInfo}>
+                <Typography variant="body1" weight="medium">
+                  {t.showRpe[lang]}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="textMuted"
+                  style={{ marginTop: 4 }}
+                >
+                  {t.rpeDescription[lang]}
+                </Typography>
+              </View>
+              <Switch
+                value={renderShowRpe}
+                onValueChange={handleRpeChange}
+                accessibilityLabel={t.showRpe[lang]}
+                trackColor={{
+                  false: isDarkMode
+                    ? "rgba(255,255,255,0.15)"
+                    : "rgba(0,0,0,0.1)",
+                  true: colors.primary[500],
+                }}
+                thumbColor="#ffffff"
+                ios_backgroundColor={
+                  isDarkMode ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)"
+                }
+              />
             </View>
-            <Switch
-              value={renderShowTempo}
-              onValueChange={handleTempoChange}
-              accessibilityLabel={t.showTempo[lang]}
-              trackColor={{
-                false: colors.gray[300],
-                true: colors.primary[500],
-              }}
-              thumbColor="#ffffff"
-            />
+
+            {/* Tempo Setting */}
+            <View
+              style={[
+                styles.settingCard,
+                {
+                  backgroundColor: isDarkMode
+                    ? "rgba(255,255,255,0.04)"
+                    : "rgba(0,0,0,0.02)",
+                  borderColor: isDarkMode
+                    ? "rgba(255,255,255,0.08)"
+                    : "rgba(0,0,0,0.06)",
+                },
+              ]}
+            >
+              <View style={styles.settingInfo}>
+                <Typography variant="body1" weight="medium">
+                  {t.showTempo[lang]}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  color="textMuted"
+                  style={{ marginTop: 4 }}
+                >
+                  {t.tempoDescription[lang]}
+                </Typography>
+              </View>
+              <Switch
+                value={renderShowTempo}
+                onValueChange={handleTempoChange}
+                accessibilityLabel={t.showTempo[lang]}
+                trackColor={{
+                  false: isDarkMode
+                    ? "rgba(255,255,255,0.15)"
+                    : "rgba(0,0,0,0.1)",
+                  true: colors.primary[500],
+                }}
+                thumbColor="#ffffff"
+                ios_backgroundColor={
+                  isDarkMode ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.1)"
+                }
+              />
+            </View>
           </View>
+
+          <View style={{ height: 34 }} />
         </BottomSheetScrollView>
       </BottomSheetModal>
     );
@@ -132,15 +237,56 @@ export const RoutineSettingsBottomSheet = forwardRef<BottomSheetModal>(
 );
 
 const styles = StyleSheet.create({
-  row: {
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 20,
+  },
+  headerInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 1,
+  },
+  headerIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  headerText: {
+    flex: 1,
+    marginLeft: 14,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  settingsContainer: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  settingCard: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0,0,0,0.04)",
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 1,
   },
-  rowLeft: { flex: 1, paddingRight: 12 },
+  settingInfo: {
+    flex: 1,
+    paddingRight: 16,
+  },
 });
 
 RoutineSettingsBottomSheet.displayName = "RoutineSettingsBottomSheet";

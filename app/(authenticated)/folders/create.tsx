@@ -1,5 +1,5 @@
-import { FolderFormFeature } from "@/features/folder-form";
-import { useFolderFormStore } from "@/features/folder-form/hooks/use-folder-form-store";
+import { FolderFormV2 } from "@/features/folder-form-v2";
+import { useFolderFormStore } from "@/features/folder-form-v2/hooks/use-folder-form-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useCallback } from "react";
 
@@ -14,5 +14,5 @@ export default function CreateFolderScreen() {
     }, [resetForm])
   );
 
-  return <FolderFormFeature isEditMode={false} />;
+  return <FolderFormV2 isEditMode={false} />;
 }

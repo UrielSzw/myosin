@@ -1,7 +1,7 @@
+import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
-import { ScreenWrapper } from "@/shared/ui/screen-wrapper";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import React from "react";
 import { ScrollView, View } from "react-native";
@@ -47,7 +47,8 @@ export const RoutineFormFeature = () => {
 
   return (
     <BottomSheetModalProvider>
-      <ScreenWrapper withSheets fullscreen>
+      <View style={{ flex: 1 }}>
+        <AuroraBackground />
         <CreateRoutineHeader />
 
         <ScrollView
@@ -55,6 +56,7 @@ export const RoutineFormFeature = () => {
           accessible={true}
           accessibilityLabel={t.routineContent[lang]}
           contentInsetAdjustmentBehavior="automatic"
+          contentContainerStyle={{ paddingTop: 65 }}
         >
           <View
             style={{ flex: 1 }}
@@ -73,8 +75,7 @@ export const RoutineFormFeature = () => {
                 paddingTop: 20,
               }}
             >
-              {/* Decorative vertical rail limited to the top content (RoutineInfo + VolumePreview)
-                so it doesn't overlap the BlocksList below. Non-interactive. */}
+              {/* Decorative vertical rail */}
               <View
                 accessible={false}
                 importantForAccessibility="no"
@@ -136,7 +137,7 @@ export const RoutineFormFeature = () => {
           tempoSelectorBottomSheetRef={tempoSelectorBottomSheetRef}
           routineSettingsBottomSheetRef={routineSettingsBottomSheetRef}
         />
-      </ScreenWrapper>
+      </View>
     </BottomSheetModalProvider>
   );
 };

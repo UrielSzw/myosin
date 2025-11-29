@@ -1,4 +1,4 @@
-import { PRDetailFeature } from "@/features/pr-detail";
+import { PRDetailFeatureV2 } from "@/features/pr-detail-v2";
 import { useLocalSearchParams } from "expo-router";
 import React from "react";
 
@@ -9,5 +9,5 @@ export default function PRDetailScreen() {
     throw new Error("Exercise ID is required");
   }
 
-  return <PRDetailFeature exerciseId={exerciseId} />;
+  return <PRDetailFeatureV2 exerciseId={exerciseId} />;
 }

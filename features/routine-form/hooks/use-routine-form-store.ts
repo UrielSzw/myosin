@@ -15,7 +15,7 @@ import { ReorderExercise } from "@/shared/types/reorder";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { routinesService } from "../../workouts/service/routines";
+import { routinesService } from "../../workouts-v2/service/routines";
 import {
   convertBlockToIndividualBlocks,
   createExercises,

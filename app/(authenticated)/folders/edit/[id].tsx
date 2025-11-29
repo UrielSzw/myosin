@@ -1,5 +1,5 @@
-import { FolderFormFeature } from "@/features/folder-form";
-import { useFolderFormStore } from "@/features/folder-form/hooks/use-folder-form-store";
+import { FolderFormV2 } from "@/features/folder-form-v2";
+import { useFolderFormStore } from "@/features/folder-form-v2/hooks/use-folder-form-store";
 import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback } from "react";
@@ -20,5 +20,5 @@ export default function EditFolderScreen() {
     }, [id, initializeForm, resetForm])
   );
 
-  return <FolderFormFeature isEditMode={true} />;
+  return <FolderFormV2 isEditMode={true} />;
 }

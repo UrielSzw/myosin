@@ -10,8 +10,8 @@ import React, { useCallback, useEffect, useState } from "react";
 import { ScrollView, View } from "react-native";
 import { useSharedValue, withSpring } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useFolderForm } from "../folder-form-v2/hooks/use-folder-form";
 import { FolderInfoForm } from "./elements/folder-info-form";
-import { useFolderForm } from "./hooks/use-folder-form";
 
 type Props = {
   isEditMode?: boolean;

@@ -1,4 +1,4 @@
-import { WorkoutSummaryFeature } from "@/features/workout-summary";
+import { WorkoutSummaryV2 } from "@/features/workout-summary-v2";
 import { Stack } from "expo-router";
 
 export default function WorkoutSummaryScreen() {
@@ -10,7 +10,7 @@ export default function WorkoutSummaryScreen() {
           gestureEnabled: false,
         }}
       />
-      <WorkoutSummaryFeature />
+      <WorkoutSummaryV2 />
     </>
   );
 }

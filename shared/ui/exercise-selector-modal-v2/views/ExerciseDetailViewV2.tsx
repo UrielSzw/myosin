@@ -29,7 +29,6 @@ import {
   View,
 } from "react-native";
 import Animated, { FadeInDown, FadeInRight } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = {
   exercise: BaseExercise;
@@ -42,7 +41,6 @@ export const ExerciseDetailViewV2: React.FC<Props> = ({
 }) => {
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
-  const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
   const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = exerciseSelectorTranslations;

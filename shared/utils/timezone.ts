@@ -10,7 +10,10 @@ export const getUserTimezone = (): string => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (timezone) return timezone;
   } catch (error) {
-    console.warn("Intl.DateTimeFormat no disponible, usando expo-localization");
+    console.warn(
+      "Intl.DateTimeFormat no disponible, usando expo-localization",
+      error
+    );
   }
 
   // Fallback a expo-localization (API actualizada en versiones recientes)

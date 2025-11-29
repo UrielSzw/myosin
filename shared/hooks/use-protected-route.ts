@@ -1,5 +1,5 @@
-import { useAuth } from "@/shared/providers/auth-provider";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useAuth } from "@/shared/providers/auth-provider";
 import { useRouter, useSegments } from "expo-router";
 import { useEffect, useRef } from "react";
 
@@ -64,7 +64,9 @@ export function useProtectedRoute() {
     if (user && inOnboardingGroup) {
       // Si ya completó onboarding pero está en /onboarding, redirigir a app
       if (prefs?.onboarding_completed) {
-        console.log("✅ [Route Guard] Onboarding already done, redirecting to app");
+        console.log(
+          "✅ [Route Guard] Onboarding already done, redirecting to app"
+        );
         router.replace("/(authenticated)/(tabs)/");
       }
       return;
@@ -72,14 +74,18 @@ export function useProtectedRoute() {
 
     // Usuario NO autenticado pero en rutas protegidas → redirect a auth
     if (!user && inAuthenticatedGroup) {
-      console.log("🚫 [Route Guard] User not authenticated, redirecting to sign-in");
+      console.log(
+        "🚫 [Route Guard] User not authenticated, redirecting to sign-in"
+      );
       router.replace("/auth/sign-in");
       return;
     }
 
     // Usuario NO autenticado pero en onboarding → redirect a auth
     if (!user && inOnboardingGroup) {
-      console.log("🚫 [Route Guard] User not authenticated, redirecting to sign-in");
+      console.log(
+        "🚫 [Route Guard] User not authenticated, redirecting to sign-in"
+      );
       router.replace("/auth/sign-in");
       return;
     }

@@ -144,10 +144,6 @@ export const analyticsTranslations = {
     es: "Récords Personales",
     en: "Personal Records",
   },
-  viewAll: {
-    es: "Ver todos",
-    en: "View all",
-  },
   total: {
     es: "total",
     en: "total",

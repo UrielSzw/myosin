@@ -56,8 +56,14 @@ export const VictoryBadgeV2: React.FC<Props> = ({
 
   useEffect(() => {
     // Sequence the animations for dramatic reveal
-    outerScale.value = withDelay(100, withSpring(1, { damping: 10, stiffness: 80 }));
-    innerScale.value = withDelay(200, withSpring(1, { damping: 12, stiffness: 100 }));
+    outerScale.value = withDelay(
+      100,
+      withSpring(1, { damping: 10, stiffness: 80 })
+    );
+    innerScale.value = withDelay(
+      200,
+      withSpring(1, { damping: 12, stiffness: 100 })
+    );
     iconScale.value = withDelay(
       400,
       withSpring(1, { damping: 8, stiffness: 120 }, (finished) => {
@@ -75,8 +81,14 @@ export const VictoryBadgeV2: React.FC<Props> = ({
       600,
       withRepeat(
         withSequence(
-          withTiming(1.15, { duration: 1500, easing: Easing.inOut(Easing.quad) }),
-          withTiming(0.95, { duration: 1500, easing: Easing.inOut(Easing.quad) })
+          withTiming(1.15, {
+            duration: 1500,
+            easing: Easing.inOut(Easing.quad),
+          }),
+          withTiming(0.95, {
+            duration: 1500,
+            easing: Easing.inOut(Easing.quad),
+          })
         ),
         -1,
         true
@@ -87,7 +99,10 @@ export const VictoryBadgeV2: React.FC<Props> = ({
       800,
       withRepeat(
         withSequence(
-          withTiming(1.03, { duration: 2000, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1.03, {
+            duration: 2000,
+            easing: Easing.inOut(Easing.quad),
+          }),
           withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.quad) })
         ),
         -1,
@@ -164,7 +179,11 @@ export const VictoryBadgeV2: React.FC<Props> = ({
                 ry="50%"
               >
                 <Stop offset="0%" stopColor={successColor} stopOpacity="0.3" />
-                <Stop offset="100%" stopColor={successColor} stopOpacity="0.1" />
+                <Stop
+                  offset="100%"
+                  stopColor={successColor}
+                  stopOpacity="0.1"
+                />
               </RadialGradient>
             </Defs>
             {/* Background circle */}
@@ -217,7 +236,11 @@ export const VictoryBadgeV2: React.FC<Props> = ({
 
               {/* Success gradient overlay */}
               <LinearGradient
-                colors={[`${successColor}15`, `${successColor}08`, "transparent"]}
+                colors={[
+                  `${successColor}15`,
+                  `${successColor}08`,
+                  "transparent",
+                ]}
                 style={StyleSheet.absoluteFill}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}

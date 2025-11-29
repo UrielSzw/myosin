@@ -49,8 +49,14 @@ const ConfettiParticle = ({
       delay,
       withRepeat(
         withSequence(
-          withTiming(randomX, { duration: 500, easing: Easing.inOut(Easing.quad) }),
-          withTiming(-randomX * 0.7, { duration: 500, easing: Easing.inOut(Easing.quad) })
+          withTiming(randomX, {
+            duration: 500,
+            easing: Easing.inOut(Easing.quad),
+          }),
+          withTiming(-randomX * 0.7, {
+            duration: 500,
+            easing: Easing.inOut(Easing.quad),
+          })
         ),
         -1,
         true
@@ -189,7 +195,10 @@ const GlowingOrb = ({
       delay,
       withRepeat(
         withSequence(
-          withTiming(1.1, { duration: 2000, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1.1, {
+            duration: 2000,
+            easing: Easing.inOut(Easing.quad),
+          }),
           withTiming(0.8, { duration: 2000, easing: Easing.inOut(Easing.quad) })
         ),
         -1,
@@ -200,7 +209,10 @@ const GlowingOrb = ({
       delay,
       withRepeat(
         withSequence(
-          withTiming(0.6, { duration: 2000, easing: Easing.inOut(Easing.quad) }),
+          withTiming(0.6, {
+            duration: 2000,
+            easing: Easing.inOut(Easing.quad),
+          }),
           withTiming(0.3, { duration: 2000, easing: Easing.inOut(Easing.quad) })
         ),
         -1,
@@ -270,7 +282,8 @@ export const CelebrationBackground = () => {
       id: i,
       delay: Math.random() * 2000,
       startX: Math.random() * SCREEN_WIDTH,
-      color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
+      color:
+        CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
       size: 6 + Math.random() * 6,
     }));
   }, []);
@@ -305,9 +318,7 @@ export const CelebrationBackground = () => {
         <LinearGradient
           colors={[
             "transparent",
-            isDarkMode
-              ? "rgba(16, 185, 129, 0.06)"
-              : "rgba(16, 185, 129, 0.1)",
+            isDarkMode ? "rgba(16, 185, 129, 0.06)" : "rgba(16, 185, 129, 0.1)",
             isDarkMode
               ? "rgba(14, 165, 233, 0.04)"
               : "rgba(14, 165, 233, 0.08)",

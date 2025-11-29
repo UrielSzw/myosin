@@ -185,7 +185,11 @@ export const SessionMuscleDistributionV2: React.FC<Props> = ({
             <Typography variant="caption" color="textMuted">
               {lang === "es" ? "Total de sets" : "Total sets"}
             </Typography>
-            <Typography variant="body2" weight="bold" style={{ color: colors.text }}>
+            <Typography
+              variant="body2"
+              weight="bold"
+              style={{ color: colors.text }}
+            >
               {muscleGroups.reduce((sum, g) => sum + g.sets, 0)}
             </Typography>
           </View>

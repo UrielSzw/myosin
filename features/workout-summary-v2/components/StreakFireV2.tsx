@@ -46,8 +46,14 @@ const AnimatedFlame = ({
       delay + index * 80,
       withRepeat(
         withSequence(
-          withTiming(1, { duration: 300 + Math.random() * 200, easing: Easing.inOut(Easing.quad) }),
-          withTiming(0, { duration: 300 + Math.random() * 200, easing: Easing.inOut(Easing.quad) })
+          withTiming(1, {
+            duration: 300 + Math.random() * 200,
+            easing: Easing.inOut(Easing.quad),
+          }),
+          withTiming(0, {
+            duration: 300 + Math.random() * 200,
+            easing: Easing.inOut(Easing.quad),
+          })
         ),
         -1,
         true
@@ -147,7 +153,11 @@ export const StreakFireV2: React.FC<Props> = ({
 
         {/* Gradient overlay */}
         <LinearGradient
-          colors={["rgba(245, 158, 11, 0.1)", "transparent", "rgba(239, 68, 68, 0.05)"]}
+          colors={[
+            "rgba(245, 158, 11, 0.1)",
+            "transparent",
+            "rgba(239, 68, 68, 0.05)",
+          ]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -201,7 +211,9 @@ export const StreakFireV2: React.FC<Props> = ({
 
           {/* Right section - Text */}
           <View style={styles.textSection}>
-            <Animated.View entering={FadeInDown.delay(baseDelay + 300).duration(400)}>
+            <Animated.View
+              entering={FadeInDown.delay(baseDelay + 300).duration(400)}
+            >
               <Typography
                 variant="body2"
                 weight="semibold"

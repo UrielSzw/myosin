@@ -49,9 +49,7 @@ export const SessionSearchBarV2: React.FC<Props> = ({
           <Search size={18} color={colors.textMuted} />
           <TextInput
             placeholder={
-              lang === "es"
-                ? "Buscar por rutina..."
-                : "Search by routine..."
+              lang === "es" ? "Buscar por rutina..." : "Search by routine..."
             }
             value={searchQuery}
             onChangeText={onSearchChange}

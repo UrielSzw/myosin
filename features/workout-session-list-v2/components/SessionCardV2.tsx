@@ -99,7 +99,10 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
         {/* Recent indicator glow */}
         {isRecent && (
           <View
-            style={[styles.recentGlow, { backgroundColor: colors.success[500] }]}
+            style={[
+              styles.recentGlow,
+              { backgroundColor: colors.success[500] },
+            ]}
           />
         )}
 
@@ -199,11 +202,7 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
                 variant="caption"
                 style={{ color: statusInfo.color, fontSize: 10 }}
               >
-                {isCompleted
-                  ? "✓"
-                  : lang === "es"
-                  ? "Progreso"
-                  : "Progress"}
+                {isCompleted ? "✓" : lang === "es" ? "Progreso" : "Progress"}
               </Typography>
               <Typography
                 variant="h6"

@@ -127,10 +127,7 @@ export const ImprovementsCardV2: React.FC<Props> = ({
           {/* Left - Icon and arrows */}
           <View style={styles.iconSection}>
             <View
-              style={[
-                styles.iconBg,
-                { backgroundColor: `${successColor}15` },
-              ]}
+              style={[styles.iconBg, { backgroundColor: `${successColor}15` }]}
             >
               <TrendingUp size={22} color={successColor} />
             </View>

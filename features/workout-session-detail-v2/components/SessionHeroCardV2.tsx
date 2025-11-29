@@ -98,7 +98,9 @@ export const SessionHeroCardV2: React.FC<Props> = ({
                 cx={ringSize / 2}
                 cy={ringSize / 2}
                 r={radius}
-                stroke={isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"}
+                stroke={
+                  isDarkMode ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)"
+                }
                 strokeWidth={strokeWidth}
                 fill="transparent"
               />

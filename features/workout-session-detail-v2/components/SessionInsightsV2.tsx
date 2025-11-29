@@ -212,7 +212,11 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
                     {analytics.prCount}
                   </Typography>
                 </View>
-                <Typography variant="body2" color="textMuted" style={{ flex: 1 }}>
+                <Typography
+                  variant="body2"
+                  color="textMuted"
+                  style={{ flex: 1 }}
+                >
                   {analytics.prCount === 1
                     ? lang === "es"
                       ? "récord personal en esta sesión"

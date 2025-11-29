@@ -44,7 +44,8 @@ export const SessionSetRowV2: React.FC<Props> = ({
   };
 
   const formatActualValues = (): string => {
-    if (!set.completed) return lang === "es" ? "No completado" : "Not completed";
+    if (!set.completed)
+      return lang === "es" ? "No completado" : "Not completed";
 
     if (!measurementTemplate) return "-";
 

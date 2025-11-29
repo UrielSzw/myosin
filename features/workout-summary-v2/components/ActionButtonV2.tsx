@@ -110,11 +110,7 @@ export const ActionButtonV2: React.FC<Props> = ({
           {/* Shimmer overlay */}
           <Animated.View style={[styles.shimmer, shimmerStyle]}>
             <LinearGradient
-              colors={[
-                "transparent",
-                "rgba(255,255,255,0.4)",
-                "transparent",
-              ]}
+              colors={["transparent", "rgba(255,255,255,0.4)", "transparent"]}
               style={StyleSheet.absoluteFill}
               start={{ x: 0, y: 0.5 }}
               end={{ x: 1, y: 0.5 }}

@@ -61,9 +61,8 @@ export const WorkoutSummaryV2: React.FC = () => {
   }
 
   // Calculate estimated volume if not provided (rough estimate)
-  const estimatedVolume = totalVolume > 0 
-    ? totalVolume 
-    : totalSetsCompleted * 60; // Rough estimate: 60kg avg per set
+  const estimatedVolume =
+    totalVolume > 0 ? totalVolume : totalSetsCompleted * 60; // Rough estimate: 60kg avg per set
 
   // Trigger celebration haptic on mount
   const [hasTriggeredHaptic, setHasTriggeredHaptic] = useState(false);
@@ -132,11 +131,7 @@ export const WorkoutSummaryV2: React.FC = () => {
         />
 
         {/* Streak Fire (if streak > 0) */}
-        <StreakFireV2
-          streak={currentStreak}
-          lang={lang}
-          baseDelay={1100}
-        />
+        <StreakFireV2 streak={currentStreak} lang={lang} baseDelay={1100} />
 
         {/* PR Showcase (if any PRs) */}
         {hasPRs && (

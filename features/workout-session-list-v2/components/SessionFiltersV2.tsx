@@ -3,7 +3,13 @@ import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, X } from "lucide-react-native";
 import React from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import {
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {

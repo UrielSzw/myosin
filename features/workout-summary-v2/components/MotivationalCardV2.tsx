@@ -2,7 +2,14 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
-import { Heart, MessageCircle, Quote, Star, Swords, Target } from "lucide-react-native";
+import {
+  Heart,
+  MessageCircle,
+  Quote,
+  Star,
+  Swords,
+  Target,
+} from "lucide-react-native";
 import React, { useMemo } from "react";
 import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -61,7 +68,10 @@ const MESSAGES = {
     ],
     en: [
       { text: "Another day, another victory", icon: "star" },
-      { text: "The only bad workout is the one that didn't happen", icon: "quote" },
+      {
+        text: "The only bad workout is the one that didn't happen",
+        icon: "quote",
+      },
       { text: "You're closer to your goals", icon: "target" },
     ],
   },
@@ -166,7 +176,7 @@ export const MotivationalCardV2: React.FC<Props> = ({
                 lineHeight: 60,
               }}
             >
-              {"\""}
+              {'"'}
             </Typography>
           </View>
 

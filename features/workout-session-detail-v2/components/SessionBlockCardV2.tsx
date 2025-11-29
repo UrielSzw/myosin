@@ -162,10 +162,7 @@ export const SessionBlockCardV2: React.FC<Props> = ({
                   : "exercises"}
               </Typography>
               <View
-                style={[
-                  styles.dot,
-                  { backgroundColor: colors.textMuted },
-                ]}
+                style={[styles.dot, { backgroundColor: colors.textMuted }]}
               />
               <Typography variant="caption" color="textMuted">
                 {completedSets}/{totalSets} sets

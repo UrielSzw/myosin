@@ -71,7 +71,10 @@ const PRCardAnimated: React.FC<{
       baseDelay + index * 150 + 600,
       withRepeat(
         withSequence(
-          withTiming(1.5, { duration: 1500, easing: Easing.inOut(Easing.quad) }),
+          withTiming(1.5, {
+            duration: 1500,
+            easing: Easing.inOut(Easing.quad),
+          }),
           withTiming(-1, { duration: 0 })
         ),
         -1,
@@ -139,11 +142,7 @@ const PRCardAnimated: React.FC<{
       {/* Shimmer effect */}
       <Animated.View style={[styles.shimmer, shimmerStyle]}>
         <LinearGradient
-          colors={[
-            "transparent",
-            "rgba(255,255,255,0.3)",
-            "transparent",
-          ]}
+          colors={["transparent", "rgba(255,255,255,0.3)", "transparent"]}
           style={StyleSheet.absoluteFill}
           start={{ x: 0, y: 0.5 }}
           end={{ x: 1, y: 0.5 }}
@@ -154,10 +153,7 @@ const PRCardAnimated: React.FC<{
         {/* Trophy icon */}
         <Animated.View style={[styles.trophyContainer, trophyStyle]}>
           <View
-            style={[
-              styles.trophyBg,
-              { backgroundColor: `${accentColor}20` },
-            ]}
+            style={[styles.trophyBg, { backgroundColor: `${accentColor}20` }]}
           >
             {isGold ? (
               <Trophy size={24} color={accentColor} fill={`${accentColor}40`} />
@@ -187,7 +183,11 @@ const PRCardAnimated: React.FC<{
           >
             {pr.exerciseName}
           </Typography>
-          <Typography variant="caption" color="textMuted" style={{ marginTop: 2 }}>
+          <Typography
+            variant="caption"
+            color="textMuted"
+            style={{ marginTop: 2 }}
+          >
             {pr.weight} {weightUnit} × {pr.reps} reps
           </Typography>
         </View>

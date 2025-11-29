@@ -42,7 +42,9 @@ export const SessionExerciseCardV2: React.FC<Props> = ({
 
   const getMuscleLabel = () => {
     const key = exercise.exercise.main_muscle_group as IExerciseMuscle;
-    return muscleT[key]?.[lang as "es" | "en"] || exercise.exercise.main_muscle_group;
+    return (
+      muscleT[key]?.[lang as "es" | "en"] || exercise.exercise.main_muscle_group
+    );
   };
 
   return (
@@ -106,13 +108,19 @@ export const SessionExerciseCardV2: React.FC<Props> = ({
           </View>
 
           <View style={styles.metaRow}>
-            <Typography variant="caption" color="textMuted" style={{ fontSize: 11 }}>
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={{ fontSize: 11 }}
+            >
               {getMuscleLabel()}
             </Typography>
-            <View
-              style={[styles.dot, { backgroundColor: colors.textMuted }]}
-            />
-            <Typography variant="caption" color="textMuted" style={{ fontSize: 11 }}>
+            <View style={[styles.dot, { backgroundColor: colors.textMuted }]} />
+            <Typography
+              variant="caption"
+              color="textMuted"
+              style={{ fontSize: 11 }}
+            >
               {completedSets}/{totalSets} sets
             </Typography>
           </View>

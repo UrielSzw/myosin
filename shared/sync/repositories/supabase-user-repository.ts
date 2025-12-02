@@ -48,6 +48,15 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           keep_screen_awake: data.keep_screen_awake,
           haptic_feedback_enabled: data.haptic_feedback_enabled,
           default_rest_time_seconds: data.default_rest_time_seconds,
+          // Onboarding fields
+          biological_sex: data.biological_sex,
+          birth_date: data.birth_date,
+          height_cm: data.height_cm,
+          initial_weight_kg: data.initial_weight_kg,
+          fitness_goal: data.fitness_goal,
+          activity_level: data.activity_level,
+          onboarding_completed: data.onboarding_completed,
+          onboarding_completed_at: data.onboarding_completed_at,
           updated_at: new Date().toISOString(),
         })
         .eq("user_id", userId)

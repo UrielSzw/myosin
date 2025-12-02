@@ -1,5 +1,6 @@
 import { BaseUserPreferences } from "@/shared/db/schema/user";
 import { SyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
+import { SupabaseUserRepository } from "@/shared/sync/repositories/supabase-user-repository";
 import { syncToSupabase } from "@/shared/sync/sync-engine";
 import type { MutationCode } from "@/shared/sync/types/mutations";
 import NetInfo from "@react-native-community/netinfo";
@@ -97,30 +98,66 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
       load: async (userId: string) => {
         set({ loading: true });
         try {
-          const row = await usersRepository.getUserPreferences(userId);
+          // 1. First check local SQLite
+          const localRow = await usersRepository.getUserPreferences(userId);
 
-          if (row) {
-            set({ prefs: row as BaseUserPreferences });
+          if (localRow) {
+            set({ prefs: localRow as BaseUserPreferences });
           } else {
-            // create defaults if not present
-            const defaults: BaseUserPreferences = {
-              theme: "dark" as BaseUserPreferences["theme"],
-              weight_unit: "kg",
-              distance_unit: "metric",
-              language: "es",
-              show_rpe: false,
-              show_tempo: false,
-              keep_screen_awake: true,
-              haptic_feedback_enabled: true,
-              default_rest_time_seconds: 60,
-            } as BaseUserPreferences;
+            // 2. No local data - check if user has data in Supabase (new device scenario)
+            console.log("📱 No local preferences found, checking Supabase...");
 
-            await usersRepository.createUserPreferences(
-              userId,
-              defaults as Partial<BaseUserPreferences>
-            );
+            const netInfo = await NetInfo.fetch();
+            const isOnline = netInfo.isConnected && netInfo.isInternetReachable;
 
-            set({ prefs: defaults });
+            let supabasePrefs: BaseUserPreferences | null = null;
+
+            if (isOnline) {
+              try {
+                const supabaseRepo = new SupabaseUserRepository();
+                supabasePrefs = await supabaseRepo.getUserPreferences(userId);
+
+                if (supabasePrefs) {
+                  console.log(
+                    "☁️ Found preferences in Supabase, syncing to local..."
+                  );
+                }
+              } catch (e) {
+                console.warn("Could not fetch from Supabase:", e);
+              }
+            }
+
+            if (supabasePrefs) {
+              // 3a. Found in Supabase - save to local and use
+              await usersRepository.createUserPreferences(
+                userId,
+                supabasePrefs
+              );
+              set({ prefs: supabasePrefs });
+              console.log("✅ Synced Supabase preferences to local DB");
+            } else {
+              // 3b. Not found anywhere - create defaults
+              console.log("🆕 Creating default preferences...");
+              const defaults: BaseUserPreferences = {
+                theme: "dark" as BaseUserPreferences["theme"],
+                weight_unit: "kg",
+                distance_unit: "metric",
+                language: "es",
+                show_rpe: false,
+                show_tempo: false,
+                keep_screen_awake: true,
+                haptic_feedback_enabled: true,
+                default_rest_time_seconds: 60,
+                onboarding_completed: false,
+              } as BaseUserPreferences;
+
+              await usersRepository.createUserPreferences(
+                userId,
+                defaults as Partial<BaseUserPreferences>
+              );
+
+              set({ prefs: defaults });
+            }
           }
         } catch (e) {
           console.error("Error loading user preferences", e);

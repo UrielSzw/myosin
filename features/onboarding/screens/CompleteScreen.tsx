@@ -1,10 +1,12 @@
 import { usersRepository } from "@/shared/db/repository/user";
+import { BaseUserPreferences } from "@/shared/db/schema/user";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import {
   useUserPreferences,
   useUserPreferencesStore,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { syncToSupabase } from "@/shared/sync/sync-engine";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -331,18 +333,23 @@ export default function CompleteScreen() {
     setIsCompleting(true);
 
     try {
-      const updateData = {
-        biological_sex: biologicalSex ?? undefined,
-        birth_date: birthDate?.toISOString().split("T")[0],
-        height_cm: heightCm ?? undefined,
-        initial_weight_kg: weightKg ?? undefined,
-        fitness_goal:
-          fitnessGoal === "lose_weight"
-            ? "lose_fat"
-            : fitnessGoal === "build_muscle"
-            ? "gain_muscle"
-            : fitnessGoal ?? undefined,
-        activity_level: activityLevel ?? undefined,
+      // Map fitness goal to DB format
+      const mappedFitnessGoal =
+        fitnessGoal === "lose_weight"
+          ? "lose_fat"
+          : fitnessGoal === "build_muscle"
+          ? "gain_muscle"
+          : fitnessGoal === "maintain"
+          ? "maintain"
+          : null;
+
+      const updateData: Partial<BaseUserPreferences> = {
+        biological_sex: biologicalSex ?? null,
+        birth_date: birthDate?.toISOString().split("T")[0] ?? null,
+        height_cm: heightCm ?? null,
+        initial_weight_kg: weightKg ?? null,
+        fitness_goal: mappedFitnessGoal,
+        activity_level: activityLevel ?? null,
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
       };
@@ -352,12 +359,16 @@ export default function CompleteScreen() {
 
       // Update Zustand store immediately so route guard sees onboarding_completed
       useUserPreferencesStore.setState((state) => ({
-        prefs: state.prefs
-          ? { ...state.prefs, onboarding_completed: true }
-          : null,
+        prefs: state.prefs ? { ...state.prefs, ...updateData } : null,
       }));
 
-      // TODO: Sync to Supabase
+      // Sync to Supabase (fire and forget)
+      syncToSupabase("USER_PREFERENCES_UPDATE", {
+        userId: user.id,
+        data: updateData,
+      }).catch((err) => {
+        console.warn("Failed to sync onboarding to Supabase:", err);
+      });
 
       // Reset store and navigate
       reset();

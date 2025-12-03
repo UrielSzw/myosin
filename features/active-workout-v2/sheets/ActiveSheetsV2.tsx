@@ -14,8 +14,8 @@ import {
   SetTypeSheetV2,
 } from "@/shared/ui/sheets-v2";
 import React, { useCallback } from "react";
+import { TempoMetronomeV2 } from "../elements/TempoMetronomeV2";
 import { IActiveSheetV2 } from "../hooks/use-active-workout-sheets-v2";
-import { TempoMetronomeV2 } from "./TempoMetronomeV2";
 
 type Props = {
   activeSheet: IActiveSheetV2;

@@ -40,7 +40,7 @@ const createDefaultSets = (
     user_id: "default-user",
     exercise_id: exerciseId,
     id: "",
-    order_index: 2,
+    order_index: 1,
     measurement_template: measurementTemplate,
     planned_primary_value: null,
     planned_secondary_value: null,

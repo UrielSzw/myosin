@@ -202,9 +202,11 @@ export const SetTypeSheetV2 = ({
 
       {/* Set Types List */}
       <ScrollView
-        style={styles.optionsList}
+        style={[styles.optionsList, { maxHeight: SCREEN_HEIGHT * 0.7 }]}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 40 }}
+        bounces={true}
+        nestedScrollEnabled={true}
       >
         {SET_TYPES.map((option, index) => {
           const isSelected = currentSetType === option.type;
@@ -803,7 +805,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   optionsList: {
-    flex: 1,
     paddingHorizontal: 16,
   },
   optionCard: {

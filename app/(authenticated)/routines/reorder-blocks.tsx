@@ -1,17 +1,12 @@
 import { ReorderBlocksV2Feature } from "@/features/reorder-blocks-v2";
 import { useRoutineSharedActions } from "@/features/routine-form-v2/hooks/use-routine-form-store";
 import { BlockInsert } from "@/shared/db/schema";
-import {
-  useReorderBlockActions,
-  useReorderBlocksState,
-} from "@/shared/hooks/use-reorder-store";
+import { useReorderBlocksState } from "@/shared/hooks/use-reorder-store";
 import { router } from "expo-router";
 import React from "react";
 
 export default function ReorderBlocksScreen() {
   const { blocks } = useReorderBlocksState();
-  const { setBlocks, setExercisesByBlock, setExercisesInBlock } =
-    useReorderBlockActions();
   const { setNewOrderBlocks, setNewOrderBlocksIds } = useRoutineSharedActions();
 
   const handleReorder = (
@@ -35,18 +30,17 @@ export default function ReorderBlocksScreen() {
 
     setNewOrderBlocks(newReorderedBlocks);
     setNewOrderBlocksIds(newOrderIds);
-    setBlocks({});
-    setExercisesByBlock({});
-    setExercisesInBlock({});
     router.back();
   };
 
   const handleCancel = () => {
-    setBlocks({});
-    setExercisesByBlock({});
-    setExercisesInBlock({});
     router.back();
   };
+
+  // Guard against undefined blocks state
+  if (!blocks || Object.keys(blocks).length === 0) {
+    return null;
+  }
 
   return (
     <ReorderBlocksV2Feature

@@ -172,6 +172,18 @@ export const sharedUiTranslations = {
     es: "Sin ejercicios",
     en: "No exercises",
   },
+  block: {
+    es: "Bloque",
+    en: "Block",
+  },
+  exercise: {
+    es: "ejercicio",
+    en: "exercise",
+  },
+  exercises: {
+    es: "ejercicios",
+    en: "exercises",
+  },
   deleteRoutine: {
     es: "Eliminar Rutina",
     en: "Delete Routine",

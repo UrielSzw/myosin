@@ -210,7 +210,8 @@ const ReorderBlockItemV2: React.FC<BlockItemProps> = ({
   const lang = (prefs?.language ?? "es") as "es" | "en";
   const t = sharedUiTranslations;
   const { getBlockTypeLabel, getBlockColors } = useBlockStyles();
-  const { exercisesByBlock, exercisesInBlock } = useReorderBlocksState();
+  const { exercisesByBlock = {}, exercisesInBlock = {} } =
+    useReorderBlocksState();
   const haptic = useHaptic();
 
   const blockColors = getBlockColors(blockData.type);

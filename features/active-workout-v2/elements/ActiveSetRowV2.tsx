@@ -17,7 +17,7 @@ import { Typography } from "@/shared/ui/typography";
 import { fromKm, fromMeters } from "@/shared/utils/distance-conversion";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { Check, ChevronRight, Timer, Trophy } from "lucide-react-native";
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   FadeInRight,
@@ -56,7 +56,8 @@ export const ActiveSetRowV2 = React.memo<Props>(
       getBlockColors,
       formatMeasurementValue,
     } = useBlockStyles();
-    const { completeSet, uncompleteSet } = useActiveSetActions();
+    const { completeSet, uncompleteSet, updateSetValue } =
+      useActiveSetActions();
     const { setCurrentState } = useActiveMainActions();
     const { sets, exercisePreviousSets, session } = useActiveWorkout();
 
@@ -67,11 +68,6 @@ export const ActiveSetRowV2 = React.memo<Props>(
 
     const nextSetIndicator = useNextSetIndicator(blockId);
     const { validatePR } = usePRLogic(exerciseInBlock.exercise_id, setId);
-
-    const [setData, setSetData] = useState({
-      primaryValue: null as number | null,
-      secondaryValue: null as number | null,
-    });
 
     const blockColors = getBlockColors(blockType);
     const set = sets[setId];
@@ -131,15 +127,15 @@ export const ActiveSetRowV2 = React.memo<Props>(
         withSpring(1, { damping: 15 })
       );
 
-      // Priority: user input → store value → prev set → 0
+      // Priority: store value → planned range → planned value → prev set → 0
       const getEffectiveValue = (
-        userInput: number | null,
+        storeValue: number | null,
         plannedRange: { min: number; max: number } | null,
         plannedValue: number | null,
         prevValue: number | null | undefined,
         fallback: number = 0
       ): number => {
-        if (userInput !== null) return userInput;
+        if (storeValue !== null) return storeValue;
         if (plannedRange) return plannedRange.min;
         if (plannedValue) return plannedValue;
         if (prevValue) return prevValue;
@@ -147,7 +143,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
       };
 
       const effectivePrimary = getEffectiveValue(
-        setData.primaryValue ?? set.actual_primary_value ?? null,
+        set.actual_primary_value,
         set.planned_primary_range,
         set.planned_primary_value,
         prevSet?.actual_primary_value,
@@ -155,7 +151,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
       );
 
       const effectiveSecondary = getEffectiveValue(
-        setData.secondaryValue ?? set.actual_secondary_value ?? null,
+        set.actual_secondary_value,
         set.planned_secondary_range,
         set.planned_secondary_value,
         prevSet?.actual_secondary_value,
@@ -185,7 +181,6 @@ export const ActiveSetRowV2 = React.memo<Props>(
       }
     }, [
       checkScale,
-      setData,
       set,
       prevSet,
       validatePR,
@@ -301,12 +296,6 @@ export const ActiveSetRowV2 = React.memo<Props>(
       // Fallback
       return "0";
     };
-
-    // Render values (user input or store value)
-    const renderPrimaryValue =
-      setData.primaryValue || set.actual_primary_value || null;
-    const renderSecondaryValue =
-      setData.secondaryValue || set.actual_secondary_value || null;
 
     const formatPrevSet = () => {
       if (!prevSet) return "-";
@@ -427,9 +416,9 @@ export const ActiveSetRowV2 = React.memo<Props>(
                   unit: "",
                 }
               }
-              value={renderPrimaryValue}
+              value={set.actual_primary_value}
               onChange={(value) => {
-                setSetData((prev) => ({ ...prev, primaryValue: value }));
+                updateSetValue(setId, "primary", value, exerciseInBlock.tempId);
               }}
               placeholder={getPlaceholderValue("primary")}
               setNumber={setNumber}
@@ -452,9 +441,14 @@ export const ActiveSetRowV2 = React.memo<Props>(
                     unit: "",
                   }
                 }
-                value={renderSecondaryValue}
+                value={set.actual_secondary_value}
                 onChange={(value) => {
-                  setSetData((prev) => ({ ...prev, secondaryValue: value }));
+                  updateSetValue(
+                    setId,
+                    "secondary",
+                    value,
+                    exerciseInBlock.tempId
+                  );
                 }}
                 placeholder={getPlaceholderValue("secondary")}
                 setNumber={setNumber}

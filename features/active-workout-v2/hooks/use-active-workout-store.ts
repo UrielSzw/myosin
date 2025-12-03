@@ -203,16 +203,27 @@ type Store = {
     deleteSet: () => void;
     updateSetType: (setType: ISetType) => void;
     updateRpe: (rpe: RPEValue | null) => void;
+    /**
+     * Updates a set's actual value and triggers auto-fill for following sets
+     * @param setId - The set to update
+     * @param field - Which field to update ('primary' or 'secondary')
+     * @param value - The new value
+     * @param exerciseInBlockId - The exercise this set belongs to (for auto-fill)
+     */
+    updateSetValue: (
+      setId: string,
+      field: "primary" | "secondary",
+      value: number | null,
+      exerciseInBlockId: string
+    ) => void;
     autoFillFollowingSets: (
       exerciseInBlockId: string,
       currentSetOrder: number,
       updates: {
         primaryValue?: number | null;
         secondaryValue?: number | null;
-        primaryMin?: number | null;
-        primaryMax?: number | null;
-        secondaryMin?: number | null;
-        secondaryMax?: number | null;
+        previousPrimaryValue?: number | null;
+        previousSecondaryValue?: number | null;
       }
     ) => void;
   };
@@ -1651,9 +1662,8 @@ const useActiveWorkoutStore = create<Store>()(
 
           set.completed = false;
           set.completed_at = null;
-          set.actual_primary_value = null;
-          set.actual_secondary_value = null;
-          set.actual_rpe = null;
+          // Keep actual values so user can edit and re-complete
+          // set.actual_primary_value, set.actual_secondary_value, set.actual_rpe are preserved
 
           state.stats.totalSetsCompleted -= 1;
         });
@@ -1720,79 +1730,120 @@ const useActiveWorkoutStore = create<Store>()(
           }
         });
       },
+
+      updateSetValue: (setId, field, value, exerciseInBlockId) => {
+        const state = get();
+        const currentSet = state.activeWorkout.sets[setId];
+        if (!currentSet) return;
+
+        // Get the previous value BEFORE updating (for auto-fill comparison)
+        const previousValue =
+          field === "primary"
+            ? currentSet.actual_primary_value
+            : currentSet.actual_secondary_value;
+
+        // Update the current set's value
+        set((state) => {
+          const setToUpdate = state.activeWorkout.sets[setId];
+          if (!setToUpdate) return;
+
+          if (field === "primary") {
+            setToUpdate.actual_primary_value = value;
+          } else {
+            setToUpdate.actual_secondary_value = value;
+          }
+        });
+
+        // Trigger auto-fill for following sets (only for weight/distance fields)
+        if (value !== null) {
+          const firstSetId =
+            state.activeWorkout.setsByExercise[exerciseInBlockId]?.[0];
+          const firstSet = firstSetId
+            ? state.activeWorkout.sets[firstSetId]
+            : null;
+
+          if (firstSet) {
+            const template = getMeasurementTemplate(
+              firstSet.measurement_template,
+              "kg"
+            );
+            const fieldIndex = field === "primary" ? 0 : 1;
+            const fieldType = template?.fields[fieldIndex]?.type;
+
+            // Only auto-fill for weight and distance fields
+            if (fieldType === "weight" || fieldType === "distance") {
+              // Check if this exercise has planned values - if so, don't auto-fill
+              const hasPrimaryPlanned =
+                firstSet.planned_primary_value !== null &&
+                firstSet.planned_primary_value !== 0;
+              const hasSecondaryPlanned =
+                firstSet.planned_secondary_value !== null &&
+                firstSet.planned_secondary_value !== 0;
+
+              const shouldAutoFill =
+                field === "primary" ? !hasPrimaryPlanned : !hasSecondaryPlanned;
+
+              if (shouldAutoFill) {
+                get().setActions.autoFillFollowingSets(
+                  exerciseInBlockId,
+                  currentSet.order_index,
+                  field === "primary"
+                    ? {
+                        primaryValue: value,
+                        previousPrimaryValue: previousValue,
+                      }
+                    : {
+                        secondaryValue: value,
+                        previousSecondaryValue: previousValue,
+                      }
+                );
+              }
+            }
+          }
+        }
+      },
+
       autoFillFollowingSets: (exerciseInBlockId, currentSetOrder, updates) => {
         set((state) => {
           // Guard: Check if there's an active workout
           if (!state.activeWorkout.session) return;
-
-          // Find the block that contains this exercise
-          const blockId = Object.keys(
-            state.activeWorkout.exercisesByBlock
-          ).find((bId) =>
-            state.activeWorkout.exercisesByBlock[bId]?.includes(
-              exerciseInBlockId
-            )
-          );
-
-          if (!blockId) return;
-
-          // Get the exercise
-          const exerciseInBlock =
-            state.activeWorkout.exercises[exerciseInBlockId];
-          if (!exerciseInBlock) return;
 
           // Get all sets for this exercise
           const setIds =
             state.activeWorkout.setsByExercise[exerciseInBlockId] || [];
           if (setIds.length === 0) return;
 
-          // Get the first set to determine measurement template
-          const firstSetId = setIds[0];
-          const firstSet = state.activeWorkout.sets[firstSetId];
-          if (!firstSet) return;
-
-          // Get measurement template to determine field types
-          const template = getMeasurementTemplate(
-            firstSet.measurement_template,
-            "kg" // Default to kg, this should ideally come from user preferences
-          );
-
-          // Get following sets (order_index > currentSetOrder)
+          // Get following sets (order_index > currentSetOrder, not completed)
           const followingSets = setIds
             .map((id) => state.activeWorkout.sets[id])
             .filter(
-              (set) =>
-                set && set.order_index > currentSetOrder && !set.completed_at // Skip completed sets
+              (s) => s && s.order_index > currentSetOrder && !s.completed_at
             );
 
-          // Auto-fill following uncompleted sets with smart logic
+          // Auto-fill logic: Update following sets that have the SAME value as the previous value
           followingSets.forEach((nextSet) => {
             // Handle primary value
-            if (updates.primaryValue !== undefined) {
-              const primaryFieldType = template.fields[0]?.type;
-
-              // Smart auto-fill rules:
-              // 1. Weight fields ALWAYS auto-fill (weight typically stays constant)
-              // 2. Reps fields NEVER auto-fill (reps vary due to fatigue)
-              // 3. Other fields (time, distance, etc.) only if empty
-              const shouldAutoFillPrimary =
-                primaryFieldType === "weight" || // ALWAYS for weight
-                nextSet.actual_primary_value === null; // Or if empty
-
-              if (shouldAutoFillPrimary && primaryFieldType !== "reps") {
+            if (
+              updates.primaryValue !== undefined &&
+              updates.previousPrimaryValue !== undefined
+            ) {
+              // Only update if the next set's current value equals the previous value of the edited set
+              if (
+                nextSet.actual_primary_value === updates.previousPrimaryValue
+              ) {
                 nextSet.actual_primary_value = updates.primaryValue;
               }
             }
 
             // Handle secondary value
-            if (updates.secondaryValue !== undefined) {
-              const secondaryFieldType = template.fields[1]?.type;
-
-              const shouldAutoFillSecondary =
-                secondaryFieldType === "weight" || // ALWAYS for weight
-                nextSet.actual_secondary_value === null; // Or if empty
-
-              if (shouldAutoFillSecondary && secondaryFieldType !== "reps") {
+            if (
+              updates.secondaryValue !== undefined &&
+              updates.previousSecondaryValue !== undefined
+            ) {
+              if (
+                nextSet.actual_secondary_value ===
+                updates.previousSecondaryValue
+              ) {
                 nextSet.actual_secondary_value = updates.secondaryValue;
               }
             }

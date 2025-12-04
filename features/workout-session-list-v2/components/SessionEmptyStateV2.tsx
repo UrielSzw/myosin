@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Calendar, Search } from "lucide-react-native";
@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   variant: "no-sessions" | "no-results";
   onClearFilters?: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionEmptyStateV2: React.FC<Props> = ({

@@ -112,4 +112,20 @@ export const tempoSelectorTranslations = {
     es: "Personalizado",
     en: "Custom",
   },
+  noTempoAssigned: {
+    es: "Sin tempo asignado",
+    en: "No tempo assigned",
+  },
+  sec: {
+    es: "seg",
+    en: "sec",
+  },
+  seconds: {
+    es: "segundos",
+    en: "seconds",
+  },
+  tempoPhaseLabels: {
+    es: "Excéntrica - Pausa - Concéntrica - Pausa",
+    en: "Eccentric - Pause - Concentric - Pause",
+  },
 } as const;

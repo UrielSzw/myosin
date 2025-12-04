@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
@@ -31,7 +32,7 @@ export const RoutineFormV2Feature = () => {
 
   const { setIsExerciseModalOpen, setExerciseModalMode } = useMainActions();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // V2 sheets system - Modal-based
   const { activeSheet, openSheet, closeSheet } = useFormRoutineSheetsV2();

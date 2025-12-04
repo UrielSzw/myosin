@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "react-native";
@@ -19,7 +20,7 @@ type Props = {
 
 export const useFolderForm = ({ isEditMode }: Props) => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = folderFormTranslations;
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder

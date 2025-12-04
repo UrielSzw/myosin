@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -21,7 +22,7 @@ import Animated, {
 
 type Props = {
   streak: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   baseDelay?: number;
 };
 
@@ -221,12 +222,8 @@ export const StreakFireV2: React.FC<Props> = ({
                 style={{ color: colors.text }}
               >
                 {streak === 1
-                  ? lang === "es"
-                    ? "¡Primer día!"
-                    : "First day!"
-                  : lang === "es"
-                  ? `¡${streak} días seguidos!`
-                  : `${streak} days in a row!`}
+                  ? t.firstDay[lang]
+                  : `¡${streak} ${t.daysInARow[lang]}!`}
               </Typography>
               <Typography
                 variant="caption"

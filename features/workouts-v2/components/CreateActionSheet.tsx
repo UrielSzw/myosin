@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -46,7 +47,7 @@ type ActionOption = {
 export const CreateActionSheet = ({ visible, onClose }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = workoutsTranslations;
 
   const { initializeQuickWorkout } = useActiveMainActions();

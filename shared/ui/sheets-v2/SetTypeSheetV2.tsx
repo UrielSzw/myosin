@@ -2,6 +2,8 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { setTypeTranslations } from "@/shared/translations/set-type";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { ISetType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -63,7 +65,7 @@ export const SetTypeSheetV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = setTypeTranslations;
   const { getSetTypeColor, getSetTypeLabel } = useBlockStyles();
 
@@ -171,16 +173,14 @@ export const SetTypeSheetV2 = ({
               weight="bold"
               style={{ color: colors.text }}
             >
-              {lang === "es" ? "Tipo de Serie" : "Set Type"}
+              {sharedUiTranslations.setType[lang]}
             </Typography>
             <Typography
               variant="caption"
               color="textMuted"
               style={{ marginTop: 4 }}
             >
-              {lang === "es"
-                ? "Selecciona el método de entrenamiento"
-                : "Select training method"}
+              {sharedUiTranslations.selectTrainingMethod[lang]}
             </Typography>
           </View>
         </View>

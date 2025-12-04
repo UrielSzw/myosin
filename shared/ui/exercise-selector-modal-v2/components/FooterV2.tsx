@@ -1,6 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { BlurView } from "expo-blur";
 import { Layers, Plus, RotateCcw } from "lucide-react-native";
 import React, { useEffect } from "react";
@@ -33,7 +34,7 @@ export const FooterV2: React.FC<Props> = ({
 }) => {
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = exerciseSelectorTranslations;
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -109,8 +110,8 @@ export const FooterV2: React.FC<Props> = ({
         </View>
         <Typography variant="body2" color="textMuted" style={{ fontSize: 13 }}>
           {selectedExercisesLength === 1
-            ? t.exerciseSelected?.[lang] || "ejercicio seleccionado"
-            : t.exercisesSelected?.[lang] || "ejercicios seleccionados"}
+            ? t.exerciseSelected[lang]
+            : t.exercisesSelected[lang]}
         </Typography>
       </View>
 

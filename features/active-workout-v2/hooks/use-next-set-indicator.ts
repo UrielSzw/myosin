@@ -1,3 +1,6 @@
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { routineFormTranslations as t } from "@/shared/translations/routine-form";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useMemo } from "react";
 import { getNextSetToComplete } from "../utils/store-helpers";
 import {
@@ -18,6 +21,8 @@ export const useNextSetIndicator = (blockId: string) => {
   const { blocks, exercises, sets, exercisesByBlock, setsByExercise } =
     useActiveWorkout();
   const { addSet } = useActiveSetActions();
+  const prefs = useUserPreferences();
+  const lang = toSupportedLanguage(prefs?.language);
 
   const block = blocks[blockId];
 
@@ -104,7 +109,10 @@ export const useNextSetIndicator = (blockId: string) => {
       };
     }
 
-    const blockTypeLabel = block.type === "superset" ? "Superset" : "Circuito";
+    const blockTypeLabel =
+      block.type === "superset"
+        ? t.blockTypeSuperset[lang]
+        : t.blockTypeCircuit[lang];
 
     return {
       shouldShow: !nextSetInfo.isBlockComplete,
@@ -114,7 +122,7 @@ export const useNextSetIndicator = (blockId: string) => {
       needsSetCreation: nextSetInfo.setId === null,
       blockTypeLabel,
     };
-  }, [nextSetInfo, block]);
+  }, [nextSetInfo, block, lang]);
 
   return {
     // Información del próximo set

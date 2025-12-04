@@ -2,6 +2,7 @@ import type { MetricDisplayData } from "@/features/tracker-v2/types/visual-state
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { getMetricName } from "@/shared/translations/tracker";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import * as Icons from "lucide-react-native";
@@ -12,7 +13,7 @@ type BooleanMetricCardV2Props = {
   metric: TrackerMetricWithQuickActions;
   displayData: MetricDisplayData;
   onPress: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const BooleanMetricCardV2: React.FC<BooleanMetricCardV2Props> =

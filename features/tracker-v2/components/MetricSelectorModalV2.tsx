@@ -17,6 +17,8 @@ import {
   getMetricUnit,
   trackerTranslations,
 } from "@/shared/translations/tracker";
+import type { SupportedLanguage } from "@/shared/types/language";
+import { DEFAULT_LANGUAGE } from "@/shared/types/language";
 import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -50,13 +52,13 @@ type PredefinedMetric = Omit<TrackerMetricInsert, "user_id" | "id">;
 type Props = {
   visible: boolean;
   onClose: () => void;
-  lang?: "es" | "en";
+  lang?: SupportedLanguage;
 };
 
 export const MetricSelectorModalV2: React.FC<Props> = ({
   visible,
   onClose,
-  lang = "es",
+  lang = DEFAULT_LANGUAGE,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const { user } = useAuth();
@@ -503,7 +505,7 @@ const HeaderContent: React.FC<{
   colors: ThemeColors;
   isDarkMode: boolean;
   onClose: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ colors, isDarkMode, onClose, lang }) => {
   const t = trackerTranslations;
 
@@ -564,7 +566,7 @@ const TemplateContent: React.FC<{
   displayUnit: string;
   isAdding: boolean;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ template, IconComponent, displayUnit, isAdding, colors, lang }) => {
   const t = trackerTranslations;
 
@@ -626,7 +628,7 @@ const DeletedHeaderContent: React.FC<{
   count: number;
   showDeleted: boolean;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ count, showDeleted, colors, lang }) => {
   const t = trackerTranslations;
 
@@ -680,7 +682,7 @@ const DeletedMetricContent: React.FC<{
   IconComponent: React.ComponentType<{ size: number; color: string }> | null;
   displayUnit: string;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ metric, IconComponent, displayUnit, colors, lang }) => {
   const t = trackerTranslations;
 

@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations as t } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   MEASUREMENT_TEMPLATES,
   MeasurementTemplate,
@@ -39,7 +41,7 @@ export const MeasurementTemplateSelectorV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Animations
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
@@ -185,16 +187,14 @@ export const MeasurementTemplateSelectorV2 = ({
                   weight="bold"
                   style={{ color: colors.text }}
                 >
-                  {lang === "es" ? "Tipo de Medición" : "Measurement Type"}
+                  {t.measurementType[lang]}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="textMuted"
                   style={{ marginTop: 4 }}
                 >
-                  {lang === "es"
-                    ? "Selecciona cómo medir este ejercicio"
-                    : "Select how to measure this exercise"}
+                  {t.selectMeasurementType[lang]}
                 </Typography>
               </View>
             </View>

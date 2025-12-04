@@ -172,4 +172,12 @@ export const activeWorkoutTranslations = {
     es: "Puedes agregar más ejercicios en cualquier momento",
     en: "You can add more exercises at any time",
   },
+  workout: {
+    es: "Entrenamiento",
+    en: "Workout",
+  },
+  errorUpdatingRoutine: {
+    es: "Error al actualizar la rutina. Intenta nuevamente.",
+    en: "Error updating routine. Please try again.",
+  },
 };

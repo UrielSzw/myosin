@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { BlurView } from "expo-blur";
 import { Search, X } from "lucide-react-native";
 import React from "react";
@@ -9,7 +9,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionSearchBarV2: React.FC<Props> = ({

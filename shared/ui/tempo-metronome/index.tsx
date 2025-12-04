@@ -2,6 +2,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { tempoMetronomeTranslations } from "@/shared/translations/tempo-metronome";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetView } from "@gorhom/bottom-sheet";
 import { Pause, Play, RotateCcw, X } from "lucide-react-native";
@@ -27,7 +28,7 @@ interface TempoMetronomeProps {
 }
 
 interface TempoPhase {
-  name: string;
+  name: { es: string; en: string };
   duration: number;
   color: string;
   type: "eccentric" | "pause1" | "concentric" | "pause2";
@@ -39,13 +40,6 @@ const PHASE_COLORS = {
   pause1: "#F59E0B", // Amber - pausa inferior
   concentric: "#EF4444", // Red - subir
   pause2: "#F59E0B", // Amber - pausa superior
-} as const;
-
-const PHASE_NAMES = {
-  eccentric: "Excéntrica",
-  pause1: "Pausa Inferior",
-  concentric: "Concéntrica",
-  pause2: "Pausa Superior",
 } as const;
 
 // State management types
@@ -75,7 +69,10 @@ type Action =
 // HELPER FUNCTIONS
 // ============================================================================
 
-const parseTempoString = (tempoString?: string | null): TempoPhase[] => {
+const parseTempoString = (
+  tempoString: string | null | undefined,
+  phaseNames: typeof tempoMetronomeTranslations.phases
+): TempoPhase[] => {
   if (!tempoString) return [];
 
   const [eccentric, pause1, concentric, pause2] = tempoString
@@ -84,25 +81,25 @@ const parseTempoString = (tempoString?: string | null): TempoPhase[] => {
 
   const phases: TempoPhase[] = [
     {
-      name: PHASE_NAMES.eccentric,
+      name: phaseNames.eccentric,
       duration: eccentric,
       color: PHASE_COLORS.eccentric,
       type: "eccentric",
     },
     {
-      name: PHASE_NAMES.pause1,
+      name: phaseNames.pause1,
       duration: pause1,
       color: PHASE_COLORS.pause1,
       type: "pause1",
     },
     {
-      name: PHASE_NAMES.concentric,
+      name: phaseNames.concentric,
       duration: concentric,
       color: PHASE_COLORS.concentric,
       type: "concentric",
     },
     {
-      name: PHASE_NAMES.pause2,
+      name: phaseNames.pause2,
       duration: pause2,
       color: PHASE_COLORS.pause2,
       type: "pause2",
@@ -233,7 +230,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
   ({ tempo }, ref) => {
     const { colors } = useColorScheme();
     const prefs = useUserPreferences();
-    const lang = prefs?.language ?? "es";
+    const lang = toSupportedLanguage(prefs?.language);
     const t = tempoMetronomeTranslations;
     const haptic = useHaptic();
 
@@ -241,7 +238,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
     const [state, dispatch] = useReducer(timerReducer, initialState);
 
     // Parse tempo into phases
-    const phases = parseTempoString(tempo);
+    const phases = parseTempoString(tempo, t.phases);
     const currentPhase = phases[state.currentPhaseIndex];
 
     // Refs for cleanup
@@ -447,18 +444,18 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
 
     const getDisplayText = () => {
       if (state.timerState === "countdown") {
-        return "Prepárate";
+        return t.getReady[lang];
       }
 
       if (state.timerState === "running" && currentPhase) {
-        return currentPhase.name;
+        return currentPhase.name[lang];
       }
 
       if (state.timerState === "paused") {
-        return "Pausado";
+        return t.paused[lang];
       }
 
-      return "Presiona para comenzar";
+      return t.pressToStart[lang];
     };
 
     // ============================================================================
@@ -486,7 +483,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
             </TouchableOpacity>
 
             <Typography variant="h6" weight="semibold" color="text">
-              Guía de Tempo
+              {t.title[lang]}
             </Typography>
 
             <Typography
@@ -507,7 +504,7 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
                 color="textMuted"
                 style={styles.cycleCounter}
               >
-                Ciclo {state.currentCycle}
+                {t.cycle[lang]} {state.currentCycle}
               </Typography>
             )}
 
@@ -541,8 +538,12 @@ export const TempoMetronome = forwardRef<BottomSheetModal, TempoMetronomeProps>(
             {state.timerState === "running" && phases.length > 1 && (
               <View style={styles.nextPhaseContainer}>
                 <Typography variant="caption" color="textMuted">
-                  Siguiente:{" "}
-                  {phases[(state.currentPhaseIndex + 1) % phases.length]?.name}
+                  {t.next[lang]}:{" "}
+                  {
+                    phases[(state.currentPhaseIndex + 1) % phases.length]?.name[
+                      lang
+                    ]
+                  }
                 </Typography>
               </View>
             )}

@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   QUICK_FILTERS,
   QuickFilterType,
@@ -140,7 +141,7 @@ export const QuickFiltersV2: React.FC<Props> = ({
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const handleFilterToggle = useCallback(
     (filterId: QuickFilterType) => {

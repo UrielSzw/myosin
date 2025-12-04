@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -46,7 +47,7 @@ export const SetsTableV2: React.FC<Props> = ({
   const { setCurrentState } = useMainActions();
   const { getBlockColors } = useBlockStyles();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = routineFormTranslations;
   const weightUnit = prefs?.weight_unit ?? "kg";
   const distanceUnit = prefs?.distance_unit ?? "metric";

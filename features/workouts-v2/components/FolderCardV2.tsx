@@ -2,6 +2,8 @@ import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { ChevronRight, FolderOpen } from "lucide-react-native";
@@ -25,7 +27,7 @@ type Props = {
 export const FolderCardV2 = ({ folder, onLongPress }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const setSelectedFolder = useSelectedFolderStore(
     (state) => state.setSelectedFolder
   );
@@ -100,12 +102,8 @@ export const FolderCardV2 = ({ folder, onLongPress }: Props) => {
           >
             {folder.routineCount}{" "}
             {folder.routineCount === 1
-              ? lang === "es"
-                ? "rutina"
-                : "routine"
-              : lang === "es"
-              ? "rutinas"
-              : "routines"}
+              ? sharedUiTranslations.routine[lang]
+              : sharedUiTranslations.routines[lang]}
           </Typography>
 
           {/* Chevron indicator */}

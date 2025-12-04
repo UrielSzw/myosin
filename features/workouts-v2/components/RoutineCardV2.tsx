@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -19,7 +20,7 @@ type Props = {
 export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 

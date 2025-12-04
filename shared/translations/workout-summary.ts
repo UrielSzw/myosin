@@ -88,4 +88,20 @@ export const workoutSummaryTranslations = {
     es: "Sigue así 💪",
     en: "Keep it up 💪",
   },
+
+  // Streak messages
+  firstDay: {
+    es: "¡Primer día!",
+    en: "First day!",
+  },
+  daysInARow: {
+    es: "días seguidos",
+    en: "days in a row",
+  },
+
+  // Improvements
+  inExercisesVsLastTime: {
+    es: "En {count} {exerciseWord} vs la última vez",
+    en: "In {count} {exerciseWord} vs last time",
+  },
 } as const;

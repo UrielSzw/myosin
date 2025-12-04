@@ -1,6 +1,7 @@
 import { WorkoutExerciseWithSets } from "@/shared/db/schema/workout-session";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { supportsPRCalculation } from "@/shared/types/measurement";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -13,7 +14,7 @@ type Props = {
   exercise: WorkoutExerciseWithSets;
   isLast: boolean;
   showRpe: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionExerciseCardV2: React.FC<Props> = ({
@@ -42,9 +43,7 @@ export const SessionExerciseCardV2: React.FC<Props> = ({
 
   const getMuscleLabel = () => {
     const key = exercise.exercise.main_muscle_group as IExerciseMuscle;
-    return (
-      muscleT[key]?.[lang as "es" | "en"] || exercise.exercise.main_muscle_group
-    );
+    return muscleT[key]?.[lang] || exercise.exercise.main_muscle_group;
   };
 
   return (

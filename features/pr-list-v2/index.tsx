@@ -4,6 +4,8 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { prListTranslations as t } from "@/shared/translations/pr-list";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -25,7 +27,7 @@ export const PRListFeatureV2: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const { data: allPRs, isLoading, error, stats } = usePRList(user?.id);
 
@@ -69,9 +71,7 @@ export const PRListFeatureV2: React.FC = () => {
             align="center"
             style={{ marginTop: 8 }}
           >
-            {lang === "es"
-              ? "Necesitas iniciar sesión para ver tus récords"
-              : "You need to sign in to view your records"}
+            {sharedUiTranslations.needToSignIn[lang]}
           </Typography>
         </View>
       </View>
@@ -141,10 +141,7 @@ export const PRListFeatureV2: React.FC = () => {
             align="center"
             style={{ marginTop: 8 }}
           >
-            {error?.message ||
-              (lang === "es"
-                ? "No se pudieron cargar los récords"
-                : "Failed to load records")}
+            {error?.message || sharedUiTranslations.failedToLoadRecords[lang]}
           </Typography>
         </View>
       </View>
@@ -201,13 +198,9 @@ export const PRListFeatureV2: React.FC = () => {
               style={styles.resultsCount}
             >
               {filteredPRs.length}{" "}
-              {lang === "es"
-                ? filteredPRs.length === 1
-                  ? "récord encontrado"
-                  : "récords encontrados"
-                : filteredPRs.length === 1
-                ? "record found"
-                : "records found"}
+              {filteredPRs.length === 1
+                ? sharedUiTranslations.recordFound[lang]
+                : sharedUiTranslations.recordsFound[lang]}
             </Typography>
           </Animated.View>
         )}

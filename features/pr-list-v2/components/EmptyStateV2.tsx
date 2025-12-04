@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { prListTranslations as t } from "@/shared/translations/pr-list";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Search, Trophy } from "lucide-react-native";
@@ -10,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   variant: "no-prs" | "no-results";
   onClearFilters?: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const EmptyStateV2: React.FC<Props> = ({
@@ -69,12 +71,8 @@ export const EmptyStateV2: React.FC<Props> = ({
             style={{ color: colors.text, marginTop: 20 }}
           >
             {isNoPRs
-              ? lang === "es"
-                ? "Sin récords aún"
-                : "No records yet"
-              : lang === "es"
-              ? "Sin resultados"
-              : "No results"}
+              ? sharedUiTranslations.noRecordsYet[lang]
+              : sharedUiTranslations.noResults[lang]}
           </Typography>
 
           {/* Description */}
@@ -85,12 +83,8 @@ export const EmptyStateV2: React.FC<Props> = ({
             style={{ marginTop: 8, paddingHorizontal: 20 }}
           >
             {isNoPRs
-              ? lang === "es"
-                ? "Completa entrenamientos para registrar tus récords personales automáticamente"
-                : "Complete workouts to automatically track your personal records"
-              : lang === "es"
-              ? "No se encontraron récords con los filtros actuales"
-              : "No records found with current filters"}
+              ? sharedUiTranslations.completeWorkoutsToTrackPRs[lang]
+              : sharedUiTranslations.noRecordsWithFilters[lang]}
           </Typography>
 
           {/* Action button for no results */}

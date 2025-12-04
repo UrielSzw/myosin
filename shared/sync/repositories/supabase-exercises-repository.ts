@@ -1,7 +1,10 @@
 import type { ExerciseInsert } from "../../db/schema";
+import type { SupportedLanguage } from "../../types/language";
+import { DEFAULT_LANGUAGE } from "../../types/language";
 import { BaseSupabaseRepository } from "./base-supabase-repository";
 
-export type LanguageCode = "es" | "en";
+/** @deprecated Use SupportedLanguage from shared/types/language instead */
+export type LanguageCode = SupportedLanguage;
 
 export class SupabaseExercisesRepository extends BaseSupabaseRepository {
   /**
@@ -9,7 +12,7 @@ export class SupabaseExercisesRepository extends BaseSupabaseRepository {
    * Usa la función RPC get_exercises_with_translations de Supabase
    */
   async getSystemExercisesWithTranslations(
-    languageCode: LanguageCode = "es"
+    languageCode: SupportedLanguage = DEFAULT_LANGUAGE
   ): Promise<ExerciseInsert[]> {
     try {
       const { data, error } = await this.supabase.rpc(

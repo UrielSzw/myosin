@@ -2,6 +2,8 @@ import type { PRHistoryItem } from "@/features/pr-detail-v2/hooks/use-pr-detail"
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -13,7 +15,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   history: PRHistoryItem[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
@@ -35,7 +37,7 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
       label:
         index === 0 || index === sorted.length - 1
           ? new Date(item.created_at || "").toLocaleDateString(
-              lang === "es" ? "es-ES" : "en-US",
+              getLocale(lang),
               { month: "short", day: "numeric" }
             )
           : "",
@@ -91,9 +93,7 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
             <TrendingUp size={24} color={colors.primary[500]} />
           </View>
           <Typography variant="body2" color="textMuted" align="center">
-            {lang === "es"
-              ? "Necesitas al menos 2 PRs para ver el gráfico"
-              : "You need at least 2 PRs to see the chart"}
+            {sharedUiTranslations.needAtLeast2PRs[lang]}
           </Typography>
         </View>
       </Animated.View>
@@ -138,9 +138,7 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
               {t.progression1RM[lang]}
             </Typography>
             <Typography variant="caption" color="textMuted">
-              {lang === "es"
-                ? "Estimado a lo largo del tiempo"
-                : "Estimated over time"}
+              {sharedUiTranslations.estimatedOverTime[lang]}
             </Typography>
           </View>
         </View>

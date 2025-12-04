@@ -1,6 +1,7 @@
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import type { SupportedLanguage } from "@/shared/types/language";
 import React, { useMemo } from "react";
 import { useDayData } from "../hooks/use-tracker-data";
 import { getMetricDisplayData } from "../types/visual-states";
@@ -12,7 +13,7 @@ type Props = {
   metric: TrackerMetricWithQuickActions;
   date: string;
   onPress: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const MetricCardV2: React.FC<Props> = ({

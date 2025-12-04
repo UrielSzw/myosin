@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   DEFAULT_FILTERS,
   EQUIPMENT_GROUPS,
@@ -18,7 +19,7 @@ export const useExerciseFilters = (
 ) => {
   const [filters, setFilters] = useState<ExerciseFilters>(DEFAULT_FILTERS);
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = exerciseSelectorTranslations;
 
   // Helper para obtener label de categoría traducido

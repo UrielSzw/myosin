@@ -1,7 +1,9 @@
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import React, { useMemo } from "react";
@@ -30,7 +32,7 @@ export const WorkoutSessionListV2: React.FC = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Fetch sessions data
   const { data: sessions, isLoading, isError, stats } = useSessionList();
@@ -116,9 +118,7 @@ export const WorkoutSessionListV2: React.FC = () => {
               />
             )}
             <Typography variant="body1" color="textMuted" align="center">
-              {lang === "es"
-                ? "Error al cargar sesiones"
-                : "Error loading sessions"}
+              {sharedUiTranslations.errorLoadingSessions[lang]}
             </Typography>
           </View>
         </View>
@@ -193,13 +193,9 @@ export const WorkoutSessionListV2: React.FC = () => {
             style={styles.resultsCount}
           >
             {filteredSessions.length}{" "}
-            {lang === "es"
-              ? filteredSessions.length === 1
-                ? "sesión encontrada"
-                : "sesiones encontradas"
-              : filteredSessions.length === 1
-              ? "session found"
-              : "sessions found"}
+            {filteredSessions.length === 1
+              ? sharedUiTranslations.sessionFound[lang]
+              : sharedUiTranslations.sessionsFound[lang]}
           </Typography>
         </Animated.View>
 

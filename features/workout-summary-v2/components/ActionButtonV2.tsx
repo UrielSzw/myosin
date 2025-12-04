@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { LinearGradient } from "expo-linear-gradient";
 import { ChevronRight } from "lucide-react-native";
@@ -18,7 +18,7 @@ import Animated, {
 
 type Props = {
   onPress: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   baseDelay?: number;
 };
 

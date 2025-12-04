@@ -250,6 +250,11 @@ export const profileTranslations = {
     es: "Idioma",
     en: "Language",
   },
+  // Display current language name in user's language
+  currentLanguageName: {
+    es: "Español",
+    en: "English",
+  },
   languageEs: {
     es: "Español",
     en: "Spanish",

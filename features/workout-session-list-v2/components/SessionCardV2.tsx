@@ -1,6 +1,7 @@
 import { SessionListItem } from "@/features/workout-session-list-v2/types/session-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -18,7 +19,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 type Props = {
   session: SessionListItem;
   index: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
@@ -68,7 +69,7 @@ export const SessionCardV2: React.FC<Props> = ({ session, index, lang }) => {
       day: "numeric",
       month: "short",
     };
-    return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", options);
+    return date.toLocaleDateString(getLocale(lang), options);
   };
 
   return (

@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Button } from "@/shared/ui/button";
@@ -174,7 +175,7 @@ const GlowingLogo = ({ size }: { size: number }) => {
 export default function WelcomeScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = onboardingTranslations.welcome;
   const { nextStep, reset } = useOnboardingStore();
 

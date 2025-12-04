@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
@@ -33,7 +34,7 @@ export const WorkoutsContent = ({
   const insets = useSafeAreaInsets();
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Calculate header height to match TrackerFeatureV2
   const headerHeight = insets.top + 8 + 60 + 20;

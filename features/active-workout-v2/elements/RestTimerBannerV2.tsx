@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   useActiveRestTimer,
   useActiveRestTimerActions,
@@ -37,7 +38,7 @@ const PROGRESS_HEIGHT = 4;
 export const RestTimerBannerV2: React.FC = () => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = activeWorkoutTranslations;
   const { skipRestTimer } = useActiveRestTimerActions();
   const restTimerStore = useActiveRestTimer();

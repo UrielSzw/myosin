@@ -1,3 +1,7 @@
+import {
+  DEFAULT_LANGUAGE,
+  type SupportedLanguage,
+} from "@/shared/types/language";
 import { Link2, RotateCcw, Target } from "lucide-react-native";
 import { routineFormTranslations } from "../translations/routine-form";
 import {
@@ -48,7 +52,7 @@ export const useBlockStyles = () => {
 
   const getBlockTypeLabel = (
     blockType: IBlockType,
-    lang: "es" | "en" = "es"
+    lang: SupportedLanguage = DEFAULT_LANGUAGE
   ) => {
     const blockTypeMap = {
       superset: t.blockTypeSuperset[lang],

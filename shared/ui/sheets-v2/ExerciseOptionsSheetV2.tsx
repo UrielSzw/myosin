@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Typography } from "@/shared/ui/typography";
@@ -54,7 +55,7 @@ export const ExerciseOptionsSheetV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Animations
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;

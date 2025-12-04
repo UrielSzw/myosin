@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { BlockInsert } from "@/shared/db/schema";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -47,7 +48,7 @@ export const ReorderExercisesV2Feature: React.FC<Props> = ({
   const { colors, isDarkMode } = useColorScheme();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = reorderTranslations;
   const { getBlockTypeLabel, getBlockColors } = useBlockStyles();
 

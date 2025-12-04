@@ -1,5 +1,5 @@
 import { CurrentPR } from "@/features/pr-detail-v2/hooks/use-pr-detail";
-import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import type { SupportedLanguage } from "@/shared/types/language";import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
@@ -12,10 +12,10 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   currentPR: CurrentPR;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
-const formatRelativeDate = (dateString: string, lang: "es" | "en"): string => {
+const formatRelativeDate = (dateString: string, lang: SupportedLanguage): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());

@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
@@ -39,7 +40,7 @@ export const WorkoutsFeatureV2 = () => {
   const { folders } = useMainWorkoutsData();
   const queryClient = useQueryClient();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const { handleDeleteRoutine, handleEditRoutine, handleRemoveTrainingDays } =
     useRoutineOptions();
 

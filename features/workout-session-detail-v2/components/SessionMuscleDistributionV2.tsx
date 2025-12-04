@@ -1,6 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { exerciseMuscleTranslations } from "@/shared/translations/exercise-labels";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -17,7 +18,7 @@ type MuscleGroupData = {
 
 type Props = {
   muscleGroups: MuscleGroupData[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 // Muscle group colors
@@ -58,7 +59,7 @@ export const SessionMuscleDistributionV2: React.FC<Props> = ({
   // Get translated muscle name
   const getMuscleLabel = (group: string): string => {
     const key = group.toLowerCase() as IExerciseMuscle;
-    return muscleT[key]?.[lang as "es" | "en"] || group;
+    return muscleT[key]?.[lang] || group;
   };
 
   return (

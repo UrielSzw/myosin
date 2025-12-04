@@ -155,4 +155,30 @@ export const workoutSessionDetailTranslations = {
     es: "Realizado",
     en: "Completed",
   },
+
+  // Hero Card Status
+  completedStatus: {
+    es: "COMPLETADO",
+    en: "COMPLETED",
+  },
+  inProgress: {
+    es: "EN PROGRESO",
+    en: "IN PROGRESS",
+  },
+
+  // PR Messages
+  personalRecordSingular: {
+    es: "récord personal en esta sesión",
+    en: "personal record in this session",
+  },
+  personalRecordPlural: {
+    es: "récords personales en esta sesión",
+    en: "personal records in this session",
+  },
+
+  // Block count
+  blocks: {
+    es: "bloques",
+    en: "blocks",
+  },
 } as const;

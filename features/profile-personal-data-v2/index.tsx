@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { personalDataTranslations as t } from "@/shared/translations/personal-data";
@@ -19,7 +20,7 @@ const ProfilePersonalDataFeatureV2 = () => {
   const { colors } = useColorScheme();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const [showWeightSheet, setShowWeightSheet] = useState(false);
   const [showHeightSheet, setShowHeightSheet] = useState(false);

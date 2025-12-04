@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useAnalyticsData } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { useTrackerAnalytics } from "@/features/analytics-v2/hooks/use-tracker-analytics";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -25,7 +26,7 @@ export const AnalyticsFeatureV2 = () => {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Data fetching
   const {

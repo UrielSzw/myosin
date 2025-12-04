@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   MAIN_CATEGORIES,
   MAIN_CATEGORY_ICONS,
@@ -101,7 +102,7 @@ export const CategoryTabsV2: React.FC<Props> = ({
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = exerciseSelectorTranslations;
 
   // Helper para obtener el label traducido

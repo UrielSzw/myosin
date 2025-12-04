@@ -1,4 +1,4 @@
-﻿// Solo importar expo-crypto para React Native
+// Solo importar expo-crypto para React Native
 import { randomUUID as expoRandomUUID } from "expo-crypto";
 import "react-native-get-random-values";
 

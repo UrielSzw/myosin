@@ -3,7 +3,9 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,7 +28,7 @@ type Props = {
 export const NextWorkoutCardV2 = ({ routines }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const { initializeWorkout } = useActiveMainActions();
   const { user } = useAuth();
 
@@ -69,9 +71,7 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
       if (routine) {
         const dayLabel =
           i === 1
-            ? lang === "es"
-              ? "Mañana"
-              : "Tomorrow"
+            ? t.tomorrow[lang]
             : dayNames[nextDate.getDay()].charAt(0).toUpperCase() +
               dayNames[nextDate.getDay()].slice(1);
         return { routine, isToday: false, dayLabel };
@@ -295,12 +295,8 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
                 <Typography variant="caption" color="textMuted">
                   {routine.exercisesCount}{" "}
                   {routine.exercisesCount === 1
-                    ? lang === "es"
-                      ? "ejercicio"
-                      : "exercise"
-                    : lang === "es"
-                    ? "ejercicios"
-                    : "exercises"}
+                    ? sharedUiTranslations.exercise[lang]
+                    : sharedUiTranslations.exercises[lang]}
                 </Typography>
               </View>
             </View>

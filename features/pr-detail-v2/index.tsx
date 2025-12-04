@@ -3,6 +3,7 @@ import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackgr
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { prDetailTranslations } from "@/shared/translations/pr-detail";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -20,11 +21,11 @@ type Props = {
 export const PRDetailFeatureV2: React.FC<Props> = ({ exerciseId }) => {
   const { user } = useAuth();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = prDetailTranslations;
   const insets = useSafeAreaInsets();
 
-  const { data, isLoading, error } = usePRDetail(exerciseId, user?.id);
+  const { data, isLoading, error } = usePRDetail(exerciseId, user?.id, lang);
 
   if (error) {
     console.error("[PRDetailFeatureV2] Error loading data:", error);

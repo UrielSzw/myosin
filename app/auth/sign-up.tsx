@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
@@ -191,7 +192,7 @@ export default function SignUpScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const { signUp } = useAuth();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = authTranslations.signUp;
 
   // Aurora animation

@@ -30,7 +30,7 @@ export const user_preferences = sqliteTable(
       .$type<"metric" | "imperial">()
       .default("metric")
       .notNull(),
-    language: text("language").$type<"en" | "es">().default("es").notNull(),
+    language: text("language").$type<"en" | "es">().default("en").notNull(),
 
     // Feature toggles
     show_rpe: integer("show_rpe", { mode: "boolean" }).default(true).notNull(),

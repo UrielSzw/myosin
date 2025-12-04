@@ -1,6 +1,7 @@
 import { calculateCalories } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -29,7 +30,7 @@ type MacroHistorySheetProps = {
   visible: boolean;
   onClose: () => void;
   selectedDate: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const translations = {
@@ -77,7 +78,7 @@ export const MacroHistorySheetV2: React.FC<MacroHistorySheetProps> = ({
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleTimeString(lang === "es" ? "es-ES" : "en-US", {
+    return date.toLocaleTimeString(getLocale(lang), {
       hour: "2-digit",
       minute: "2-digit",
     });

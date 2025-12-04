@@ -3,6 +3,10 @@ import type {
   TrackerMetricWithQuickActions,
 } from "@/shared/db/schema/tracker";
 import { trackerTranslations } from "@/shared/translations/tracker";
+import {
+  DEFAULT_LANGUAGE,
+  type SupportedLanguage,
+} from "@/shared/types/language";
 import type { ThemeColors } from "@/shared/types/theme";
 import { getInputConfig } from "../constants/templates";
 
@@ -45,7 +49,7 @@ export const getMetricDisplayData = (
   metric: TrackerMetricWithQuickActions,
   metricData: TrackerDayData["metrics"][0] | undefined,
   colors: ThemeColors,
-  lang: "es" | "en" = "es"
+  lang: SupportedLanguage = DEFAULT_LANGUAGE
 ): MetricDisplayData => {
   const hasEntry = (metricData?.entries?.length || 0) > 0;
   const currentValue = metricData?.aggregate?.sum_normalized || 0;
@@ -99,7 +103,7 @@ const getBooleanDisplayData = (
   hasEntry: boolean,
   currentValue: number,
   colors: ThemeColors,
-  lang: "es" | "en"
+  lang: SupportedLanguage
 ): MetricDisplayData => {
   const t = trackerTranslations;
 
@@ -162,7 +166,7 @@ const getScaleDisplayData = (
   hasEntry: boolean,
   currentValue: number,
   colors: ThemeColors,
-  lang: "es" | "en"
+  lang: SupportedLanguage
 ): MetricDisplayData => {
   const t = trackerTranslations;
 
@@ -262,7 +266,7 @@ const getNumericDisplayData = (
   currentValue: number,
   state: MetricVisualState,
   colors: ThemeColors,
-  lang: "es" | "en"
+  lang: SupportedLanguage
 ): MetricDisplayData => {
   // Color de acento basado en el color de la métrica
   const accentColor = metric.color || colors.primary[500];

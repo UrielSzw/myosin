@@ -135,8 +135,8 @@ export const analyticsTranslations = {
     en: "View less",
   },
   viewAll: {
-    es: "Ver todos ({count} más)",
-    en: "View all ({count} more)",
+    es: "Ver todos",
+    en: "View all",
   },
 
   // Smart PR Display
@@ -423,5 +423,27 @@ export const analyticsTranslations = {
   pending: {
     es: "pendientes",
     en: "pending",
+  },
+
+  // Week days short
+  weekDaysShort: {
+    es: {
+      monday: "Lun",
+      tuesday: "Mar",
+      wednesday: "Mié",
+      thursday: "Jue",
+      friday: "Vie",
+      saturday: "Sáb",
+      sunday: "Dom",
+    },
+    en: {
+      monday: "Mon",
+      tuesday: "Tue",
+      wednesday: "Wed",
+      thursday: "Thu",
+      friday: "Fri",
+      saturday: "Sat",
+      sunday: "Sun",
+    },
   },
 };

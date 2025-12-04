@@ -3,7 +3,7 @@ import {
   ExerciseInBlockInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import type { SupportedLanguage } from "@/shared/types/language";import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -38,7 +38,7 @@ type Props = {
   trainingDays: string[];
   blocksByRoutine: string[];
   exercisesByBlock: Record<string, string[]>;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const VolumePreviewV2: React.FC<Props> = ({

@@ -6,7 +6,11 @@ import {
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { profileTranslations as t } from "@/shared/translations/profile";
-import { AVAILABLE_LANGUAGES } from "@/shared/ui/language-selector-sheet";
+import type { SupportedLanguage } from "@/shared/types/language";
+import {
+  SUPPORTED_LANGUAGES,
+  toSupportedLanguage,
+} from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Check, Globe, X } from "lucide-react-native";
@@ -34,14 +38,14 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
   const prefs = useUserPreferences();
   const { setLanguage } = useUserPreferencesActions();
   const { syncExercises } = useExercisesSync();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
-  const currentLanguage = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
+  const currentLanguage = toSupportedLanguage(prefs?.language);
 
   // Animations
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   const backdropAnim = useRef(new Animated.Value(0)).current;
   const optionsAnim = useRef(
-    AVAILABLE_LANGUAGES.map(() => new Animated.Value(0))
+    SUPPORTED_LANGUAGES.map(() => new Animated.Value(0))
   ).current;
 
   useEffect(() => {
@@ -89,7 +93,7 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
 
-  const handleSelectLanguage = async (languageCode: "en" | "es") => {
+  const handleSelectLanguage = async (languageCode: SupportedLanguage) => {
     if (user?.id && languageCode !== currentLanguage) {
       setLanguage(user.id, languageCode);
       syncExercises(languageCode, { force: true }).catch((error) => {
@@ -207,7 +211,7 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
 
           {/* Language Options */}
           <View style={styles.optionsContainer}>
-            {AVAILABLE_LANGUAGES.map((language, index) => {
+            {SUPPORTED_LANGUAGES.map((language, index) => {
               const isSelected = currentLanguage === language.code;
               const animatedStyle = {
                 opacity: optionsAnim[index],
@@ -263,7 +267,7 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
                       ]}
                     >
                       <Typography style={{ fontSize: 28 }}>
-                        {language.code === "es" ? "🇪🇸" : "🇺🇸"}
+                        {language.flag}
                       </Typography>
                     </View>
 
@@ -276,14 +280,14 @@ export const LanguageSelectorSheetV2 = ({ visible, onClose }: Props) => {
                           color: isSelected ? colors.primary[500] : colors.text,
                         }}
                       >
-                        {language.nativeName}
+                        {language.name}
                       </Typography>
                       <Typography
                         variant="caption"
                         color="textMuted"
                         style={{ marginTop: 2 }}
                       >
-                        {language.name}
+                        {language.englishName}
                       </Typography>
                     </View>
 

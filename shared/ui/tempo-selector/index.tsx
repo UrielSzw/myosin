@@ -1,6 +1,8 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { tempoSelectorTranslations } from "@/shared/translations/tempo-selector";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BottomSheetModal, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import { BlurView } from "expo-blur";
@@ -99,7 +101,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
     const { colors, colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
     const prefs = useUserPreferences();
-    const lang = prefs?.language ?? "es";
+    const lang = toSupportedLanguage(prefs?.language);
     const t = tempoSelectorTranslations;
 
     // V2 Glassmorphism colors
@@ -310,9 +312,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
               color="textMuted"
               style={{ textAlign: "center" }}
             >
-              {lang === "es"
-                ? "Configura el ritmo de ejecución del ejercicio"
-                : "Configure exercise execution tempo"}
+              {sharedUiTranslations.configureExerciseTempo[lang]}
             </Typography>
 
             {/* Current Tempo Display */}
@@ -345,7 +345,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                       marginBottom: 4,
                     }}
                   >
-                    {lang === "es" ? "Sin tempo asignado" : "No tempo assigned"}
+                    {tempoSelectorTranslations.noTempoAssigned[lang]}
                   </Typography>
                   <Typography
                     variant="h3"
@@ -424,9 +424,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
               >
                 {displayState.isEmpty
                   ? t.selectTempoForExercise[lang]
-                  : lang === "es"
-                  ? "Excéntrica - Pausa - Concéntrica - Pausa"
-                  : "Eccentric - Pause - Concentric - Pause"}
+                  : t.tempoPhaseLabels[lang]}
               </Typography>
             </Animated.View>
           </BlurView>
@@ -771,7 +769,7 @@ export const TempoSelector = forwardRef<BottomSheetModal, Props>(
                             {value}
                           </Typography>
                           <Typography variant="caption" color="textMuted">
-                            {lang === "es" ? "segundos" : "seconds"}
+                            {tempoSelectorTranslations.seconds[lang]}
                           </Typography>
                         </View>
 

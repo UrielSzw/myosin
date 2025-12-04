@@ -2,6 +2,7 @@ import type { PRHistoryItem } from "@/features/pr-detail-v2/hooks/use-pr-detail"
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -12,7 +13,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 interface Props {
   history: PRHistoryItem[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }
 
 const getMedalIcon = (position: number) => {
@@ -28,9 +29,9 @@ const getMedalIcon = (position: number) => {
   }
 };
 
-const formatDate = (dateStr: string, lang: string): string => {
+const formatDate = (dateStr: string, lang: SupportedLanguage): string => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
+  return date.toLocaleDateString(getLocale(lang), {
     day: "numeric",
     month: "short",
     year: "numeric",

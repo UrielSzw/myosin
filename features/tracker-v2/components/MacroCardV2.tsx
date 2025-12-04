@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -26,7 +27,7 @@ import { MacroSetupModalV2 } from "./MacroSetupModalV2";
 
 type MacroCardProps = {
   selectedDate: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const translations = {

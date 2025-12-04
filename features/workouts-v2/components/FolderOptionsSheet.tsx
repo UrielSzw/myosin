@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -43,7 +44,7 @@ export const FolderOptionsSheet = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   // Animations
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;

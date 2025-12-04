@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   useActiveSetActions,
   useActiveWorkout,
@@ -35,7 +36,7 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
   const { sets, setsByExercise, session } = useActiveWorkout();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = activeWorkoutTranslations;
   const { getBlockColors } = useBlockStyles();
   const { addSet } = useActiveSetActions();

@@ -1,4 +1,9 @@
 import { prRepository } from "@/shared/db/repository/pr";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import {
+  DEFAULT_LANGUAGE,
+  type SupportedLanguage,
+} from "@/shared/types/language";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { useQuery } from "@tanstack/react-query";
 
@@ -52,9 +57,14 @@ export type PRDetailData = {
 
 export const PR_DETAIL_QUERY_KEY = ["prDetail"];
 
-export const usePRDetail = (exerciseId: string, userId?: string) => {
+export const usePRDetail = (
+  exerciseId: string,
+  userId?: string,
+  lang: SupportedLanguage = DEFAULT_LANGUAGE
+) => {
+  const t = sharedUiTranslations;
   const query = useQuery<PRDetailData>({
-    queryKey: [...PR_DETAIL_QUERY_KEY, exerciseId, userId],
+    queryKey: [...PR_DETAIL_QUERY_KEY, exerciseId, userId, lang],
     queryFn: async (): Promise<PRDetailData> => {
       if (!userId) {
         throw new Error("userId is required");
@@ -74,7 +84,7 @@ export const usePRDetail = (exerciseId: string, userId?: string) => {
       // Calcular stats de progreso
       let progressStats = {
         totalProgress: 0,
-        timeSpan: "0 días",
+        timeSpan: `0 ${t.days[lang]}`,
         averageIncrease: 0,
         bestStreak: 0,
       };
@@ -96,8 +106,10 @@ export const usePRDetail = (exerciseId: string, userId?: string) => {
 
         const timeSpan =
           diffMonths > 0
-            ? `${diffMonths} ${diffMonths === 1 ? "mes" : "meses"}`
-            : `${diffDays} días`;
+            ? `${diffMonths} ${
+                diffMonths === 1 ? t.month[lang] : t.months[lang]
+              }`
+            : `${diffDays} ${t.days[lang]}`;
 
         const averageIncrease =
           diffMonths > 0 ? weightProgress / diffMonths : 0;

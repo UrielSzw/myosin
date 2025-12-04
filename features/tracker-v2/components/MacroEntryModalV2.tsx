@@ -1,6 +1,7 @@
 import { calculateCalories } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Beef, Droplets, Flame, Wheat, X } from "lucide-react-native";
@@ -25,7 +26,7 @@ type MacroEntryModalProps = {
   visible: boolean;
   onClose: () => void;
   selectedDate: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const translations = {

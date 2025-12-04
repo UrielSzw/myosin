@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { mediaUrlCache } from "@/shared/services/secure-media-service";
@@ -29,7 +30,7 @@ export const ExerciseMedia: React.FC<Props> = ({
 }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = exerciseSelectorTranslations;
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);

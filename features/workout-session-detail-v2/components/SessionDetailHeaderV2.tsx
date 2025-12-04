@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -10,7 +11,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 type Props = {
   routineName: string;
   date: string;
-  lang: string;
+  lang: SupportedLanguage;
 };
 
 export const SessionDetailHeaderV2: React.FC<Props> = ({
@@ -32,10 +33,7 @@ export const SessionDetailHeaderV2: React.FC<Props> = ({
       month: "short",
       year: "numeric",
     };
-    return dateObj.toLocaleDateString(
-      lang === "es" ? "es-ES" : "en-US",
-      options
-    );
+    return dateObj.toLocaleDateString(getLocale(lang), options);
   };
 
   return (

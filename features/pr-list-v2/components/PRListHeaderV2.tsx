@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { prListTranslations as t } from "@/shared/translations/pr-list";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -12,7 +14,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   totalPRs: number;
   recentPRsCount: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const PRListHeaderV2: React.FC<Props> = ({
@@ -110,13 +112,9 @@ export const PRListHeaderV2: React.FC<Props> = ({
               style={{ color: colors.success[500] }}
             >
               {recentPRsCount}{" "}
-              {lang === "es"
-                ? recentPRsCount === 1
-                  ? "nuevo esta semana"
-                  : "nuevos esta semana"
-                : recentPRsCount === 1
-                ? "new this week"
-                : "new this week"}
+              {recentPRsCount === 1
+                ? sharedUiTranslations.newThisWeekSingular[lang]
+                : sharedUiTranslations.newThisWeekPlural[lang]}
             </Typography>
           </View>
         </Animated.View>

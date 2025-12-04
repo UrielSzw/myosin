@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import type { SupportedLanguage } from "@/shared/types/language";
 import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
@@ -24,7 +25,7 @@ type Props = {
   selectedDate: string;
   onDateChange: (date: string) => void;
   userId: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 type DayInfo = {

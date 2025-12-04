@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
@@ -33,7 +34,7 @@ export const AnimatedIconButton: React.FC<AnimatedIconButtonProps> = ({
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = sharedUiTranslations;
   const haptic = useHaptic();
 
@@ -116,7 +117,7 @@ export const AnimatedColorButton: React.FC<AnimatedColorButtonProps> = ({
 }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = sharedUiTranslations;
   const haptic = useHaptic();
 

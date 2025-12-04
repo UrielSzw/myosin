@@ -1,4 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { CheckCircle2, Clock, Target } from "lucide-react-native";
@@ -21,7 +23,7 @@ type Props = {
   totalSets: number;
   duration: string;
   isCompleted: boolean;
-  lang: string;
+  lang: SupportedLanguage;
 };
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -158,13 +160,7 @@ export const SessionHeroCardV2: React.FC<Props> = ({
                 weight="bold"
                 style={{ color: statusColor }}
               >
-                {isCompleted
-                  ? lang === "es"
-                    ? "COMPLETADO"
-                    : "COMPLETED"
-                  : lang === "es"
-                  ? "EN PROGRESO"
-                  : "IN PROGRESS"}
+                {isCompleted ? t.completedStatus[lang] : t.inProgress[lang]}
               </Typography>
             </View>
 

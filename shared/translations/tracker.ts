@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from "@/shared/types/language";
+
 export const trackerTranslations = {
   // Main Headers
   dailyMetrics: {
@@ -481,7 +483,7 @@ export const trackerTranslations = {
  */
 export const getMetricName = (
   metric: { slug: string | null; name: string },
-  lang: "es" | "en"
+  lang: SupportedLanguage
 ): string => {
   if (
     metric.slug &&
@@ -501,7 +503,7 @@ export const getMetricName = (
  */
 export const getQuickActionLabel = (
   action: { slug: string | null; label: string },
-  lang: "es" | "en"
+  lang: SupportedLanguage
 ): string => {
   if (
     action.slug &&
@@ -521,7 +523,7 @@ export const getQuickActionLabel = (
  */
 export const getMetricUnit = (
   metric: { slug: string | null; unit: string },
-  lang: "es" | "en",
+  lang: SupportedLanguage,
   weightUnit?: "kg" | "lb" | "lbs"
 ): string => {
   // Special case for weight - use user's preference

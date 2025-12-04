@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations as t } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, Minus, Plus, Timer, X, Zap } from "lucide-react-native";
@@ -52,7 +54,7 @@ export const RestTimeSheetV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const [selectedTime, setSelectedTime] = useState<number>(currentValue);
 
@@ -101,33 +103,20 @@ export const RestTimeSheetV2 = ({
     switch (restTimeType) {
       case "between-exercises":
         return {
-          title:
-            lang === "es"
-              ? "Descanso entre Ejercicios"
-              : "Rest Between Exercises",
-          subtitle:
-            lang === "es"
-              ? "Tiempo entre ejercicios del superset"
-              : "Time between superset exercises",
+          title: t.restBetweenExercises[lang],
+          subtitle: t.timeBetweenSupersetExercises[lang],
           icon: <Zap size={22} color={colors.primary[500]} />,
         };
       case "between-rounds":
         return {
-          title:
-            lang === "es" ? "Descanso entre Rondas" : "Rest Between Rounds",
-          subtitle:
-            lang === "es"
-              ? "Tiempo después de completar la ronda"
-              : "Time after completing the round",
+          title: t.restBetweenRounds[lang],
+          subtitle: t.timeAfterCompletingRound[lang],
           icon: <Timer size={22} color={colors.primary[500]} />,
         };
       default:
         return {
-          title: lang === "es" ? "Tiempo de Descanso" : "Rest Time",
-          subtitle:
-            lang === "es"
-              ? "Ajusta el tiempo entre series"
-              : "Adjust time between sets",
+          title: t.restTime[lang],
+          subtitle: t.adjustTimeBetweenSets[lang],
           icon: <Clock size={22} color={colors.primary[500]} />,
         };
     }
@@ -136,7 +125,7 @@ export const RestTimeSheetV2 = ({
   const headerInfo = getHeaderInfo();
 
   const formatTime = (seconds: number) => {
-    if (seconds === 0) return lang === "es" ? "Sin descanso" : "No rest";
+    if (seconds === 0) return t.noRest[lang];
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -276,7 +265,7 @@ export const RestTimeSheetV2 = ({
               color="textMuted"
               style={{ marginBottom: 12, marginLeft: 4 }}
             >
-              {lang === "es" ? "Tiempo personalizado" : "Custom time"}
+              {t.customTime[lang]}
             </Typography>
 
             <View
@@ -343,7 +332,7 @@ export const RestTimeSheetV2 = ({
               color="textMuted"
               style={{ marginBottom: 12, marginLeft: 4 }}
             >
-              {lang === "es" ? "Opciones rápidas" : "Quick options"}
+              {t.quickOptions[lang]}
             </Typography>
 
             <ScrollView
@@ -409,7 +398,7 @@ export const RestTimeSheetV2 = ({
                 weight="semibold"
                 style={{ color: "#fff" }}
               >
-                {lang === "es" ? "Aplicar Tiempo" : "Apply Time"}
+                {t.applyTime[lang]}
               </Typography>
             </Pressable>
           </View>

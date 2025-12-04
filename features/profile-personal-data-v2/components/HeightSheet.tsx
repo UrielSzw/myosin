@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { usersRepository } from "@/shared/db/repository/user";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import {
@@ -34,7 +35,7 @@ export const HeightSheet: React.FC<Props> = ({
   const { colors, isDarkMode } = useColorScheme();
   const { user } = useAuth();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const distanceUnit = prefs?.distance_unit ?? "metric";
 
   // Convert to display values

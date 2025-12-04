@@ -2,6 +2,7 @@ import { PRListItem } from "@/features/pr-list-v2/types/pr-list";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prListTranslations as t } from "@/shared/translations/pr-list";
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -14,7 +15,7 @@ type Props = {
   pr: PRListItem;
   index: number;
   onPress?: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const getMedalInfo = (
@@ -42,7 +43,7 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
       day: "numeric",
       month: "short",
     };
-    return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", options);
+    return date.toLocaleDateString(getLocale(lang), options);
   };
 
   const { Icon, color } = getMedalInfo(pr.estimated_1rm);

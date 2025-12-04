@@ -5,7 +5,7 @@ import {
   useDeleteMetric,
   useUpdateMetric,
 } from "@/features/tracker-v2/hooks/use-tracker-data";
-import { MainMetric } from "@/shared/db/schema";
+import type { SupportedLanguage } from "@/shared/types/language";import { MainMetric } from "@/shared/db/schema";
 import {
   BaseTrackerEntry,
   TrackerMetricWithQuickActions,
@@ -61,7 +61,7 @@ type Props = {
   selectedMetric: MainMetric | null;
   setSelectedMetric: (metric: MainMetric | null) => void;
   selectedDate: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const MetricModalV2: React.FC<Props> = ({
@@ -514,7 +514,7 @@ const HeaderContent: React.FC<{
   onClose: () => void;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   selectedMetric,
   IconComponent,
@@ -633,7 +633,7 @@ const QuickActionsSection: React.FC<{
   totalValue: number;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   quickActions,
   quickActionCounts,
@@ -787,7 +787,7 @@ const QuickActionContent: React.FC<{
   onIncrement: () => void;
   onDecrement: () => void;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   action,
   ActionIcon,
@@ -904,7 +904,7 @@ const ManualInputSection: React.FC<{
   isPending: boolean;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   inputValue,
   setInputValue,
@@ -1039,7 +1039,7 @@ const ScaleInputSection: React.FC<{
   onSelect: (value: number, displayValue: string) => void;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ metric, currentEntry, onSelect, colors, isDarkMode, lang }) => {
   const t = trackerTranslations;
   const inputConfig = getInputConfig(metric.slug);
@@ -1214,7 +1214,7 @@ const BooleanInputSection: React.FC<{
   metric: MainMetric;
   onSelect: (value: number, displayValue: string) => void;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ metric, onSelect, colors, lang }) => {
   const t = trackerTranslations;
   const [selectedValue, setSelectedValue] = useState<number | null>(null);
@@ -1389,7 +1389,7 @@ const HistorySection: React.FC<{
   metricColor: string;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   entries,
   isWeightMetric,
@@ -1561,7 +1561,7 @@ const SummarySection: React.FC<{
   metricColor: string;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   currentValue,
   target,
@@ -1627,7 +1627,7 @@ const SummaryContent: React.FC<{
   metricColor: string;
   progress: number;
   colors: ThemeColors;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   currentValue,
   target,
@@ -1724,7 +1724,7 @@ const SettingsSection: React.FC<{
   onDelete: () => void;
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({
   selectedMetric,
   targetValue,

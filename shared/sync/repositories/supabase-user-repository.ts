@@ -1,4 +1,5 @@
 import type { BaseUserPreferences } from "../../db/schema/user";
+import { DEFAULT_LANGUAGE } from "../../types/language";
 import { BaseSupabaseRepository } from "./base-supabase-repository";
 
 export class SupabaseUserRepository extends BaseSupabaseRepository {
@@ -14,7 +15,7 @@ export class SupabaseUserRepository extends BaseSupabaseRepository {
           theme: data.theme || "dark",
           weight_unit: data.weight_unit || "kg",
           distance_unit: data.distance_unit || "metric",
-          language: data.language || "es",
+          language: data.language || DEFAULT_LANGUAGE,
           show_rpe: data.show_rpe ?? false,
           show_tempo: data.show_tempo ?? false,
           keep_screen_awake: data.keep_screen_awake ?? true,

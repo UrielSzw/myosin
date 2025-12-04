@@ -16,6 +16,7 @@ import { useAuth } from "@/shared/providers/auth-provider";
 import { queryKeys } from "@/shared/queries/query-keys";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useActiveWorkout } from "./use-active-workout-store";
@@ -24,7 +25,7 @@ type SaveSessionState = "idle" | "saving" | "success" | "error";
 
 export const useSaveWorkoutSession = () => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = activeWorkoutTranslations;
   const [saveState, setSaveState] = useState<SaveSessionState>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -35,12 +36,12 @@ export const useSaveWorkoutSession = () => {
 
   const saveWorkoutSession = async (): Promise<string | null> => {
     if (!user) {
-      setError("Usuario no autenticado");
+      setError(t.userNotAuthenticated[lang]);
       return null;
     }
 
     if (!activeWorkout?.session) {
-      setError("No hay workout activo para guardar");
+      setError(t.noActiveWorkout[lang]);
       return null;
     }
 

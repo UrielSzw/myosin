@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   totalSessions: number;
   recentSessionsCount: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionListHeaderV2: React.FC<Props> = ({

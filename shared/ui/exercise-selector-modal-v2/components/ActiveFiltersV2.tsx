@@ -1,5 +1,7 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations as t } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { X } from "lucide-react-native";
 import React from "react";
@@ -32,7 +34,7 @@ export const ActiveFiltersV2: React.FC<Props> = ({
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
 
   if (activeFilters.length === 0) {
     return null;
@@ -57,8 +59,7 @@ export const ActiveFiltersV2: React.FC<Props> = ({
           color="textMuted"
           style={{ fontSize: 12, opacity: 0.7 }}
         >
-          {lang === "es" ? "Filtros activos" : "Active filters"} (
-          {activeFilters.length})
+          {t.activeFilters[lang]} ({activeFilters.length})
         </Typography>
         <TouchableOpacity
           onPress={onClearAll}
@@ -71,16 +72,14 @@ export const ActiveFiltersV2: React.FC<Props> = ({
               : "rgba(239, 68, 68, 0.1)",
           }}
           accessibilityRole="button"
-          accessibilityLabel={
-            lang === "es" ? "Limpiar filtros" : "Clear filters"
-          }
+          accessibilityLabel={t.clearFilters[lang]}
         >
           <Typography
             variant="caption"
             weight="medium"
             style={{ color: "#ef4444", fontSize: 11 }}
           >
-            {lang === "es" ? "Limpiar" : "Clear"}
+            {t.clear[lang]}
           </Typography>
         </TouchableOpacity>
       </View>
@@ -145,9 +144,7 @@ export const ActiveFiltersV2: React.FC<Props> = ({
                     : "rgba(0, 0, 0, 0.06)",
                 }}
                 accessibilityRole="button"
-                accessibilityLabel={`${
-                  lang === "es" ? "Remover filtro" : "Remove filter"
-                } ${filter.label}`}
+                accessibilityLabel={`${t.removeFilter[lang]} ${filter.label}`}
               >
                 <X size={12} color={colors.textMuted} />
               </TouchableOpacity>

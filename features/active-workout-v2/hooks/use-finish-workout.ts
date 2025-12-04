@@ -11,6 +11,7 @@ import { useHaptic } from "@/shared/services/haptic-service";
 import TimerService from "@/shared/services/timer-service";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -25,7 +26,7 @@ import {
 
 export const useFinishWorkout = () => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const weightUnit = prefs?.weight_unit ?? "kg";
   const t = activeWorkoutTranslations;
   const { clearWorkout, detectWorkoutChanges } = useActiveMainActions();
@@ -49,7 +50,7 @@ export const useFinishWorkout = () => {
     shouldUpdateRoutine: boolean
   ): Promise<void> => {
     if (!user || !activeWorkout?.session) {
-      Alert.alert("Error", "No hay workout activo para guardar");
+      Alert.alert("Error", t.noActiveWorkout[lang]);
       return;
     }
 
@@ -66,7 +67,7 @@ export const useFinishWorkout = () => {
       const result = await finishWorkout(payload);
 
       if (!result.success) {
-        throw new Error(result.error || "Error al guardar el workout");
+        throw new Error(result.error || t.errorSavingSession[lang]);
       }
 
       // Prepare summary data BEFORE clearing workout state

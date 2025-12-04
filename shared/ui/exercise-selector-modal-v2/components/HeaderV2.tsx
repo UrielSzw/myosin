@@ -2,6 +2,8 @@ import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { BlurView } from "expo-blur";
 import { ChevronLeft } from "lucide-react-native";
 import React from "react";
@@ -24,7 +26,7 @@ export const HeaderV2: React.FC<Props> = ({
   exerciseToReplace,
 }) => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = exerciseSelectorTranslations;
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -43,9 +45,8 @@ export const HeaderV2: React.FC<Props> = ({
     }
     if (exerciseModalMode === "add-to-block") {
       return {
-        title: lang === "es" ? "Agregar al Superset" : "Add to Superset",
-        subtitle:
-          lang === "es" ? "Selecciona un ejercicio" : "Select an exercise",
+        title: sharedUiTranslations.addToSuperset[lang],
+        subtitle: sharedUiTranslations.selectAnExercise[lang],
       };
     }
     return {
@@ -57,9 +58,7 @@ export const HeaderV2: React.FC<Props> = ({
                 ? t.exerciseSelected[lang]
                 : t.exercisesSelected[lang]
             }`
-          : lang === "es"
-          ? "Selecciona uno o más ejercicios"
-          : "Select one or more exercises",
+          : sharedUiTranslations.selectOneOrMoreExercises[lang],
     };
   };
 

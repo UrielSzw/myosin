@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useUserProfile } from "@/shared/hooks/use-user-profile";
@@ -16,7 +17,7 @@ export const ProfileHeroCard = () => {
   const { user } = useAuth();
   const { profile } = useUserProfile(user);
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const displayName =
     profile.displayName ||

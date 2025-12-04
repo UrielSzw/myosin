@@ -3,6 +3,10 @@ import { useCallback, useState } from "react";
 import { db } from "../db/client";
 import { exercises } from "../db/schema";
 import { SupabaseExercisesRepository } from "../sync/repositories/supabase-exercises-repository";
+import { isValidLanguage, type SupportedLanguage } from "../types/language";
+
+// Re-export for backward compatibility
+export type { SupportedLanguage } from "../types/language";
 
 // ============================================================================
 // Constants
@@ -15,8 +19,6 @@ const SYNC_INTERVAL_MS = 24 * 60 * 60 * 1000; // 24 horas
 // ============================================================================
 // Types
 // ============================================================================
-
-export type SupportedLanguage = "es" | "en";
 
 export interface ExercisesSyncState {
   isSyncing: boolean;
@@ -218,7 +220,7 @@ export const syncExercisesWithLanguage = async (
 export const getLastSyncedLanguage =
   async (): Promise<SupportedLanguage | null> => {
     const lang = await AsyncStorage.getItem(LAST_EXERCISES_LANGUAGE_KEY);
-    if (lang === "es" || lang === "en") {
+    if (lang && isValidLanguage(lang)) {
       return lang;
     }
     return null;

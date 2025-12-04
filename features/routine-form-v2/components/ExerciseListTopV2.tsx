@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
@@ -21,7 +22,7 @@ type Props = {
 export const ExerciseListTopV2: React.FC<Props> = ({ exercisesCount }) => {
   const { isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = routineFormTranslations;
   const { setIsExerciseModalOpen, setExerciseModalMode } = useMainActions();
 

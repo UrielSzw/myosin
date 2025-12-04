@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Button } from "@/shared/ui/button";
@@ -257,7 +258,7 @@ const MeasurementCard: React.FC<MeasurementCardProps> = ({
 export default function MeasurementsScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = onboardingTranslations.measurements;
   const tCommon = onboardingTranslations.common;
   const { heightCm, weightKg, setHeightCm, setWeightKg, nextStep } =

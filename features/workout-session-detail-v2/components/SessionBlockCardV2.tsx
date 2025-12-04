@@ -1,7 +1,9 @@
 import { WorkoutBlockWithExercises } from "@/shared/db/schema/workout-session";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { ChevronDown, ChevronRight, Layers } from "lucide-react-native";
@@ -19,7 +21,7 @@ type Props = {
   block: WorkoutBlockWithExercises;
   index: number;
   showRpe: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionBlockCardV2: React.FC<Props> = ({
@@ -154,12 +156,8 @@ export const SessionBlockCardV2: React.FC<Props> = ({
               <Typography variant="caption" color="textMuted">
                 {block.exercises.length}{" "}
                 {block.exercises.length === 1
-                  ? lang === "es"
-                    ? "ejercicio"
-                    : "exercise"
-                  : lang === "es"
-                  ? "ejercicios"
-                  : "exercises"}
+                  ? sharedUiTranslations.exercise[lang]
+                  : sharedUiTranslations.exercises[lang]}
               </Typography>
               <View
                 style={[styles.dot, { backgroundColor: colors.textMuted }]}

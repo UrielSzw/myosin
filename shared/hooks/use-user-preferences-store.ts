@@ -7,6 +7,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
+import { DEFAULT_LANGUAGE, type SupportedLanguage } from "../types/language";
 
 // Helper para sync desde Zustand store (sin React hooks)
 const syncHelper = async (code: MutationCode, payload: any) => {
@@ -48,7 +49,7 @@ type PrefsState = {
     setHapticFeedback: (userId: string, enabled: boolean) => void;
     setDefaultRestTime: (userId: string, seconds: number) => void;
     setColorScheme: (userId: string, scheme: ColorSchemeName) => void;
-    setLanguage: (userId: string, language: "en" | "es") => void;
+    setLanguage: (userId: string, language: SupportedLanguage) => void;
   };
 };
 
@@ -142,7 +143,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
                 theme: "dark" as BaseUserPreferences["theme"],
                 weight_unit: "kg",
                 distance_unit: "metric",
-                language: "es",
+                language: DEFAULT_LANGUAGE,
                 show_rpe: false,
                 show_tempo: false,
                 keep_screen_awake: true,
@@ -240,7 +241,7 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
         }));
         schedulePersist(userId);
       },
-      setLanguage: (userId: string, language: "en" | "es") => {
+      setLanguage: (userId: string, language: SupportedLanguage) => {
         set((s) => ({
           prefs: {
             ...(s.prefs ?? ({} as BaseUserPreferences)),

@@ -1,8 +1,6 @@
-import {
-  SupportedLanguage,
-  syncExercisesWithLanguage,
-} from "../../hooks/use-exercises-sync";
+import { syncExercisesWithLanguage } from "../../hooks/use-exercises-sync";
 import { supabase } from "../../services/supabase";
+import { DEFAULT_LANGUAGE, type SupportedLanguage } from "../../types/language";
 import { usersRepository } from "../repository/user";
 
 /**
@@ -26,11 +24,14 @@ const getUserLanguage = async (): Promise<SupportedLanguage> => {
       }
     }
 
-    // Fallback a inglés
-    return "en";
+    // Fallback a idioma por defecto
+    return DEFAULT_LANGUAGE;
   } catch (error) {
-    console.warn("⚠️ Error obteniendo idioma del usuario, usando 'en':", error);
-    return "en";
+    console.warn(
+      `⚠️ Error obteniendo idioma del usuario, usando '${DEFAULT_LANGUAGE}':`,
+      error
+    );
+    return DEFAULT_LANGUAGE;
   }
 };
 

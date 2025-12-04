@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useReorderExercises } from "@/features/routine-form-v2/shared/use-reorder-exercises";
 
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -42,7 +43,7 @@ export const ExerciseCardV2: React.FC<Props> = ({
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const muscleT = exerciseMuscleTranslations;
 
   const { exercisesInBlock, setsByExercise } = useRoutineFormState();

@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from "@/shared/types/language";
+
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
 import { Typography } from "@/shared/ui/typography";
@@ -10,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   weeklyVolume: WeeklyVolumeMap;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 type MuscleCategory = {
@@ -143,7 +145,7 @@ export const VolumeChartV2: React.FC<Props> = ({ weeklyVolume, lang }) => {
                   weight="medium"
                   style={{ color: colors.text }}
                 >
-                  {item.label[lang as "es" | "en"]}
+                  {item.label[lang]}
                 </Typography>
               </View>
 

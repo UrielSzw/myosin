@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { RPEValue } from "@/shared/types/workout";
@@ -267,7 +268,7 @@ export const RPESelectorV2: React.FC<Props> = ({
   const { colors, colorScheme } = useColorScheme();
   const isDark = colorScheme === "dark";
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const [viewMode, setViewMode] = useState<ViewMode>("selection");
   const [detailOption, setDetailOption] = useState<RPEOption | null>(null);

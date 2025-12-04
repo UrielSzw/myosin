@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { CreateRoutineData } from "@/shared/db/repository/routines";
 import type {
   BlockInsert,
@@ -26,7 +27,7 @@ export const useSaveRoutine = () => {
   const { sync } = useSyncEngine();
   const { user } = useAuth();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = routineFormTranslations;
 
   const saveRoutine = async (): Promise<string | null> => {

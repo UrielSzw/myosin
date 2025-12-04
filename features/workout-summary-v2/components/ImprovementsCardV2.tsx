@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -18,7 +19,7 @@ import Animated, {
 
 type Props = {
   improvementsCount: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   baseDelay?: number;
 };
 
@@ -156,17 +157,14 @@ export const ImprovementsCardV2: React.FC<Props> = ({
               color="textMuted"
               style={{ marginTop: 2 }}
             >
-              {lang === "es"
-                ? `En ${improvementsCount} ${
-                    improvementsCount === 1
-                      ? t.exercisesCount[lang]
-                      : t.exercisesCountPlural[lang]
-                  } vs la última vez`
-                : `In ${improvementsCount} ${
-                    improvementsCount === 1
-                      ? t.exercisesCount[lang]
-                      : t.exercisesCountPlural[lang]
-                  } vs last time`}
+              {t.inExercisesVsLastTime[lang]
+                .replace("{count}", String(improvementsCount))
+                .replace(
+                  "{exerciseWord}",
+                  improvementsCount === 1
+                    ? t.exercisesCount[lang]
+                    : t.exercisesCountPlural[lang]
+                )}
             </Typography>
 
             {/* Progress bar */}

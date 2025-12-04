@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Button } from "@/shared/ui/button";
@@ -277,7 +278,7 @@ const ActivityCard: React.FC<ActivityCardProps> = ({
 export default function ActivityScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = onboardingTranslations.activity;
   const tCommon = onboardingTranslations.common;
   const { activityLevel, setActivityLevel, nextStep } = useOnboardingStore();

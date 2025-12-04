@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
@@ -29,7 +30,7 @@ type Props = {
 export const EmptyWorkoutStateV2: React.FC<Props> = ({ onAddExercise }) => {
   const { colors } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = activeWorkoutTranslations;
 
   // Animation values

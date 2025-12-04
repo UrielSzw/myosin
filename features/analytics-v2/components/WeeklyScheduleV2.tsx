@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from "@/shared/types/language";
+
 import { WEEK_DAYS, WeekDay } from "@/shared/constants/analytics";
 import type { RoutineFull } from "@/shared/db/schema/routine";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -11,27 +13,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   activeRoutines: RoutineFull[];
-  lang: "es" | "en";
-};
-
-const WEEK_DAYS_EN: Record<WeekDay, string> = {
-  monday: "Mon",
-  tuesday: "Tue",
-  wednesday: "Wed",
-  thursday: "Thu",
-  friday: "Fri",
-  saturday: "Sat",
-  sunday: "Sun",
-};
-
-const WEEK_DAYS_ES: Record<WeekDay, string> = {
-  monday: "Lun",
-  tuesday: "Mar",
-  wednesday: "Mié",
-  thursday: "Jue",
-  friday: "Vie",
-  saturday: "Sáb",
-  sunday: "Dom",
+  lang: SupportedLanguage;
 };
 
 export const WeeklyScheduleV2: React.FC<Props> = ({ activeRoutines, lang }) => {
@@ -80,7 +62,7 @@ export const WeeklyScheduleV2: React.FC<Props> = ({ activeRoutines, lang }) => {
     "saturday",
   ][currentDayIndex] as WeekDay;
 
-  const dayLabels = lang === "es" ? WEEK_DAYS_ES : WEEK_DAYS_EN;
+  const dayLabels = t.weekDaysShort[lang];
 
   return (
     <Animated.View entering={FadeInDown.duration(400).delay(300)}>

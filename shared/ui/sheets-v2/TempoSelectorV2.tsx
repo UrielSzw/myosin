@@ -1,6 +1,8 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { tempoSelectorTranslations } from "@/shared/translations/tempo-selector";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -95,7 +97,7 @@ export const TempoSelectorV2 = ({
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = tempoSelectorTranslations;
 
   const [isCustomMode, setIsCustomMode] = useState(false);
@@ -312,9 +314,7 @@ export const TempoSelectorV2 = ({
                   color="textMuted"
                   style={{ marginTop: 4 }}
                 >
-                  {lang === "es"
-                    ? "Configura el ritmo de ejecución"
-                    : "Configure execution tempo"}
+                  {sharedUiTranslations.configureExecutionTempo[lang]}
                 </Typography>
               </View>
             </View>
@@ -388,7 +388,7 @@ export const TempoSelectorV2 = ({
                     weight="medium"
                     style={{ color: colors.textMuted, marginBottom: 4 }}
                   >
-                    {lang === "es" ? "Sin tempo asignado" : "No tempo assigned"}
+                    {tempoSelectorTranslations.noTempoAssigned[lang]}
                   </Typography>
                   <Typography
                     variant="h3"
@@ -404,9 +404,7 @@ export const TempoSelectorV2 = ({
                 color="textMuted"
                 style={{ marginTop: 6 }}
               >
-                {lang === "es"
-                  ? "Excéntrica - Pausa - Concéntrica - Pausa"
-                  : "Eccentric - Pause - Concentric - Pause"}
+                {sharedUiTranslations.tempoPhases[lang]}
               </Typography>
             </View>
           </View>
@@ -732,7 +730,7 @@ export const TempoSelectorV2 = ({
                             color="textMuted"
                             style={{ fontSize: 10 }}
                           >
-                            {lang === "es" ? "seg" : "sec"}
+                            {tempoSelectorTranslations.sec[lang]}
                           </Typography>
                         </View>
 

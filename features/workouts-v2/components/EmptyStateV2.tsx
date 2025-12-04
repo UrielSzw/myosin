@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
@@ -19,7 +20,7 @@ const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 export const EmptyStateV2 = () => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const handleCreateRoutine = () => {
     router.push("/routines/create" as any);

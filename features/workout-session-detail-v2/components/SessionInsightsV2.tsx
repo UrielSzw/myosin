@@ -2,6 +2,7 @@ import { SessionAnalytics } from "@/features/workout-session-detail-v2/hooks/use
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -12,7 +13,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   analytics: SessionAnalytics;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
@@ -218,12 +219,8 @@ export const SessionInsightsV2: React.FC<Props> = ({ analytics, lang }) => {
                   style={{ flex: 1 }}
                 >
                   {analytics.prCount === 1
-                    ? lang === "es"
-                      ? "récord personal en esta sesión"
-                      : "personal record in this session"
-                    : lang === "es"
-                    ? "récords personales en esta sesión"
-                    : "personal records in this session"}
+                    ? t.personalRecordSingular[lang]
+                    : t.personalRecordPlural[lang]}
                 </Typography>
               </View>
             </>

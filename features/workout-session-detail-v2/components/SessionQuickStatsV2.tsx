@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import type { SupportedLanguage } from "@/shared/types/language";import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -13,7 +13,7 @@ type Props = {
   duration: string;
   totalSets: number;
   totalVolume: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 type StatCardProps = {

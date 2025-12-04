@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { getLocale, toSupportedLanguage } from "@/shared/types/language";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -113,7 +114,7 @@ const FloatingOrb = ({
 export default function BirthdateScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = onboardingTranslations.birthdate;
   const tCommon = onboardingTranslations.common;
   const { birthDate, setBirthDate, getAge, nextStep } = useOnboardingStore();
@@ -169,7 +170,7 @@ export default function BirthdateScreen() {
       month: "long",
       day: "numeric",
     };
-    return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", options);
+    return date.toLocaleDateString(getLocale(lang), options);
   };
 
   return (

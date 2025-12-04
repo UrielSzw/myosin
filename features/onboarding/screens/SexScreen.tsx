@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { Button } from "@/shared/ui/button";
@@ -228,7 +229,7 @@ const SexCard = ({
 export default function SexScreen() {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = onboardingTranslations.sex;
   const tCommon = onboardingTranslations.common;
   const { biologicalSex, setBiologicalSex, nextStep } = useOnboardingStore();

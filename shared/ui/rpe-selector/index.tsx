@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { rpeSelectorTranslations } from "@/shared/translations/rpe-selector";
@@ -87,7 +88,7 @@ export const RPESelector = forwardRef<BottomSheetModal, Props>(
     const { colors, colorScheme } = useColorScheme();
     const isDark = colorScheme === "dark";
     const prefs = useUserPreferences();
-    const lang = prefs?.language ?? "es";
+    const lang = toSupportedLanguage(prefs?.language);
     const t = rpeSelectorTranslations;
 
     const handleSelect = useCallback(

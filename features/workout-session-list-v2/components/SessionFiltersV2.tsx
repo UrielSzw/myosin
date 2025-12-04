@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSessionListTranslations as t } from "@/shared/translations/workout-session-list";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, X } from "lucide-react-native";
@@ -18,7 +18,7 @@ type Props = {
   onShowRecentToggle: () => void;
   activeFiltersCount: number;
   onClearAll: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionFiltersV2: React.FC<Props> = ({

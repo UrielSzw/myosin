@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
@@ -11,7 +12,7 @@ export const AnalyticsHeaderV2 = () => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   return (
     <View style={[styles.header, { paddingTop: insets.top + 8 }]}>

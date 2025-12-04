@@ -1,5 +1,5 @@
 import { BaseWorkoutSet } from "@/shared/db/schema/workout-session";
-import { useBlockStyles } from "@/shared/hooks/use-block-styles";
+import type { SupportedLanguage } from "@/shared/types/language";import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
@@ -18,7 +18,7 @@ type Props = {
   set: BaseWorkoutSet;
   index: number;
   showRpe: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const SessionSetRowV2: React.FC<Props> = ({

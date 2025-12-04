@@ -3,13 +3,15 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { folderFormTranslations } from "@/shared/translations/folder-form";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useCallback } from "react";
 import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 
 export const useSaveFolder = () => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = folderFormTranslations;
   const { name, color, icon, mode, editingId } = useFolderFormStore();
   const { selectedFolder, setSelectedFolder } = useSelectedFolderStore(
@@ -80,12 +82,8 @@ export const useSaveFolder = () => {
         success: false,
         error:
           mode === "edit"
-            ? lang === "es"
-              ? "Error al actualizar la carpeta"
-              : "Error updating folder"
-            : lang === "es"
-            ? "Error al crear la carpeta"
-            : "Error creating folder",
+            ? sharedUiTranslations.errorUpdatingFolder[lang]
+            : sharedUiTranslations.errorCreatingFolder[lang],
       };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

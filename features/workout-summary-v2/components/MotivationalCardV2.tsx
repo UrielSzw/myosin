@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { Typography } from "@/shared/ui/typography";
+import type { SupportedLanguage } from "@/shared/types/language";import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -15,7 +15,7 @@ import { Platform, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   hasPRs: boolean;
   hasImprovements: boolean;
   streak: number;

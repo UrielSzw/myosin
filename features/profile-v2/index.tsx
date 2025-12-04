@@ -2,6 +2,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { profileTranslations as t } from "@/shared/translations/profile";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { router } from "expo-router";
 import {
   Globe,
@@ -27,7 +28,7 @@ export const ProfileFeatureV2 = () => {
   const { user, signOut } = useAuth();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const [showLanguageSheet, setShowLanguageSheet] = useState(false);
 
@@ -90,7 +91,7 @@ export const ProfileFeatureV2 = () => {
               iconColor="#8b5cf6"
               iconBgColor="rgba(139, 92, 246, 0.15)"
               title={t.language[lang]}
-              subtitle={lang === "es" ? t.languageEs[lang] : t.languageEn[lang]}
+              subtitle={t.currentLanguageName[lang]}
               onPress={() => setShowLanguageSheet(true)}
               delay={650}
             />

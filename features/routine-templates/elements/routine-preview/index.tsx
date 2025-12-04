@@ -1,10 +1,12 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useExercises } from "@/shared/hooks/use-exercises";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { exerciseFiltersTranslations as filterT } from "@/shared/translations/exercise-filters";
 import {
   exerciseEquipmentTranslations,
   exerciseMuscleTranslations,
 } from "@/shared/translations/exercise-labels";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { Camera, Dumbbell } from "lucide-react-native";
@@ -21,7 +23,7 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
   const { colors } = useColorScheme();
   const { exercises } = useExercises();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const weightUnit = prefs?.weight_unit ?? "kg";
   const distanceUnit = prefs?.distance_unit ?? "metric";
   const muscleT = exerciseMuscleTranslations;
@@ -53,7 +55,10 @@ export const RoutinePreview: React.FC<Props> = ({ routine }) => {
       equipment:
         equipmentT[exercise.primary_equipment]?.[lang] ||
         exercise.primary_equipment,
-      type: exercise.exercise_type === "compound" ? "Compuesto" : "Aislamiento",
+      type:
+        exercise.exercise_type === "compound"
+          ? filterT.compound.label[lang]
+          : filterT.isolation.label[lang],
     };
   };
 

@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { personalDataTranslations as t } from "@/shared/translations/personal-data";
@@ -12,7 +13,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export const PersonalDataHeader = () => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
   const insets = useSafeAreaInsets();
 
   return (

@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import type { SupportedLanguage } from "@/shared/types/language";import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -28,7 +28,7 @@ type PR = {
 
 type Props = {
   prs: PR[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   weightUnit: string;
   baseDelay?: number;
 };
@@ -38,7 +38,7 @@ const PRCardAnimated: React.FC<{
   pr: PR;
   index: number;
   weightUnit: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   baseDelay: number;
 }> = ({ pr, index, weightUnit, lang, baseDelay }) => {
   const { colors, isDarkMode } = useColorScheme();

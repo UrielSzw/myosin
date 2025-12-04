@@ -230,4 +230,270 @@ export const sharedUiTranslations = {
     es: "Seleccionar",
     en: "Select",
   },
+
+  // Rest Time Sheet
+  restBetweenRounds: {
+    es: "Descanso entre Rondas",
+    en: "Rest Between Rounds",
+  },
+  restTime: {
+    es: "Tiempo de Descanso",
+    en: "Rest Time",
+  },
+  customTime: {
+    es: "Tiempo personalizado",
+    en: "Custom time",
+  },
+  quickOptions: {
+    es: "Opciones rápidas",
+    en: "Quick options",
+  },
+  applyTime: {
+    es: "Aplicar Tiempo",
+    en: "Apply Time",
+  },
+
+  // Measurement Template Selector
+  measurementType: {
+    es: "Tipo de Medición",
+    en: "Measurement Type",
+  },
+  selectMeasurementType: {
+    es: "Selecciona cómo medir este ejercicio",
+    en: "Select how to measure this exercise",
+  },
+
+  // Set Type Sheet
+  setType: {
+    es: "Tipo de Serie",
+    en: "Set Type",
+  },
+
+  // Active Filters
+  activeFilters: {
+    es: "Filtros activos",
+    en: "Active filters",
+  },
+  clearFilters: {
+    es: "Limpiar filtros",
+    en: "Clear filters",
+  },
+  clear: {
+    es: "Limpiar",
+    en: "Clear",
+  },
+  removeFilter: {
+    es: "Remover filtro",
+    en: "Remove filter",
+  },
+
+  // Exercise Selector Header
+  addToSuperset: {
+    es: "Agregar al Superset",
+    en: "Add to Superset",
+  },
+  selectAnExercise: {
+    es: "Selecciona un ejercicio",
+    en: "Select an exercise",
+  },
+  selectOneOrMoreExercises: {
+    es: "Selecciona uno o más ejercicios",
+    en: "Select one or more exercises",
+  },
+
+  // Rest Time Sheet - Additional
+  restBetweenExercises: {
+    es: "Descanso entre Ejercicios",
+    en: "Rest Between Exercises",
+  },
+  timeBetweenSupersetExercises: {
+    es: "Tiempo entre ejercicios del superset",
+    en: "Time between superset exercises",
+  },
+  timeAfterCompletingRound: {
+    es: "Tiempo después de completar la ronda",
+    en: "Time after completing the round",
+  },
+
+  // Tempo Selector
+  configureExerciseTempo: {
+    es: "Configura el ritmo de ejecución del ejercicio",
+    en: "Configure exercise execution tempo",
+  },
+
+  // PR Detail
+  month: {
+    es: "mes",
+    en: "month",
+  },
+  months: {
+    es: "meses",
+    en: "months",
+  },
+  days: {
+    es: "días",
+    en: "days",
+  },
+
+  // Tracker
+  tookSupplements: {
+    es: "✅ Tomé suplementos",
+    en: "✅ Took supplements",
+  },
+  didNotTakeSupplements: {
+    es: "❌ No tomé",
+    en: "❌ Didn't take",
+  },
+  completed: {
+    es: "✅ Completado",
+    en: "✅ Completed",
+  },
+  pending: {
+    es: "❌ Pendiente",
+    en: "❌ Pending",
+  },
+
+  // Rest Time Sheet - Additional subtitles
+  adjustTimeBetweenSets: {
+    es: "Ajusta el tiempo entre series",
+    en: "Adjust time between sets",
+  },
+
+  // Set Type Sheet
+  selectTrainingMethod: {
+    es: "Selecciona el método de entrenamiento",
+    en: "Select training method",
+  },
+
+  // Tempo Selector
+  configureExecutionTempo: {
+    es: "Configura el ritmo de ejecución",
+    en: "Configure execution tempo",
+  },
+
+  // Navigation titles
+  workoutSessions: {
+    es: "Sesiones de Entrenamiento",
+    en: "Workout Sessions",
+  },
+  personalRecords: {
+    es: "Records Personales",
+    en: "Personal Records",
+  },
+  prHistory: {
+    es: "Historial de PR",
+    en: "PR History",
+  },
+
+  // Folder Card
+  routine: {
+    es: "rutina",
+    en: "routine",
+  },
+  routines: {
+    es: "rutinas",
+    en: "routines",
+  },
+
+  // PR List Empty State
+  noRecordsYet: {
+    es: "Sin récords aún",
+    en: "No records yet",
+  },
+  noResults: {
+    es: "Sin resultados",
+    en: "No results",
+  },
+  completeWorkoutsToTrackPRs: {
+    es: "Completa entrenamientos para registrar tus récords personales automáticamente",
+    en: "Complete workouts to automatically track your personal records",
+  },
+  noRecordsWithFilters: {
+    es: "No se encontraron récords con los filtros actuales",
+    en: "No records found with current filters",
+  },
+
+  // Folder Form Errors
+  errorUpdatingFolder: {
+    es: "Error al actualizar la carpeta",
+    en: "Error updating folder",
+  },
+  errorCreatingFolder: {
+    es: "Error al crear la carpeta",
+    en: "Error creating folder",
+  },
+
+  // Folder organization
+  createFoldersToOrganize: {
+    es: "Crea carpetas para organizar tus rutinas",
+    en: "Create folders to organize your routines",
+  },
+
+  // Tempo phases
+  tempoPhases: {
+    es: "Excéntrica - Pausa - Concéntrica - Pausa",
+    en: "Eccentric - Pause - Concentric - Pause",
+  },
+
+  // PR Chart
+  needAtLeast2PRs: {
+    es: "Necesitas al menos 2 PRs para ver el gráfico",
+    en: "You need at least 2 PRs to see the chart",
+  },
+  estimatedOverTime: {
+    es: "Estimado a lo largo del tiempo",
+    en: "Estimated over time",
+  },
+
+  // Session List
+  errorLoadingSessions: {
+    es: "Error al cargar sesiones",
+    en: "Error loading sessions",
+  },
+  sessionFound: {
+    es: "sesión encontrada",
+    en: "session found",
+  },
+  sessionsFound: {
+    es: "sesiones encontradas",
+    en: "sessions found",
+  },
+
+  // Session Detail Error
+  errorLoadingSession: {
+    es: "Error al cargar sesión",
+    en: "Error loading session",
+  },
+  couldNotLoadSessionInfo: {
+    es: "No se pudo cargar la información de esta sesión",
+    en: "Could not load this session information",
+  },
+
+  // PR List Header
+  newThisWeekSingular: {
+    es: "nuevo esta semana",
+    en: "new this week",
+  },
+  newThisWeekPlural: {
+    es: "nuevos esta semana",
+    en: "new this week",
+  },
+
+  // PR List
+  needToSignIn: {
+    es: "Necesitas iniciar sesión para ver tus récords",
+    en: "You need to sign in to view your records",
+  },
+  failedToLoadRecords: {
+    es: "No se pudieron cargar los récords",
+    en: "Failed to load records",
+  },
+  recordFound: {
+    es: "récord encontrado",
+    en: "record found",
+  },
+  recordsFound: {
+    es: "récords encontrados",
+    en: "records found",
+  },
 } as const;

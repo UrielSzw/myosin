@@ -2,7 +2,9 @@ import { useSessionDetail } from "@/features/workout-session-detail-v2/hooks/use
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { workoutSessionDetailTranslations as t } from "@/shared/translations/workout-session-detail";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Layers } from "lucide-react-native";
@@ -30,7 +32,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
   const insets = useSafeAreaInsets();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const {
     data: sessionData,
@@ -110,9 +112,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
               />
             )}
             <Typography variant="h6" weight="semibold" align="center">
-              {lang === "es"
-                ? "Error al cargar sesión"
-                : "Error loading session"}
+              {sharedUiTranslations.errorLoadingSession[lang]}
             </Typography>
             <Typography
               variant="body2"
@@ -120,9 +120,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
               align="center"
               style={{ marginTop: 8 }}
             >
-              {lang === "es"
-                ? "No se pudo cargar la información de esta sesión"
-                : "Could not load this session information"}
+              {sharedUiTranslations.couldNotLoadSessionInfo[lang]}
             </Typography>
           </View>
         </View>
@@ -207,13 +205,7 @@ export const WorkoutSessionDetailV2: React.FC<Props> = ({ sessionId }) => {
             style={{ marginLeft: "auto" }}
           >
             {sessionData.blocks.length}{" "}
-            {sessionData.blocks.length === 1
-              ? lang === "es"
-                ? "bloque"
-                : "block"
-              : lang === "es"
-              ? "bloques"
-              : "blocks"}
+            {sessionData.blocks.length === 1 ? t.block[lang] : t.blocks[lang]}
           </Typography>
         </View>
 

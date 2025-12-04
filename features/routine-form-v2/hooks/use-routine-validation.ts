@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { useMemo } from "react";
@@ -31,7 +32,7 @@ export const useRoutineValidation = (): RoutineValidation => {
     exercisesInBlock,
   } = useRoutineFormState();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = routineFormTranslations;
 
   return useMemo(() => {

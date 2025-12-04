@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { BaseExercise } from "@/shared/db/schema";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import {
@@ -49,7 +50,7 @@ export const ExerciseCardV2: React.FC<Props> = memo(
     onSeeMoreInfo,
   }) => {
     const prefs = useUserPreferences();
-    const lang = prefs?.language ?? "es";
+    const lang = toSupportedLanguage(prefs?.language);
     const t = exerciseSelectorTranslations;
     const muscleT = exerciseMuscleTranslations;
     const equipmentT = exerciseEquipmentTranslations;

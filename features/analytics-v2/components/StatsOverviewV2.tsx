@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from "@/shared/types/language";
+
 import { AnalyticsDashboardData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
@@ -10,7 +12,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   data: AnalyticsDashboardData;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 type StatCardProps = {

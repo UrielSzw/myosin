@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
+import type { SupportedLanguage } from "@/shared/types/language";import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { useRouter } from "expo-router";
@@ -9,7 +9,7 @@ import { Platform, Pressable, StyleSheet, View } from "react-native";
 
 type Props = {
   exerciseName: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const PRDetailHeaderV2: React.FC<Props> = ({ exerciseName, lang }) => {

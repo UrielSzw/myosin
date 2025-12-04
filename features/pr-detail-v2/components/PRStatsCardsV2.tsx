@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import type { SupportedLanguage } from "@/shared/types/language";import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -13,7 +13,7 @@ type Props = {
   totalProgress: number;
   timeSpan: string;
   totalPRs: number;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const PRStatsCardsV2: React.FC<Props> = ({

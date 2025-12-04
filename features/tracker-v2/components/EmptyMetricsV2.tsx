@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { trackerTranslations } from "@/shared/translations/tracker";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { BarChart3, Plus } from "lucide-react-native";
@@ -9,7 +10,7 @@ import Animated, { FadeIn } from "react-native-reanimated";
 
 type Props = {
   onAddMetric: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const EmptyMetricsV2: React.FC<Props> = ({ onAddMetric, lang }) => {

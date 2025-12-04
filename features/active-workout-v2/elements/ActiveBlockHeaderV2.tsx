@@ -6,6 +6,10 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import {
+  toSupportedLanguage,
+  type SupportedLanguage,
+} from "@/shared/types/language";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import {
@@ -40,7 +44,7 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = activeWorkoutTranslations;
   const { getBlockTypeLabel, formatRestTime, getBlockColors } =
     useBlockStyles();
@@ -106,8 +110,8 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
           >
             {exercisesCount}{" "}
             {exercisesCount === 1
-              ? t.exercise[lang as "es" | "en"]
-              : t.exercises[lang as "es" | "en"]}
+              ? t.exercise[lang as SupportedLanguage]
+              : t.exercises[lang as SupportedLanguage]}
           </Typography>
         )}
       </View>
@@ -137,7 +141,7 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
                   color: blockColors.primary,
                 }}
               >
-                {t.between[lang as "es" | "en"]}{" "}
+                {t.between[lang as SupportedLanguage]}{" "}
                 {formatRestTime(block.rest_between_exercises_seconds || 0)}
               </Typography>
             </Pressable>
@@ -163,7 +167,7 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
                   color: blockColors.primary,
                 }}
               >
-                {t.sets[lang as "es" | "en"]}{" "}
+                {t.sets[lang as SupportedLanguage]}{" "}
                 {formatRestTime(block.rest_time_seconds || 60)}
               </Typography>
             </Pressable>

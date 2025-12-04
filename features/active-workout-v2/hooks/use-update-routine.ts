@@ -5,7 +5,10 @@ import type {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { queryKeys } from "@/shared/queries/query-keys";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createRoutineService } from "../../routine-form-v2/service/routine";
@@ -14,6 +17,9 @@ import { useActiveWorkout } from "./use-active-workout-store";
 type UpdateState = "idle" | "updating" | "success" | "error";
 
 export const useUpdateRoutine = () => {
+  const prefs = useUserPreferences();
+  const lang = toSupportedLanguage(prefs?.language);
+  const t = activeWorkoutTranslations;
   const [updateState, setUpdateState] = useState<UpdateState>("idle");
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
@@ -21,7 +27,7 @@ export const useUpdateRoutine = () => {
 
   const updateRoutine = async (): Promise<string | null> => {
     if (!activeWorkout?.session) {
-      setError("No hay workout activo para actualizar");
+      setError(t.noActiveWorkoutToUpdate[lang]);
       return null;
     }
 
@@ -138,7 +144,7 @@ export const useUpdateRoutine = () => {
       return updatedRoutine.id;
     } catch (err) {
       console.error("Error updating routine:", err);
-      setError("Error al actualizar la rutina. Intenta nuevamente.");
+      setError(t.errorUpdatingRoutine[lang]);
       setUpdateState("error");
       return null;
     }

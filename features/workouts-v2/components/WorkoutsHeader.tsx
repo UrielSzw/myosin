@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
@@ -22,7 +23,7 @@ export const WorkoutsHeader = ({ selectedFolder, onPressAdd }: Props) => {
     (state) => state.setSelectedFolder
   );
   const prefs = useUserPreferences();
-  const lang = (prefs?.language ?? "es") as "es" | "en";
+  const lang = toSupportedLanguage(prefs?.language);
 
   const handleBack = () => {
     setSelectedFolder(null);

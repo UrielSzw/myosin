@@ -4,7 +4,9 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { queryKeys } from "@/shared/queries/query-keys";
 import { useHaptic } from "@/shared/services/haptic-service";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { workoutsTranslations } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { useQueryClient } from "@tanstack/react-query";
 import { BlurView } from "expo-blur";
@@ -50,7 +52,7 @@ export const MoveRoutineSheet = ({
   const { colors, isDarkMode } = useColorScheme();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = workoutsTranslations;
   const haptic = useHaptic();
   const queryClient = useQueryClient();
@@ -461,9 +463,7 @@ export const MoveRoutineSheet = ({
                   align="center"
                   style={{ marginTop: 4, opacity: 0.7 }}
                 >
-                  {lang === "es"
-                    ? "Crea carpetas para organizar tus rutinas"
-                    : "Create folders to organize your routines"}
+                  {sharedUiTranslations.createFoldersToOrganize[lang]}
                 </Typography>
               </Animated.View>
             )}

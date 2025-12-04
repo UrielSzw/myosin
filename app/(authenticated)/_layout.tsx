@@ -1,5 +1,8 @@
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useSync } from "@/shared/sync/hooks/use-sync";
+import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { Stack } from "expo-router";
 
@@ -11,6 +14,9 @@ import { Stack } from "expo-router";
  */
 export default function AuthenticatedLayout() {
   const { user, loading } = useProtectedRoute();
+  const prefs = useUserPreferences();
+  const lang = toSupportedLanguage(prefs?.language);
+  const t = sharedUiTranslations;
 
   // Inicializar sistema de sync solo cuando hay usuario autenticado
   useSync();
@@ -66,7 +72,7 @@ export default function AuthenticatedLayout() {
         name="routines/reorder-blocks"
         options={{
           presentation: "fullScreenModal",
-          title: "Reordenar Bloques",
+          title: t.reorderBlocks[lang],
           gestureEnabled: false,
         }}
       />
@@ -74,7 +80,7 @@ export default function AuthenticatedLayout() {
         name="routines/reorder-exercises"
         options={{
           presentation: "fullScreenModal",
-          title: "Reordenar Ejercicios",
+          title: t.reorderBlockExercises[lang],
           gestureEnabled: false,
           gestureDirection: "horizontal",
           fullScreenGestureEnabled: false,
@@ -127,20 +133,20 @@ export default function AuthenticatedLayout() {
       <Stack.Screen
         name="workout-session/workout-session-list"
         options={{
-          title: "Sesiones de Entrenamiento",
+          title: t.workoutSessions[lang],
         }}
       />
       <Stack.Screen
         name="pr-list/index"
         options={{
-          title: "Records Personales",
+          title: t.personalRecords[lang],
         }}
       />
       <Stack.Screen
         name="pr-detail/[exerciseId]"
         options={{
           presentation: "modal",
-          title: "Historial de PR",
+          title: t.prHistory[lang],
         }}
       />
     </Stack>

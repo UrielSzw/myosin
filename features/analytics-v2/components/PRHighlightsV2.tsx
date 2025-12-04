@@ -1,3 +1,5 @@
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
+
 import { AnalyticsPRData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
@@ -11,7 +13,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   prs: AnalyticsPRData[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const getMedalIcon = (index: number) => {
@@ -87,10 +89,10 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
         {displayPRs.map((pr, index) => {
           const { Icon, color } = getMedalIcon(index);
           const prDate = new Date(pr.achieved_at);
-          const formattedDate = prDate.toLocaleDateString(
-            lang === "es" ? "es-ES" : "en-US",
-            { month: "short", day: "numeric" }
-          );
+          const formattedDate = prDate.toLocaleDateString(getLocale(lang), {
+            month: "short",
+            day: "numeric",
+          });
 
           return (
             <Animated.View

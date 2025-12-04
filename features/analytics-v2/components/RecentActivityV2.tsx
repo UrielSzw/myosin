@@ -1,3 +1,5 @@
+import { getLocale, type SupportedLanguage } from "@/shared/types/language";
+
 import { AnalyticsSessionData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
@@ -17,7 +19,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   sessions: AnalyticsSessionData[];
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const formatDuration = (seconds: number): string => {
@@ -30,7 +32,10 @@ const formatDuration = (seconds: number): string => {
   return `${minutes}m`;
 };
 
-const formatRelativeDate = (dateStr: string, lang: "es" | "en"): string => {
+const formatRelativeDate = (
+  dateStr: string,
+  lang: SupportedLanguage
+): string => {
   const date = new Date(dateStr);
   const now = new Date();
   const diffTime = now.getTime() - date.getTime();
@@ -40,7 +45,7 @@ const formatRelativeDate = (dateStr: string, lang: "es" | "en"): string => {
   if (diffDays === 1) return t.yesterday[lang];
   if (diffDays < 7) return `${diffDays} ${t.daysAgo[lang]}`;
 
-  return date.toLocaleDateString(lang === "es" ? "es-ES" : "en-US", {
+  return date.toLocaleDateString(getLocale(lang), {
     weekday: "short",
     day: "numeric",
     month: "short",

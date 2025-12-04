@@ -1,3 +1,4 @@
+import { toSupportedLanguage } from "@/shared/types/language";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { queryKeys } from "@/shared/queries/query-keys";
@@ -11,7 +12,7 @@ import { routinesService } from "../service/routines";
 
 export const useRoutineOptions = () => {
   const prefs = useUserPreferences();
-  const lang = prefs?.language ?? "es";
+  const lang = toSupportedLanguage(prefs?.language);
   const t = workoutsTranslations;
   const queryClient = useQueryClient();
   const { sync } = useSyncEngine();

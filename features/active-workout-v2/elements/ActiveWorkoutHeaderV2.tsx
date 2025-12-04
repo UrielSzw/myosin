@@ -1,6 +1,9 @@
 import { useActiveWorkout } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useFinishWorkout } from "@/features/active-workout-v2/hooks/use-finish-workout";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Flag, Loader2, Timer, X } from "lucide-react-native";
@@ -19,6 +22,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 export const ActiveWorkoutHeaderV2 = () => {
   const { colors, isDarkMode } = useColorScheme();
   const insets = useSafeAreaInsets();
+  const prefs = useUserPreferences();
+  const lang = toSupportedLanguage(prefs?.language);
+  const t = activeWorkoutTranslations;
   const { session, sets } = useActiveWorkout();
   const { handleFinishWorkout, handleExitWorkout } = useFinishWorkout();
 
@@ -134,7 +140,7 @@ export const ActiveWorkoutHeaderV2 = () => {
             numberOfLines={1}
             style={{ color: colors.text }}
           >
-            {session.routine?.name || "Entrenamiento"}
+            {session.routine?.name || t.workout[lang]}
           </Typography>
 
           {/* Timer row */}

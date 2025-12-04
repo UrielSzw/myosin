@@ -5,6 +5,7 @@ import {
   getMetricName,
   trackerTranslations,
 } from "@/shared/translations/tracker";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import * as Icons from "lucide-react-native";
@@ -15,7 +16,7 @@ type ScaleMetricCardV2Props = {
   metric: TrackerMetricWithQuickActions;
   displayData: MetricDisplayData;
   onPress: () => void;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 export const ScaleMetricCardV2: React.FC<ScaleMetricCardV2Props> = React.memo(

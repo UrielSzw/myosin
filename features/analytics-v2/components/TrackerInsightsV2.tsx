@@ -1,3 +1,5 @@
+import type { SupportedLanguage } from "@/shared/types/language";
+
 import { TrackerAnalyticsData } from "@/features/analytics-v2/service/trackerAnalyticsService";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
@@ -34,7 +36,7 @@ import Svg, {
 
 type Props = {
   data: TrackerAnalyticsData;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 };
 
 const METRIC_ICONS: Record<string, React.FC<any>> = {
@@ -131,7 +133,7 @@ const WeightProgressCard: React.FC<{
   data: TrackerAnalyticsData["weightProgress"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ data, colors, isDarkMode, lang }) => {
   const { dataPoints, currentWeight, weightChange, trend } = data;
 
@@ -295,7 +297,7 @@ const StreaksCard: React.FC<{
   streaks: TrackerAnalyticsData["streaks"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ streaks, colors, isDarkMode, lang }) => {
   return (
     <Animated.View
@@ -384,7 +386,7 @@ const HabitsCard: React.FC<{
   habits: TrackerAnalyticsData["habits"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
 }> = ({ habits, colors, isDarkMode, lang }) => {
   return (
     <Animated.View

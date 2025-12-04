@@ -1,5 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
+import type { SupportedLanguage } from "@/shared/types/language";import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,7 +25,7 @@ import Svg, { Circle, Defs, RadialGradient, Stop } from "react-native-svg";
 type Props = {
   workoutNumber: number;
   routineName: string;
-  lang: "es" | "en";
+  lang: SupportedLanguage;
   onAnimationComplete?: () => void;
 };
 

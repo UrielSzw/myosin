@@ -1,13 +1,12 @@
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { analyticsService } from "../service/analyticsService";
 import { AnalyticsDashboardData } from "../types/dashboard";
 import { sanitizeAnalyticsData } from "../utils/analytics-helpers";
 
-export const ANALYTICS_QUERY_KEY = ["analyticsDashboard"];
-
 export const useAnalyticsData = (userId: string = "default-user") => {
   const query = useQuery<AnalyticsDashboardData>({
-    queryKey: [...ANALYTICS_QUERY_KEY, userId],
+    queryKey: queryKeys.analytics.dashboard(userId),
     queryFn: async () => {
       const rawData = await analyticsService.getDashboardData(userId);
       const sanitizedData = sanitizeAnalyticsData(rawData);

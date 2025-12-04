@@ -1,3 +1,4 @@
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { exercisesRepository } from "../db/repository/exercises";
 
@@ -7,7 +8,7 @@ export const useExercises = () => {
     isLoading: loading,
     error,
   } = useQuery({
-    queryKey: ["exercises"],
+    queryKey: queryKeys.exercises.all,
     queryFn: () => exercisesRepository.findAll(),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos

@@ -2,6 +2,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { Typography } from "@/shared/ui/typography";
@@ -108,7 +109,7 @@ export const MoveRoutineSheet = ({
   const handleMoveToFolder = async (folderId: string | null) => {
     haptic.light();
     await routinesService.updateRoutineFolderId(routine.id, folderId);
-    queryClient.invalidateQueries({ queryKey: ["workouts"] });
+    queryClient.invalidateQueries({ queryKey: queryKeys.workouts.all });
     onClose();
   };
 

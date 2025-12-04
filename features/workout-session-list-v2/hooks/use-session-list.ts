@@ -1,8 +1,7 @@
 import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { SessionListItem, SessionListStats } from "../types/session-list";
-
-export const SESSION_LIST_QUERY_KEY = ["sessionList"];
 
 // Helper functions
 const formatDuration = (seconds: number): string => {
@@ -38,7 +37,7 @@ const getTimeAgo = (dateString: string): string => {
 
 export const useSessionList = (userId: string = "default-user") => {
   const query = useQuery<SessionListItem[]>({
-    queryKey: [...SESSION_LIST_QUERY_KEY, userId],
+    queryKey: queryKeys.sessions.list(userId),
     queryFn: async () => {
       const rawSessions = await workoutSessionsRepository.findAllWithSummary(
         100

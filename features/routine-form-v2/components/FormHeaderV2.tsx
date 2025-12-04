@@ -1,6 +1,6 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
 import { Typography } from "@/shared/ui/typography";
@@ -80,12 +80,8 @@ export const FormHeaderV2: React.FC = () => {
 
     if (savedRoutineId) {
       haptic.success();
-      queryClient.invalidateQueries({
-        queryKey: ["workouts", "routines"],
-      });
-      queryClient.invalidateQueries({
-        queryKey: ANALYTICS_QUERY_KEY,
-      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workouts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
       clearForm();
       router.back();
     } else if (error) {

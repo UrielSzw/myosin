@@ -1,5 +1,6 @@
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import type { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import { routinesService } from "../service/routines";
 
@@ -9,14 +10,14 @@ export const useMainWorkoutsData = () => {
     isLoading: routinesLoading,
     error: routinesError,
   } = useQuery({
-    queryKey: ["workouts", "routines"],
+    queryKey: queryKeys.workouts.routines.list(null),
     queryFn: () => routinesService.findAllWithMetrics(null),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
   });
 
   const { data: routinesCount = 0 } = useQuery({
-    queryKey: ["workouts", "routines", "count"],
+    queryKey: queryKeys.workouts.routines.count(),
     queryFn: () => routinesService.getAllRoutinesCount(),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
@@ -27,7 +28,7 @@ export const useMainWorkoutsData = () => {
     isLoading: foldersLoading,
     error: foldersError,
   } = useQuery({
-    queryKey: ["workouts", "folders"],
+    queryKey: queryKeys.workouts.folders.all(),
     queryFn: () => routinesService.getAllFoldersWithMetrics(),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos

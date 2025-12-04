@@ -1,4 +1,3 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,
@@ -6,6 +5,7 @@ import type {
   SetInsert,
 } from "@/shared/db/schema";
 import { generateUUID } from "@/shared/db/utils/uuid";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { createRoutineService } from "../../routine-form-v2/service/routine";
@@ -132,14 +132,8 @@ export const useUpdateRoutine = () => {
       );
 
       setUpdateState("success");
-      queryClient.invalidateQueries({
-        queryKey: ["workouts", "routines"],
-      });
-
-      // Invalidar analíticas del dashboard
-      queryClient.invalidateQueries({
-        queryKey: ANALYTICS_QUERY_KEY,
-      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workouts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
 
       return updatedRoutine.id;
     } catch (err) {

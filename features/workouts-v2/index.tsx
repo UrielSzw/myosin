@@ -4,6 +4,7 @@ import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -94,8 +95,9 @@ export const WorkoutsFeatureV2 = () => {
           onPress: async () => {
             try {
               await folderService.deleteFolder(selectedFolderForOptions.id);
-              queryClient.invalidateQueries({ queryKey: ["folders"] });
-              queryClient.invalidateQueries({ queryKey: ["routines"] });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.workouts.all,
+              });
               setSelectedFolderForOptions(null);
             } catch (error) {
               console.error("Error deleting folder:", error);

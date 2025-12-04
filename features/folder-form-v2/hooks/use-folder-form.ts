@@ -4,6 +4,7 @@ import { Alert } from "react-native";
 
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { ValidationState } from "@/shared/ui/enhanced-input";
@@ -182,7 +183,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
       const result = await saveFolder();
 
       if (result.success) {
-        queryClient.invalidateQueries({ queryKey: ["workouts", "folders"] });
+        queryClient.invalidateQueries({ queryKey: queryKeys.workouts.all });
         resetForm();
         router.back();
       } else {

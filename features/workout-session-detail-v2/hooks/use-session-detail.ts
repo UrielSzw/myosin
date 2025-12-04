@@ -1,5 +1,6 @@
 import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
 import { WorkoutSessionFull } from "@/shared/db/schema/workout-session";
+import { queryKeys } from "@/shared/queries/query-keys";
 import {
   hasWeightMeasurement,
   supportsPRCalculation,
@@ -184,7 +185,7 @@ export const useSessionDetail = (sessionId: string) => {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["workout-session", sessionId],
+    queryKey: queryKeys.sessions.detail(sessionId),
     queryFn: () => workoutSessionsRepository.findSessionById(sessionId),
     enabled: !!sessionId,
   });

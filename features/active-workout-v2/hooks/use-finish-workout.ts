@@ -1,8 +1,8 @@
 import { getSummaryStats } from "@/features/active-workout-v2/hooks/summary-stats";
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { routinesRepository } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { queryKeys } from "@/shared/queries/query-keys";
 import {
   finishWorkout,
   prepareFinishData,
@@ -110,9 +110,9 @@ export const useFinishWorkout = () => {
       clearWorkout();
 
       // Invalidate queries to refresh data
-      queryClient.invalidateQueries({ queryKey: ["workouts", "routines"] });
-      queryClient.invalidateQueries({ queryKey: ANALYTICS_QUERY_KEY });
-      queryClient.invalidateQueries({ queryKey: ["workout-sessions"] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.workouts.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.sessions.all });
 
       // Push summary screen on top of active workout
       // The summary will dismiss the entire stack when closed

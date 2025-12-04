@@ -1,14 +1,13 @@
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useQuery } from "@tanstack/react-query";
 import {
   TrackerAnalyticsData,
   trackerAnalyticsService,
 } from "../service/trackerAnalyticsService";
 
-export const TRACKER_ANALYTICS_QUERY_KEY = ["trackerAnalytics"];
-
 export const useTrackerAnalytics = (userId?: string) => {
   const query = useQuery<TrackerAnalyticsData>({
-    queryKey: [...TRACKER_ANALYTICS_QUERY_KEY, userId],
+    queryKey: queryKeys.analytics.tracker(userId ?? ""),
     queryFn: async () => {
       if (!userId) {
         return {

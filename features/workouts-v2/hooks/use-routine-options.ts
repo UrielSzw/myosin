@@ -1,6 +1,6 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { workoutsTranslations } from "@/shared/translations/workouts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -38,10 +38,11 @@ export const useRoutineOptions = () => {
               // Sync to Supabase after deletion
               sync("ROUTINE_DELETE", { id: routine.id });
 
-              queryClient.invalidateQueries({ queryKey: ["workouts"] });
-
               queryClient.invalidateQueries({
-                queryKey: ANALYTICS_QUERY_KEY,
+                queryKey: queryKeys.workouts.all,
+              });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.analytics.all,
               });
             } catch (error) {
               console.error("Error deleting routine:", error);
@@ -81,10 +82,12 @@ export const useRoutineOptions = () => {
                 routineId: routine.id,
               });
 
-              queryClient.invalidateQueries({ queryKey: ["workouts"] });
-
-              // Invalidar analíticas del dashboard
-              queryClient.invalidateQueries({ queryKey: ANALYTICS_QUERY_KEY });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.workouts.all,
+              });
+              queryClient.invalidateQueries({
+                queryKey: queryKeys.analytics.all,
+              });
             } catch (error) {
               console.error("Error removing training days:", error);
               Alert.alert(

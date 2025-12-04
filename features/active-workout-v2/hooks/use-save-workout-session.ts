@@ -1,4 +1,3 @@
-import { ANALYTICS_QUERY_KEY } from "@/features/analytics-v2/hooks/use-analytics-data";
 import { prRepository } from "@/shared/db/repository/pr";
 import {
   workoutSessionsRepository,
@@ -14,6 +13,7 @@ import type {
 import { generateUUID } from "@/shared/db/utils/uuid";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { queryKeys } from "@/shared/queries/query-keys";
 import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { useQueryClient } from "@tanstack/react-query";
@@ -306,9 +306,7 @@ export const useSaveWorkoutSession = () => {
       setSaveState("success");
 
       // Invalidar analíticas del dashboard
-      queryClient.invalidateQueries({
-        queryKey: ANALYTICS_QUERY_KEY,
-      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.analytics.all });
 
       return savedSession.id;
     } catch (err) {

@@ -31,9 +31,20 @@ export class SyncQueueRepository {
   async enqueue(mutation: SyncMutation): Promise<string> {
     const now = new Date().toISOString();
 
+    // Validar que el payload sea serializable
+    let serializedPayload: string;
+    try {
+      serializedPayload = JSON.stringify(mutation.payload);
+    } catch (e) {
+      const error = e instanceof Error ? e.message : String(e);
+      throw new Error(
+        `Failed to serialize mutation payload for ${mutation.code}: ${error}`
+      );
+    }
+
     const entry: SyncQueueInsert = {
       mutation_code: mutation.code,
-      payload: JSON.stringify(mutation.payload),
+      payload: serializedPayload,
       scheduled_at: now, // Inmediato por defecto
       max_retries: mutation.maxRetries ?? 5,
     };

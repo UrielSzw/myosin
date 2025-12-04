@@ -12,11 +12,22 @@ import { useDrizzleStudio } from "expo-drizzle-studio-plugin";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutos
+      retry: 2,
+      refetchOnWindowFocus: false,
+    },
+    mutations: {
+      retry: 1,
+    },
+  },
+});
 
 /**
  * AppContent: Renderiza todas las rutas y maneja la navegación protegida
@@ -53,12 +64,14 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
+  const hasLoadedSeed = useRef(false);
+
   useEffect(() => {
-    if (success && isConnected) {
+    if (success && isConnected && !hasLoadedSeed.current) {
+      hasLoadedSeed.current = true;
       loadExercisesSeed();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [success]);
+  }, [success, isConnected]);
 
   if (!loaded) {
     return <LoadingScreen />;

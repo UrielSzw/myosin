@@ -21,6 +21,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
+import type { ThemeColors } from "../../../../shared/types/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -33,7 +34,7 @@ interface QuickFilterChipProps {
   filter: (typeof QUICK_FILTERS)[0];
   isSelected: boolean;
   onPress: () => void;
-  colors: any;
+  colors: ThemeColors;
   isDark: boolean;
   lang: string;
 }

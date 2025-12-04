@@ -6,7 +6,10 @@ import {
   useUpdateMetric,
 } from "@/features/tracker-v2/hooks/use-tracker-data";
 import { MainMetric } from "@/shared/db/schema";
-import { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
+import {
+  BaseTrackerEntry,
+  TrackerMetricWithQuickActions,
+} from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
@@ -17,6 +20,7 @@ import {
   trackerTranslations,
   trackerUiTranslations,
 } from "@/shared/translations/tracker";
+import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg, toKg, WeightUnit } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -501,14 +505,14 @@ export const MetricModalV2: React.FC<Props> = ({
 
 const HeaderContent: React.FC<{
   selectedMetric: MainMetric;
-  IconComponent: any;
+  IconComponent: React.ComponentType<{ size: number; color: string }> | null;
   metricColor: string;
   displayValue: number;
   displayUnit: string;
   showSettings: boolean;
   setShowSettings: (show: boolean) => void;
   onClose: () => void;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({
@@ -606,8 +610,17 @@ const HeaderContent: React.FC<{
   );
 };
 
+// Type for quick actions (works with both DB records and predefined templates)
+type QuickActionLike = {
+  value: number;
+  label: string;
+  icon: string | null;
+  slug: string | null;
+  value_normalized?: number | null;
+};
+
 const QuickActionsSection: React.FC<{
-  quickActions: any[];
+  quickActions: QuickActionLike[];
   quickActionCounts: { [index: number]: number };
   metricColor: string;
   isWeightMetric: boolean;
@@ -618,7 +631,7 @@ const QuickActionsSection: React.FC<{
   onConfirm: () => void;
   hasSelections: boolean;
   totalValue: number;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({
@@ -763,8 +776,8 @@ const QuickActionsSection: React.FC<{
 };
 
 const QuickActionContent: React.FC<{
-  action: any;
-  ActionIcon: any;
+  action: QuickActionLike;
+  ActionIcon: React.ComponentType<{ size: number; color: string }> | null;
   count: number;
   isSelected: boolean;
   metricColor: string;
@@ -773,7 +786,7 @@ const QuickActionContent: React.FC<{
   displayUnit: string;
   onIncrement: () => void;
   onDecrement: () => void;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({
   action,
@@ -889,7 +902,7 @@ const ManualInputSection: React.FC<{
   metricColor: string;
   onSubmit: () => void;
   isPending: boolean;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({
@@ -1024,7 +1037,7 @@ const ScaleInputSection: React.FC<{
   metric: MainMetric;
   currentEntry?: number;
   onSelect: (value: number, displayValue: string) => void;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({ metric, currentEntry, onSelect, colors, isDarkMode, lang }) => {
@@ -1200,7 +1213,7 @@ const ScaleInputSection: React.FC<{
 const BooleanInputSection: React.FC<{
   metric: MainMetric;
   onSelect: (value: number, displayValue: string) => void;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({ metric, onSelect, colors, lang }) => {
   const t = trackerTranslations;
@@ -1369,12 +1382,12 @@ const BooleanInputSection: React.FC<{
 };
 
 const HistorySection: React.FC<{
-  entries: any[];
+  entries: BaseTrackerEntry[];
   isWeightMetric: boolean;
   weightUnit: WeightUnit;
   displayUnit: string;
   metricColor: string;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({
@@ -1546,7 +1559,7 @@ const SummarySection: React.FC<{
   target: number;
   displayUnit: string;
   metricColor: string;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({
@@ -1613,7 +1626,7 @@ const SummaryContent: React.FC<{
   displayUnit: string;
   metricColor: string;
   progress: number;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({
   currentValue,
@@ -1709,7 +1722,7 @@ const SettingsSection: React.FC<{
   displayUnit: string;
   onSave: () => void;
   onDelete: () => void;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: "es" | "en";
 }> = ({

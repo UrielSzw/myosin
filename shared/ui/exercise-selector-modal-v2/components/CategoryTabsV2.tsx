@@ -14,6 +14,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
 } from "react-native-reanimated";
+import type { ThemeColors } from "../../../../shared/types/theme";
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -28,7 +29,7 @@ interface CategoryTabProps {
   label: string;
   icon: React.ReactNode;
   onPress: () => void;
-  colors: any;
+  colors: ThemeColors;
   isDark: boolean;
 }
 

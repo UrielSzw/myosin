@@ -1,4 +1,5 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -183,7 +184,7 @@ export const WeekStripV2: React.FC<Props> = ({
 const DayItemV2: React.FC<{
   day: DayInfo;
   onPress: (date: string) => void;
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   selectionAnim?: Animated.Value;
 }> = React.memo(({ day, onPress, colors, isDarkMode, selectionAnim }) => {

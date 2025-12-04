@@ -4,6 +4,10 @@ import {
   useDeletedMetrics,
   useRestoreMetric,
 } from "@/features/tracker-v2/hooks/use-tracker-data";
+import type {
+  BaseTrackerMetric,
+  TrackerMetricInsert,
+} from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
@@ -13,6 +17,7 @@ import {
   getMetricUnit,
   trackerTranslations,
 } from "@/shared/translations/tracker";
+import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import * as Icons from "lucide-react-native";
@@ -38,6 +43,9 @@ import Animated, {
   FadeInDown,
   FadeInUp,
 } from "react-native-reanimated";
+
+// Type for predefined metric templates
+type PredefinedMetric = Omit<TrackerMetricInsert, "user_id" | "id">;
 
 type Props = {
   visible: boolean;
@@ -492,7 +500,7 @@ export const MetricSelectorModalV2: React.FC<Props> = ({
 // ===== SUB-COMPONENTS =====
 
 const HeaderContent: React.FC<{
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   onClose: () => void;
   lang: "es" | "en";
@@ -551,11 +559,11 @@ const HeaderContent: React.FC<{
 };
 
 const TemplateContent: React.FC<{
-  template: any;
-  IconComponent: any;
+  template: PredefinedMetric;
+  IconComponent: React.ComponentType<{ size: number; color: string }> | null;
   displayUnit: string;
   isAdding: boolean;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({ template, IconComponent, displayUnit, isAdding, colors, lang }) => {
   const t = trackerTranslations;
@@ -617,7 +625,7 @@ const TemplateContent: React.FC<{
 const DeletedHeaderContent: React.FC<{
   count: number;
   showDeleted: boolean;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({ count, showDeleted, colors, lang }) => {
   const t = trackerTranslations;
@@ -668,10 +676,10 @@ const DeletedHeaderContent: React.FC<{
 };
 
 const DeletedMetricContent: React.FC<{
-  metric: any;
-  IconComponent: any;
+  metric: BaseTrackerMetric;
+  IconComponent: React.ComponentType<{ size: number; color: string }> | null;
   displayUnit: string;
-  colors: any;
+  colors: ThemeColors;
   lang: "es" | "en";
 }> = ({ metric, IconComponent, displayUnit, colors, lang }) => {
   const t = trackerTranslations;

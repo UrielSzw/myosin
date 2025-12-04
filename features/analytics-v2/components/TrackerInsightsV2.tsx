@@ -1,6 +1,7 @@
 import { TrackerAnalyticsData } from "@/features/analytics-v2/service/trackerAnalyticsService";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
+import type { ThemeColors } from "@/shared/types/theme";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -128,7 +129,7 @@ export const TrackerInsightsV2: React.FC<Props> = ({ data, lang }) => {
 // Weight Progress Sub-component
 const WeightProgressCard: React.FC<{
   data: TrackerAnalyticsData["weightProgress"];
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: string;
 }> = ({ data, colors, isDarkMode, lang }) => {
@@ -292,7 +293,7 @@ const WeightProgressCard: React.FC<{
 // Streaks Sub-component
 const StreaksCard: React.FC<{
   streaks: TrackerAnalyticsData["streaks"];
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: string;
 }> = ({ streaks, colors, isDarkMode, lang }) => {
@@ -381,7 +382,7 @@ const StreaksCard: React.FC<{
 // Habits Sub-component
 const HabitsCard: React.FC<{
   habits: TrackerAnalyticsData["habits"];
-  colors: any;
+  colors: ThemeColors;
   isDarkMode: boolean;
   lang: string;
 }> = ({ habits, colors, isDarkMode, lang }) => {

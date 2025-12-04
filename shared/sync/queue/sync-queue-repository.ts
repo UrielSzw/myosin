@@ -9,6 +9,19 @@ import type {
   SyncQueueStatus,
 } from "../types/sync-queue";
 
+// Singleton instance - única instancia en toda la app
+let globalInstance: SyncQueueRepository | null = null;
+
+/**
+ * Get the singleton instance of SyncQueueRepository
+ */
+export const getSyncQueueRepository = (): SyncQueueRepository => {
+  if (!globalInstance) {
+    globalInstance = new SyncQueueRepository();
+  }
+  return globalInstance;
+};
+
 export class SyncQueueRepository {
   // ==================== QUEUE OPERATIONS ====================
 

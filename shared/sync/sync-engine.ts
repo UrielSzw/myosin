@@ -1,6 +1,6 @@
 import { useNetwork } from "../hooks/use-network";
 import { supabaseSyncDictionary } from "./dictionary/sync-dictionary";
-import { SyncQueueRepository } from "./queue/sync-queue-repository";
+import { getSyncQueueRepository } from "./queue/sync-queue-repository";
 import { useSyncStateManager } from "./queue/sync-state-manager";
 import type { MutationCode } from "./types/mutations";
 import type { SyncMutation } from "./types/sync-queue";
@@ -37,7 +37,7 @@ export const syncToSupabase = async (
 
 export const useSyncEngine = () => {
   const isOnline = useNetwork();
-  const queueRepo = new SyncQueueRepository();
+  const queueRepo = getSyncQueueRepository();
   const syncState = useSyncStateManager();
 
   const sync = async (

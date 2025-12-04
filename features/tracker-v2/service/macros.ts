@@ -8,7 +8,7 @@ import {
   MacroTargetWithCalories,
   calculateCalories,
 } from "@/shared/db/schema/macros";
-import { SyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
+import { getSyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
 import { syncToSupabase } from "@/shared/sync/sync-engine";
 import type { MutationCode } from "@/shared/sync/types/mutations";
 import {
@@ -27,7 +27,7 @@ const syncHelper = async (code: MutationCode, payload: any) => {
     if (isOnline) {
       await syncToSupabase(code, payload);
     } else {
-      const queueRepo = new SyncQueueRepository();
+      const queueRepo = getSyncQueueRepository();
       await queueRepo.enqueue({ code, payload });
       console.log(`📴 Queued for later sync: ${code}`);
     }

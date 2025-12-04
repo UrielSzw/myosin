@@ -9,7 +9,7 @@ import type {
   TrackerMetricWithQuickActions,
   TrackerQuickActionInsert,
 } from "@/shared/db/schema/tracker";
-import { SyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
+import { getSyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
 import { syncToSupabase } from "@/shared/sync/sync-engine";
 import type { MutationCode } from "@/shared/sync/types/mutations";
 import {
@@ -30,7 +30,7 @@ const syncHelper = async (code: MutationCode, payload: any) => {
       await syncToSupabase(code, payload);
     } else {
       // Offline: agregar a queue
-      const queueRepo = new SyncQueueRepository();
+      const queueRepo = getSyncQueueRepository();
       await queueRepo.enqueue({
         code,
         payload,

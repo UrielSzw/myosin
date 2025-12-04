@@ -1,18 +1,23 @@
-import { useRef } from "react";
 import type { SyncEngineState } from "../types/sync-queue";
 import {
   calculateNextRetryDate,
   DEFAULT_RETRY_CONFIG,
   shouldTriggerCircuitBreaker,
 } from "../utils/backoff-calculator";
-import { SyncQueueRepository } from "./sync-queue-repository";
+import {
+  getSyncQueueRepository,
+  SyncQueueRepository,
+} from "./sync-queue-repository";
+
+// Singleton instance - única instancia en toda la app
+let globalInstance: SyncStateManager | null = null;
 
 export class SyncStateManager {
   private queueRepo: SyncQueueRepository;
   private cachedState: SyncEngineState | null = null;
 
   constructor() {
-    this.queueRepo = new SyncQueueRepository();
+    this.queueRepo = getSyncQueueRepository();
   }
 
   /**
@@ -189,14 +194,20 @@ export class SyncStateManager {
 }
 
 /**
- * Hook para usar el state manager
+ * Get the singleton instance of SyncStateManager
+ * Use this for non-React code (services, utilities)
  */
-export const useSyncStateManager = () => {
-  const stateManagerRef = useRef<SyncStateManager | null>(null);
-
-  if (!stateManagerRef.current) {
-    stateManagerRef.current = new SyncStateManager();
+export const getSyncStateManager = (): SyncStateManager => {
+  if (!globalInstance) {
+    globalInstance = new SyncStateManager();
   }
+  return globalInstance;
+};
 
-  return stateManagerRef.current;
+/**
+ * Hook para usar el state manager en componentes React
+ * Retorna el mismo singleton que getSyncStateManager()
+ */
+export const useSyncStateManager = (): SyncStateManager => {
+  return getSyncStateManager();
 };

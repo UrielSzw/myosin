@@ -1,16 +1,6 @@
 import NetInfo from "@react-native-community/netinfo";
 import { useEffect, useRef, useState } from "react";
-import { SyncStateManager } from "../sync/queue/sync-state-manager";
-
-// Singleton instance para notificar cambios de red
-let globalSyncStateManager: SyncStateManager | null = null;
-
-const getSyncStateManager = () => {
-  if (!globalSyncStateManager) {
-    globalSyncStateManager = new SyncStateManager();
-  }
-  return globalSyncStateManager;
-};
+import { getSyncStateManager } from "../sync/queue/sync-state-manager";
 
 export const useNetwork = () => {
   const [isOnline, setIsOnline] = useState(true);

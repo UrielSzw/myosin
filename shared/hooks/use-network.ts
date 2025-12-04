@@ -1,5 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SyncStateManager } from "../sync/queue/sync-state-manager";
 
 // Singleton instance para notificar cambios de red
@@ -14,15 +14,18 @@ const getSyncStateManager = () => {
 
 export const useNetwork = () => {
   const [isOnline, setIsOnline] = useState(true);
+  const isOnlineRef = useRef(true);
 
   useEffect(() => {
     const syncStateManager = getSyncStateManager();
 
     const unsubscribe = NetInfo.addEventListener(async (state) => {
-      const wasOnline = isOnline;
+      const wasOnline = isOnlineRef.current;
       const isNowOnline = state.isConnected ?? false;
       const isGoodConnection = state.isInternetReachable ?? true;
 
+      // Actualizar ref inmediatamente y state para UI
+      isOnlineRef.current = isNowOnline;
       setIsOnline(isNowOnline);
 
       // Notificar al sync state manager solo si cambió el estado
@@ -44,7 +47,7 @@ export const useNetwork = () => {
     });
 
     return () => unsubscribe();
-  }, [isOnline]);
+  }, []);
 
   return isOnline;
 };

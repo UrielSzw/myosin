@@ -1,9 +1,10 @@
+import type { MutationPayloadMap } from "./mutation-payloads";
 import type { MutationCode } from "./mutations";
 
 // Queue Entry Types
-export interface SyncMutation {
-  code: MutationCode;
-  payload: any;
+export interface SyncMutation<T extends MutationCode = MutationCode> {
+  code: T;
+  payload: T extends keyof MutationPayloadMap ? MutationPayloadMap[T] : unknown;
   maxRetries?: number;
 }
 

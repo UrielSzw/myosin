@@ -2,23 +2,24 @@ import { useNetwork } from "../hooks/use-network";
 import { supabaseSyncDictionary } from "./dictionary/sync-dictionary";
 import { getSyncQueueRepository } from "./queue/sync-queue-repository";
 import { useSyncStateManager } from "./queue/sync-state-manager";
+import type { MutationPayloadMap } from "./types/mutation-payloads";
 import type { MutationCode } from "./types/mutations";
 import type { SyncMutation } from "./types/sync-queue";
 import { calculateNextRetryDate } from "./utils/backoff-calculator";
 
-export interface SyncResult {
+export interface SyncResult<T = unknown> {
   success: boolean;
   queued?: boolean;
-  result?: any;
+  result?: T;
   error?: string;
 }
 
 /**
- * Función simple para sync directo (para tests y uso sin hooks)
+ * Type-safe sync function for direct sync (for tests and usage without hooks)
  */
-export const syncToSupabase = async (
-  code: MutationCode,
-  payload: any
+export const syncToSupabase = async <T extends MutationCode>(
+  code: T,
+  payload: MutationPayloadMap[T]
 ): Promise<SyncResult> => {
   try {
     const syncFunction = supabaseSyncDictionary[code];
@@ -27,7 +28,7 @@ export const syncToSupabase = async (
       throw new Error(`No sync function found for mutation code: ${code}`);
     }
 
-    const result = await syncFunction(payload);
+    const result = await syncFunction(payload as never);
     return { success: true, result };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -40,9 +41,13 @@ export const useSyncEngine = () => {
   const queueRepo = getSyncQueueRepository();
   const syncState = useSyncStateManager();
 
-  const sync = async (
-    code: MutationCode,
-    payload: any
+  /**
+   * Type-safe sync function.
+   * Attempts immediate sync if online, otherwise queues the mutation.
+   */
+  const sync = async <T extends MutationCode>(
+    code: T,
+    payload: MutationPayloadMap[T]
   ): Promise<SyncResult> => {
     console.log(`🔄 Attempting sync: ${code}`, { isOnline, payload });
 
@@ -68,7 +73,7 @@ export const useSyncEngine = () => {
       }
     }
 
-    // Usar la función directa
+    // Use direct sync function
     return await syncToSupabase(code, payload);
   };
 

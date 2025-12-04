@@ -34,7 +34,7 @@ import Svg, {
 
 type Props = {
   data: TrackerAnalyticsData;
-  lang: string;
+  lang: "es" | "en";
 };
 
 const METRIC_ICONS: Record<string, React.FC<any>> = {
@@ -131,7 +131,7 @@ const WeightProgressCard: React.FC<{
   data: TrackerAnalyticsData["weightProgress"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: string;
+  lang: "es" | "en";
 }> = ({ data, colors, isDarkMode, lang }) => {
   const { dataPoints, currentWeight, weightChange, trend } = data;
 
@@ -295,7 +295,7 @@ const StreaksCard: React.FC<{
   streaks: TrackerAnalyticsData["streaks"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: string;
+  lang: "es" | "en";
 }> = ({ streaks, colors, isDarkMode, lang }) => {
   return (
     <Animated.View
@@ -384,7 +384,7 @@ const HabitsCard: React.FC<{
   habits: TrackerAnalyticsData["habits"];
   colors: ThemeColors;
   isDarkMode: boolean;
-  lang: string;
+  lang: "es" | "en";
 }> = ({ habits, colors, isDarkMode, lang }) => {
   return (
     <Animated.View

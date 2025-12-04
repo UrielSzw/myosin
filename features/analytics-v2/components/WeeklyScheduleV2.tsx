@@ -11,7 +11,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   activeRoutines: RoutineFull[];
-  lang: string;
+  lang: "es" | "en";
 };
 
 const WEEK_DAYS_EN: Record<WeekDay, string> = {

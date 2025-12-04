@@ -1,4 +1,4 @@
-import { InferSelectModel, relations } from "drizzle-orm";
+import { InferInsertModel, InferSelectModel, relations } from "drizzle-orm";
 import {
   index,
   integer,
@@ -316,6 +316,10 @@ export type ExerciseInBlockInsert = Omit<
 export type SetInsert = Omit<BaseSet, "created_at" | "updated_at">;
 
 // 5. Otros tipos útiles
-export type ExerciseInsert = Omit<BaseExercise, "created_at" | "updated_at"> & {
+// Use InferInsertModel to respect optional columns (name_search, primary_media_url, primary_media_type)
+export type ExerciseInsert = Omit<
+  InferInsertModel<typeof exercises>,
+  "created_at" | "updated_at"
+> & {
   images: string[];
 };

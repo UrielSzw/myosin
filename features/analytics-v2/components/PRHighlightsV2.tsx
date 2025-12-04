@@ -11,7 +11,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   prs: AnalyticsPRData[];
-  lang: string;
+  lang: "es" | "en";
 };
 
 const getMedalIcon = (index: number) => {

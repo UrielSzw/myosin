@@ -10,7 +10,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   weeklyVolume: WeeklyVolumeMap;
-  lang: string;
+  lang: "es" | "en";
 };
 
 type MuscleCategory = {

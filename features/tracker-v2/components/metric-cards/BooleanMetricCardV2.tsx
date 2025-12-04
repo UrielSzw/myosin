@@ -1,4 +1,4 @@
-import type { MetricDisplayData } from "@/features/tracker/types/visual-states";
+import type { MetricDisplayData } from "@/features/tracker-v2/types/visual-states";
 import type { TrackerMetricWithQuickActions } from "@/shared/db/schema/tracker";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { getMetricName } from "@/shared/translations/tracker";

@@ -8,7 +8,7 @@
  * - Maximum precision in storage, smart rounding in display
  */
 
-export type DistanceSystem = "metric" | "imperial";
+export type DistanceUnit = "metric" | "imperial";
 
 /**
  * Conversion factors (international standards)
@@ -38,7 +38,7 @@ const FEET_TO_METERS = 0.3048;
  */
 export const fromMeters = (
   meters: number,
-  system: DistanceSystem,
+  system: DistanceUnit,
   decimals: number = 0
 ): number => {
   if (system === "metric") {
@@ -60,7 +60,7 @@ export const fromMeters = (
  * toMeters(100, "metric") // 100
  * toMeters(328, "imperial") // ~100 (from feet)
  */
-export const toMeters = (value: number, system: DistanceSystem): number => {
+export const toMeters = (value: number, system: DistanceUnit): number => {
   if (system === "metric") return value;
   // Imperial: convert from feet to meters
   return value * FEET_TO_METERS;
@@ -84,7 +84,7 @@ export const toMeters = (value: number, system: DistanceSystem): number => {
  */
 export const fromKm = (
   km: number,
-  system: DistanceSystem,
+  system: DistanceUnit,
   decimals: number = 1
 ): number => {
   if (system === "metric") {
@@ -106,7 +106,7 @@ export const fromKm = (
  * toKm(10, "metric") // 10
  * toKm(6.2, "imperial") // ~10 (from miles)
  */
-export const toKm = (value: number, system: DistanceSystem): number => {
+export const toKm = (value: number, system: DistanceUnit): number => {
   if (system === "metric") return value;
   // Imperial: convert from miles to km
   return value * MILES_TO_KM;
@@ -119,28 +119,28 @@ export const toKm = (value: number, system: DistanceSystem): number => {
 /**
  * Get display unit label for short distances
  */
-export const getShortDistanceUnit = (system: DistanceSystem): string => {
+export const getShortDistanceUnit = (system: DistanceUnit): string => {
   return system === "metric" ? "m" : "ft";
 };
 
 /**
  * Get display unit label for short distances (uppercase for headers)
  */
-export const getShortDistanceLabel = (system: DistanceSystem): string => {
+export const getShortDistanceLabel = (system: DistanceUnit): string => {
   return system === "metric" ? "METROS" : "FEET";
 };
 
 /**
  * Get display unit label for long distances
  */
-export const getLongDistanceUnit = (system: DistanceSystem): string => {
+export const getLongDistanceUnit = (system: DistanceUnit): string => {
   return system === "metric" ? "km" : "mi";
 };
 
 /**
  * Get display unit label for long distances (uppercase for headers)
  */
-export const getLongDistanceLabel = (system: DistanceSystem): string => {
+export const getLongDistanceLabel = (system: DistanceUnit): string => {
   return system === "metric" ? "KM" : "MI";
 };
 
@@ -162,7 +162,7 @@ export const getLongDistanceLabel = (system: DistanceSystem): string => {
  */
 export const formatShortDistance = (
   meters: number,
-  system: DistanceSystem,
+  system: DistanceUnit,
   decimals: number = 0
 ): string => {
   const value = fromMeters(meters, system, decimals);
@@ -184,7 +184,7 @@ export const formatShortDistance = (
  */
 export const formatLongDistance = (
   km: number,
-  system: DistanceSystem,
+  system: DistanceUnit,
   decimals: number = 1
 ): string => {
   const value = fromKm(km, system, decimals);

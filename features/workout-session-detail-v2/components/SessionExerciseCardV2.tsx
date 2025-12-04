@@ -13,7 +13,7 @@ type Props = {
   exercise: WorkoutExerciseWithSets;
   isLast: boolean;
   showRpe: boolean;
-  lang: string;
+  lang: "es" | "en";
 };
 
 export const SessionExerciseCardV2: React.FC<Props> = ({

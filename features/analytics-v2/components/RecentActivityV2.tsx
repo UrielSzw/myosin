@@ -17,7 +17,7 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 
 type Props = {
   sessions: AnalyticsSessionData[];
-  lang: string;
+  lang: "es" | "en";
 };
 
 const formatDuration = (seconds: number): string => {

@@ -1,7 +1,14 @@
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { useRouter, useSegments } from "expo-router";
+import { Href, useRouter, useSegments } from "expo-router";
 import { useEffect, useRef } from "react";
+
+// Type-safe route constants
+const ROUTES = {
+  TABS: "/(authenticated)/(tabs)/" as Href,
+  ONBOARDING: "/onboarding" as Href,
+  SIGN_IN: "/auth/sign-in" as Href,
+} as const;
 
 /**
  * Hook para proteger rutas y redirigir según el estado de autenticación
@@ -41,10 +48,10 @@ export function useProtectedRoute() {
     if (user && inAuthGroup) {
       if (prefs?.onboarding_completed) {
         console.log("✅ [Route Guard] Onboarding complete, redirecting to app");
-        router.replace("/(authenticated)/(tabs)/");
+        router.replace(ROUTES.TABS);
       } else {
         console.log("🎯 [Route Guard] Onboarding needed, redirecting...");
-        router.replace("/onboarding");
+        router.replace(ROUTES.ONBOARDING);
       }
       return;
     }
@@ -54,7 +61,7 @@ export function useProtectedRoute() {
       // Si onboarding no está completo, redirigir
       if (prefs && !prefs.onboarding_completed) {
         console.log("🎯 [Route Guard] Onboarding incomplete, redirecting...");
-        router.replace("/onboarding");
+        router.replace(ROUTES.ONBOARDING);
       }
       // Si está completo, no hacer nada - dejar que la app cargue normal
       return;
@@ -67,7 +74,7 @@ export function useProtectedRoute() {
         console.log(
           "✅ [Route Guard] Onboarding already done, redirecting to app"
         );
-        router.replace("/(authenticated)/(tabs)/");
+        router.replace(ROUTES.TABS);
       }
       return;
     }
@@ -77,7 +84,7 @@ export function useProtectedRoute() {
       console.log(
         "🚫 [Route Guard] User not authenticated, redirecting to sign-in"
       );
-      router.replace("/auth/sign-in");
+      router.replace(ROUTES.SIGN_IN);
       return;
     }
 
@@ -86,7 +93,7 @@ export function useProtectedRoute() {
       console.log(
         "🚫 [Route Guard] User not authenticated, redirecting to sign-in"
       );
-      router.replace("/auth/sign-in");
+      router.replace(ROUTES.SIGN_IN);
       return;
     }
 
@@ -95,7 +102,7 @@ export function useProtectedRoute() {
       if (!hasHandledRef.current) {
         console.log("🚫 [Route Guard] Initial redirect to sign-in");
         hasHandledRef.current = true;
-        router.replace("/auth/sign-in");
+        router.replace(ROUTES.SIGN_IN);
       }
       return;
     }
@@ -106,10 +113,10 @@ export function useProtectedRoute() {
         hasHandledRef.current = true;
         if (prefs?.onboarding_completed) {
           console.log("✅ [Route Guard] Redirecting to app");
-          router.replace("/(authenticated)/(tabs)/");
+          router.replace(ROUTES.TABS);
         } else {
           console.log("🎯 [Route Guard] Redirecting to onboarding");
-          router.replace("/onboarding");
+          router.replace(ROUTES.ONBOARDING);
         }
       }
       return;

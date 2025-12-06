@@ -184,4 +184,43 @@ export const activeWorkoutTranslations = {
     es: "Error al actualizar la rutina. Intenta nuevamente.",
     en: "Error updating routine. Please try again.",
   },
+  of: {
+    es: "de",
+    en: "of",
+  },
+  // Single Set Timer
+  singleSetTimer: {
+    start: {
+      es: "Iniciar",
+      en: "Start",
+    },
+    pause: {
+      es: "Pausar",
+      en: "Pause",
+    },
+    resume: {
+      es: "Reanudar",
+      en: "Resume",
+    },
+    completed: {
+      es: "¡Completado!",
+      en: "Completed!",
+    },
+    complete: {
+      es: "Completar",
+      en: "Complete",
+    },
+    reset: {
+      es: "Reiniciar",
+      en: "Reset",
+    },
+    target: {
+      es: "objetivo",
+      en: "target",
+    },
+    completeTarget: {
+      es: "Completar objetivo",
+      en: "Complete target",
+    },
+  },
 };

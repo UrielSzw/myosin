@@ -16,8 +16,8 @@ import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
 import { fromKm, fromMeters } from "@/shared/utils/distance-conversion";
 import { fromKg } from "@/shared/utils/weight-conversion";
-import { Check, ChevronRight, Timer, Trophy } from "lucide-react-native";
-import React, { useCallback } from "react";
+import { Check, ChevronRight, Play, Timer, Trophy } from "lucide-react-native";
+import React, { useCallback, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   FadeInRight,
@@ -26,6 +26,7 @@ import Animated, {
   withSequence,
   withSpring,
 } from "react-native-reanimated";
+import { SingleSetTimerSheet } from "./SingleSetTimerSheet";
 
 type Props = {
   setId: string;
@@ -59,7 +60,8 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const { completeSet, uncompleteSet, updateSetValue } =
       useActiveSetActions();
     const { setCurrentState } = useActiveMainActions();
-    const { sets, exercisePreviousSets, session } = useActiveWorkout();
+    const { sets, exercisePreviousSets, session, setsByExercise } =
+      useActiveWorkout();
 
     const prefs = useUserPreferences();
     const weightUnit = prefs?.weight_unit ?? "kg";
@@ -84,6 +86,9 @@ export const ActiveSetRowV2 = React.memo<Props>(
     // Animation values - following SetRowV2 style
     const typeScale = useSharedValue(1);
     const checkScale = useSharedValue(1);
+
+    // Single Set Timer state
+    const [timerVisible, setTimerVisible] = useState(false);
 
     const typeAnimatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: typeScale.value }],
@@ -205,6 +210,72 @@ export const ActiveSetRowV2 = React.memo<Props>(
       onOpenTempoMetronome();
     }, [set, setCurrentState, onOpenTempoMetronome]);
 
+    // Handler para abrir el timer de un set individual
+    const handleOpenTimer = useCallback(() => {
+      setTimerVisible(true);
+    }, []);
+
+    // Handler cuando el timer completa (receives duration in seconds)
+    const handleTimerComplete = useCallback(
+      (actualDurationSeconds: number) => {
+        // Convert back to minutes if the field uses minutes
+        const field = template?.fields[timeFieldType === "primary" ? 0 : 1];
+        const isMinutes = field?.unit === "min";
+        const valueToStore = isMinutes
+          ? Math.round((actualDurationSeconds / 60) * 100) / 100 // Round to 2 decimals
+          : Math.round(actualDurationSeconds);
+
+        // Update the value
+        updateSetValue(
+          setId,
+          timeFieldType,
+          valueToStore,
+          exerciseInBlock.tempId
+        );
+
+        // Get effective values for completion
+        const effectivePrimary =
+          timeFieldType === "primary"
+            ? valueToStore
+            : set?.actual_primary_value ??
+              set?.planned_primary_value ??
+              prevSet?.actual_primary_value ??
+              0;
+
+        const effectiveSecondary =
+          timeFieldType === "secondary"
+            ? valueToStore
+            : set?.actual_secondary_value ??
+              set?.planned_secondary_value ??
+              prevSet?.actual_secondary_value ??
+              0;
+
+        // Complete the set
+        completeSet(exerciseInBlock.tempId, setId, blockId, {
+          primaryValue: effectivePrimary,
+          secondaryValue: effectiveSecondary,
+          actualRpe: set?.actual_rpe || set?.planned_rpe || 0,
+          estimated1RM: 0,
+          isPR: false,
+        });
+
+        haptic.success();
+        setTimerVisible(false);
+      },
+      [
+        timeFieldType,
+        template,
+        setId,
+        exerciseInBlock.tempId,
+        blockId,
+        set,
+        prevSet,
+        updateSetValue,
+        completeSet,
+        haptic,
+      ]
+    );
+
     if (!set) return null;
 
     const setNumber = set.order_index + 1;
@@ -219,6 +290,46 @@ export const ActiveSetRowV2 = React.memo<Props>(
       distanceUnit
     );
     const hasSecondaryField = template?.fields && template.fields.length > 1;
+
+    // Detect time fields for timer functionality
+    const primaryFieldIsTime = template?.fields[0]?.type === "time";
+    const secondaryFieldIsTime = template?.fields[1]?.type === "time";
+    const hasTimeField = primaryFieldIsTime || secondaryFieldIsTime;
+
+    // Determine which field is the time field and its unit
+    const timeFieldType: "primary" | "secondary" = primaryFieldIsTime
+      ? "primary"
+      : "secondary";
+    const timeFieldUnit = primaryFieldIsTime
+      ? template?.fields[0]?.unit
+      : template?.fields[1]?.unit;
+    const timeFieldIsMinutes = timeFieldUnit === "min";
+
+    // Get timer duration (always in seconds for the timer)
+    const getTimerDuration = (): number => {
+      const isPrimary = timeFieldType === "primary";
+      const actualValue = isPrimary
+        ? set.actual_primary_value
+        : set.actual_secondary_value;
+      const plannedValue = isPrimary
+        ? set.planned_primary_value
+        : set.planned_secondary_value;
+      const prevValue = isPrimary
+        ? prevSet?.actual_primary_value
+        : prevSet?.actual_secondary_value;
+
+      const rawValue =
+        actualValue ??
+        plannedValue ??
+        prevValue ??
+        (timeFieldIsMinutes ? 5 : 30);
+
+      // Convert to seconds if the field is in minutes
+      return timeFieldIsMinutes ? rawValue * 60 : rawValue;
+    };
+
+    // Total sets for the exercise
+    const totalSets = setsByExercise[exerciseInBlock.tempId]?.length ?? 1;
 
     // Helper para obtener placeholders basado en el template
     const getPlaceholderValue = (fieldType: "primary" | "secondary") => {
@@ -501,35 +612,53 @@ export const ActiveSetRowV2 = React.memo<Props>(
             </View>
           )}
 
-          {/* Check/Complete Column */}
+          {/* Check/Complete/Timer Column */}
           <View style={styles.checkColumn}>
             <Animated.View style={checkAnimatedStyle}>
-              <Pressable
-                onPress={isCompleted ? handleUncomplete : handleCompleteSet}
-                style={({ pressed }) => [
-                  styles.checkButton,
-                  {
-                    backgroundColor: isCompleted
-                      ? isCurrentPR
-                        ? "#FBBF24"
-                        : blockColors.primary
-                      : isDarkMode
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(0,0,0,0.05)",
-                    opacity: pressed ? 0.8 : 1,
-                  },
-                ]}
-              >
-                {isCompleted && isCurrentPR ? (
-                  <Trophy size={16} color="#FFFFFF" />
-                ) : (
-                  <Check
-                    size={16}
-                    color={isCompleted ? "#FFFFFF" : colors.textMuted}
-                    strokeWidth={2.5}
-                  />
-                )}
-              </Pressable>
+              {/* Timer button for time-based sets (not completed) */}
+              {hasTimeField && !isCompleted ? (
+                <Pressable
+                  onPress={handleOpenTimer}
+                  style={({ pressed }) => [
+                    styles.checkButton,
+                    {
+                      backgroundColor: pressed
+                        ? colors.primary[600]
+                        : colors.primary[500],
+                      opacity: pressed ? 0.9 : 1,
+                    },
+                  ]}
+                >
+                  <Play size={16} color="#FFFFFF" fill="#FFFFFF" />
+                </Pressable>
+              ) : (
+                <Pressable
+                  onPress={isCompleted ? handleUncomplete : handleCompleteSet}
+                  style={({ pressed }) => [
+                    styles.checkButton,
+                    {
+                      backgroundColor: isCompleted
+                        ? isCurrentPR
+                          ? "#FBBF24"
+                          : blockColors.primary
+                        : isDarkMode
+                        ? "rgba(255,255,255,0.08)"
+                        : "rgba(0,0,0,0.05)",
+                      opacity: pressed ? 0.8 : 1,
+                    },
+                  ]}
+                >
+                  {isCompleted && isCurrentPR ? (
+                    <Trophy size={16} color="#FFFFFF" />
+                  ) : (
+                    <Check
+                      size={16}
+                      color={isCompleted ? "#FFFFFF" : colors.textMuted}
+                      strokeWidth={2.5}
+                    />
+                  )}
+                </Pressable>
+              )}
             </Animated.View>
           </View>
         </Animated.View>
@@ -572,6 +701,17 @@ export const ActiveSetRowV2 = React.memo<Props>(
             </Typography>
           </Pressable>
         )}
+
+        {/* Single Set Timer Sheet */}
+        <SingleSetTimerSheet
+          visible={timerVisible}
+          duration={getTimerDuration()}
+          exerciseName={exerciseInBlock.exercise.name}
+          setNumber={setNumber}
+          totalSets={totalSets}
+          onClose={() => setTimerVisible(false)}
+          onComplete={handleTimerComplete}
+        />
       </>
     );
   }

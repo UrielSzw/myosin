@@ -11,4 +11,5 @@ export * from "./CircuitTimerModeV2";
 export * from "./EmptyWorkoutStateV2";
 export * from "./NextSetArrowV2";
 export * from "./RestTimerBannerV2";
+export * from "./SingleSetTimerSheet";
 export * from "./TempoMetronomeV2";

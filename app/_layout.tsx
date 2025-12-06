@@ -4,6 +4,8 @@ import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
 import { AuthProvider } from "@/shared/providers/auth-provider";
+import { logger } from "@/shared/services/logger";
+import { ErrorBoundary } from "@/shared/ui/error-boundary";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -82,15 +84,25 @@ export default function RootLayout() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <BottomSheetModalProvider>
-          <AuthProvider>
-            <AppContent />
-            <StatusBar style="auto" />
-          </AuthProvider>
-        </BottomSheetModalProvider>
-      </GestureHandlerRootView>
-    </QueryClientProvider>
+    <ErrorBoundary
+      onError={(error, errorInfo) => {
+        // Log to external service in production
+        logger.error("Root ErrorBoundary caught error", {
+          error: error.message,
+          componentStack: errorInfo.componentStack,
+        });
+      }}
+    >
+      <QueryClientProvider client={queryClient}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <BottomSheetModalProvider>
+            <AuthProvider>
+              <AppContent />
+              <StatusBar style="auto" />
+            </AuthProvider>
+          </BottomSheetModalProvider>
+        </GestureHandlerRootView>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

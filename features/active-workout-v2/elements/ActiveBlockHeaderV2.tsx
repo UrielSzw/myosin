@@ -13,6 +13,7 @@ import {
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import {
+  AlertTriangle,
   Clock,
   Layers,
   MoreVertical,
@@ -28,6 +29,7 @@ type Props = {
   exercisesCount: number;
   onPress: () => void;
   onOpenRestTime: () => void;
+  hasBalancedSets?: boolean;
 };
 
 const BLOCK_ICONS: Record<IBlockType, React.ReactNode> = {
@@ -41,6 +43,7 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
   exercisesCount,
   onPress,
   onOpenRestTime,
+  hasBalancedSets = true,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
@@ -76,17 +79,45 @@ export const ActiveBlockHeaderV2: React.FC<Props> = ({
     <View style={styles.container}>
       <View style={styles.leftSection}>
         {/* Block Type Badge */}
-        <View
-          style={[styles.typeBadge, { backgroundColor: blockColors.primary }]}
-        >
-          {BLOCK_ICONS[block.type]}
-          <Typography
-            variant="caption"
-            weight="bold"
-            style={{ color: "#fff", marginLeft: 4, fontSize: 10 }}
+        <View style={styles.badgeRow}>
+          <View
+            style={[styles.typeBadge, { backgroundColor: blockColors.primary }]}
           >
-            {blockLabel.toUpperCase()}
-          </Typography>
+            {BLOCK_ICONS[block.type]}
+            <Typography
+              variant="caption"
+              weight="bold"
+              style={{ color: "#fff", marginLeft: 4, fontSize: 10 }}
+            >
+              {blockLabel.toUpperCase()}
+            </Typography>
+          </View>
+
+          {/* Unbalanced Sets Warning */}
+          {block.type !== "individual" && !hasBalancedSets && (
+            <View
+              style={[
+                styles.warningBadge,
+                {
+                  backgroundColor: `${colors.warning[500]}15`,
+                  borderColor: `${colors.warning[500]}30`,
+                },
+              ]}
+            >
+              <AlertTriangle size={10} color={colors.warning[500]} />
+              <Typography
+                variant="caption"
+                weight="medium"
+                style={{
+                  color: colors.warning[500],
+                  marginLeft: 3,
+                  fontSize: 9,
+                }}
+              >
+                {t.unbalancedSets[lang as SupportedLanguage]}
+              </Typography>
+            </View>
+          )}
         </View>
 
         {/* Block Name */}
@@ -232,6 +263,12 @@ const styles = StyleSheet.create({
   leftSection: {
     flex: 1,
   },
+  badgeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
+  },
   typeBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -239,6 +276,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
+  },
+  warningBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
   },
   rightSection: {
     flexDirection: "row",

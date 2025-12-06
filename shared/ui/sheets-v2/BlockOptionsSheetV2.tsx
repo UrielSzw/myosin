@@ -1,11 +1,13 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
+  AlertTriangle,
   ChevronRight,
   Layers,
+  Play,
   PlusCircle,
   RotateCcw,
   Shuffle,
@@ -34,11 +36,16 @@ type ActionOption = {
   color: string;
   onPress: () => void;
   show?: boolean;
+  disabled?: boolean;
+  warning?: string;
 };
 
 type Props = {
   visible: boolean;
   isMultiBlock: boolean;
+  isCircuit?: boolean;
+  canUseTimerMode?: boolean;
+  hasBalancedSets?: boolean;
   exerciseName?: string | null;
   onClose: () => void;
   onDelete: () => void;
@@ -47,11 +54,15 @@ type Props = {
   onReplace: () => void;
   onReorderExercises?: () => void;
   onReorderBlocks?: () => void;
+  onStartTimerMode?: () => void;
 };
 
 export const BlockOptionsSheetV2 = ({
   visible,
   isMultiBlock,
+  isCircuit,
+  canUseTimerMode,
+  hasBalancedSets = true,
   exerciseName,
   onClose,
   onDelete,
@@ -60,6 +71,7 @@ export const BlockOptionsSheetV2 = ({
   onReplace,
   onReorderExercises,
   onReorderBlocks,
+  onStartTimerMode,
 }: Props) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
@@ -155,9 +167,41 @@ export const BlockOptionsSheetV2 = ({
       es: "Esta acción no se puede deshacer",
       en: "This action cannot be undone",
     },
+    startTimerMode: { es: "Iniciar Timer", en: "Start Timer" },
+    startTimerModeDesc: {
+      es: "Timer automático para el circuito",
+      en: "Automatic timer for the circuit",
+    },
+    unbalancedSetsWarning: {
+      es: "Igualar sets por ejercicio",
+      en: "Balance sets per exercise",
+    },
   };
 
+  // Check if timer mode should be shown (circuit with time exercises)
+  const showTimerModeOption =
+    isCircuit && canUseTimerMode && !!onStartTimerMode;
+  // Timer is disabled if sets are unbalanced
+  const timerModeDisabled = !hasBalancedSets;
+
   const options: ActionOption[] = [
+    {
+      id: "timerMode",
+      icon: <Play size={22} color="#fff" strokeWidth={2} fill="#fff" />,
+      label: t.startTimerMode[lang],
+      description: timerModeDisabled
+        ? t.unbalancedSetsWarning[lang]
+        : t.startTimerModeDesc[lang],
+      color: timerModeDisabled ? colors.textMuted : "#4A90E2", // Circuit blue or muted
+      onPress: () => {
+        if (timerModeDisabled) return;
+        onClose();
+        onStartTimerMode?.();
+      },
+      show: showTimerModeOption,
+      disabled: timerModeDisabled,
+      warning: timerModeDisabled ? t.unbalancedSetsWarning[lang] : undefined,
+    },
     {
       id: "add",
       icon: <PlusCircle size={22} color="#fff" strokeWidth={2} />,
@@ -372,11 +416,13 @@ export const BlockOptionsSheetV2 = ({
               };
 
               const isDestructive = option.id === "delete";
+              const isDisabled = option.disabled;
 
               return (
                 <Animated.View key={option.id} style={animatedStyle}>
                   <Pressable
-                    onPress={option.onPress}
+                    onPress={isDisabled ? undefined : option.onPress}
+                    disabled={isDisabled}
                     style={({ pressed }) => [
                       styles.optionCard,
                       {
@@ -387,13 +433,17 @@ export const BlockOptionsSheetV2 = ({
                           : isDarkMode
                           ? "rgba(255,255,255,0.04)"
                           : "rgba(0,0,0,0.02)",
-                        borderColor: isDestructive
+                        borderColor: isDisabled
+                          ? `${colors.warning[500]}30`
+                          : isDestructive
                           ? `${colors.error[500]}20`
                           : isDarkMode
                           ? "rgba(255,255,255,0.08)"
                           : "rgba(0,0,0,0.06)",
-                        opacity: pressed ? 0.8 : 1,
-                        transform: [{ scale: pressed ? 0.98 : 1 }],
+                        opacity: isDisabled ? 0.6 : pressed ? 0.8 : 1,
+                        transform: [
+                          { scale: pressed && !isDisabled ? 0.98 : 1 },
+                        ],
                       },
                     ]}
                   >
@@ -401,7 +451,11 @@ export const BlockOptionsSheetV2 = ({
                     <View
                       style={[
                         styles.optionIcon,
-                        { backgroundColor: option.color },
+                        {
+                          backgroundColor: isDisabled
+                            ? colors.textMuted
+                            : option.color,
+                        },
                       ]}
                     >
                       {option.icon}
@@ -413,7 +467,9 @@ export const BlockOptionsSheetV2 = ({
                         variant="body1"
                         weight="semibold"
                         style={{
-                          color: isDestructive
+                          color: isDisabled
+                            ? colors.textMuted
+                            : isDestructive
                             ? colors.error[500]
                             : colors.text,
                         }}
@@ -421,26 +477,44 @@ export const BlockOptionsSheetV2 = ({
                         {option.label}
                       </Typography>
                       {option.description && (
-                        <Typography
-                          variant="caption"
+                        <View
                           style={{
-                            color: isDestructive
-                              ? `${colors.error[500]}80`
-                              : colors.textMuted,
+                            flexDirection: "row",
+                            alignItems: "center",
                             marginTop: 2,
                           }}
                         >
-                          {option.description}
-                        </Typography>
+                          {isDisabled && (
+                            <AlertTriangle
+                              size={12}
+                              color={colors.warning[500]}
+                              style={{ marginRight: 4 }}
+                            />
+                          )}
+                          <Typography
+                            variant="caption"
+                            style={{
+                              color: isDisabled
+                                ? colors.warning[500]
+                                : isDestructive
+                                ? `${colors.error[500]}80`
+                                : colors.textMuted,
+                            }}
+                          >
+                            {option.description}
+                          </Typography>
+                        </View>
                       )}
                     </View>
 
-                    {/* Arrow */}
+                    {/* Arrow or Warning */}
                     <View
                       style={[
                         styles.arrowContainer,
                         {
-                          backgroundColor: isDestructive
+                          backgroundColor: isDisabled
+                            ? `${colors.warning[500]}15`
+                            : isDestructive
                             ? `${colors.error[500]}10`
                             : isDarkMode
                             ? "rgba(255,255,255,0.05)"
@@ -448,12 +522,16 @@ export const BlockOptionsSheetV2 = ({
                         },
                       ]}
                     >
-                      <ChevronRight
-                        size={16}
-                        color={
-                          isDestructive ? colors.error[500] : colors.textMuted
-                        }
-                      />
+                      {isDisabled ? (
+                        <AlertTriangle size={16} color={colors.warning[500]} />
+                      ) : (
+                        <ChevronRight
+                          size={16}
+                          color={
+                            isDestructive ? colors.error[500] : colors.textMuted
+                          }
+                        />
+                      )}
                     </View>
                   </Pressable>
                 </Animated.View>

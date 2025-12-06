@@ -1,7 +1,7 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { profileTranslations as t } from "@/shared/translations/profile";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Clock, Minus, Plus, X } from "lucide-react-native";
@@ -96,7 +96,7 @@ export const RestTimeSheetV2 = ({
   }, [visible]);
 
   const formatTime = (seconds: number) => {
-    if (seconds === 0) return t.noRest[lang];
+    if (seconds === 0) return "0";
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

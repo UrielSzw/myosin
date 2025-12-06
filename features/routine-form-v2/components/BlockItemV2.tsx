@@ -4,7 +4,7 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { IToogleSheet } from "../hooks/use-form-routine-sheets";
@@ -26,7 +26,8 @@ export const BlockItemV2: React.FC<Props> = ({
   onToggleSheet,
   index,
 }) => {
-  const { blocks, exercisesByBlock, exercisesInBlock } = useRoutineFormState();
+  const { blocks, exercisesByBlock, exercisesInBlock, setsByExercise } =
+    useRoutineFormState();
   const { setCurrentState } = useMainActions();
   const { initializeReorder } = useReorderBlocks();
   const { getBlockColors } = useBlockStyles();
@@ -36,6 +37,18 @@ export const BlockItemV2: React.FC<Props> = ({
   const block = blocks[blockId];
   const exercisesInBlockIds = exercisesByBlock[blockId] || [];
   const blockColors = getBlockColors(block?.type);
+
+  // Check if multi-exercise block has balanced sets (circuit or superset)
+  const hasBalancedSets = useMemo(() => {
+    if (!block || block.type === "individual") return true;
+    if (exercisesInBlockIds.length === 0) return true;
+
+    const setCounts = exercisesInBlockIds.map(
+      (exId) => (setsByExercise[exId] || []).length
+    );
+
+    return setCounts.every((count) => count === setCounts[0]);
+  }, [block, exercisesInBlockIds, setsByExercise]);
 
   const handleLongPress = () => {
     haptic.drag();
@@ -113,6 +126,7 @@ export const BlockItemV2: React.FC<Props> = ({
               exercisesCount={exercisesInBlockIds.length}
               onToggleSheet={onToggleSheet}
               onOptionsPress={handlePress}
+              hasBalancedSets={hasBalancedSets}
             />
 
             {/* Exercises */}

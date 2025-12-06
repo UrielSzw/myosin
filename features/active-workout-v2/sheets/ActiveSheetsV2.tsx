@@ -3,6 +3,7 @@ import {
   useActiveExerciseActions,
   useActiveMainActions,
   useActiveSetActions,
+  useActiveWorkout,
   useActiveWorkoutState,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { ISetType, RPEValue } from "@/shared/types/workout";
@@ -13,18 +14,25 @@ import {
   RPESelectorV2,
   SetTypeSheetV2,
 } from "@/shared/ui/sheets-v2";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
+import { CircuitTimerModeV2 } from "../elements/CircuitTimerModeV2";
 import { TempoMetronomeV2 } from "../elements/TempoMetronomeV2";
 import { IActiveSheetV2 } from "../hooks/use-active-workout-sheets-v2";
+import {
+  canUseCircuitTimerMode,
+  hasBalancedCircuitSets,
+} from "../utils/store-helpers";
 
 type Props = {
   activeSheet: IActiveSheetV2;
   closeSheet: () => void;
+  openCircuitTimerModeSheet: () => void;
 };
 
 export const ActiveSheetsV2: React.FC<Props> = ({
   activeSheet,
   closeSheet,
+  openCircuitTimerModeSheet,
 }) => {
   const {
     currentSetType,
@@ -33,7 +41,10 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     currentExerciseName,
     currentTempo,
     currentRpeValue,
+    currentBlockId,
   } = useActiveWorkoutState();
+  const { blocks, exercises, sets, exercisesByBlock, setsByExercise } =
+    useActiveWorkout();
   const { setExerciseModalMode, clearCurrentState } = useActiveMainActions();
   const { deleteSet, updateSetType, updateRpe } = useActiveSetActions();
   const { updateRestTime, deleteBlock, convertBlockToIndividual } =
@@ -106,6 +117,61 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     [clearCurrentState, updateRpe, closeSheet]
   );
 
+  // Circuit Timer Mode handlers
+  const currentBlock = currentBlockId ? blocks[currentBlockId] : null;
+  const isCircuit = currentBlock?.type === "circuit";
+
+  const canUseTimerModeValue = useMemo(() => {
+    if (!currentBlockId || !currentBlock || currentBlock.type !== "circuit") {
+      return false;
+    }
+    const exerciseIds = exercisesByBlock[currentBlockId] || [];
+    const exercisesInBlock = exerciseIds
+      .map((id) => exercises[id])
+      .filter(Boolean)
+      .sort((a, b) => a.order_index - b.order_index);
+
+    return canUseCircuitTimerMode(
+      currentBlock,
+      exercisesInBlock,
+      sets,
+      setsByExercise
+    );
+  }, [
+    currentBlockId,
+    currentBlock,
+    exercisesByBlock,
+    exercises,
+    sets,
+    setsByExercise,
+  ]);
+
+  const hasBalancedSets = useMemo(() => {
+    if (!currentBlockId || !currentBlock || currentBlock.type !== "circuit") {
+      return true;
+    }
+    const exerciseIds = exercisesByBlock[currentBlockId] || [];
+    const exercisesInBlock = exerciseIds
+      .map((id) => exercises[id])
+      .filter(Boolean);
+
+    return hasBalancedCircuitSets(exercisesInBlock, setsByExercise);
+  }, [
+    currentBlockId,
+    currentBlock,
+    exercisesByBlock,
+    exercises,
+    setsByExercise,
+  ]);
+
+  const handleStartTimerMode = useCallback(() => {
+    closeSheet();
+    // Small delay to let block options sheet close first
+    setTimeout(() => {
+      openCircuitTimerModeSheet();
+    }, 100);
+  }, [closeSheet, openCircuitTimerModeSheet]);
+
   return (
     <>
       {/* Set Type Sheet */}
@@ -133,7 +199,11 @@ export const ActiveSheetsV2: React.FC<Props> = ({
         onConvertToIndividual={handleConvertBlockToIndividual}
         onAddExercise={handleShowAddExerciseModal}
         isMultiBlock={!!isCurrentBlockMulti}
+        isCircuit={isCircuit}
+        canUseTimerMode={canUseTimerModeValue}
+        hasBalancedSets={hasBalancedSets}
         onReplace={handleShowReplaceModal}
+        onStartTimerMode={handleStartTimerMode}
       />
 
       {/* Exercise Options Sheet */}
@@ -160,6 +230,13 @@ export const ActiveSheetsV2: React.FC<Props> = ({
         visible={activeSheet === "tempoMetronome"}
         onClose={closeSheet}
         tempo={currentTempo}
+      />
+
+      {/* Circuit Timer Mode */}
+      <CircuitTimerModeV2
+        visible={activeSheet === "circuitTimerMode"}
+        onClose={closeSheet}
+        blockId={currentBlockId || ""}
       />
     </>
   );

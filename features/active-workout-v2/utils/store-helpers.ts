@@ -653,3 +653,206 @@ export const getNextSetToComplete = (
     isBlockComplete: true,
   };
 };
+
+/**
+ * Checks if a circuit block has balanced sets (same number of sets per exercise)
+ * This is required for Circuit Timer Mode to work properly
+ *
+ * @param exercisesInBlock - Exercises in the block
+ * @param setsByExercise - Mapping of exercise to set IDs
+ * @returns true if all exercises have the same number of sets
+ */
+export const hasBalancedCircuitSets = (
+  exercisesInBlock: { tempId: string }[],
+  setsByExercise: Record<string, string[]>
+): boolean => {
+  if (exercisesInBlock.length === 0) return true;
+
+  const setCounts = exercisesInBlock.map(
+    (ex) => (setsByExercise[ex.tempId] || []).length
+  );
+
+  // All exercises must have the same number of sets
+  return setCounts.every((count) => count === setCounts[0]);
+};
+
+/**
+ * Determines if a circuit block can use the Circuit Timer Mode
+ * Requirements:
+ * 1. Block type must be "circuit"
+ * 2. ALL sets in the block must have measurement_template === "time_only"
+ *
+ * @param block - The workout block to check
+ * @param exercisesInBlock - Exercises in the block
+ * @param sets - All sets by ID
+ * @param setsByExercise - Mapping of exercise to set IDs
+ * @returns true if the block is eligible for timer mode
+ */
+export const canUseCircuitTimerMode = (
+  block: ActiveWorkoutBlock,
+  exercisesInBlock: ActiveWorkoutExercise[],
+  sets: Record<string, ActiveWorkoutSet>,
+  setsByExercise: Record<string, string[]>
+): boolean => {
+  // Must be a circuit
+  if (block.type !== "circuit") return false;
+
+  // Must have exercises
+  if (exercisesInBlock.length === 0) return false;
+
+  // Check all sets in all exercises
+  for (const exercise of exercisesInBlock) {
+    const exerciseSetIds = setsByExercise[exercise.tempId] || [];
+
+    // Must have at least one set
+    if (exerciseSetIds.length === 0) return false;
+
+    for (const setId of exerciseSetIds) {
+      const set = sets[setId];
+      if (!set) return false;
+
+      // Every set must be time_only
+      if (set.measurement_template !== "time_only") {
+        return false;
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Gets the circuit timer state for a block
+ * Returns all information needed to run the circuit timer
+ *
+ * @param block - The circuit block
+ * @param exercisesInBlock - Exercises in the block (sorted by order_index)
+ * @param sets - All sets by ID
+ * @param setsByExercise - Mapping of exercise to set IDs
+ * @returns Circuit timer state or null if not a valid circuit
+ */
+export const getCircuitTimerState = (
+  block: ActiveWorkoutBlock,
+  exercisesInBlock: ActiveWorkoutExercise[],
+  sets: Record<string, ActiveWorkoutSet>,
+  setsByExercise: Record<string, string[]>
+): {
+  blockId: string;
+  totalRounds: number;
+  totalExercises: number;
+  restBetweenExercises: number;
+  restBetweenRounds: number;
+  exercises: {
+    exerciseInBlockId: string;
+    exerciseId: string;
+    name: string;
+    setIds: string[];
+    targetDurations: number[];
+  }[];
+  completedSetIds: string[];
+} | null => {
+  if (block.type !== "circuit") return null;
+
+  const sortedExercises = [...exercisesInBlock].sort(
+    (a, b) => a.order_index - b.order_index
+  );
+
+  // Calculate total rounds (max sets among all exercises)
+  const maxSets = Math.max(
+    ...sortedExercises.map((ex) => setsByExercise[ex.tempId]?.length || 0)
+  );
+
+  const exercises = sortedExercises.map((exercise) => {
+    const setIds = setsByExercise[exercise.tempId] || [];
+    const targetDurations = setIds.map((setId) => {
+      const set = sets[setId];
+      // For time_only, planned_primary_value is the duration in seconds
+      return set?.planned_primary_value || 30; // Default 30 seconds
+    });
+
+    return {
+      exerciseInBlockId: exercise.tempId,
+      exerciseId: exercise.exercise_id,
+      name: exercise.exercise.name,
+      setIds,
+      targetDurations,
+    };
+  });
+
+  // Get all completed set IDs
+  const completedSetIds: string[] = [];
+  for (const exercise of sortedExercises) {
+    const exerciseSetIds = setsByExercise[exercise.tempId] || [];
+    for (const setId of exerciseSetIds) {
+      const set = sets[setId];
+      if (set?.completed_at) {
+        completedSetIds.push(setId);
+      }
+    }
+  }
+
+  return {
+    blockId: block.tempId,
+    totalRounds: maxSets,
+    totalExercises: sortedExercises.length,
+    restBetweenExercises: block.rest_between_exercises_seconds || 10,
+    restBetweenRounds: block.rest_time_seconds || 60,
+    exercises,
+    completedSetIds,
+  };
+};
+
+/**
+ * Gets the next incomplete exercise/set in a circuit for the timer
+ *
+ * @param timerState - The circuit timer state
+ * @param sets - All sets by ID
+ * @returns Next item to execute or null if complete
+ */
+export const getNextCircuitTimerItem = (
+  timerState: ReturnType<typeof getCircuitTimerState>,
+  sets: Record<string, ActiveWorkoutSet>
+): {
+  exerciseIndex: number;
+  roundIndex: number;
+  setId: string;
+  exerciseName: string;
+  targetDuration: number;
+  isLastInRound: boolean;
+  isLastRound: boolean;
+} | null => {
+  if (!timerState) return null;
+
+  const { exercises, totalRounds } = timerState;
+
+  // Iterate through rounds and exercises in order
+  for (let roundIndex = 0; roundIndex < totalRounds; roundIndex++) {
+    for (
+      let exerciseIndex = 0;
+      exerciseIndex < exercises.length;
+      exerciseIndex++
+    ) {
+      const exercise = exercises[exerciseIndex];
+      const setId = exercise.setIds[roundIndex];
+
+      if (!setId) continue;
+
+      const set = sets[setId];
+      if (!set?.completed_at) {
+        // Found the next incomplete set
+        return {
+          exerciseIndex,
+          roundIndex,
+          setId,
+          exerciseName: exercise.name,
+          targetDuration: exercise.targetDurations[roundIndex] || 30,
+          isLastInRound: exerciseIndex === exercises.length - 1,
+          isLastRound: roundIndex === totalRounds - 1,
+        };
+      }
+    }
+  }
+
+  // All sets completed
+  return null;
+};

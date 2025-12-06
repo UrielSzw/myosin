@@ -5,7 +5,7 @@ import {
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { BlurView } from "expo-blur";
-import React from "react";
+import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { ActiveBlockHeaderV2 } from "./ActiveBlockHeaderV2";
@@ -33,7 +33,8 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
   onOpenRPESelector,
   onOpenTempoMetronome,
 }) => {
-  const { blocks, exercisesByBlock, exercises } = useActiveWorkout();
+  const { blocks, exercisesByBlock, exercises, setsByExercise } =
+    useActiveWorkout();
   const { getBlockColors } = useBlockStyles();
   const { setCurrentState } = useActiveMainActions();
   const { isDarkMode } = useColorScheme();
@@ -41,6 +42,18 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
   const block = blocks[blockId];
   const blockColors = getBlockColors(block.type);
   const exercisesInBlockIds = exercisesByBlock[blockId] || [];
+
+  // Check if multi-exercise block has balanced sets (circuit or superset)
+  const hasBalancedSets = useMemo(() => {
+    if (!block || block.type === "individual") return true;
+    if (exercisesInBlockIds.length === 0) return true;
+
+    const setCounts = exercisesInBlockIds.map(
+      (exId) => (setsByExercise[exId] || []).length
+    );
+
+    return setCounts.every((count) => count === setCounts[0]);
+  }, [block, exercisesInBlockIds, setsByExercise]);
 
   const handleBlockPress = () => {
     if (block.type === "individual") {
@@ -108,6 +121,7 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
               exercisesCount={exercisesInBlockIds.length}
               onPress={handleBlockPress}
               onOpenRestTime={onOpenRestTime}
+              hasBalancedSets={hasBalancedSets}
             />
 
             {/* Exercises in block */}

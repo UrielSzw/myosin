@@ -226,6 +226,16 @@ type Store = {
         previousSecondaryValue?: number | null;
       }
     ) => void;
+    /**
+     * Auto-completes a time-based set from the Circuit Timer Mode
+     * Marks the set as completed with the target duration
+     */
+    autoCompleteTimeSet: (
+      setId: string,
+      blockId: string,
+      exerciseInBlockId: string,
+      durationSeconds: number
+    ) => void;
   };
 
   timerActions: {
@@ -1848,6 +1858,34 @@ const useActiveWorkoutStore = create<Store>()(
               }
             }
           });
+        });
+      },
+
+      autoCompleteTimeSet: (
+        setId,
+        blockId,
+        exerciseInBlockId,
+        durationSeconds
+      ) => {
+        set((state) => {
+          const setToComplete = state.activeWorkout.sets[setId];
+          const exerciseInBlock =
+            state.activeWorkout.exercises[exerciseInBlockId];
+
+          if (!setToComplete || setToComplete.completed || !exerciseInBlock)
+            return;
+
+          // Mark as completed with the actual duration
+          setToComplete.completed = true;
+          setToComplete.completed_at = new Date().toISOString();
+          // For time_only template, primary_value is the duration in seconds
+          setToComplete.actual_primary_value = durationSeconds;
+
+          // Update stats
+          state.stats.totalSetsCompleted += 1;
+
+          // Note: We don't trigger rest timer here because Circuit Timer Mode
+          // handles its own rest timing internally
         });
       },
     },

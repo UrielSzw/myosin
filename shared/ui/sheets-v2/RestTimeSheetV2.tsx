@@ -125,7 +125,7 @@ export const RestTimeSheetV2 = ({
   const headerInfo = getHeaderInfo();
 
   const formatTime = (seconds: number) => {
-    if (seconds === 0) return t.noRest[lang];
+    if (seconds === 0) return "0";
     if (seconds < 60) return `${seconds}s`;
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;

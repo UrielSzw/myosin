@@ -7,6 +7,8 @@ export * from "./ActiveSetRowV2";
 export * from "./ActiveSetsTableV2";
 export * from "./ActiveWorkoutHeaderV2";
 export * from "./AddExerciseButtonV2";
+export * from "./CircuitTimerModeV2";
 export * from "./EmptyWorkoutStateV2";
 export * from "./NextSetArrowV2";
 export * from "./RestTimerBannerV2";
+export * from "./TempoMetronomeV2";

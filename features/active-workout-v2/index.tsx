@@ -58,6 +58,7 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
     openExerciseOptionsSheet,
     openRPESelectorSheet,
     openTempoMetronomeSheet,
+    openCircuitTimerModeSheet,
   } = useActiveWorkoutSheetsV2();
 
   // Keep screen awake during workout
@@ -166,7 +167,11 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
       />
 
       {/* All Sheets */}
-      <ActiveSheetsV2 activeSheet={activeSheet} closeSheet={closeSheet} />
+      <ActiveSheetsV2
+        activeSheet={activeSheet}
+        closeSheet={closeSheet}
+        openCircuitTimerModeSheet={openCircuitTimerModeSheet}
+      />
     </View>
   );
 };

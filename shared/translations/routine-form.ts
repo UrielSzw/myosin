@@ -240,6 +240,10 @@ export const routineFormTranslations = {
     es: "Toca para ajustar el tiempo de descanso entre series",
     en: "Tap to adjust rest time between sets",
   },
+  unbalancedSets: {
+    es: "Sets desiguales",
+    en: "Unbalanced sets",
+  },
   restTime: {
     es: "Tiempo de Descanso",
     en: "Rest Time",

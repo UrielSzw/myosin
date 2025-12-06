@@ -7,6 +7,7 @@ export type IActiveSheetV2 =
   | "exerciseOptions"
   | "rpeSelector"
   | "tempoMetronome"
+  | "circuitTimerMode"
   | "exerciseSelector"
   | "finishConfirm"
   | "exitConfirm"
@@ -50,6 +51,10 @@ export const useActiveWorkoutSheetsV2 = () => {
     ),
     openTempoMetronomeSheet: useCallback(
       () => openSheet("tempoMetronome"),
+      [openSheet]
+    ),
+    openCircuitTimerModeSheet: useCallback(
+      () => openSheet("circuitTimerMode"),
       [openSheet]
     ),
     openExerciseSelectorSheet: useCallback(

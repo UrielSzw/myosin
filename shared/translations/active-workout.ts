@@ -14,6 +14,10 @@ export const activeWorkoutTranslations = {
     es: "ejercicios",
     en: "exercises",
   },
+  unbalancedSets: {
+    es: "Sets desiguales",
+    en: "Unbalanced sets",
+  },
   sets: {
     es: "Sets:",
     en: "Sets:",

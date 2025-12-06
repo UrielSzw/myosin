@@ -1,4 +1,3 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import {
   useActiveSetActions,
   useActiveWorkout,
@@ -7,6 +6,7 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
@@ -111,9 +111,7 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
         <View
           style={[
             styles.measurementHeaders,
-            template?.fields.length === 1
-              ? { width: "35%" }
-              : { flex: template?.fields.length || 1 },
+            { flex: template?.fields.length || 1 },
           ]}
         >
           {template?.fields.map((field) => (

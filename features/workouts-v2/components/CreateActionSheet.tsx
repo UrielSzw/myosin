@@ -1,10 +1,9 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { workoutsTranslations } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -51,7 +50,6 @@ export const CreateActionSheet = ({ visible, onClose }: Props) => {
   const t = workoutsTranslations;
 
   const { initializeQuickWorkout } = useActiveMainActions();
-  const { sync } = useSyncEngine();
   const { user } = useAuth();
   const [isLoadingQuickWorkout, setIsLoadingQuickWorkout] = useState(false);
 
@@ -140,18 +138,8 @@ export const CreateActionSheet = ({ visible, onClose }: Props) => {
       }
 
       const quickWorkoutName = t.quickWorkout[lang];
-      const routineData = await initializeQuickWorkout(
-        user.id,
-        quickWorkoutName
-      );
-
-      // Sync in background
-      sync("ROUTINE_CREATE_QUICK_WORKOUT", {
-        ...routineData,
-        created_by_user_id: user.id,
-      }).catch((err) => {
-        console.warn("Failed to sync quick workout routine:", err);
-      });
+      // initializeQuickWorkout ya incluye sync automático
+      await initializeQuickWorkout(user.id, quickWorkoutName);
 
       handleClose();
       router.push("/workout/active");

@@ -1,5 +1,4 @@
-import { toSupportedLanguage } from "@/shared/types/language";
-import { usersRepository } from "@/shared/db/repository/user";
+import { dataService } from "@/shared/data/data-service";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import {
   useUserPreferences,
@@ -7,6 +6,7 @@ import {
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { personalDataTranslations as t } from "@/shared/translations/personal-data";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Check, Minus, Plus, X } from "lucide-react-native";
@@ -107,8 +107,8 @@ export const WeightSheet: React.FC<Props> = ({
           : state.prefs,
       }));
 
-      // Persist to database
-      await usersRepository.updateUserPreferences(user.id, {
+      // Persist to database with auto-sync
+      await dataService.userPreferences.upsert(user.id, {
         initial_weight_kg: valueInKg,
       });
 

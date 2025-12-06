@@ -1,21 +1,19 @@
-import { toSupportedLanguage } from "@/shared/types/language";
-import { RoutineWithMetrics } from "@/shared/db/repository/routines";
+import { dataService } from "@/shared/data/data-service";
+import { RoutineWithMetrics } from "@/shared/data/repositories/routines.repository";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { queryKeys } from "@/shared/queries/query-keys";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { workoutsTranslations } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert } from "react-native";
-import { routinesService } from "../service/routines";
 
 export const useRoutineOptions = () => {
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
   const t = workoutsTranslations;
   const queryClient = useQueryClient();
-  const { sync } = useSyncEngine();
 
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -34,10 +32,8 @@ export const useRoutineOptions = () => {
           onPress: async () => {
             setIsDeleting(true);
             try {
-              await routinesService.deleteRoutine(routine.id);
-
-              // Sync to Supabase after deletion
-              sync("ROUTINE_DELETE", { id: routine.id });
+              // Delete con sync automático
+              await dataService.routines.deleteRoutineById(routine.id);
 
               queryClient.invalidateQueries({
                 queryKey: queryKeys.workouts.all,
@@ -76,12 +72,8 @@ export const useRoutineOptions = () => {
           onPress: async () => {
             setIsDeleting(true);
             try {
-              await routinesService.clearRoutineTrainingDays(routine.id);
-
-              // Sync to Supabase after clearing training days
-              sync("ROUTINE_CLEAR_TRAINING_DAYS", {
-                routineId: routine.id,
-              });
+              // Clear con sync automático
+              await dataService.routines.clearRoutineTrainingDays(routine.id);
 
               queryClient.invalidateQueries({
                 queryKey: queryKeys.workouts.all,

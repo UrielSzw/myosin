@@ -1,12 +1,11 @@
+import { useDataService } from "@/shared/data/use-data-service";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { useCallback } from "react";
-import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 
 export const useSaveFolder = () => {
@@ -17,7 +16,7 @@ export const useSaveFolder = () => {
   const { selectedFolder, setSelectedFolder } = useSelectedFolderStore(
     (state) => state
   );
-  const { sync } = useSyncEngine();
+  const data = useDataService();
   const { user } = useAuth();
 
   const saveFolder = useCallback(async () => {
@@ -31,17 +30,11 @@ export const useSaveFolder = () => {
 
     try {
       if (mode === "edit" && editingId) {
-        // Update existing folder
-        await folderService.updateFolder(editingId, {
+        // Update existing folder - sync automático incluido
+        await data.folders.update(editingId, {
           name: name.trim(),
           color,
           icon,
-        });
-
-        // Sync to Supabase after update
-        sync("FOLDER_UPDATE", {
-          id: editingId,
-          data: { name: name.trim(), color, icon },
         });
 
         if (selectedFolder) {
@@ -53,20 +46,10 @@ export const useSaveFolder = () => {
           });
         }
       } else {
-        // Create new folder
-        const orderIndex = await folderService.getNextOrderIndex();
+        // Create new folder - sync automático incluido
+        const orderIndex = await data.folders.getNextOrderIndex();
 
-        const newFolder = await folderService.createFolder({
-          name: name.trim(),
-          color,
-          icon,
-          order_index: orderIndex,
-          created_by_user_id: user.id,
-        });
-
-        // Sync to Supabase after creation - include the ID from SQLite
-        sync("FOLDER_CREATE", {
-          id: newFolder.id,
+        await data.folders.create({
           name: name.trim(),
           color,
           icon,

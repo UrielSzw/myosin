@@ -1,6 +1,6 @@
+import { dataService } from "@/shared/data/data-service";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { macroService } from "../service/macros";
 
 // ==================== QUERY KEYS ====================
 export const macroQueryKeys = {
@@ -27,7 +27,7 @@ export const macroQueryKeys = {
 export const useMacroTarget = (userId: string) => {
   return useQuery({
     queryKey: macroQueryKeys.target(userId),
-    queryFn: () => macroService.getActiveTarget(userId),
+    queryFn: () => dataService.macros.getActiveTarget(userId),
     staleTime: 1000 * 60 * 30, // 30 minutes (targets don't change often)
     gcTime: 1000 * 60 * 60, // 1 hour
     enabled: !!userId,
@@ -40,7 +40,7 @@ export const useMacroTarget = (userId: string) => {
 export const useHasMacroTargets = (userId: string) => {
   return useQuery({
     queryKey: macroQueryKeys.hasTargets(userId),
-    queryFn: () => macroService.hasTargets(userId),
+    queryFn: () => dataService.macros.hasTargets(userId),
     staleTime: 1000 * 60 * 30,
     enabled: !!userId,
   });
@@ -65,7 +65,7 @@ export const useSetMacroTargets = () => {
       fats: number;
       userId: string;
       name?: string;
-    }) => macroService.setTargets(protein, carbs, fats, userId, name),
+    }) => dataService.macros.setTargets(protein, carbs, fats, userId, name),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.target(userId),
@@ -103,7 +103,8 @@ export const useUpdateMacroTargets = () => {
       carbs: number;
       fats: number;
       userId: string;
-    }) => macroService.updateTargets(targetId, protein, carbs, fats, userId),
+    }) =>
+      dataService.macros.updateTargets(targetId, protein, carbs, fats, userId),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.target(userId),
@@ -126,7 +127,7 @@ export const useUpdateMacroTargets = () => {
 export const useMacroDayData = (dayKey: string, userId: string) => {
   return useQuery({
     queryKey: macroQueryKeys.dayData(userId, dayKey),
-    queryFn: () => macroService.getDayData(dayKey, userId),
+    queryFn: () => dataService.macros.getDayData(dayKey, userId),
     staleTime: 1000 * 60 * 2, // 2 minutes
     gcTime: 1000 * 60 * 5,
     enabled: !!userId && !!dayKey,
@@ -139,7 +140,7 @@ export const useMacroDayData = (dayKey: string, userId: string) => {
 export const useMacroTodayData = (userId: string) => {
   return useQuery({
     queryKey: macroQueryKeys.todayData(userId),
-    queryFn: () => macroService.getTodayData(userId),
+    queryFn: () => dataService.macros.getTodayData(userId),
     staleTime: 1000 * 30, // 30 seconds
     gcTime: 1000 * 60 * 2,
     refetchOnWindowFocus: true,
@@ -173,7 +174,7 @@ export const useAddMacroEntry = () => {
       notes?: string;
       recordedAt?: string;
     }) =>
-      macroService.addEntry(protein, carbs, fats, userId, {
+      dataService.macros.addEntry(protein, carbs, fats, userId, {
         label,
         notes,
         recordedAt,
@@ -216,7 +217,11 @@ export const useAddMacroFromQuickAction = () => {
       userId: string;
       recordedAt?: string;
     }) =>
-      macroService.addEntryFromQuickAction(quickActionId, userId, recordedAt),
+      dataService.macros.addEntryFromQuickAction(
+        quickActionId,
+        userId,
+        recordedAt
+      ),
     onSuccess: (entry, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.dayData(userId, entry.day_key),
@@ -258,7 +263,14 @@ export const useUpdateMacroEntry = () => {
       userId: string;
       label?: string;
     }) =>
-      macroService.updateEntry(entryId, protein, carbs, fats, userId, label),
+      dataService.macros.updateEntry(
+        entryId,
+        protein,
+        carbs,
+        fats,
+        userId,
+        label
+      ),
     onSuccess: (entry, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.dayData(userId, entry.day_key),
@@ -282,7 +294,7 @@ export const useDeleteMacroEntry = () => {
 
   return useMutation({
     mutationFn: ({ entryId, userId }: { entryId: string; userId: string }) =>
-      macroService.deleteEntry(entryId, userId),
+      dataService.macros.deleteEntry(entryId, userId),
     onSuccess: (_, { userId }) => {
       // Invalidate all day data since we don't know which day
       queryClient.invalidateQueries({
@@ -306,7 +318,7 @@ export const useDeleteMacroEntry = () => {
 export const useMacroQuickActions = (userId: string) => {
   return useQuery({
     queryKey: macroQueryKeys.quickActions(userId),
-    queryFn: () => macroService.getQuickActions(userId),
+    queryFn: () => dataService.macros.getQuickActions(userId),
     staleTime: 1000 * 60 * 10, // 10 minutes
     gcTime: 1000 * 60 * 30,
     enabled: !!userId,
@@ -320,7 +332,8 @@ export const useInitializeMacroQuickActions = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (userId: string) => macroService.initializeQuickActions(userId),
+    mutationFn: (userId: string) =>
+      dataService.macros.initializeQuickActions(userId),
     onSuccess: (_, userId) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.quickActions(userId),
@@ -348,7 +361,8 @@ export const useCreateMacroQuickAction = () => {
       carbs: number;
       fats: number;
       userId: string;
-    }) => macroService.createQuickAction(label, protein, carbs, fats, userId),
+    }) =>
+      dataService.macros.createQuickAction(label, protein, carbs, fats, userId),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.quickActions(userId),
@@ -370,7 +384,7 @@ export const useDeleteMacroQuickAction = () => {
     }: {
       quickActionId: string;
       userId: string;
-    }) => macroService.deleteQuickAction(quickActionId, userId),
+    }) => dataService.macros.deleteQuickAction(quickActionId, userId),
     onSuccess: (_, { userId }) => {
       queryClient.invalidateQueries({
         queryKey: macroQueryKeys.quickActions(userId),
@@ -387,7 +401,7 @@ export const useDeleteMacroQuickAction = () => {
 export const useMacroStats = (userId: string, days: number = 7) => {
   return useQuery({
     queryKey: macroQueryKeys.stats(userId, days),
-    queryFn: () => macroService.getStats(userId, days),
+    queryFn: () => dataService.macros.getStats(userId, days),
     staleTime: 1000 * 60 * 5, // 5 minutes
     gcTime: 1000 * 60 * 15,
     enabled: !!userId,

@@ -1,8 +1,8 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { folderFormTranslations as t } from "@/shared/translations/folder-form";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -310,7 +310,7 @@ export const FolderFormV2 = ({ isEditMode }: Props) => {
                   { backgroundColor: `${folderColor}20` },
                 ]}
               >
-                <Folder size={48} color={folderColor} />{" "}
+                <Folder size={48} color={folderColor} />
               </View>
               <Typography
                 variant="h3"

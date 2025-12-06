@@ -1,3 +1,4 @@
+import { dataService } from "@/shared/data/data-service";
 import { prRepository } from "@/shared/db/repository/pr";
 import { routinesRepository } from "@/shared/db/repository/routines";
 import { workoutSessionsRepository } from "@/shared/db/repository/workout-sessions";
@@ -750,9 +751,9 @@ const useActiveWorkoutStore = create<Store>()(
           // 1. Obtener preferencias del usuario para show_rpe y show_tempo
           const prefs = useUserPreferencesStore.getState().prefs;
 
-          // 2. Crear rutina temporal vacía con is_quick_workout=true
+          // 2. Crear rutina temporal vacía con is_quick_workout=true (sync automático)
           const quickRoutine =
-            await routinesRepository.createQuickWorkoutRoutine(userId, {
+            await dataService.routines.createQuickWorkoutRoutine(userId, {
               show_rpe: prefs?.show_rpe ?? false,
               show_tempo: prefs?.show_tempo ?? false,
               name,

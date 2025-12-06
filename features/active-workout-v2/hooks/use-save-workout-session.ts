@@ -1,8 +1,5 @@
-import { prRepository } from "@/shared/db/repository/pr";
-import {
-  workoutSessionsRepository,
-  type CreateWorkoutSessionData,
-} from "@/shared/db/repository/workout-sessions";
+import { dataService } from "@/shared/data/data-service";
+import type { CreateWorkoutSessionData } from "@/shared/data/repositories/workouts.repository";
 import type { PRCurrentInsert, PRHistoryInsert } from "@/shared/db/schema/pr";
 import type {
   WorkoutBlockInsert,
@@ -14,7 +11,6 @@ import { generateUUID } from "@/shared/db/utils/uuid";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { queryKeys } from "@/shared/queries/query-keys";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
@@ -31,7 +27,6 @@ export const useSaveWorkoutSession = () => {
   const [error, setError] = useState<string | null>(null);
   const activeWorkout = useActiveWorkout();
   const queryClient = useQueryClient();
-  const { sync } = useSyncEngine();
   const { user } = useAuth();
 
   const saveWorkoutSession = async (): Promise<string | null> => {
@@ -231,7 +226,7 @@ export const useSaveWorkoutSession = () => {
         }
       );
 
-      // 6. Guardar en base de datos
+      // 6. Guardar en base de datos (con sync automático a Supabase)
       const createData: CreateWorkoutSessionData = {
         session: sessionData,
         blocks: blocksData,
@@ -240,15 +235,7 @@ export const useSaveWorkoutSession = () => {
       };
 
       const savedSession =
-        await workoutSessionsRepository.createWorkoutSessionWithData(
-          createData
-        );
-
-      // Sync to Supabase after saving workout session
-      await sync("WORKOUT_COMPLETE", {
-        ...createData,
-        id: savedSession.id,
-      });
+        await dataService.workouts.createWorkoutSessionWithData(createData);
 
       // Persistir PRs buffer: usar sessionBestPRs (solo 1 PR por ejercicio máximo)
       try {
@@ -279,23 +266,19 @@ export const useSaveWorkoutSession = () => {
           updated_at: new Date()?.toISOString(),
         }));
 
-        // Insert each history row
+        // Insert each history row (con sync automático)
         for (const h of prHistoryArray) {
           try {
-            await prRepository.insertPRHistory(h);
-            // Sync PR history to Supabase
-            await sync("PR_UPDATE", h);
+            await dataService.prs.insertPRHistory(h);
           } catch (e) {
             console.warn("Failed to insert PR history", h.exercise_id, e);
           }
         }
 
-        // Upsert each current PR
+        // Upsert each current PR (con sync automático)
         for (const c of prCurrentArray) {
           try {
-            await prRepository.upsertCurrentPR(c);
-            // Sync current PR to Supabase
-            await sync("PR_CREATE", c);
+            await dataService.prs.upsertCurrentPR(c);
           } catch (e) {
             console.warn("Failed to upsert current PR", c.exercise_id, e);
           }

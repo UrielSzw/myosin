@@ -1,36 +1,11 @@
+import { dataService } from "@/shared/data/data-service";
 import { BaseUserPreferences } from "@/shared/db/schema/user";
-import { getSyncQueueRepository } from "@/shared/sync/queue/sync-queue-repository";
 import { SupabaseUserRepository } from "@/shared/sync/repositories/supabase-user-repository";
-import { syncToSupabase } from "@/shared/sync/sync-engine";
-import type { MutationCode } from "@/shared/sync/types/mutations";
 import NetInfo from "@react-native-community/netinfo";
 import { ColorSchemeName } from "react-native";
 import { create } from "zustand";
 import { usersRepository } from "../db/repository/user";
 import { DEFAULT_LANGUAGE, type SupportedLanguage } from "../types/language";
-
-// Helper para sync desde Zustand store (sin React hooks)
-const syncHelper = async (code: MutationCode, payload: any) => {
-  try {
-    const netInfo = await NetInfo.fetch();
-    const isOnline = netInfo.isConnected && netInfo.isInternetReachable;
-
-    if (isOnline) {
-      // Online: sync directo
-      await syncToSupabase(code, payload);
-    } else {
-      // Offline: agregar a queue
-      const queueRepo = getSyncQueueRepository();
-      await queueRepo.enqueue({
-        code,
-        payload,
-      });
-      console.log(`📴 Queued for later sync: ${code}`);
-    }
-  } catch (error) {
-    console.error(`Failed to sync ${code}:`, error);
-  }
-};
 
 type PrefsState = {
   prefs: BaseUserPreferences | null;
@@ -75,14 +50,8 @@ export const useUserPreferencesStore = create<PrefsState>((set, get) => {
       } as Partial<BaseUserPreferences>;
 
       try {
-        // 1. Actualizar local primero (local-first)
-        await usersRepository.updateUserPreferences(userId, updateData);
-
-        // 2. Sync a Supabase en background
-        syncHelper("USER_PREFERENCES_UPDATE", {
-          userId,
-          data: updateData,
-        });
+        // Upsert con sync automático via DataService
+        await dataService.userPreferences.upsert(userId, updateData);
       } catch (e) {
         console.error("Error persisting user preferences", e);
       } finally {

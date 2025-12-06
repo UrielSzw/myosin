@@ -1,5 +1,4 @@
-import { toSupportedLanguage } from "@/shared/types/language";
-import { usersRepository } from "@/shared/db/repository/user";
+import { dataService } from "@/shared/data/data-service";
 import { BaseUserPreferences } from "@/shared/db/schema/user";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import {
@@ -7,7 +6,7 @@ import {
   useUserPreferencesStore,
 } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { syncToSupabase } from "@/shared/sync/sync-engine";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Button } from "@/shared/ui/button";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -355,21 +354,13 @@ export default function CompleteScreen() {
         onboarding_completed_at: new Date().toISOString(),
       };
 
-      // Save onboarding data to local DB
-      await usersRepository.updateUserPreferences(user.id, updateData);
+      // Save onboarding data with auto-sync via DataService
+      await dataService.userPreferences.upsert(user.id, updateData);
 
       // Update Zustand store immediately so route guard sees onboarding_completed
       useUserPreferencesStore.setState((state) => ({
         prefs: state.prefs ? { ...state.prefs, ...updateData } : null,
       }));
-
-      // Sync to Supabase (fire and forget)
-      syncToSupabase("USER_PREFERENCES_UPDATE", {
-        userId: user.id,
-        data: updateData,
-      }).catch((err) => {
-        console.warn("Failed to sync onboarding to Supabase:", err);
-      });
 
       // Reset store and navigate
       reset();

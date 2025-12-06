@@ -1,5 +1,5 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import { useDataService } from "@/shared/data/use-data-service";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
@@ -7,11 +7,11 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { queryKeys } from "@/shared/queries/query-keys";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import React, { useState } from "react";
 import { Alert, View } from "react-native";
-import { folderService } from "../folder-form-v2/service/folder";
 import { AuroraBackground } from "./components/AuroraBackground";
 import { CreateActionSheet } from "./components/CreateActionSheet";
 import { FolderOptionsSheet } from "./components/FolderOptionsSheet";
@@ -41,6 +41,7 @@ export const WorkoutsFeatureV2 = () => {
   const queryClient = useQueryClient();
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
+  const data = useDataService();
   const { handleDeleteRoutine, handleEditRoutine, handleRemoveTrainingDays } =
     useRoutineOptions();
 
@@ -95,7 +96,7 @@ export const WorkoutsFeatureV2 = () => {
           style: "destructive",
           onPress: async () => {
             try {
-              await folderService.deleteFolder(selectedFolderForOptions.id);
+              await data.folders.delete(selectedFolderForOptions.id);
               queryClient.invalidateQueries({
                 queryKey: queryKeys.workouts.all,
               });

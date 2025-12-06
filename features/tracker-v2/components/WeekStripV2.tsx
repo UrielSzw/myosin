@@ -1,3 +1,4 @@
+import { dataService } from "@/shared/data/data-service";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import type { SupportedLanguage } from "@/shared/types/language";
 import type { ThemeColors } from "@/shared/types/theme";
@@ -16,7 +17,6 @@ import {
   View,
 } from "react-native";
 import { trackerQueryKeys } from "../hooks/use-tracker-data";
-import { trackerService } from "../service/tracker";
 
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const DAY_WIDTH = (SCREEN_WIDTH - 40 - 24) / 7; // 7 days, 20px padding each side, 24px internal padding
@@ -101,13 +101,13 @@ export const WeekStripV2: React.FC<Props> = ({
       // Prefetch in background
       queryClient.prefetchQuery({
         queryKey: trackerQueryKeys.dayData(userId, yesterdayKey),
-        queryFn: () => trackerService.getDayData(yesterdayKey, userId),
+        queryFn: () => dataService.tracker.getDayData(yesterdayKey, userId),
         staleTime: Infinity,
       });
 
       queryClient.prefetchQuery({
         queryKey: trackerQueryKeys.dayData(userId, dayBeforeKey),
-        queryFn: () => trackerService.getDayData(dayBeforeKey, userId),
+        queryFn: () => dataService.tracker.getDayData(dayBeforeKey, userId),
         staleTime: Infinity,
       });
     };

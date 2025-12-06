@@ -1,3 +1,4 @@
+import { dataService } from "@/shared/data/data-service";
 import type {
   BaseTrackerEntry,
   TrackerDayData,
@@ -6,7 +7,6 @@ import type {
 } from "@/shared/db/schema/tracker";
 import { getDayKey } from "@/shared/utils/date-utils";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { trackerService } from "../service/tracker";
 
 // ==================== QUERY KEYS ====================
 export const trackerQueryKeys = {
@@ -43,7 +43,7 @@ export const trackerQueryKeys = {
 export const useActiveMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.activeMetrics(userId),
-    queryFn: () => trackerService.getActiveMetrics(userId),
+    queryFn: () => dataService.tracker.getActiveMetrics(userId),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
   });
@@ -55,7 +55,7 @@ export const useActiveMetrics = (userId: string) => {
 export const useAllMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.metrics(userId),
-    queryFn: () => trackerService.getMetrics(userId),
+    queryFn: () => dataService.tracker.getMetrics(userId),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
   });
@@ -67,7 +67,7 @@ export const useAllMetrics = (userId: string) => {
 export const useDeletedMetrics = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.deletedMetrics(userId),
-    queryFn: () => trackerService.getDeletedMetrics(userId),
+    queryFn: () => dataService.tracker.getDeletedMetrics(userId),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
   });
@@ -86,7 +86,7 @@ export const useCreateMetric = () => {
     }: {
       data: Omit<TrackerMetricInsert, "user_id" | "order_index">;
       userId: string;
-    }) => trackerService.createCustomMetric(data, userId),
+    }) => dataService.tracker.createCustomMetric(data, userId),
     onSuccess: (_, { userId }) => {
       // Invalidar métricas para refrescar la lista
       queryClient.invalidateQueries({
@@ -126,7 +126,7 @@ export const useAddMetricFromTemplate = () => {
     }: {
       templateSlug: string;
       userId: string;
-    }) => trackerService.addMetricFromTemplate(templateSlug, userId),
+    }) => dataService.tracker.addMetricFromTemplate(templateSlug, userId),
     onSuccess: (_, { userId }) => {
       // Invalidar todas las queries de métricas
       queryClient.invalidateQueries({
@@ -162,7 +162,7 @@ export const useAddMetricFromTemplate = () => {
 export const useAvailableTemplates = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.availableTemplates(userId),
-    queryFn: () => trackerService.getAvailableTemplates(userId),
+    queryFn: () => dataService.tracker.getAvailableTemplates(userId),
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 };
@@ -180,7 +180,7 @@ export const useUpdateMetric = () => {
     }: {
       metricId: string;
       data: Partial<TrackerMetricInsert>;
-    }) => trackerService.updateMetric(metricId, data),
+    }) => dataService.tracker.updateMetric(metricId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trackerQueryKeys.all });
     },
@@ -194,7 +194,8 @@ export const useDeleteMetric = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (metricId: string) => trackerService.deleteMetric(metricId),
+    mutationFn: (metricId: string) =>
+      dataService.tracker.deleteMetric(metricId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trackerQueryKeys.all });
     },
@@ -208,7 +209,8 @@ export const useRestoreMetric = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (metricId: string) => trackerService.restoreMetric(metricId),
+    mutationFn: (metricId: string) =>
+      dataService.tracker.restoreMetric(metricId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: trackerQueryKeys.all });
     },
@@ -225,7 +227,7 @@ export const useCreateQuickAction = () => {
 
   return useMutation({
     mutationFn: (data: TrackerQuickActionInsert) =>
-      trackerService.createQuickAction(data),
+      dataService.tracker.createQuickAction(data),
     onSuccess: () => {
       // Invalidar métricas activas para refrescar quick actions
       queryClient.invalidateQueries({
@@ -243,7 +245,7 @@ export const useDeleteQuickAction = () => {
 
   return useMutation({
     mutationFn: (quickActionId: string) =>
-      trackerService.deleteQuickAction(quickActionId),
+      dataService.tracker.deleteQuickAction(quickActionId),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: trackerQueryKeys.activeMetrics(),
@@ -276,7 +278,7 @@ export const useAddEntry = () => {
       recordedAt?: string;
       displayValue?: string;
     }) =>
-      trackerService.addEntry(
+      dataService.tracker.addEntry(
         metricId,
         value,
         userId,
@@ -342,7 +344,7 @@ export const useAddEntryFromQuickAction = () => {
       recordedAt?: string;
       slug?: string;
     }) =>
-      trackerService.addEntryFromQuickAction(
+      dataService.tracker.addEntryFromQuickAction(
         quickActionId,
         userId,
         notes,
@@ -402,7 +404,7 @@ export const useUpdateEntry = () => {
       value: number;
       userId: string;
       notes?: string;
-    }) => trackerService.updateEntry(entryId, value, userId, notes),
+    }) => dataService.tracker.updateEntry(entryId, value, userId, notes),
     onSuccess: (updatedEntry) => {
       // Invalidar day data del día de la entrada
       queryClient.invalidateQueries({
@@ -441,7 +443,7 @@ export const useDeleteEntry = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (entryId: string) => trackerService.deleteEntry(entryId),
+    mutationFn: (entryId: string) => dataService.tracker.deleteEntry(entryId),
     onSuccess: () => {
       // Invalidar todas las queries relacionadas (no tenemos la info de la entry eliminada)
       queryClient.invalidateQueries({ queryKey: trackerQueryKeys.all });
@@ -462,7 +464,7 @@ export const useDayData = (dayKey: string, userId: string) => {
 
   return useQuery({
     queryKey: trackerQueryKeys.dayData(userId, dayKey),
-    queryFn: () => trackerService.getDayData(dayKey, userId),
+    queryFn: () => dataService.tracker.getDayData(dayKey, userId),
     // Días pasados: caché infinito (no cambian)
     // Hoy: caché corto (cambia frecuentemente)
     staleTime: isPast ? Infinity : isToday ? 1000 * 30 : 1000 * 60 * 2,
@@ -480,7 +482,7 @@ export const useDayData = (dayKey: string, userId: string) => {
 export const useTodayData = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.todayData(userId),
-    queryFn: () => trackerService.getTodayData(userId),
+    queryFn: () => dataService.tracker.getTodayData(userId),
     staleTime: 1000 * 30, // 30 segundos (muy dinámico)
     gcTime: 1000 * 60 * 2, // 2 minutos
     refetchOnWindowFocus: true, // Refrescar cuando vuelve a la app
@@ -493,7 +495,7 @@ export const useTodayData = (userId: string) => {
 export const useTodaySummary = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.todaySummary(userId),
-    queryFn: () => trackerService.getTodaySummary(userId),
+    queryFn: () => dataService.tracker.getTodaySummary(userId),
     staleTime: 1000 * 30, // 30 segundos
     gcTime: 1000 * 60 * 2, // 2 minutos
     refetchOnWindowFocus: true,
@@ -506,7 +508,7 @@ export const useTodaySummary = (userId: string) => {
 export const useDayDataSummary = (dayKey: string, userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.daySummary(userId, dayKey),
-    queryFn: () => trackerService.getDayDataSummary(dayKey, userId),
+    queryFn: () => dataService.tracker.getDayDataSummary(dayKey, userId),
     staleTime: 1000 * 60 * 5, // 5 minutos (datos históricos cambian menos)
     gcTime: 1000 * 60 * 10, // 10 minutos
     refetchOnWindowFocus: dayKey === getDayKey(), // Solo refrescar si es hoy
@@ -525,7 +527,8 @@ export const useMetricProgress = (
 ) => {
   return useQuery({
     queryKey: trackerQueryKeys.metricProgress(userId, metricId, days),
-    queryFn: () => trackerService.getMetricProgress(metricId, days, userId),
+    queryFn: () =>
+      dataService.tracker.getMetricProgress(metricId, days, userId),
     staleTime: 1000 * 60 * 5, // 5 minutos
     gcTime: 1000 * 60 * 10, // 10 minutos
     enabled: !!metricId, // Solo ejecutar si tenemos metricId
@@ -542,7 +545,7 @@ export const useMetricHistory = (
 ) => {
   return useQuery({
     queryKey: trackerQueryKeys.metricHistory(userId, metricId, days),
-    queryFn: () => trackerService.getMetricHistory(metricId, days, userId),
+    queryFn: () => dataService.tracker.getMetricHistory(metricId, days, userId),
     staleTime: 1000 * 60 * 10, // 10 minutos (datos históricos cambian poco)
     gcTime: 1000 * 60 * 30, // 30 minutos
     enabled: !!metricId,
@@ -555,7 +558,7 @@ export const useMetricHistory = (
 export const useTrackerStats = (userId: string) => {
   return useQuery({
     queryKey: trackerQueryKeys.stats(userId),
-    queryFn: () => trackerService.getTrackerStats(userId),
+    queryFn: () => dataService.tracker.getTrackerStats(userId),
     staleTime: 1000 * 60 * 15, // 15 minutos
     gcTime: 1000 * 60 * 30, // 30 minutos
   });

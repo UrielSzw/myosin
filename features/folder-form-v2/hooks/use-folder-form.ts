@@ -3,14 +3,13 @@ import { useRouter } from "expo-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Alert } from "react-native";
 
+import { useDataService } from "@/shared/data/use-data-service";
 import { useSelectedFolderStore } from "@/shared/hooks/use-selected-folder-store";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { queryKeys } from "@/shared/queries/query-keys";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { folderFormTranslations } from "@/shared/translations/folder-form";
 import { ValidationState } from "@/shared/ui/enhanced-input";
 import { useQueryClient } from "@tanstack/react-query";
-import { folderService } from "../service/folder";
 import { useFolderFormStore } from "./use-folder-form-store";
 import { useSaveFolder } from "./use-save-folder";
 
@@ -26,7 +25,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
     (state) => state.setSelectedFolder
   );
   const queryClient = useQueryClient();
-  const { sync } = useSyncEngine();
+  const data = useDataService();
 
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
@@ -78,7 +77,7 @@ export const useFolderForm = ({ isEditMode }: Props) => {
 
       // Check for duplicate names (skip if editing the same folder)
       try {
-        const allFolders = await folderService.getAllFolders();
+        const allFolders = await data.folders.findAllWithMetrics();
         const duplicateFolder = allFolders.find(
           (folder) =>
             folder.name.toLowerCase() === folderName.trim().toLowerCase() &&
@@ -209,10 +208,8 @@ export const useFolderForm = ({ isEditMode }: Props) => {
         onPress: async () => {
           setIsDeleting(true);
           try {
-            await folderService.deleteFolder(editingId);
-
-            // Sync to Supabase after deletion
-            sync("FOLDER_DELETE", { id: editingId });
+            // Sync automático incluido
+            await data.folders.delete(editingId);
 
             queryClient.invalidateQueries({
               queryKey: ["workouts", "folders"],

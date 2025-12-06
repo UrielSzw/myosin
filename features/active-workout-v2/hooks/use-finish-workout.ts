@@ -1,5 +1,5 @@
 import { getSummaryStats } from "@/features/active-workout-v2/hooks/summary-stats";
-import { routinesRepository } from "@/shared/db/repository/routines";
+import { dataService } from "@/shared/data/data-service";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { queryKeys } from "@/shared/queries/query-keys";
@@ -9,7 +9,6 @@ import {
 } from "@/shared/services/finish-workout";
 import { useHaptic } from "@/shared/services/haptic-service";
 import TimerService from "@/shared/services/timer-service";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -36,7 +35,6 @@ export const useFinishWorkout = () => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
-  const { sync } = useSyncEngine();
   const haptic = useHaptic();
 
   /**
@@ -163,17 +161,11 @@ export const useFinishWorkout = () => {
           {
             text: t.yesCreateRoutine[lang],
             onPress: async () => {
-              // Convertir a rutina normal (is_quick_workout=false)
+              // Convertir a rutina normal (is_quick_workout=false) con sync automático
               if (activeWorkout?.session?.routine_id) {
                 const routineId = activeWorkout.session.routine_id;
-                await routinesRepository.convertQuickWorkoutToRoutine(
+                await dataService.routines.convertQuickWorkoutToRoutine(
                   routineId
-                );
-                // Sync conversión a Supabase en background
-                sync("ROUTINE_CONVERT_FROM_QUICK", { routineId }).catch(
-                  (err: unknown) => {
-                    console.warn("Failed to sync convert quick workout:", err);
-                  }
                 );
               }
               await executeFinishWorkout(true);

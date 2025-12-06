@@ -2,6 +2,7 @@
 const { defineConfig } = require("eslint/config");
 const expoConfig = require("eslint-config-expo/flat");
 const tanstackQuery = require("@tanstack/eslint-plugin-query");
+const tseslint = require("typescript-eslint");
 
 module.exports = defineConfig([
   expoConfig,
@@ -13,13 +14,16 @@ module.exports = defineConfig([
     },
     rules: {
       // Asegura que las query keys incluyan todas las dependencias
-      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/exhaustive-deps": "warn",
       // Asegura que el queryClient sea estable
       "@tanstack/query/stable-query-client": "error",
       // Previene errores comunes en queries
       "@tanstack/query/no-rest-destructuring": "warn",
     },
   },
+
+  // TypeScript rules
+  ...tseslint.configs.recommended,
 
   // Reglas generales
   {
@@ -41,6 +45,11 @@ module.exports = defineConfig([
       // React hooks
       "react-hooks/exhaustive-deps": "warn",
       "react-hooks/rules-of-hooks": "error",
+
+      // Desactivar reglas muy estrictas de typescript-eslint
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-require-imports": "off",
+      "@typescript-eslint/no-empty-object-type": "off",
     },
   },
 

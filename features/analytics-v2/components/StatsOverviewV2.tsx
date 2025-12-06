@@ -118,7 +118,7 @@ export const StatsOverviewV2: React.FC<Props> = ({ data, lang }) => {
     });
 
     // Count consecutive weeks
-    let checkDate = new Date(startOfWeek);
+    const checkDate = new Date(startOfWeek);
     while (sessionsPerWeek[checkDate.toISOString().split("T")[0]]) {
       weeklyStreak++;
       checkDate.setDate(checkDate.getDate() - 7);

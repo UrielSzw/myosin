@@ -54,6 +54,7 @@ export const useUpdateRoutine = () => {
       const blocksData: BlockInsert[] = activeWorkout.blocksBySession.map(
         (tempBlockId, index) => {
           const block = activeWorkout.blocks[tempBlockId];
+          if (!block) throw new Error(`Block not found: ${tempBlockId}`);
           return {
             id: generateUUID(),
             user_id: "default-user",
@@ -71,7 +72,10 @@ export const useUpdateRoutine = () => {
       // 3. Crear mapping de tempId → ID real para bloques
       const blockIdMapping: Record<string, string> = {};
       activeWorkout.blocksBySession.forEach((tempBlockId, index) => {
-        blockIdMapping[tempBlockId] = blocksData[index].id;
+        const blockData = blocksData[index];
+        if (blockData) {
+          blockIdMapping[tempBlockId] = blockData.id;
+        }
       });
 
       // 4. Preparar exercisesInBlock con IDs reales
@@ -80,17 +84,20 @@ export const useUpdateRoutine = () => {
 
       activeWorkout.blocksBySession.forEach((tempBlockId) => {
         const exerciseIds = activeWorkout.exercisesByBlock[tempBlockId] || [];
+        const blockId = blockIdMapping[tempBlockId];
+        if (!blockId) return;
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = activeWorkout.exercises[tempExerciseId];
-          const realExerciseId = generateUUID();
+          if (!exerciseInBlock) return;
 
+          const realExerciseId = generateUUID();
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
           exercisesInBlockData.push({
             id: realExerciseId,
             user_id: "default-user",
-            block_id: blockIdMapping[tempBlockId],
+            block_id: blockId,
             exercise_id: exerciseInBlock.exercise_id,
             order_index: exerciseInBlock.order_index,
             notes: exerciseInBlock.notes,
@@ -104,9 +111,11 @@ export const useUpdateRoutine = () => {
       Object.entries(activeWorkout.setsByExercise).forEach(
         ([tempExerciseId, setIds]) => {
           const realExerciseId = exerciseIdMapping[tempExerciseId];
+          if (!realExerciseId) return;
 
           setIds.forEach((tempSetId) => {
             const set = activeWorkout.sets[tempSetId];
+            if (!set) return;
 
             setsData.push({
               id: generateUUID(),

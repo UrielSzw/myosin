@@ -494,12 +494,12 @@ const useActiveWorkoutStore = create<Store>()(
               if (!setsByExercise[activeExercise.tempId]) {
                 setsByExercise[activeExercise.tempId] = [];
               }
-              setsByExercise[activeExercise.tempId].push(setTempId);
+              setsByExercise[activeExercise.tempId]?.push(setTempId);
             });
 
             // 9. Ordenar índices por order_index
             Object.keys(exercisesByBlock).forEach((blockId) => {
-              exercisesByBlock[blockId].sort((a, b) => {
+              exercisesByBlock[blockId]?.sort((a, b) => {
                 const exerciseA = activeExercises[a];
                 const exerciseB = activeExercises[b];
                 return (
@@ -509,7 +509,7 @@ const useActiveWorkoutStore = create<Store>()(
             });
 
             Object.keys(setsByExercise).forEach((exerciseId) => {
-              setsByExercise[exerciseId].sort((a, b) => {
+              setsByExercise[exerciseId]?.sort((a, b) => {
                 const setA = activeSets[a];
                 const setB = activeSets[b];
                 return (setA?.order_index || 0) - (setB?.order_index || 0);
@@ -1099,7 +1099,7 @@ const useActiveWorkoutStore = create<Store>()(
             state.activeWorkout.exercisesByBlock[currentBlockId] || [];
           const exercisesInBlock = exerciseIds
             .map((id) => state.activeWorkout.exercises[id])
-            .filter(Boolean);
+            .filter((e): e is ActiveWorkoutExercise => e !== undefined);
 
           if (exercisesInBlock.length === 0) return;
 
@@ -1273,7 +1273,10 @@ const useActiveWorkoutStore = create<Store>()(
           const exerciseIndex = currentExercisesInBlock.indexOf(
             currentExerciseInBlockId
           );
-          if (exerciseIndex !== -1) {
+          if (
+            exerciseIndex !== -1 &&
+            state.activeWorkout.exercisesByBlock[currentBlockId]
+          ) {
             state.activeWorkout.exercisesByBlock[currentBlockId][
               exerciseIndex
             ] = newExerciseTempId;
@@ -1310,10 +1313,9 @@ const useActiveWorkoutStore = create<Store>()(
           delete state.activeWorkout.exercises[currentExerciseInBlockId];
 
           // 4. Eliminar del índice exercisesByBlock
-          state.activeWorkout.exercisesByBlock[currentBlockId] =
-            state.activeWorkout.exercisesByBlock[currentBlockId].filter(
-              (id) => id !== currentExerciseInBlockId
-            );
+          state.activeWorkout.exercisesByBlock[currentBlockId] = (
+            state.activeWorkout.exercisesByBlock[currentBlockId] || []
+          ).filter((id) => id !== currentExerciseInBlockId);
 
           // 5. Actualizar stats
           state.stats.totalSetsPlanned -= setIds.length;
@@ -1366,10 +1368,12 @@ const useActiveWorkoutStore = create<Store>()(
           if (!exerciseInBlock) return;
 
           const currentSets =
-            state.activeWorkout.setsByExercise[exerciseInBlockId];
+            state.activeWorkout.setsByExercise[exerciseInBlockId] || [];
 
-          const lastSet =
-            state.activeWorkout.sets[currentSets[currentSets.length - 1]];
+          const lastSetId = currentSets[currentSets.length - 1];
+          const lastSet = lastSetId
+            ? state.activeWorkout.sets[lastSetId]
+            : undefined;
 
           // Obtener lastPrevSet para herencia
           const exercisePrevSets =
@@ -1394,11 +1398,11 @@ const useActiveWorkoutStore = create<Store>()(
           // Auto-fill BEGIN
           // Auto-fill actual values from last COMPLETED set (Option B)
           // Only for weight and distance fields (not reps, time, etc.)
-          const lastCompletedSet = [...currentSets]
+          const lastCompletedSet = currentSets
+            .slice()
             .reverse()
             .map((setId) => state.activeWorkout.sets[setId])
             .find((s) => s?.completed_at !== null);
-          console.log("Last completed set:", lastCompletedSet);
           if (lastCompletedSet) {
             const template = getMeasurementTemplate(
               lastCompletedSet.measurement_template,
@@ -1431,6 +1435,9 @@ const useActiveWorkoutStore = create<Store>()(
 
           // Agregar el nuevo set al estado
           state.activeWorkout.sets[newSet.tempId] = newSet;
+          if (!state.activeWorkout.setsByExercise[exerciseInBlockId]) {
+            state.activeWorkout.setsByExercise[exerciseInBlockId] = [];
+          }
           state.activeWorkout.setsByExercise[exerciseInBlockId].push(
             newSet.tempId
           );
@@ -1508,19 +1515,21 @@ const useActiveWorkoutStore = create<Store>()(
 
           state.stats.totalSetsCompleted += 1;
 
-          const nextSetId = state.activeWorkout.setsByExercise[
-            exerciseInBlockId
-          ].find(
+          const setsForExercise =
+            state.activeWorkout.setsByExercise[exerciseInBlockId] || [];
+          const nextSetId = setsForExercise.find(
             (sId) =>
-              state.activeWorkout.sets[sId].order_index === set.order_index + 1
+              state.activeWorkout.sets[sId]?.order_index === set.order_index + 1
           );
           const currentNextSet = nextSetId
-            ? state.activeWorkout.sets[nextSetId]
+            ? state.activeWorkout.sets[nextSetId] ?? null
             : null;
 
           const currentBlock = state.activeWorkout.blocks[blockId];
           const currentExercise =
             state.activeWorkout.exercises[exerciseInBlockId];
+
+          if (!currentBlock || !currentExercise) return;
 
           const currentBlockExercises =
             state.activeWorkout.exercisesByBlock[blockId] || [];
@@ -1542,7 +1551,7 @@ const useActiveWorkoutStore = create<Store>()(
               // Para circuitos, determinar si es entre ejercicios o entre rounds
               const exercisesInBlock = currentBlockExercises
                 .map((exId) => state.activeWorkout.exercises[exId])
-                .filter(Boolean)
+                .filter((e): e is ActiveWorkoutExercise => e !== undefined)
                 .sort((a, b) => a.order_index - b.order_index);
 
               const circuitRestType = getCircuitRestType(
@@ -1690,23 +1699,22 @@ const useActiveWorkoutStore = create<Store>()(
 
           delete state.activeWorkout.sets[currentSetId];
 
-          state.activeWorkout.setsByExercise[currentExerciseInBlockId] =
-            state.activeWorkout.setsByExercise[currentExerciseInBlockId].filter(
-              (id) => id !== currentSetId
-            );
+          state.activeWorkout.setsByExercise[currentExerciseInBlockId] = (
+            state.activeWorkout.setsByExercise[currentExerciseInBlockId] || []
+          ).filter((id) => id !== currentSetId);
 
           state.stats.totalSetsPlanned -= 1;
 
           // Actualizar order index de los sets restantes
-          state.activeWorkout.setsByExercise[currentExerciseInBlockId].forEach(
-            (setId, index) => {
-              const set = state.activeWorkout.sets[setId];
+          (
+            state.activeWorkout.setsByExercise[currentExerciseInBlockId] || []
+          ).forEach((setId, index) => {
+            const set = state.activeWorkout.sets[setId];
 
-              if (set) {
-                set.order_index = index;
-              }
+            if (set) {
+              set.order_index = index;
             }
-          );
+          });
         });
       },
 
@@ -1828,7 +1836,10 @@ const useActiveWorkoutStore = create<Store>()(
           const followingSets = setIds
             .map((id) => state.activeWorkout.sets[id])
             .filter(
-              (s) => s && s.order_index > currentSetOrder && !s.completed_at
+              (s): s is NonNullable<typeof s> =>
+                s !== undefined &&
+                s.order_index > currentSetOrder &&
+                !s.completed_at
             );
 
           // Auto-fill logic: Update following sets that have the SAME value as the previous value

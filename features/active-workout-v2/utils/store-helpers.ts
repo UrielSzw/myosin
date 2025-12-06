@@ -605,7 +605,7 @@ export const getNextSetToComplete = (
   } else if (block.type === "superset") {
     // SUPERSERIES: Completar TODOS los ejercicios del mismo set index antes de avanzar
     for (let setIndex = 0; setIndex < maxSets; setIndex++) {
-      let incompleteInThisRound: {
+      const incompleteInThisRound: {
         exercise: ActiveWorkoutExercise;
         setId: string | null;
       }[] = [];

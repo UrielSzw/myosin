@@ -2,8 +2,8 @@
 // ROUTINE TEMPLATES - SERVICE
 // ================================================================================
 
-import { createRoutineService } from "@/features/routine-form-v2/service/routine";
-import type { CreateRoutineData } from "@/shared/db/repository/routines";
+import { dataService } from "@/shared/data/data-service";
+import type { CreateRoutineData } from "@/shared/data/repositories/routines.repository";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,
@@ -142,7 +142,9 @@ export const createRoutineFromTemplate = async (
   }
 
   const createData = convertTemplateToCreateData(templateData, overrides);
-  const savedRoutine = await createRoutineService.createRoutine(createData);
+  const savedRoutine = await dataService.routines.createRoutineWithData(
+    createData
+  );
 
   return savedRoutine.id;
 };

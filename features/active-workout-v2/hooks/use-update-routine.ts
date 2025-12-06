@@ -1,3 +1,4 @@
+import { dataService } from "@/shared/data/data-service";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,
@@ -11,7 +12,6 @@ import { activeWorkoutTranslations } from "@/shared/translations/active-workout"
 import { toSupportedLanguage } from "@/shared/types/language";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { createRoutineService } from "../../routine-form-v2/service/routine";
 import { useActiveWorkout } from "./use-active-workout-store";
 
 type UpdateState = "idle" | "updating" | "success" | "error";
@@ -126,8 +126,8 @@ export const useUpdateRoutine = () => {
         }
       );
 
-      // 6. Ejecutar actualización completa (delete & recreate)
-      const updatedRoutine = await createRoutineService.updateRoutine(
+      // 6. Ejecutar actualización completa (delete & recreate) - dataService hace SQLite + sync
+      const updatedRoutine = await dataService.routines.updateRoutineWithData(
         originalRoutineId,
         {
           routine: routineData,

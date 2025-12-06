@@ -1,5 +1,4 @@
-import { toSupportedLanguage } from "@/shared/types/language";
-import { CreateRoutineData } from "@/shared/db/repository/routines";
+import { dataService } from "@/shared/data/data-service";
 import type {
   BlockInsert,
   ExerciseInBlockInsert,
@@ -9,10 +8,9 @@ import type {
 import { generateUUID } from "@/shared/db/utils/uuid";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
-import { useSyncEngine } from "@/shared/sync/sync-engine";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { useState } from "react";
-import { createRoutineService } from "../service/routine";
 import { useRoutineFormState } from "./use-routine-form-store";
 import { useRoutineValidation } from "./use-routine-validation";
 
@@ -24,7 +22,6 @@ export const useSaveRoutine = () => {
   const formState = useRoutineFormState();
   const validation = useRoutineValidation();
   const { show_rpe, show_tempo } = useUserPreferences() || {};
-  const { sync } = useSyncEngine();
   const { user } = useAuth();
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
@@ -68,6 +65,7 @@ export const useSaveRoutine = () => {
       const blocksData: BlockInsert[] = formState.blocksByRoutine.map(
         (tempBlockId, index) => {
           const block = formState.blocks[tempBlockId];
+          if (!block) throw new Error(`Block not found: ${tempBlockId}`);
           return {
             id: generateUUID(),
             user_id: user.id,
@@ -85,7 +83,10 @@ export const useSaveRoutine = () => {
       // 3. Crear mapping de tempId → ID real para bloques
       const blockIdMapping: Record<string, string> = {};
       formState.blocksByRoutine.forEach((tempBlockId, index) => {
-        blockIdMapping[tempBlockId] = blocksData[index].id;
+        const blockData = blocksData[index];
+        if (blockData) {
+          blockIdMapping[tempBlockId] = blockData.id;
+        }
       });
 
       // 4. Preparar exercisesInBlock (eliminar tempId y asignar IDs reales)
@@ -94,17 +95,20 @@ export const useSaveRoutine = () => {
 
       formState.blocksByRoutine.forEach((tempBlockId) => {
         const exerciseIds = formState.exercisesByBlock[tempBlockId] || [];
+        const blockId = blockIdMapping[tempBlockId];
+        if (!blockId) return;
 
         exerciseIds.forEach((tempExerciseId) => {
           const exerciseInBlock = formState.exercisesInBlock[tempExerciseId];
-          const realExerciseId = generateUUID();
+          if (!exerciseInBlock) return;
 
+          const realExerciseId = generateUUID();
           exerciseIdMapping[tempExerciseId] = realExerciseId;
 
           exercisesInBlockData.push({
             id: realExerciseId,
             user_id: user.id,
-            block_id: blockIdMapping[tempBlockId],
+            block_id: blockId,
             exercise_id: exerciseInBlock.exercise_id,
             order_index: exerciseInBlock.order_index,
             notes: exerciseInBlock.notes,
@@ -118,9 +122,11 @@ export const useSaveRoutine = () => {
       Object.entries(formState.setsByExercise).forEach(
         ([tempExerciseId, setIds]) => {
           const realExerciseId = exerciseIdMapping[tempExerciseId];
+          if (!realExerciseId) return;
 
           setIds.forEach((tempSetId) => {
             const set = formState.sets[tempSetId];
+            if (!set) return;
 
             setsData.push({
               id: generateUUID(),
@@ -140,8 +146,8 @@ export const useSaveRoutine = () => {
         }
       );
 
-      // 6. Ejecutar transacción (create o update)
-      const formattedRoutineData: CreateRoutineData = {
+      // 6. Ejecutar transacción (create o update) - dataService hace SQLite + sync automático
+      const formattedRoutineData = {
         routine: routineData,
         blocks: blocksData,
         exercisesInBlock: exercisesInBlockData,
@@ -149,39 +155,13 @@ export const useSaveRoutine = () => {
       };
 
       const savedRoutine = isEditMode
-        ? await createRoutineService.updateRoutine(
+        ? await dataService.routines.updateRoutineWithData(
             formState.originalRoutineId!,
             formattedRoutineData
           )
-        : await createRoutineService.createRoutine(formattedRoutineData);
-
-      // 7. Sync to cloud
-      try {
-        const syncCode = isEditMode ? "ROUTINE_UPDATE" : "ROUTINE_CREATE";
-        const syncPayload = isEditMode
-          ? {
-              routineId: formState.originalRoutineId!,
-              data: {
-                routine: routineData,
-                blocks: blocksData,
-                exercisesInBlock: exercisesInBlockData,
-                sets: setsData,
-              },
-            }
-          : {
-              routine: routineData,
-              blocks: blocksData,
-              exercisesInBlock: exercisesInBlockData,
-              sets: setsData,
-            };
-
-        sync(syncCode, syncPayload);
-      } catch (syncError) {
-        console.warn(
-          `⚠️ Routine ${isEditMode ? "update" : "creation"} sync failed:`,
-          syncError
-        );
-      }
+        : await dataService.routines.createRoutineWithData(
+            formattedRoutineData
+          );
 
       setSaveState("success");
       return savedRoutine.id;

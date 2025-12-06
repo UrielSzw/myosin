@@ -411,10 +411,12 @@ export const createRoutinesRepository = (): IRoutinesRepository => {
       );
       syncAdapter.sync("ROUTINE_UPDATE", {
         routineId,
-        routine: data.routine,
-        blocks: data.blocks,
-        exercisesInBlock: data.exercisesInBlock,
-        sets: data.sets,
+        data: {
+          routine: data.routine,
+          blocks: data.blocks,
+          exercisesInBlock: data.exercisesInBlock,
+          sets: data.sets,
+        },
       });
       return result;
     },

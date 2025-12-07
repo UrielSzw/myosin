@@ -1,15 +1,15 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { FolderWithMetrics } from "@/shared/db/repository/folders";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { BaseFolder } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { Folder } from "lucide-react-native";
 import React from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
+import Animated, { FadeIn, FadeInDown, FadeOut } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useFolderDetailData } from "../hooks/use-folder-detail-data";
 import { useMainWorkoutsData } from "../hooks/use-main-workouts-data";
@@ -40,18 +40,36 @@ export const WorkoutsContent = ({
   const headerHeight = insets.top + 8 + 60 + 20;
 
   // Main data (when no folder is selected)
-  const { routines: mainRoutines, folders } = useMainWorkoutsData();
+  const {
+    routines: mainRoutines,
+    folders,
+    loading: mainLoading,
+  } = useMainWorkoutsData();
 
   // Folder data (when a folder is selected)
-  const { routines: folderRoutines } = useFolderDetailData(
-    selectedFolder?.id || "skip"
-  );
+  const { routines: folderRoutines, loading: folderLoading } =
+    useFolderDetailData(selectedFolder?.id || "skip");
 
   // Use the appropriate data based on selection
   const routines = selectedFolder ? folderRoutines : mainRoutines;
+  const isLoading = selectedFolder ? folderLoading : mainLoading;
   const isEmpty = selectedFolder
     ? folderRoutines.length === 0
     : mainRoutines.length === 0 && folders.length === 0;
+
+  // Don't render content until data is loaded to avoid empty state flash
+  if (isLoading) {
+    return (
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: headerHeight, paddingBottom: insets.bottom + 100 },
+        ]}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+  }
 
   // Folder view content
   if (selectedFolder) {
@@ -74,12 +92,16 @@ export const WorkoutsContent = ({
           {folderRoutines.length > 0 ? (
             <View style={styles.section}>
               <View style={styles.routinesList}>
-                {folderRoutines.map((routine) => (
-                  <RoutineCardV2
+                {folderRoutines.map((routine, index) => (
+                  <Animated.View
                     key={routine.id}
-                    routine={routine}
-                    onLongPress={onRoutineLongPress}
-                  />
+                    entering={FadeInDown.duration(300).delay(100 + index * 50)}
+                  >
+                    <RoutineCardV2
+                      routine={routine}
+                      onLongPress={onRoutineLongPress}
+                    />
+                  </Animated.View>
                 ))}
               </View>
             </View>
@@ -133,47 +155,71 @@ export const WorkoutsContent = ({
       ) : (
         <>
           {/* Next Workout Hero Card */}
-          <NextWorkoutCardV2 routines={routines} />
+          <Animated.View entering={FadeInDown.duration(400).delay(100)}>
+            <NextWorkoutCardV2 routines={routines} />
+          </Animated.View>
 
           {/* Quick Stats */}
-          <QuickStatsBar
-            routinesCount={routines.length}
-            foldersCount={folders.length}
-          />
+          <Animated.View entering={FadeInDown.duration(400).delay(200)}>
+            <QuickStatsBar
+              routinesCount={routines.length}
+              foldersCount={folders.length}
+            />
+          </Animated.View>
 
           {/* Folders Section */}
           {folders.length > 0 && (
-            <View style={styles.section}>
+            <Animated.View
+              entering={FadeInDown.duration(400).delay(300)}
+              style={styles.section}
+            >
               <SectionHeader title={t.folders[lang]} count={folders.length} />
               <View style={styles.foldersGrid}>
-                {folders.map((folder) => (
-                  <FolderCardV2
+                {folders.map((folder, index) => (
+                  <Animated.View
                     key={folder.id}
-                    folder={folder}
-                    onLongPress={onFolderLongPress}
-                  />
+                    entering={FadeInDown.duration(300).delay(350 + index * 50)}
+                    style={styles.folderCardWrapper}
+                  >
+                    <FolderCardV2
+                      folder={folder}
+                      onLongPress={onFolderLongPress}
+                    />
+                  </Animated.View>
                 ))}
               </View>
-            </View>
+            </Animated.View>
           )}
 
           {/* Routines Section */}
           {routines.length > 0 && (
-            <View style={styles.section}>
+            <Animated.View
+              entering={FadeInDown.duration(400).delay(
+                folders.length > 0 ? 400 + folders.length * 50 : 300
+              )}
+              style={styles.section}
+            >
               <SectionHeader
                 title={t.myRoutines[lang]}
                 count={routines.length}
               />
               <View style={styles.routinesList}>
-                {routines.map((routine) => (
-                  <RoutineCardV2
+                {routines.map((routine, index) => (
+                  <Animated.View
                     key={routine.id}
-                    routine={routine}
-                    onLongPress={onRoutineLongPress}
-                  />
+                    entering={FadeInDown.duration(300).delay(
+                      (folders.length > 0 ? 450 + folders.length * 50 : 350) +
+                        index * 50
+                    )}
+                  >
+                    <RoutineCardV2
+                      routine={routine}
+                      onLongPress={onRoutineLongPress}
+                    />
+                  </Animated.View>
                 ))}
               </View>
-            </View>
+            </Animated.View>
           )}
         </>
       )}
@@ -196,6 +242,9 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     gap: 12,
     marginTop: 12,
+  },
+  folderCardWrapper: {
+    width: "48%",
   },
   routinesList: {
     gap: 12,

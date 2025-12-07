@@ -8,7 +8,7 @@ import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Beef, Droplets, Flame, Target, Wheat, X } from "lucide-react-native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -21,7 +21,14 @@ import {
   TouchableWithoutFeedback,
   View,
 } from "react-native";
-import Animated, { FadeInDown } from "react-native-reanimated";
+import Animated, {
+  FadeInDown,
+  SharedValue,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   useSetMacroTargets,
@@ -83,6 +90,12 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
   const [carbs, setCarbs] = useState("");
   const [fats, setFats] = useState("");
 
+  // Animation values for preset pulse effect
+  const proteinPulse = useSharedValue(1);
+  const carbsPulse = useSharedValue(1);
+  const fatsPulse = useSharedValue(1);
+  const caloriesPulse = useSharedValue(1);
+
   // Mutations
   const setTargets = useSetMacroTargets();
   const updateTargets = useUpdateMacroTargets();
@@ -106,12 +119,49 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
   const fatsNum = parseFloat(fats) || 0;
   const caloriesPreview = calculateCalories(proteinNum, carbsNum, fatsNum);
 
+  const triggerPulse = useCallback((pulseValue: SharedValue<number>) => {
+    pulseValue.value = withSequence(
+      withTiming(1.03, { duration: 100 }),
+      withTiming(0.98, { duration: 100 }),
+      withTiming(1, { duration: 100 })
+    );
+  }, []);
+
   const applyPreset = (preset: keyof typeof PRESETS) => {
     const values = PRESETS[preset];
     setProtein(values.protein.toString());
     setCarbs(values.carbs.toString());
     setFats(values.fats.toString());
+
+    // Trigger staggered pulse animations
+    triggerPulse(proteinPulse);
+    setTimeout(() => triggerPulse(carbsPulse), 50);
+    setTimeout(() => triggerPulse(fatsPulse), 100);
+
+    // Calories gets a more dramatic bounce after all inputs animate
+    setTimeout(() => {
+      caloriesPulse.value = withSequence(
+        withTiming(1.08, { duration: 120 }),
+        withTiming(0.95, { duration: 100 }),
+        withTiming(1.02, { duration: 80 }),
+        withTiming(1, { duration: 80 })
+      );
+    }, 200);
   };
+
+  // Animated styles for each input
+  const proteinAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: proteinPulse.value }],
+  }));
+  const carbsAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: carbsPulse.value }],
+  }));
+  const fatsAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: fatsPulse.value }],
+  }));
+  const caloriesAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: caloriesPulse.value }],
+  }));
 
   const handleClose = () => {
     setProtein("");
@@ -156,6 +206,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
       setValue: setProtein,
       color: MACRO_COLORS.protein,
       icon: <Beef size={20} color={MACRO_COLORS.protein} />,
+      animatedStyle: proteinAnimatedStyle,
     },
     {
       key: "carbs",
@@ -164,6 +215,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
       setValue: setCarbs,
       color: MACRO_COLORS.carbs,
       icon: <Wheat size={20} color={MACRO_COLORS.carbs} />,
+      animatedStyle: carbsAnimatedStyle,
     },
     {
       key: "fats",
@@ -172,6 +224,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
       setValue: setFats,
       color: MACRO_COLORS.fats,
       icon: <Droplets size={20} color={MACRO_COLORS.fats} />,
+      animatedStyle: fatsAnimatedStyle,
     },
   ];
 
@@ -180,6 +233,14 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
     { key: "maintenance", label: translations.maintenance[lang] },
     { key: "bulking", label: translations.bulking[lang] },
   ];
+
+  // Check if current values match a preset
+  const activePreset = Object.entries(PRESETS).find(
+    ([_, values]) =>
+      proteinNum === values.protein &&
+      carbsNum === values.carbs &&
+      fatsNum === values.fats
+  )?.[0] as keyof typeof PRESETS | undefined;
 
   return (
     <Modal
@@ -270,42 +331,61 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                     {translations.presets[lang]}
                   </Typography>
                   <View style={styles.presetsRow}>
-                    {presetOptions.map((preset) => (
-                      <Pressable
-                        key={preset.key}
-                        onPress={() =>
-                          applyPreset(preset.key as keyof typeof PRESETS)
-                        }
-                        style={({ pressed }) => [
-                          styles.presetButton,
-                          {
-                            backgroundColor: isDarkMode
-                              ? "rgba(255,255,255,0.05)"
-                              : "rgba(0,0,0,0.03)",
-                            borderColor: isDarkMode
-                              ? "rgba(255,255,255,0.1)"
-                              : "rgba(0,0,0,0.08)",
-                            opacity: pressed ? 0.7 : 1,
-                          },
-                        ]}
-                      >
-                        <Typography
-                          variant="caption"
-                          weight="semibold"
-                          style={{ color: colors.text }}
+                    {presetOptions.map((preset) => {
+                      const isActive = activePreset === preset.key;
+                      return (
+                        <Pressable
+                          key={preset.key}
+                          onPress={() =>
+                            applyPreset(preset.key as keyof typeof PRESETS)
+                          }
+                          style={({ pressed }) => [
+                            styles.presetButton,
+                            {
+                              backgroundColor: isActive
+                                ? `${colors.primary[500]}10`
+                                : isDarkMode
+                                ? "rgba(255,255,255,0.05)"
+                                : "rgba(0,0,0,0.03)",
+                              borderColor: isActive
+                                ? `${colors.primary[500]}40`
+                                : isDarkMode
+                                ? "rgba(255,255,255,0.1)"
+                                : "rgba(0,0,0,0.08)",
+                              opacity: pressed ? 0.7 : 1,
+                            },
+                          ]}
                         >
-                          {preset.label}
-                        </Typography>
-                        <Typography variant="caption" color="textMuted">
-                          {calculateCalories(
-                            PRESETS[preset.key as keyof typeof PRESETS].protein,
-                            PRESETS[preset.key as keyof typeof PRESETS].carbs,
-                            PRESETS[preset.key as keyof typeof PRESETS].fats
-                          )}{" "}
-                          cal
-                        </Typography>
-                      </Pressable>
-                    ))}
+                          <Typography
+                            variant="caption"
+                            weight="semibold"
+                            style={{
+                              color: isActive
+                                ? colors.primary[500]
+                                : colors.text,
+                            }}
+                          >
+                            {preset.label}
+                          </Typography>
+                          <Typography
+                            variant="caption"
+                            style={{
+                              color: isActive
+                                ? colors.primary[400]
+                                : colors.textMuted,
+                            }}
+                          >
+                            {calculateCalories(
+                              PRESETS[preset.key as keyof typeof PRESETS]
+                                .protein,
+                              PRESETS[preset.key as keyof typeof PRESETS].carbs,
+                              PRESETS[preset.key as keyof typeof PRESETS].fats
+                            )}{" "}
+                            cal
+                          </Typography>
+                        </Pressable>
+                      );
+                    })}
                   </View>
                 </Animated.View>
 
@@ -317,6 +397,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                       entering={FadeInDown.duration(300).delay(
                         100 + index * 50
                       )}
+                      style={input.animatedStyle}
                     >
                       <View style={styles.inputGroup}>
                         <View style={styles.inputLabel}>
@@ -336,27 +417,29 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                             {input.label}
                           </Typography>
                         </View>
-                        <TextInput
-                          value={input.value}
-                          onChangeText={input.setValue}
-                          keyboardType="numeric"
-                          placeholder="0"
-                          placeholderTextColor={colors.textMuted}
-                          style={[
-                            styles.input,
-                            {
-                              backgroundColor: isDarkMode
-                                ? "rgba(255,255,255,0.05)"
-                                : "rgba(0,0,0,0.03)",
-                              borderColor: input.value
-                                ? input.color
-                                : isDarkMode
-                                ? "rgba(255,255,255,0.1)"
-                                : "rgba(0,0,0,0.08)",
-                              color: colors.text,
-                            },
-                          ]}
-                        />
+                        <Animated.View>
+                          <TextInput
+                            value={input.value}
+                            onChangeText={input.setValue}
+                            keyboardType="numeric"
+                            placeholder="0"
+                            placeholderTextColor={colors.textMuted}
+                            style={[
+                              styles.input,
+                              {
+                                backgroundColor: isDarkMode
+                                  ? "rgba(255,255,255,0.05)"
+                                  : "rgba(0,0,0,0.03)",
+                                borderColor: input.value
+                                  ? input.color
+                                  : isDarkMode
+                                  ? "rgba(255,255,255,0.1)"
+                                  : "rgba(0,0,0,0.08)",
+                                color: colors.text,
+                              },
+                            ]}
+                          />
+                        </Animated.View>
                       </View>
                     </Animated.View>
                   ))}
@@ -388,13 +471,15 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                       </Typography>
                     </View>
                     <View style={styles.caloriesRight}>
-                      <Typography
-                        variant="h4"
-                        weight="bold"
-                        style={{ color: MACRO_COLORS.calories }}
-                      >
-                        {caloriesPreview}
-                      </Typography>
+                      <Animated.View style={caloriesAnimatedStyle}>
+                        <Typography
+                          variant="h4"
+                          weight="bold"
+                          style={{ color: MACRO_COLORS.calories }}
+                        >
+                          {caloriesPreview}
+                        </Typography>
+                      </Animated.View>
                       <Typography variant="caption" color="textMuted">
                         {translations.calculated[lang]}
                       </Typography>

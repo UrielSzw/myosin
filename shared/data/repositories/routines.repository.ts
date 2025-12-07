@@ -443,7 +443,12 @@ export const createRoutinesRepository = (): IRoutinesRepository => {
         options
       );
       syncAdapter.sync("ROUTINE_CREATE_QUICK_WORKOUT", {
-        routine: result,
+        id: result.id,
+        name: result.name,
+        created_by_user_id: result.created_by_user_id,
+        is_quick_workout: result.is_quick_workout,
+        show_rpe: result.show_rpe,
+        show_tempo: result.show_tempo,
       });
       return result;
     },

@@ -209,7 +209,6 @@ const inferAndMarkFromMutation = async (
 
     // Routines (including child entities)
     case "ROUTINE_CREATE":
-    case "ROUTINE_CREATE_QUICK_WORKOUT":
       // Mark routine
       if (payload.routine?.id) {
         await markEntitySynced("routines", payload.routine.id);
@@ -231,6 +230,13 @@ const inferAndMarkFromMutation = async (
         for (const set of payload.sets) {
           if (set.id) await markEntitySynced("routine_sets", set.id);
         }
+      }
+      break;
+
+    case "ROUTINE_CREATE_QUICK_WORKOUT":
+      // Quick workout payload has id directly (not nested in routine)
+      if (payload.id) {
+        await markEntitySynced("routines", payload.id);
       }
       break;
 

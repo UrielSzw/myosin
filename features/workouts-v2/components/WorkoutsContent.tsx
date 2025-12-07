@@ -16,7 +16,6 @@ import { useMainWorkoutsData } from "../hooks/use-main-workouts-data";
 import { EmptyStateV2 } from "./EmptyStateV2";
 import { FolderCardV2 } from "./FolderCardV2";
 import { NextWorkoutCardV2 } from "./NextWorkoutCardV2";
-import { QuickStatsBar } from "./QuickStatsBar";
 import { RoutineCardV2 } from "./RoutineCardV2";
 import { SectionHeader } from "./SectionHeader";
 
@@ -159,18 +158,10 @@ export const WorkoutsContent = ({
             <NextWorkoutCardV2 routines={routines} />
           </Animated.View>
 
-          {/* Quick Stats */}
-          <Animated.View entering={FadeInDown.duration(400).delay(200)}>
-            <QuickStatsBar
-              routinesCount={routines.length}
-              foldersCount={folders.length}
-            />
-          </Animated.View>
-
           {/* Folders Section */}
           {folders.length > 0 && (
             <Animated.View
-              entering={FadeInDown.duration(400).delay(300)}
+              entering={FadeInDown.duration(400).delay(200)}
               style={styles.section}
             >
               <SectionHeader title={t.folders[lang]} count={folders.length} />
@@ -178,7 +169,7 @@ export const WorkoutsContent = ({
                 {folders.map((folder, index) => (
                   <Animated.View
                     key={folder.id}
-                    entering={FadeInDown.duration(300).delay(350 + index * 50)}
+                    entering={FadeInDown.duration(300).delay(250 + index * 50)}
                     style={styles.folderCardWrapper}
                   >
                     <FolderCardV2
@@ -195,7 +186,7 @@ export const WorkoutsContent = ({
           {routines.length > 0 && (
             <Animated.View
               entering={FadeInDown.duration(400).delay(
-                folders.length > 0 ? 400 + folders.length * 50 : 300
+                folders.length > 0 ? 300 + folders.length * 50 : 200
               )}
               style={styles.section}
             >
@@ -208,7 +199,7 @@ export const WorkoutsContent = ({
                   <Animated.View
                     key={routine.id}
                     entering={FadeInDown.duration(300).delay(
-                      (folders.length > 0 ? 450 + folders.length * 50 : 350) +
+                      (folders.length > 0 ? 350 + folders.length * 50 : 250) +
                         index * 50
                     )}
                   >

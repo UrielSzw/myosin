@@ -1,7 +1,7 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Dumbbell, FolderOpen } from "lucide-react-native";
@@ -27,10 +27,10 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
           {
             backgroundColor: isDarkMode
               ? "rgba(255,255,255,0.04)"
-              : "rgba(255,255,255,0.8)",
+              : "rgba(255,255,255,0.85)",
             borderColor: isDarkMode
-              ? "rgba(255,255,255,0.06)"
-              : "rgba(0,0,0,0.04)",
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(0,0,0,0.06)",
           },
         ]}
       >
@@ -41,6 +41,15 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
             style={StyleSheet.absoluteFill}
           />
         )}
+
+        {/* Decorative glow */}
+        <View
+          style={[
+            styles.decorativeGlow,
+            { backgroundColor: colors.primary[500] },
+          ]}
+        />
+
         <View style={styles.statContent}>
           <View
             style={[
@@ -48,20 +57,25 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
               { backgroundColor: `${colors.primary[500]}15` },
             ]}
           >
-            <Dumbbell size={18} color={colors.primary[500]} />
+            <Dumbbell size={20} color={colors.primary[500]} />
           </View>
-          <View style={styles.textContainer}>
-            <Typography
-              variant="h4"
-              weight="bold"
-              style={{ color: colors.text }}
-            >
-              {routinesCount}
-            </Typography>
-            <Typography variant="caption" color="textMuted">
-              {t.routines[lang]}
-            </Typography>
-          </View>
+          <Typography
+            variant="h2"
+            weight="bold"
+            style={[styles.statValue, { color: colors.text }]}
+          >
+            {routinesCount}
+          </Typography>
+          <Typography variant="caption" color="textMuted">
+            {t.routines[lang]}
+          </Typography>
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={[styles.sublabel, { color: colors.primary[500] }]}
+          >
+            {t.created[lang]}
+          </Typography>
         </View>
       </View>
 
@@ -72,10 +86,10 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
           {
             backgroundColor: isDarkMode
               ? "rgba(255,255,255,0.04)"
-              : "rgba(255,255,255,0.8)",
+              : "rgba(255,255,255,0.85)",
             borderColor: isDarkMode
-              ? "rgba(255,255,255,0.06)"
-              : "rgba(0,0,0,0.04)",
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(0,0,0,0.06)",
           },
         ]}
       >
@@ -86,6 +100,10 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
             style={StyleSheet.absoluteFill}
           />
         )}
+
+        {/* Decorative glow */}
+        <View style={[styles.decorativeGlow, { backgroundColor: "#A855F7" }]} />
+
         <View style={styles.statContent}>
           <View
             style={[
@@ -93,20 +111,25 @@ export const QuickStatsBar = ({ routinesCount, foldersCount }: Props) => {
               { backgroundColor: "rgba(168, 85, 247, 0.15)" },
             ]}
           >
-            <FolderOpen size={18} color="#A855F7" />
+            <FolderOpen size={20} color="#A855F7" />
           </View>
-          <View style={styles.textContainer}>
-            <Typography
-              variant="h4"
-              weight="bold"
-              style={{ color: colors.text }}
-            >
-              {foldersCount}
-            </Typography>
-            <Typography variant="caption" color="textMuted">
-              {t.folders[lang]}
-            </Typography>
-          </View>
+          <Typography
+            variant="h2"
+            weight="bold"
+            style={[styles.statValue, { color: colors.text }]}
+          >
+            {foldersCount}
+          </Typography>
+          <Typography variant="caption" color="textMuted">
+            {t.folders[lang]}
+          </Typography>
+          <Typography
+            variant="caption"
+            weight="medium"
+            style={[styles.sublabel, { color: "#A855F7" }]}
+          >
+            {t.organized[lang]}
+          </Typography>
         </View>
       </View>
     </View>
@@ -121,14 +144,23 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    borderRadius: 16,
+    borderRadius: 20,
     borderWidth: 1,
     overflow: "hidden",
+    minHeight: 130,
+  },
+  decorativeGlow: {
+    position: "absolute",
+    top: -40,
+    right: -40,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    opacity: 0.15,
   },
   statContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 14,
+    padding: 16,
+    flex: 1,
   },
   iconContainer: {
     width: 40,
@@ -136,9 +168,15 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    marginRight: 12,
+    marginBottom: 12,
   },
-  textContainer: {
-    flex: 1,
+  statValue: {
+    fontSize: 32,
+    lineHeight: 36,
+    marginBottom: 2,
+  },
+  sublabel: {
+    fontSize: 11,
+    marginTop: 2,
   },
 });

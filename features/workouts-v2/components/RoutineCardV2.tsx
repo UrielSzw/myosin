@@ -1,10 +1,10 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useActiveMainActions } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { RoutineWithMetrics } from "@/shared/db/repository/routines";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { workoutsTranslations as t } from "@/shared/translations/workouts";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -74,6 +74,16 @@ export const RoutineCardV2 = ({ routine, onLongPress }: Props) => {
             intensity={isDarkMode ? 15 : 30}
             tint={isDarkMode ? "dark" : "light"}
             style={StyleSheet.absoluteFill}
+          />
+        )}
+
+        {/* Decorative glow for scheduled routines */}
+        {hasTrainingDays && (
+          <View
+            style={[
+              styles.decorativeGlow,
+              { backgroundColor: colors.primary[500] },
+            ]}
           />
         )}
 
@@ -157,6 +167,15 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     borderWidth: 1,
     overflow: "hidden",
+  },
+  decorativeGlow: {
+    position: "absolute",
+    top: -30,
+    right: -30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    opacity: 0.12,
   },
   content: {
     flexDirection: "row",

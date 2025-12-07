@@ -73,6 +73,11 @@ export const FolderCardV2 = ({ folder, onLongPress }: Props) => {
           />
         )}
 
+        {/* Decorative glow */}
+        <View
+          style={[styles.decorativeGlow, { backgroundColor: folderColor }]}
+        />
+
         <View style={styles.content}>
           {/* Folder icon */}
           <View
@@ -122,6 +127,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
     aspectRatio: 1,
+  },
+  decorativeGlow: {
+    position: "absolute",
+    top: -35,
+    right: -35,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    opacity: 0.12,
   },
   content: {
     flex: 1,

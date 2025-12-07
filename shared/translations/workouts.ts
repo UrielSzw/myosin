@@ -258,6 +258,14 @@ export const workoutsTranslations = {
     es: "Carpetas",
     en: "Folders",
   },
+  created: {
+    es: "creadas",
+    en: "created",
+  },
+  organized: {
+    es: "organizadas",
+    en: "organized",
+  },
   emptyFolder: {
     es: "Carpeta vacía",
     en: "Empty folder",

@@ -10,7 +10,7 @@ import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import { Calendar, Play, Sparkles } from "lucide-react-native";
+import { Calendar, Dumbbell, Play, Sparkles } from "lucide-react-native";
 import React, { useEffect, useMemo } from "react";
 import { Platform, Pressable, StyleSheet, View } from "react-native";
 import Animated, {
@@ -215,6 +215,23 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
           />
         )}
 
+        {/* Decorative glow - always visible */}
+        <View
+          style={[
+            styles.decorativeGlow,
+            { backgroundColor: colors.primary[500] },
+          ]}
+        />
+
+        {/* Decorative icon watermark */}
+        <View style={styles.watermarkContainer}>
+          <Dumbbell
+            size={80}
+            color={colors.primary[500]}
+            style={{ opacity: isDarkMode ? 0.04 : 0.06 }}
+          />
+        </View>
+
         {/* Content */}
         <View style={styles.content}>
           {/* Header row with badge */}
@@ -299,6 +316,36 @@ export const NextWorkoutCardV2 = ({ routines }: Props) => {
                     : sharedUiTranslations.exercises[lang]}
                 </Typography>
               </View>
+
+              {/* Training days chips */}
+              {routine.training_days && routine.training_days.length > 0 && (
+                <View style={styles.trainingDaysRow}>
+                  {routine.training_days.slice(0, 5).map((day) => (
+                    <View
+                      key={day}
+                      style={[
+                        styles.dayChip,
+                        {
+                          backgroundColor: `${colors.primary[500]}15`,
+                        },
+                      ]}
+                    >
+                      <Typography
+                        variant="caption"
+                        weight="semibold"
+                        style={{
+                          color: colors.primary[500],
+                          fontSize: 10,
+                        }}
+                      >
+                        {t.weekDaysShort[lang][
+                          day as keyof (typeof t.weekDaysShort)["en"]
+                        ]?.slice(0, 2) || day.slice(0, 2).toUpperCase()}
+                      </Typography>
+                    </View>
+                  ))}
+                </View>
+              )}
             </View>
 
             {/* Play button */}
@@ -331,6 +378,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     overflow: "hidden",
     position: "relative",
+  },
+  decorativeGlow: {
+    position: "absolute",
+    top: -50,
+    right: -50,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    opacity: 0.12,
+  },
+  watermarkContainer: {
+    position: "absolute",
+    bottom: -15,
+    right: -10,
+    transform: [{ rotate: "-15deg" }],
   },
   auroraContainer: {
     ...StyleSheet.absoluteFillObject,
@@ -399,6 +461,17 @@ const styles = StyleSheet.create({
     borderRadius: 1.5,
     marginHorizontal: 8,
     opacity: 0.5,
+  },
+  trainingDaysRow: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+    marginTop: 10,
+  },
+  dayChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
   },
   playButton: {
     width: 56,

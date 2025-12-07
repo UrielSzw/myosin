@@ -3,11 +3,12 @@ import {
   ExerciseInBlockInsert,
   SetInsert,
 } from "@/shared/db/schema";
-import type { SupportedLanguage } from "@/shared/types/language";import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { routineFormTranslations } from "@/shared/translations/routine-form";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
-import { MuscleVolumeData, VolumeDisplay } from "@/shared/ui/volume-display";
+import { MuscleVolumeData, VolumeChart } from "@/shared/ui/volume-chart";
 import { VolumeCalculator } from "@/shared/utils/volume-calculator";
 import { BlurView } from "expo-blur";
 import { ChevronRight, TrendingUp } from "lucide-react-native";
@@ -234,16 +235,12 @@ export const VolumePreviewV2: React.FC<Props> = ({
           entering={FadeInDown.duration(300)}
           style={styles.expandedContent}
         >
-          <VolumeDisplay
+          <VolumeChart
             volumeData={volumeDataForDisplay}
             totalSets={Math.round(volumeData.totalSets)}
-            title={t.distributionByMuscle[lang]}
-            subtitle={t.trainingDaysPerWeek[lang]
-              .replace("{count}", trainingDays.length.toString())
-              .replace(
-                "{plural}",
-                trainingDays.length !== 1 ? t.days[lang] : t.day[lang]
-              )}
+            lang={lang}
+            showHeader={false}
+            animationDelay={0}
           />
         </Animated.View>
       )}

@@ -1,4 +1,4 @@
-import { MuscleVolumeData } from "@/shared/ui/volume-display";
+import { MuscleVolumeData } from "@/shared/ui/volume-chart";
 
 /**
  * Utilidad para formatear datos de volumen muscular con traducción y cálculos

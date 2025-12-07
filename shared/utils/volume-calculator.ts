@@ -10,7 +10,7 @@ import {
   type RoutineFull,
 } from "../db/schema/routine";
 import { IExerciseMuscle } from "../types/workout";
-import { MuscleVolumeData } from "../ui/volume-display";
+import { MuscleVolumeData } from "../ui/volume-chart";
 import {
   MUSCLE_CONTRIBUTION,
   MuscleCategoryKey,

@@ -8,7 +8,6 @@ import React, {
   useState,
 } from "react";
 import { Alert } from "react-native";
-import { useUserPreferencesStore } from "../hooks/use-user-preferences-store";
 import { useUserProfileStore } from "../hooks/use-user-profile";
 import { supabase } from "../services/supabase";
 
@@ -53,9 +52,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const loadAvatarColor = useUserProfileStore((s) => s.loadAvatarColor);
-  const loadUserPreferences = useUserPreferencesStore(
-    (s) => s.mainActions.load
-  );
 
   useEffect(() => {
     // Get initial session
@@ -72,14 +68,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
           setSession(session);
           setUser(session?.user ?? null);
 
-          // Cargar preferencias si ya hay sesión activa
-          if (session?.user?.id) {
-            console.log(
-              "Loading user preferences for existing session:",
-              session.user.email
-            );
-            await loadUserPreferences(session.user.id);
-          }
+          // NO cargar preferencias aquí - LoginSyncGate se encarga
+          // Esto evita race conditions con la detección de usuario previo
         }
       } catch (error) {
         console.error("Error in getInitialSession:", error);
@@ -96,29 +86,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
-
       setSession(session);
       setUser(session?.user ?? null);
 
       if (event === "SIGNED_OUT") {
         // Clear any local data here if needed
-        console.log("User signed out, clearing local data...");
+        console.warn("[AuthProvider] User signed out");
       }
 
       if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
-        // Cargar user preferences desde SQLite local (o crear defaults si no existen)
-        if (session?.user?.id) {
-          console.log("Loading user preferences for user:", session.user.email);
-          await loadUserPreferences(session.user.id);
-        }
+        // NO cargar preferencias aquí - LoginSyncGate se encarga de:
+        // 1. Detectar si hay datos de otro usuario
+        // 2. Hacer full_reset si es necesario
+        // 3. Cargar los datos del nuevo usuario
+        // Cargar aquí causaría una race condition que sobrescribe la detección de usuario previo
+        console.warn(
+          `[AuthProvider] ${event} for user: ${session?.user?.email}`
+        );
       }
 
       setLoading(false);
     });
 
     return () => subscription.unsubscribe();
-  }, [loadAvatarColor, loadUserPreferences]);
+  }, [loadAvatarColor]);
 
   const signUp = useCallback(
     async (email: string, password: string, displayName?: string) => {

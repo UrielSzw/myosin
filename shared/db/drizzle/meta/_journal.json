@@ -239,6 +239,13 @@
       "when": 1764374032449,
       "tag": "0033_bitter_switch",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "6",
+      "when": 1765045534067,
+      "tag": "0034_outstanding_lizard",
+      "breakpoints": true
     }
   ]
 }

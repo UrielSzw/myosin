@@ -44,7 +44,7 @@ export class SupabasePRRepository extends BaseSupabaseRepository {
         // Insert new
         const { data: inserted, error: insertError } = await this.supabase
           .from("pr_current")
-          .insert(data)
+          .insert(this.stripLocalFields(data))
           .select()
           .single();
 
@@ -60,7 +60,7 @@ export class SupabasePRRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("pr_history")
-        .insert(data)
+        .insert(this.stripLocalFields(data))
         .select()
         .single();
 

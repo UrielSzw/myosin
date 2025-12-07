@@ -67,6 +67,11 @@ export const user_preferences = sqliteTable(
       .notNull(),
     onboarding_completed_at: text("onboarding_completed_at"),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [index("idx_user_preferences_user_id").on(t.user_id)]

@@ -45,7 +45,7 @@ export class SupabaseWorkoutRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("workout_sessions")
-        .update(data)
+        .update(this.stripLocalFields(data))
         .eq("id", sessionId)
         .select()
         .single();

@@ -8,6 +8,7 @@ export const useNetwork = () => {
 
   useEffect(() => {
     const syncStateManager = getSyncStateManager();
+    let isInitialized = false;
 
     const unsubscribe = NetInfo.addEventListener(async (state) => {
       const wasOnline = isOnlineRef.current;
@@ -18,15 +19,11 @@ export const useNetwork = () => {
       isOnlineRef.current = isNowOnline;
       setIsOnline(isNowOnline);
 
-      // Notificar al sync state manager solo si cambió el estado
-      if (wasOnline !== isNowOnline) {
+      // Notificar al sync state manager en la primera llamada o cuando cambia
+      if (!isInitialized || wasOnline !== isNowOnline) {
+        isInitialized = true;
         try {
           await syncStateManager.onNetworkChange(isNowOnline, isGoodConnection);
-          console.log(
-            `🌐 Network state changed: ${wasOnline ? "online" : "offline"} → ${
-              isNowOnline ? "online" : "offline"
-            }`
-          );
         } catch (error) {
           console.warn(
             "Failed to notify sync state manager of network change:",

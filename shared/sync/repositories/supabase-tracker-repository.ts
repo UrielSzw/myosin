@@ -16,7 +16,7 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("tracker_metrics")
-        .insert(data)
+        .insert(this.stripLocalFields(data))
         .select()
         .single();
 
@@ -34,7 +34,7 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("tracker_metrics")
-        .update(data)
+        .update(this.stripLocalFields(data))
         .eq("id", id)
         .select()
         .single();
@@ -74,7 +74,7 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("tracker_quick_actions")
-        .insert(data)
+        .insert(this.stripLocalFields(data))
         .select()
         .single();
 
@@ -104,7 +104,7 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("tracker_entries")
-        .insert(data)
+        .insert(this.stripLocalFields(data))
         .select()
         .single();
 
@@ -122,7 +122,7 @@ export class SupabaseTrackerRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("tracker_entries")
-        .update(data)
+        .update(this.stripLocalFields(data))
         .eq("id", id)
         .select()
         .single();

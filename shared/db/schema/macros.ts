@@ -32,6 +32,11 @@ export const macro_targets = sqliteTable(
       .default(true)
       .notNull(),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -68,6 +73,11 @@ export const macro_entries = sqliteTable(
     day_key: text("day_key").notNull(), // 'YYYY-MM-DD'
     recorded_at: text("recorded_at").notNull(), // ISO timestamp
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -95,6 +105,11 @@ export const macro_daily_aggregates = sqliteTable(
     // total_calories calculated: P*4 + C*4 + F*9
 
     entry_count: integer("entry_count").notNull(),
+
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
 
     ...timestamps,
   },
@@ -133,6 +148,11 @@ export const macro_quick_actions = sqliteTable(
       .notNull(),
     slug: text("slug"), // for predefined: 'chicken_breast_150g', null for custom
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -153,23 +173,31 @@ export type BaseMacroDailyAggregate = InferSelectModel<
 >;
 export type BaseMacroQuickAction = InferSelectModel<typeof macro_quick_actions>;
 
-// Insert types
+// Insert types (is_synced opcional)
 export type MacroTargetInsert = Omit<
   BaseMacroTarget,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type MacroEntryInsert = Omit<
   BaseMacroEntry,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type MacroDailyAggregateInsert = Omit<
   BaseMacroDailyAggregate,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type MacroQuickActionInsert = Omit<
   BaseMacroQuickAction,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 
 // ==================== HELPERS ====================
 /**

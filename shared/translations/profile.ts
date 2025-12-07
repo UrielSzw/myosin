@@ -98,6 +98,14 @@ export const profileTranslations = {
     es: "Soporte",
     en: "Support",
   },
+  syncStatus: {
+    es: "Estado de Sync",
+    en: "Sync Status",
+  },
+  syncStatusSubtitle: {
+    es: "Ver estado de sincronización y datos locales",
+    en: "View sync status and local data",
+  },
   helpFaq: {
     es: "Ayuda y Preguntas Frecuentes",
     en: "Help & FAQ",

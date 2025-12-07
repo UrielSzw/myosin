@@ -57,6 +57,11 @@ export const tracker_metrics = sqliteTable(
     // Orden
     order_index: integer("order_index").default(0).notNull(),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -89,6 +94,11 @@ export const tracker_quick_actions = sqliteTable(
     // Visualización
     icon: text("icon"), // icon key opcional
     position: integer("position").default(0).notNull(), // orden de display
+
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
 
     ...timestamps,
   },
@@ -134,6 +144,11 @@ export const tracker_entries = sqliteTable(
     // Extensibilidad
     meta: blob("meta", { mode: "json" }).$type<Record<string, any>>(), // datos adicionales
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -170,6 +185,11 @@ export const tracker_daily_aggregates = sqliteTable(
 
     // Para comparaciones
     previous_day_sum: real("previous_day_sum"), // suma del día anterior (tendencia)
+
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
 
     ...timestamps,
   },
@@ -260,20 +280,28 @@ export type TrackerDayData = {
   metrics: MainMetric[];
 };
 
-// ---------------- Tipos para Inserts ----------------
+// ---------------- Tipos para Inserts (is_synced opcional) ----------------
 export type TrackerMetricInsert = Omit<
   BaseTrackerMetric,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type TrackerQuickActionInsert = Omit<
   BaseTrackerQuickAction,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type TrackerEntryInsert = Omit<
   BaseTrackerEntry,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type TrackerDailyAggregateInsert = Omit<
   BaseTrackerDailyAggregate,
-  "id" | "created_at" | "updated_at"
->;
+  "id" | "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};

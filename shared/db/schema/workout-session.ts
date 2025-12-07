@@ -39,6 +39,11 @@ export const workout_sessions = sqliteTable(
     total_volume_kg: real("total_volume_kg"),
     average_rpe: real("average_rpe"),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -78,6 +83,11 @@ export const workout_blocks = sqliteTable(
       .default(false)
       .notNull(),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -111,6 +121,11 @@ export const workout_exercises = sqliteTable(
     was_added_during_workout: integer("was_added_during_workout", {
       mode: "boolean",
     })
+      .default(false)
+      .notNull(),
+
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
       .default(false)
       .notNull(),
 
@@ -178,6 +193,11 @@ export const workout_sets = sqliteTable(
 
     // Simple status
     completed: integer("completed", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
       .default(false)
       .notNull(),
 
@@ -292,20 +312,28 @@ export type WorkoutSessionFull = BaseWorkoutSession & {
   blocks: WorkoutBlockWithExercises[];
 };
 
-// 3. Tipos para inserts (sin timestamps automáticos)
+// 3. Tipos para inserts (sin timestamps automáticos, is_synced opcional)
 export type WorkoutSessionInsert = Omit<
   BaseWorkoutSession,
-  "created_at" | "updated_at"
->;
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type WorkoutBlockInsert = Omit<
   BaseWorkoutBlock,
-  "created_at" | "updated_at"
->;
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type WorkoutExerciseInsert = Omit<
   BaseWorkoutExercise,
-  "created_at" | "updated_at"
->;
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type WorkoutSetInsert = Omit<
   BaseWorkoutSet,
-  "created_at" | "updated_at"
->;
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};

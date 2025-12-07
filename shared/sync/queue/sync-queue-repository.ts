@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, lte } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, lte } from "drizzle-orm";
 import { db } from "../../db/client";
 import { syncEngineState, syncQueue } from "../../db/schema/sync-queue";
 import type {
@@ -23,13 +23,31 @@ export const getSyncQueueRepository = (): SyncQueueRepository => {
 };
 
 export class SyncQueueRepository {
+  // ==================== CONSTANTS ====================
+
+  /**
+   * Límite máximo de items en la queue.
+   * Protege contra crecimiento infinito si el usuario está offline mucho tiempo.
+   */
+  private static readonly MAX_QUEUE_SIZE = 1000;
+
   // ==================== QUEUE OPERATIONS ====================
 
   /**
-   * Agrega mutation a la queue
+   * Agrega mutation a la queue.
+   * @throws Error si la queue está llena (MAX_QUEUE_SIZE alcanzado)
    */
   async enqueue(mutation: SyncMutation): Promise<string> {
     const now = new Date().toISOString();
+
+    // Verificar límite de queue para evitar crecimiento infinito
+    // Contamos pending + processing para ser más precisos
+    const currentSize = await this.getActiveQueueSize();
+    if (currentSize >= SyncQueueRepository.MAX_QUEUE_SIZE) {
+      throw new Error(
+        `Sync queue is full (${currentSize}/${SyncQueueRepository.MAX_QUEUE_SIZE}). Please connect to internet to sync pending changes.`
+      );
+    }
 
     // Validar que el payload sea serializable
     let serializedPayload: string;
@@ -58,7 +76,6 @@ export class SyncQueueRepository {
       })
       .returning();
 
-    console.log(`📥 Queued mutation: ${mutation.code} (id: ${inserted.id})`);
     return inserted.id;
   }
 
@@ -172,13 +189,26 @@ export class SyncQueueRepository {
   }
 
   /**
-   * Queue size total
+   * Queue size (solo pending) - para compatibilidad
    */
   async getQueueSize(): Promise<number> {
     const [result] = await db
       .select({ count: db.$count(syncQueue.id) })
       .from(syncQueue)
       .where(eq(syncQueue.status, "pending"));
+
+    return result.count;
+  }
+
+  /**
+   * Queue size activa (pending + processing)
+   * Usada para verificar el límite de queue.
+   */
+  async getActiveQueueSize(): Promise<number> {
+    const [result] = await db
+      .select({ count: db.$count(syncQueue.id) })
+      .from(syncQueue)
+      .where(inArray(syncQueue.status, ["pending", "processing"]));
 
     return result.count;
   }
@@ -243,6 +273,46 @@ export class SyncQueueRepository {
     const result = await db
       .delete(syncQueue)
       .where(eq(syncQueue.status, "failed"));
+
+    return result.changes;
+  }
+
+  /**
+   * Limpia entries fallidas (older than X days)
+   */
+  async cleanupFailed(daysOld: number = 30): Promise<number> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+
+    const result = await db
+      .delete(syncQueue)
+      .where(
+        and(
+          eq(syncQueue.status, "failed"),
+          lte(syncQueue.updated_at, cutoffDate.toISOString())
+        )
+      );
+
+    return result.changes;
+  }
+
+  // ==================== RECOVERY ====================
+
+  /**
+   * Recupera items que quedaron stuck en "processing" (ej: app killed mid-sync)
+   * Los resetea a "pending" para que se reprocesen.
+   * Debe llamarse al iniciar la app.
+   */
+  async recoverStuckProcessingItems(): Promise<number> {
+    const now = new Date().toISOString();
+
+    const result = await db
+      .update(syncQueue)
+      .set({
+        status: "pending" as SyncQueueStatus,
+        updated_at: now,
+      })
+      .where(eq(syncQueue.status, "processing"));
 
     return result.changes;
   }

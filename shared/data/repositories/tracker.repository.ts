@@ -505,10 +505,11 @@ export const createTrackerRepository = () => {
 
       const result = await trackerRepository.createMetric(metricData);
 
-      syncAdapter.sync(
-        "TRACKER_METRIC_CREATE" as MutationCode,
-        metricData
-      );
+      // Sync with the generated ID so we can mark as synced later
+      syncAdapter.sync("TRACKER_METRIC_CREATE" as MutationCode, {
+        ...metricData,
+        id: result.id,
+      });
 
       return result;
     },
@@ -656,12 +657,13 @@ export const createTrackerRepository = () => {
     async createQuickAction(data: TrackerQuickActionInsert): Promise<void> {
       validateQuickActionData(data);
 
-      await trackerRepository.createQuickAction(data);
+      const result = await trackerRepository.createQuickAction(data);
 
-      syncAdapter.sync(
-        "TRACKER_QUICK_ACTION_CREATE" as MutationCode,
-        data
-      );
+      // Include ID in payload for sync confirmation
+      syncAdapter.sync("TRACKER_QUICK_ACTION_CREATE" as MutationCode, {
+        ...data,
+        id: result.id,
+      });
     },
 
     /**
@@ -853,13 +855,10 @@ export const createTrackerRepository = () => {
         day_key
       );
 
-      syncAdapter.sync(
-        "TRACKER_DELETE_ENTRY_WITH_AGGREGATE" as MutationCode,
-        {
-          entryId,
-          dailyAggregate: updatedAggregate,
-        }
-      );
+      syncAdapter.sync("TRACKER_DELETE_ENTRY_WITH_AGGREGATE" as MutationCode, {
+        entryId,
+        dailyAggregate: updatedAggregate,
+      });
     },
   };
 };

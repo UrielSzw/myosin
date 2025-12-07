@@ -9,13 +9,14 @@ import type {
 } from "../../db/schema/macros";
 import { BaseSupabaseRepository } from "./base-supabase-repository";
 
-// Helper to strip calculated fields that don't exist in Supabase
+// Helper to strip calculated fields that don't exist in Supabase (in addition to is_synced)
 const stripCalculatedFields = <T extends Record<string, any>>(
   data: T,
   fieldsToRemove: string[]
 ): Partial<T> => {
   const result = { ...data };
-  fieldsToRemove.forEach((field) => delete result[field]);
+  // Always remove is_synced + any additional fields
+  ["is_synced", ...fieldsToRemove].forEach((field) => delete result[field]);
   return result;
 };
 
@@ -247,7 +248,7 @@ export class SupabaseMacrosRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("macro_quick_actions")
-        .insert(data)
+        .insert(stripCalculatedFields(data, []))
         .select()
         .single();
 
@@ -262,9 +263,12 @@ export class SupabaseMacrosRepository extends BaseSupabaseRepository {
     data: MacroQuickActionInsert[]
   ): Promise<BaseMacroQuickAction[]> {
     try {
+      // Strip is_synced field that doesn't exist in Supabase
+      const cleanData = data.map((item) => stripCalculatedFields(item, []));
+
       const { data: result, error } = await this.supabase
         .from("macro_quick_actions")
-        .upsert(data, { onConflict: "id" })
+        .upsert(cleanData, { onConflict: "id" })
         .select();
 
       if (error) throw error;

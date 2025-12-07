@@ -109,13 +109,9 @@ export const syncExercisesWithLanguage = async (
   try {
     // Verificar si es necesario sincronizar
     if (!force) {
-      const { needed, reason } = await checkSyncNeeded(language);
+      const { needed } = await checkSyncNeeded(language);
 
       if (!needed) {
-        const hoursRemaining = await getTimeUntilNextSync();
-        console.log(
-          `⚡️ Ejercicios sincronizados recientemente (${language}). Próximo sync en ~${hoursRemaining}h`
-        );
         return {
           success: true,
           syncedCount: 0,
@@ -123,27 +119,11 @@ export const syncExercisesWithLanguage = async (
           skipped: true,
         };
       }
-
-      if (reason === "language_changed") {
-        console.log(
-          `🌍 Idioma cambió a '${language}', re-sincronizando ejercicios...`
-        );
-      }
-    } else {
-      console.log(`🔄 Forzando sync de ejercicios (${language})...`);
     }
-
-    console.log(
-      `🌐 Sincronizando ejercicios desde Supabase (idioma: ${language})...`
-    );
 
     // Obtener ejercicios con traducciones desde Supabase
     const exercisesFromSupabase =
       await supabaseExercisesRepo.getSystemExercisesWithTranslations(language);
-
-    console.log(
-      `📦 ${exercisesFromSupabase.length} ejercicios obtenidos de Supabase`
-    );
 
     // Insertar o actualizar en SQLite local
     for (const ex of exercisesFromSupabase) {
@@ -191,10 +171,6 @@ export const syncExercisesWithLanguage = async (
     const now = Date.now();
     await AsyncStorage.setItem(LAST_EXERCISES_SYNC_KEY, now.toString());
     await AsyncStorage.setItem(LAST_EXERCISES_LANGUAGE_KEY, language);
-
-    console.log(
-      `✅ ${exercisesFromSupabase.length} ejercicios sincronizados (${language}) desde Supabase a SQLite local`
-    );
 
     return {
       success: true,

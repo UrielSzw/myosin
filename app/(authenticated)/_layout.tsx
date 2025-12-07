@@ -4,11 +4,13 @@ import { useSync } from "@/shared/sync/hooks/use-sync";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
+import { LoginSyncGate } from "@/shared/ui/login-sync-gate";
 import { Stack } from "expo-router";
 
 /**
  * Authenticated Layout: Protege todas las rutas autenticadas
  * - Verifica que el usuario esté autenticado
+ * - Sincroniza datos al login (LoginSyncGate)
  * - Inicializa el sistema de sync automático
  * - Redirige a /auth/sign-in si no hay usuario
  */
@@ -33,122 +35,124 @@ export default function AuthenticatedLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      {/* Main tabs */}
-      <Stack.Screen name="(tabs)" />
-
-      {/* Modals and full screen experiences */}
-      <Stack.Screen
-        name="routines/create"
-        options={{
-          presentation: "fullScreenModal",
-          gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
-        name="routines/edit/[id]"
-        options={{
-          presentation: "fullScreenModal",
-          gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
-        name="routines/templates"
-        options={{
+    <LoginSyncGate>
+      <Stack
+        screenOptions={{
           headerShown: false,
         }}
-      />
-      <Stack.Screen
-        name="routines/template-detail/[id]"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="routines/reorder-blocks"
-        options={{
-          presentation: "fullScreenModal",
-          title: t.reorderBlocks[lang],
-          gestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
-        name="routines/reorder-exercises"
-        options={{
-          presentation: "fullScreenModal",
-          title: t.reorderBlockExercises[lang],
-          gestureEnabled: false,
-          gestureDirection: "horizontal",
-          fullScreenGestureEnabled: false,
-        }}
-      />
-      <Stack.Screen
-        name="workout/active"
-        options={{
-          presentation: "fullScreenModal",
-        }}
-      />
-      <Stack.Screen
-        name="workout/summary"
-        options={{
-          presentation: "transparentModal",
-          gestureEnabled: false,
-          animation: "fade",
-        }}
-      />
-      <Stack.Screen
-        name="folders/create"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="folders/edit/[id]"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="profile/workout-config"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="profile/edit"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="workout-session/[id]"
-        options={{
-          presentation: "modal",
-        }}
-      />
-      <Stack.Screen
-        name="workout-session/workout-session-list"
-        options={{
-          title: t.workoutSessions[lang],
-        }}
-      />
-      <Stack.Screen
-        name="pr-list/index"
-        options={{
-          title: t.personalRecords[lang],
-        }}
-      />
-      <Stack.Screen
-        name="pr-detail/[exerciseId]"
-        options={{
-          presentation: "modal",
-          title: t.prHistory[lang],
-        }}
-      />
-    </Stack>
+      >
+        {/* Main tabs */}
+        <Stack.Screen name="(tabs)" />
+
+        {/* Modals and full screen experiences */}
+        <Stack.Screen
+          name="routines/create"
+          options={{
+            presentation: "fullScreenModal",
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/edit/[id]"
+          options={{
+            presentation: "fullScreenModal",
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/templates"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/template-detail/[id]"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="routines/reorder-blocks"
+          options={{
+            presentation: "fullScreenModal",
+            title: t.reorderBlocks[lang],
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="routines/reorder-exercises"
+          options={{
+            presentation: "fullScreenModal",
+            title: t.reorderBlockExercises[lang],
+            gestureEnabled: false,
+            gestureDirection: "horizontal",
+            fullScreenGestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="workout/active"
+          options={{
+            presentation: "fullScreenModal",
+          }}
+        />
+        <Stack.Screen
+          name="workout/summary"
+          options={{
+            presentation: "transparentModal",
+            gestureEnabled: false,
+            animation: "fade",
+          }}
+        />
+        <Stack.Screen
+          name="folders/create"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="folders/edit/[id]"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="profile/workout-config"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="profile/edit"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="workout-session/[id]"
+          options={{
+            presentation: "modal",
+          }}
+        />
+        <Stack.Screen
+          name="workout-session/workout-session-list"
+          options={{
+            title: t.workoutSessions[lang],
+          }}
+        />
+        <Stack.Screen
+          name="pr-list/index"
+          options={{
+            title: t.personalRecords[lang],
+          }}
+        />
+        <Stack.Screen
+          name="pr-detail/[exerciseId]"
+          options={{
+            presentation: "modal",
+            title: t.prHistory[lang],
+          }}
+        />
+      </Stack>
+    </LoginSyncGate>
   );
 }

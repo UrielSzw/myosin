@@ -15,38 +15,21 @@ export class GlobalSyncLock {
    * @returns Resultado de la función o null si no pudo obtener el lock
    */
   static async execute<T>(fn: () => Promise<T>): Promise<T | null> {
-    console.log("🔐 [GlobalSyncLock] Attempting to acquire lock...");
-
     if (this.isProcessing) {
-      console.log("🔒 [GlobalSyncLock] Already processing, skipping");
       return null;
     }
 
     this.isProcessing = true;
-    console.log("🔓 [GlobalSyncLock] Lock acquired, starting processing");
 
     try {
-      console.log("🔍 [GlobalSyncLock] About to call function...");
-      console.log("🔥 [GlobalSyncLock] CALLING FUNCTION NOW...");
       const result = await fn();
-      console.log("🔍 [GlobalSyncLock] Function returned result:", result);
-      console.log("🔍 [GlobalSyncLock] Result type:", typeof result);
-      console.log(
-        "🔍 [GlobalSyncLock] Result JSON:",
-        JSON.stringify(result, null, 2)
-      );
-      console.log("✅ [GlobalSyncLock] Processing completed successfully");
       return result;
     } catch (error) {
-      console.error("💥 [GlobalSyncLock] Processing failed:", error);
-      console.error(
-        "💥 [GlobalSyncLock] Error stack:",
-        error instanceof Error ? error.stack : "No stack available"
-      );
+      // Solo logueamos errores - importante para debugging en producción
+      console.error("[GlobalSyncLock] Processing failed:", error);
       throw error;
     } finally {
       this.isProcessing = false;
-      console.log("🔒 [GlobalSyncLock] Lock released");
     }
   }
 

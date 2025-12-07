@@ -97,6 +97,10 @@ export const folders = sqliteTable("folders", {
   icon: text("icon").notNull(),
   order_index: integer("order_index").notNull(),
   created_by_user_id: text("created_by_user_id").notNull(),
+
+  // Sync tracking
+  is_synced: integer("is_synced", { mode: "boolean" }).default(false).notNull(),
+
   ...timestamps,
 });
 
@@ -124,6 +128,9 @@ export const routines = sqliteTable("routines", {
     .notNull()
     .default(false),
 
+  // Sync tracking
+  is_synced: integer("is_synced", { mode: "boolean" }).default(false).notNull(),
+
   ...timestamps,
 });
 
@@ -145,6 +152,9 @@ export const routine_blocks = sqliteTable("routine_blocks", {
   ).notNull(),
   name: text("name").notNull(),
 
+  // Sync tracking
+  is_synced: integer("is_synced", { mode: "boolean" }).default(false).notNull(),
+
   ...timestamps,
 });
 
@@ -162,6 +172,10 @@ export const exercise_in_block = sqliteTable("exercise_in_block", {
     .notNull(),
   order_index: integer("order_index").notNull(),
   notes: text("notes"),
+
+  // Sync tracking
+  is_synced: integer("is_synced", { mode: "boolean" }).default(false).notNull(),
+
   ...timestamps,
 });
 
@@ -199,6 +213,9 @@ export const routine_sets = sqliteTable("routine_sets", {
   tempo: text("tempo"), // "3-1-2-1" o NULL
   order_index: integer("order_index").notNull(),
   set_type: text("set_type").$type<ISetType>().notNull(),
+
+  // Sync tracking
+  is_synced: integer("is_synced", { mode: "boolean" }).default(false).notNull(),
 
   ...timestamps,
 });
@@ -300,20 +317,33 @@ export type SRoutine = BaseRoutine;
 export type SFolder = BaseFolder;
 export type SBlocks = BlockWithExercises;
 
-// 4. Tipos para inserts (sin timestamps automáticos, deleted_at opcional)
+// 4. Tipos para inserts (sin timestamps automáticos, deleted_at opcional, is_synced opcional)
 export type RoutineInsert = Omit<
   BaseRoutine,
-  "created_at" | "updated_at" | "deleted_at" | "is_quick_workout"
+  "created_at" | "updated_at" | "deleted_at" | "is_quick_workout" | "is_synced"
 > & {
   deleted_at?: string | null;
   is_quick_workout?: boolean;
+  is_synced?: boolean;
 };
-export type BlockInsert = Omit<BaseBlock, "created_at" | "updated_at">;
+export type BlockInsert = Omit<
+  BaseBlock,
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 export type ExerciseInBlockInsert = Omit<
   BaseExerciseInBlock,
-  "created_at" | "updated_at"
->;
-export type SetInsert = Omit<BaseSet, "created_at" | "updated_at">;
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
+export type SetInsert = Omit<
+  BaseSet,
+  "created_at" | "updated_at" | "is_synced"
+> & {
+  is_synced?: boolean;
+};
 
 // 5. Otros tipos útiles
 // Use InferInsertModel to respect optional columns (name_search, primary_media_url, primary_media_type)

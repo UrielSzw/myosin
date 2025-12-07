@@ -9,6 +9,7 @@ import {
   HelpCircle,
   LogOut,
   Moon,
+  RefreshCw,
   Settings,
   Shield,
   Sun,
@@ -58,6 +59,10 @@ export const ProfileFeatureV2 = () => {
 
   const handleNavigatePersonalData = () => {
     router.push("/profile/personal-data" as never);
+  };
+
+  const handleNavigateSyncStatus = () => {
+    router.push("/profile/sync-status" as never);
   };
 
   // Calculate header height for padding
@@ -141,13 +146,22 @@ export const ProfileFeatureV2 = () => {
           {/* Support */}
           <SettingSectionV2 title={t.supportSection[lang]} delay={900}>
             <SettingItemV2
+              icon={RefreshCw}
+              iconColor="#10b981"
+              iconBgColor="rgba(16, 185, 129, 0.15)"
+              title={t.syncStatus[lang]}
+              subtitle={t.syncStatusSubtitle[lang]}
+              onPress={handleNavigateSyncStatus}
+              delay={950}
+            />
+            <SettingItemV2
               icon={HelpCircle}
               iconColor="#6366f1"
               iconBgColor="rgba(99, 102, 241, 0.15)"
               title={t.helpFaq[lang]}
               subtitle={t.helpFaqSubtitle[lang]}
               onPress={() => {}}
-              delay={950}
+              delay={1000}
             />
             <SettingItemV2
               icon={Shield}
@@ -156,7 +170,7 @@ export const ProfileFeatureV2 = () => {
               title={t.privacy[lang]}
               subtitle={t.privacySubtitle[lang]}
               onPress={() => {}}
-              delay={1000}
+              delay={1050}
             />
           </SettingSectionV2>
 
@@ -169,7 +183,7 @@ export const ProfileFeatureV2 = () => {
               title={t.logout[lang]}
               onPress={handleLogout}
               isDestructive
-              delay={1050}
+              delay={1100}
             />
           </View>
         </View>

@@ -10,6 +10,7 @@ import { getSyncQueueRepository } from "../../sync/queue/sync-queue-repository";
 import { syncToSupabase } from "../../sync/sync-engine";
 import type { MutationCode } from "../../sync/types/mutations";
 import type { SyncMutation } from "../../sync/types/sync-queue";
+import { confirmSyncFromPayload } from "../../sync/utils/sync-confirmation";
 import type { ISyncAdapter, SyncResult } from "../types/repository.types";
 
 /**
@@ -28,6 +29,23 @@ class SyncAdapterImpl implements ISyncAdapter {
           mutationCode as MutationCode,
           payload as Parameters<typeof syncToSupabase>[1]
         );
+
+        // If sync succeeded, mark entity as synced in SQLite
+        if (result.success) {
+          try {
+            await confirmSyncFromPayload(
+              mutationCode as MutationCode,
+              payload as Record<string, any>
+            );
+          } catch (e) {
+            // Non-fatal: log but don't fail the sync
+            console.warn(
+              `[SyncAdapter] Failed to confirm sync for ${mutationCode}:`,
+              e
+            );
+          }
+        }
+
         return {
           success: result.success,
           error: result.error,

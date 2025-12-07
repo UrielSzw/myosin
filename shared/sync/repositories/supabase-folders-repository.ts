@@ -7,7 +7,7 @@ export class SupabaseFoldersRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("folders")
-        .insert(data)
+        .insert(this.stripLocalFields(data))
         .select()
         .single();
 
@@ -22,7 +22,7 @@ export class SupabaseFoldersRepository extends BaseSupabaseRepository {
     try {
       const { data: result, error } = await this.supabase
         .from("folders")
-        .update(data)
+        .update(this.stripLocalFields(data))
         .eq("id", id)
         .select()
         .single();

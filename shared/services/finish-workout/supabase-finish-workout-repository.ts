@@ -65,6 +65,14 @@ export async function syncFinishWorkoutToSupabase(
     };
 
     if (!result.success) {
+      // Check if it's a duplicate key error (23505) - means already synced
+      if (result.detail === "23505") {
+        return {
+          success: true,
+          sessionId: payload.workoutSession.session.id,
+        };
+      }
+
       console.error("Supabase finish_workout RPC returned error:", result);
       return {
         success: false,

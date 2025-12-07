@@ -1,3 +1,4 @@
+import { syncFinishWorkoutToSupabase } from "../../services/finish-workout/supabase-finish-workout-repository";
 import { SupabaseFoldersRepository } from "../repositories/supabase-folders-repository";
 import { SupabaseMacrosRepository } from "../repositories/supabase-macros-repository";
 import { SupabasePRRepository } from "../repositories/supabase-pr-repository";
@@ -6,6 +7,7 @@ import { SupabaseTrackerRepository } from "../repositories/supabase-tracker-repo
 import { SupabaseUserRepository } from "../repositories/supabase-user-repository";
 import { SupabaseWorkoutRepository } from "../repositories/supabase-workout-repository";
 import type {
+  FinishWorkoutSyncPayload,
   FolderCreatePayload,
   FolderDeletePayload,
   FolderReorderPayload,
@@ -172,6 +174,13 @@ export const supabaseSyncDictionary: {
     workoutRepo.createWorkoutSessionWithData(payload),
   WORKOUT_UPDATE: (payload: WorkoutUpdatePayload) =>
     workoutRepo.updateSession(payload.sessionId, payload.data),
+  FINISH_WORKOUT: async (payload: FinishWorkoutSyncPayload) => {
+    const result = await syncFinishWorkoutToSupabase(payload);
+    if (!result.success) {
+      throw new Error(result.error || "Failed to sync workout");
+    }
+    return result;
+  },
 
   // User Preferences
   USER_PREFERENCES_CREATE: (payload: UserPreferencesCreatePayload) =>

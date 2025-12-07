@@ -215,6 +215,31 @@ export interface WorkoutUpdatePayload {
   data: Partial<BaseWorkoutSession>;
 }
 
+/**
+ * Payload for the unified finish_workout RPC.
+ * Includes workout session, optional routine update, and PRs.
+ */
+export interface FinishWorkoutSyncPayload {
+  userId: string;
+  finishedAt: string;
+  workoutSession: {
+    session: CreateWorkoutSessionData["session"];
+    blocks: CreateWorkoutSessionData["blocks"];
+    exercises: CreateWorkoutSessionData["exercises"];
+    sets: CreateWorkoutSessionData["sets"];
+  };
+  routineUpdate: {
+    routineId: string;
+    blocks: any[];
+    exercises: any[];
+    sets: any[];
+  } | null;
+  prs: {
+    current: any[];
+    history: any[];
+  };
+}
+
 // ==================== USER PREFERENCES PAYLOADS ====================
 
 export interface UserPreferencesCreatePayload {
@@ -291,6 +316,7 @@ export type MutationPayloadMap = {
   WORKOUT_START: WorkoutStartPayload;
   WORKOUT_COMPLETE: WorkoutCompletePayload;
   WORKOUT_UPDATE: WorkoutUpdatePayload;
+  FINISH_WORKOUT: FinishWorkoutSyncPayload;
 
   // User Preferences
   USER_PREFERENCES_CREATE: UserPreferencesCreatePayload;

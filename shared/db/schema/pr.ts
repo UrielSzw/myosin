@@ -29,6 +29,11 @@ export const pr_current = sqliteTable(
 
     source: text("source").$type<"auto" | "manual">().default("auto").notNull(),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [index("idx_pr_current_user_exercise").on(t.user_id, t.exercise_id)]
@@ -59,6 +64,11 @@ export const pr_history = sqliteTable(
       .default("auto")
       .notNull(),
 
+    // Sync tracking
+    is_synced: integer("is_synced", { mode: "boolean" })
+      .default(false)
+      .notNull(),
+
     ...timestamps,
   },
   (t) => [
@@ -70,6 +80,10 @@ export const pr_history = sqliteTable(
 export type BasePRCurrent = InferSelectModel<typeof pr_current>;
 export type BasePRHistory = InferSelectModel<typeof pr_history>;
 
-export type PRCurrentInsert = Omit<BasePRCurrent, "id">;
+export type PRCurrentInsert = Omit<BasePRCurrent, "id" | "is_synced"> & {
+  is_synced?: boolean;
+};
 
-export type PRHistoryInsert = Omit<BasePRHistory, "id">;
+export type PRHistoryInsert = Omit<BasePRHistory, "id" | "is_synced"> & {
+  is_synced?: boolean;
+};

@@ -279,6 +279,11 @@ const inferAndMarkFromMutation = async (
         await markEntitySynced("routines", payload.routineId);
       break;
 
+    case "ROUTINE_UPDATE_FOLDER":
+      if (payload.routineId)
+        await markEntitySynced("routines", payload.routineId);
+      break;
+
     // Tracker Metrics
     case "TRACKER_METRIC_CREATE":
     case "TRACKER_METRIC_UPDATE":

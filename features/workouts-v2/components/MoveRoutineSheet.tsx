@@ -392,16 +392,10 @@ export const MoveRoutineSheet = ({
                       <View
                         style={[
                           styles.folderIconContainer,
-                          { backgroundColor: folderColor },
+                          { backgroundColor: `${folderColor}20` },
                         ]}
                       >
-                        {folder.icon ? (
-                          <Typography style={{ fontSize: 20 }}>
-                            {folder.icon}
-                          </Typography>
-                        ) : (
-                          <Folder size={20} color="#fff" />
-                        )}
+                        <Folder size={20} color={folderColor} />
                       </View>
                       <View style={styles.folderOptionText}>
                         <Typography

@@ -57,6 +57,11 @@ export interface RoutineConvertFromQuickPayload {
   newName?: string;
 }
 
+export interface RoutineUpdateFolderPayload {
+  routineId: string;
+  folderId: string | null;
+}
+
 // ==================== FOLDER PAYLOADS ====================
 
 /**
@@ -266,6 +271,7 @@ export type MutationPayloadMap = {
   ROUTINE_CLEAR_TRAINING_DAYS: RoutineClearTrainingDaysPayload;
   ROUTINE_CREATE_QUICK_WORKOUT: RoutineCreateQuickWorkoutPayload;
   ROUTINE_CONVERT_FROM_QUICK: RoutineConvertFromQuickPayload;
+  ROUTINE_UPDATE_FOLDER: RoutineUpdateFolderPayload;
 
   // Folders
   FOLDER_CREATE: FolderCreatePayload;

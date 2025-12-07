@@ -122,4 +122,23 @@ export class SupabaseRoutinesRepository extends BaseSupabaseRepository {
       await this.handleError(error, "convert quick workout to routine");
     }
   }
+
+  /**
+   * Actualiza el folder_id de una rutina (mover a carpeta)
+   */
+  async updateRoutineFolderId(
+    routineId: string,
+    folderId: string | null
+  ): Promise<void> {
+    try {
+      const { error } = await this.supabase
+        .from("routines")
+        .update({ folder_id: folderId })
+        .eq("id", routineId);
+
+      if (error) throw error;
+    } catch (error) {
+      await this.handleError(error, "update routine folder");
+    }
+  }
 }

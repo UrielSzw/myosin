@@ -28,6 +28,7 @@ import type {
   RoutineCreatePayload,
   RoutineCreateQuickWorkoutPayload,
   RoutineDeletePayload,
+  RoutineUpdateFolderPayload,
   RoutineUpdatePayload,
   TrackerDeleteEntryWithAggregatePayload,
   TrackerEntryCreatePayload,
@@ -92,6 +93,8 @@ export const supabaseSyncDictionary: {
       payload.routineId,
       payload.newName
     ),
+  ROUTINE_UPDATE_FOLDER: (payload: RoutineUpdateFolderPayload) =>
+    routinesRepo.updateRoutineFolderId(payload.routineId, payload.folderId),
 
   // Folders
   FOLDER_CREATE: (payload: FolderCreatePayload) => foldersRepo.create(payload),

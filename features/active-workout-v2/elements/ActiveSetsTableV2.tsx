@@ -1,4 +1,5 @@
 import {
+  useActiveMainActions,
   useActiveSetActions,
   useActiveWorkout,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
@@ -11,8 +12,8 @@ import { getMeasurementTemplate } from "@/shared/types/measurement";
 import { IBlockType } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
-import { Check, Plus } from "lucide-react-native";
-import React from "react";
+import { Check, ChevronDown, Plus } from "lucide-react-native";
+import React, { useCallback, useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   FadeIn,
@@ -26,14 +27,17 @@ type Props = {
   exerciseInBlockId: string;
   blockType: IBlockType;
   children: React.ReactNode;
+  onOpenMeasurementTemplate?: () => void;
 };
 
 export const ActiveSetsTableV2: React.FC<Props> = ({
   exerciseInBlockId,
   blockType,
   children,
+  onOpenMeasurementTemplate,
 }) => {
   const { sets, setsByExercise, session } = useActiveWorkout();
+  const { setCurrentState } = useActiveMainActions();
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
@@ -45,7 +49,7 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
   const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const blockColors = getBlockColors(blockType);
-  const setId = setsByExercise[exerciseInBlockId]?.[0];
+  const setId = setsByExercise[exerciseInBlockId]?.[0] || "";
   const measurementTemplate =
     sets[setId]?.measurement_template || "weight_reps";
 
@@ -54,6 +58,12 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
     weightUnit,
     distanceUnit
   );
+
+  // Check if any set has been completed (prevents template change)
+  const hasAnyCompletedSet = useMemo(() => {
+    const setIds = setsByExercise[exerciseInBlockId] || [];
+    return setIds.some((setId) => sets[setId]?.completed_at != null);
+  }, [setsByExercise, exerciseInBlockId, sets]);
 
   // Animation for add button
   const addButtonScale = useSharedValue(1);
@@ -68,6 +78,20 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
     });
     addSet(exerciseInBlockId);
   };
+
+  const handleOpenMeasurementTemplate = useCallback(() => {
+    if (hasAnyCompletedSet || !onOpenMeasurementTemplate) return;
+
+    setCurrentState({
+      currentExerciseInBlockId: exerciseInBlockId,
+    });
+    onOpenMeasurementTemplate();
+  }, [
+    hasAnyCompletedSet,
+    onOpenMeasurementTemplate,
+    setCurrentState,
+    exerciseInBlockId,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -107,11 +131,15 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
           </Typography>
         </View>
 
-        {/* Measurement columns */}
-        <View
+        {/* Measurement columns - Adaptive layout */}
+        <Pressable
+          onPress={handleOpenMeasurementTemplate}
+          disabled={hasAnyCompletedSet || !onOpenMeasurementTemplate}
           style={[
             styles.measurementHeaders,
-            { flex: template?.fields.length || 1 },
+            template?.fields.length === 1
+              ? { width: "40%" }
+              : { flex: template?.fields.length || 1 },
           ]}
         >
           {template?.fields.map((field) => (
@@ -126,7 +154,14 @@ export const ActiveSetsTableV2: React.FC<Props> = ({
               </Typography>
             </View>
           ))}
-        </View>
+          {!hasAnyCompletedSet && onOpenMeasurementTemplate && (
+            <ChevronDown
+              size={12}
+              color={colors.textMuted}
+              style={{ marginLeft: 2 }}
+            />
+          )}
+        </Pressable>
 
         {/* RPE column */}
         {session?.routine?.show_rpe && (

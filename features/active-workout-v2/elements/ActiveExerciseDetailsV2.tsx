@@ -17,6 +17,7 @@ type Props = {
   onOpenSetType: () => void;
   onOpenRPESelector: () => void;
   onOpenTempoMetronome: () => void;
+  onOpenMeasurementTemplate: () => void;
 };
 
 export const ActiveExerciseDetailsV2: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const ActiveExerciseDetailsV2: React.FC<Props> = ({
   onOpenSetType,
   onOpenRPESelector,
   onOpenTempoMetronome,
+  onOpenMeasurementTemplate,
 }) => {
   const { setCurrentState } = useActiveMainActions();
   const { exercises, setsByExercise } = useActiveWorkout();
@@ -67,6 +69,7 @@ export const ActiveExerciseDetailsV2: React.FC<Props> = ({
       <ActiveSetsTableV2
         exerciseInBlockId={exerciseInBlock.tempId}
         blockType={block.type}
+        onOpenMeasurementTemplate={onOpenMeasurementTemplate}
       >
         {sets.map((setId, index) => (
           <ActiveSetRowV2

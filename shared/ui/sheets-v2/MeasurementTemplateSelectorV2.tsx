@@ -216,7 +216,7 @@ export const MeasurementTemplateSelectorV2 = ({
 
           {/* Templates List */}
           <ScrollView
-            style={styles.optionsList}
+            style={[styles.optionsList, { maxHeight: SCREEN_HEIGHT * 0.7 }]}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 40 }}
           >
@@ -347,8 +347,6 @@ export const MeasurementTemplateSelectorV2 = ({
               );
             })}
           </ScrollView>
-
-          <View style={{ height: 34 }} />
         </View>
       </Animated.View>
     </Modal>

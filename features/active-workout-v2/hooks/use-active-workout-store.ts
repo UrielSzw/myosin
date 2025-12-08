@@ -184,6 +184,16 @@ type Store = {
   exerciseActions: {
     replaceExercise: (selectedExercises: BaseExercise[]) => void;
     deleteExercise: () => void;
+    /**
+     * Updates the measurement template for an exercise and all its sets.
+     * Can only be called if no sets have been completed for this exercise.
+     * @param exerciseInBlockId - The exercise to update
+     * @param newTemplate - The new measurement template
+     */
+    updateExerciseMeasurementTemplate: (
+      exerciseInBlockId: string,
+      newTemplate: MeasurementTemplateId
+    ) => void;
   };
 
   setActions: {
@@ -1364,6 +1374,32 @@ const useActiveWorkoutStore = create<Store>()(
             currentExerciseName: null,
             isCurrentBlockMulti: false,
           };
+        });
+      },
+      updateExerciseMeasurementTemplate: (exerciseInBlockId, newTemplate) => {
+        set((state) => {
+          const setIds =
+            state.activeWorkout.setsByExercise[exerciseInBlockId] || [];
+
+          // Safety check: don't allow if any set is completed
+          const hasCompletedSets = setIds.some(
+            (setId) => state.activeWorkout.sets[setId]?.completed_at != null
+          );
+          if (hasCompletedSets) return;
+
+          // Update all sets with the new measurement template
+          // and clear values that don't apply to the new template
+          setIds.forEach((setId) => {
+            const set = state.activeWorkout.sets[setId];
+            if (set) {
+              set.measurement_template = newTemplate;
+              // Clear all actual values since template changed
+              set.actual_primary_value = null;
+              set.actual_secondary_value = null;
+              // Mark as modified so detectWorkoutChanges() suggests routine update
+              set.was_modified_during_workout = true;
+            }
+          });
         });
       },
     },

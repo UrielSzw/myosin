@@ -10,7 +10,10 @@ import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
-import { getMeasurementTemplate } from "@/shared/types/measurement";
+import {
+  getMeasurementTemplate,
+  MeasurementTemplateId,
+} from "@/shared/types/measurement";
 import { IBlockType, RPEValue } from "@/shared/types/workout";
 import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
@@ -74,13 +77,32 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const blockColors = getBlockColors(blockType);
     const set = sets[setId];
 
+    // Get measurement template early (needed for timer callback)
+    const template = getMeasurementTemplate(
+      set?.measurement_template || "weight_reps",
+      weightUnit,
+      distanceUnit
+    );
+
+    // Detect time fields for timer functionality (needed for timer callback)
+    const primaryFieldIsTime = template?.fields[0]?.type === "time";
+    const secondaryFieldIsTime = template?.fields[1]?.type === "time";
+    const hasTimeField = primaryFieldIsTime || secondaryFieldIsTime;
+    const timeFieldType: "primary" | "secondary" = primaryFieldIsTime
+      ? "primary"
+      : "secondary";
+    const timeFieldUnit = primaryFieldIsTime
+      ? template?.fields[0]?.unit
+      : template?.fields[1]?.unit;
+    const timeFieldIsMinutes = timeFieldUnit === "min";
+
     // PR solo se muestra DESPUÉS de completar el set
     const isCurrentPR = set?.was_pr || false;
 
     const exercisePrevSets =
       exercisePreviousSets[exerciseInBlock.exercise_id] || [];
     const prevSet = exercisePrevSets.find(
-      (prevData) => prevData.order_index === set.order_index
+      (prevData) => prevData.order_index === set?.order_index
     );
 
     // Animation values - following SetRowV2 style
@@ -103,27 +125,27 @@ export const ActiveSetRowV2 = React.memo<Props>(
         typeScale.value = withSpring(1);
       });
       setCurrentState({
-        currentSetId: set.tempId,
+        currentSetId: set?.tempId,
         currentExerciseInBlockId: exerciseInBlock.tempId,
-        currentSetType: set.set_type,
+        currentSetType: set?.set_type,
       });
       onOpenSetType();
     }, [
       exerciseInBlock.tempId,
       onOpenSetType,
-      set.tempId,
-      set.set_type,
+      set?.tempId,
+      set?.set_type,
       setCurrentState,
       typeScale,
     ]);
 
     const handleShowRPESelector = useCallback(() => {
       setCurrentState({
-        currentSetId: set.tempId,
-        currentRpeValue: (set.actual_rpe as RPEValue) || null,
+        currentSetId: set?.tempId,
+        currentRpeValue: (set?.actual_rpe as RPEValue) || null,
       });
       onOpenRPESelector();
-    }, [onOpenRPESelector, set.tempId, set.actual_rpe, setCurrentState]);
+    }, [onOpenRPESelector, set?.tempId, set?.actual_rpe, setCurrentState]);
 
     const handleCompleteSet = useCallback(() => {
       checkScale.value = withSequence(
@@ -148,25 +170,25 @@ export const ActiveSetRowV2 = React.memo<Props>(
       };
 
       const effectivePrimary = getEffectiveValue(
-        set.actual_primary_value,
-        set.planned_primary_range,
-        set.planned_primary_value,
+        set?.actual_primary_value || null,
+        set?.planned_primary_range || null,
+        set?.planned_primary_value || null,
         prevSet?.actual_primary_value,
         0
       );
 
       const effectiveSecondary = getEffectiveValue(
-        set.actual_secondary_value,
-        set.planned_secondary_range,
-        set.planned_secondary_value,
+        set?.actual_secondary_value || null,
+        set?.planned_secondary_range || null,
+        set?.planned_secondary_value || null,
         prevSet?.actual_secondary_value,
         0
       );
 
       // PR validation for weight_reps templates
       const supportsPRTemplate =
-        set.measurement_template === "weight_reps" ||
-        set.measurement_template === "weight_reps_range";
+        set?.measurement_template === "weight_reps" ||
+        set?.measurement_template === "weight_reps_range";
       const prValidation = supportsPRTemplate
         ? validatePR(effectivePrimary, effectiveSecondary)
         : { isPR: false, estimatedOneRM: 0 };
@@ -174,7 +196,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
       completeSet(exerciseInBlock.tempId, setId, blockId, {
         primaryValue: effectivePrimary,
         secondaryValue: effectiveSecondary,
-        actualRpe: set.actual_rpe || set.planned_rpe || 0,
+        actualRpe: set?.actual_rpe || set?.planned_rpe || 0,
         estimated1RM: prValidation.estimatedOneRM,
         isPR: prValidation.isPR,
       });
@@ -284,26 +306,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const setTypeColor = getSetTypeColor(set.set_type);
     const isCompleted = !!set.completed_at;
 
-    const template = getMeasurementTemplate(
-      set.measurement_template,
-      weightUnit,
-      distanceUnit
-    );
     const hasSecondaryField = template?.fields && template.fields.length > 1;
-
-    // Detect time fields for timer functionality
-    const primaryFieldIsTime = template?.fields[0]?.type === "time";
-    const secondaryFieldIsTime = template?.fields[1]?.type === "time";
-    const hasTimeField = primaryFieldIsTime || secondaryFieldIsTime;
-
-    // Determine which field is the time field and its unit
-    const timeFieldType: "primary" | "secondary" = primaryFieldIsTime
-      ? "primary"
-      : "secondary";
-    const timeFieldUnit = primaryFieldIsTime
-      ? template?.fields[0]?.unit
-      : template?.fields[1]?.unit;
-    const timeFieldIsMinutes = timeFieldUnit === "min";
 
     // Get timer duration (always in seconds for the timer)
     const getTimerDuration = (): number => {
@@ -408,22 +411,53 @@ export const ActiveSetRowV2 = React.memo<Props>(
       return "0";
     };
 
+    // Helper para obtener separador semántico según template
+    const getSeparatorForTemplate = (
+      templateId: MeasurementTemplateId
+    ): string => {
+      switch (templateId) {
+        case "distance_time":
+        case "weight_distance":
+          return "/";
+        default:
+          return "×";
+      }
+    };
+
     const formatPrevSet = () => {
       if (!prevSet) return "-";
+
+      // Validar compatibilidad: si el template cambió, no mostrar PREV
+      if (prevSet.measurement_template !== set.measurement_template) return "-";
+
       const primary = formatMeasurementValue(
         prevSet.actual_primary_value,
         null,
         prevSet.measurement_template,
-        "primary"
+        "primary",
+        weightUnit,
+        distanceUnit
       );
-      if (hasSecondaryField && prevSet.actual_secondary_value !== null) {
+
+      // Verificar si el template del prevSet tiene campo secundario
+      const prevTemplate = getMeasurementTemplate(
+        prevSet.measurement_template,
+        weightUnit,
+        distanceUnit
+      );
+      const prevHasSecondary = prevTemplate.fields.length > 1;
+
+      if (prevHasSecondary && prevSet.actual_secondary_value !== null) {
         const secondary = formatMeasurementValue(
           prevSet.actual_secondary_value,
           null,
           prevSet.measurement_template,
-          "secondary"
+          "secondary",
+          weightUnit,
+          distanceUnit
         );
-        return `${primary}×${secondary}`;
+        const separator = getSeparatorForTemplate(prevSet.measurement_template);
+        return `${primary}${separator}${secondary}`;
       }
       return primary;
     };
@@ -516,52 +550,89 @@ export const ActiveSetRowV2 = React.memo<Props>(
             </Typography>
           </View>
 
-          {/* Primary Input */}
-          <View style={styles.inputColumn}>
-            <MeasurementInput
-              field={
-                template?.fields[0] || {
-                  id: "primary",
-                  label: "",
-                  type: "reps",
-                  unit: "",
-                }
-              }
-              value={set.actual_primary_value}
-              onChange={(value) => {
-                updateSetValue(setId, "primary", value, exerciseInBlock.tempId);
-              }}
-              placeholder={getPlaceholderValue("primary")}
-              setNumber={setNumber}
-              activeWorkout={true}
-              weightUnit={weightUnit}
-              distanceUnit={distanceUnit}
-              disabled={isCompleted}
-            />
-          </View>
+          {/* Measurement Inputs - Adaptive layout for single vs dual fields */}
+          {hasSecondaryField ? (
+            <>
+              {/* Primary Input */}
+              <View style={styles.inputColumn}>
+                <MeasurementInput
+                  field={
+                    template?.fields[0] || {
+                      id: "primary",
+                      label: "",
+                      type: "reps",
+                      unit: "",
+                    }
+                  }
+                  value={set.actual_primary_value}
+                  onChange={(value) => {
+                    updateSetValue(
+                      setId,
+                      "primary",
+                      value,
+                      exerciseInBlock.tempId
+                    );
+                  }}
+                  placeholder={getPlaceholderValue("primary")}
+                  setNumber={setNumber}
+                  activeWorkout={true}
+                  weightUnit={weightUnit}
+                  distanceUnit={distanceUnit}
+                  disabled={isCompleted}
+                />
+              </View>
 
-          {/* Secondary Input */}
-          {hasSecondaryField && (
-            <View style={styles.inputColumn}>
+              {/* Secondary Input */}
+              <View style={styles.inputColumn}>
+                <MeasurementInput
+                  field={
+                    template?.fields[1] || {
+                      id: "secondary",
+                      label: "",
+                      type: "reps",
+                      unit: "",
+                    }
+                  }
+                  value={set.actual_secondary_value}
+                  onChange={(value) => {
+                    updateSetValue(
+                      setId,
+                      "secondary",
+                      value,
+                      exerciseInBlock.tempId
+                    );
+                  }}
+                  placeholder={getPlaceholderValue("secondary")}
+                  setNumber={setNumber}
+                  activeWorkout={true}
+                  weightUnit={weightUnit}
+                  distanceUnit={distanceUnit}
+                  disabled={isCompleted}
+                />
+              </View>
+            </>
+          ) : (
+            /* Single field - wider input */
+            <View style={styles.singleInputColumn}>
               <MeasurementInput
                 field={
-                  template?.fields[1] || {
-                    id: "secondary",
+                  template?.fields[0] || {
+                    id: "primary",
                     label: "",
                     type: "reps",
                     unit: "",
                   }
                 }
-                value={set.actual_secondary_value}
+                value={set.actual_primary_value}
                 onChange={(value) => {
                   updateSetValue(
                     setId,
-                    "secondary",
+                    "primary",
                     value,
                     exerciseInBlock.tempId
                   );
                 }}
-                placeholder={getPlaceholderValue("secondary")}
+                placeholder={getPlaceholderValue("primary")}
                 setNumber={setNumber}
                 activeWorkout={true}
                 weightUnit={weightUnit}
@@ -755,6 +826,10 @@ const styles = StyleSheet.create({
   },
   inputColumn: {
     flex: 1,
+    paddingHorizontal: 4,
+  },
+  singleInputColumn: {
+    width: "40%",
     paddingHorizontal: 4,
   },
   rpeColumn: {

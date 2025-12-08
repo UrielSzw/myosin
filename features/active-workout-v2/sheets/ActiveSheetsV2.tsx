@@ -10,10 +10,12 @@ import {
   useReorderBlocksActive,
   useReorderExercisesActive,
 } from "@/features/active-workout-v2/shared";
+import { MeasurementTemplateId } from "@/shared/types/measurement";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import {
   BlockOptionsSheetV2,
   ExerciseOptionsSheetV2,
+  MeasurementTemplateSelectorV2,
   RestTimeSheetV2,
   RPESelectorV2,
   SetTypeSheetV2,
@@ -47,6 +49,7 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     currentTempo,
     currentRpeValue,
     currentBlockId,
+    currentExerciseInBlockId,
   } = useActiveWorkoutState();
   const {
     blocks,
@@ -60,7 +63,8 @@ export const ActiveSheetsV2: React.FC<Props> = ({
   const { deleteSet, updateSetType, updateRpe } = useActiveSetActions();
   const { updateRestTime, deleteBlock, convertBlockToIndividual } =
     useActiveBlockActions();
-  const { deleteExercise } = useActiveExerciseActions();
+  const { deleteExercise, updateExerciseMeasurementTemplate } =
+    useActiveExerciseActions();
 
   // Reorder hooks
   const { initializeReorder: initializeBlocksReorder } =
@@ -203,6 +207,30 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     router.push("/workout/reorder-exercises");
   }, [closeSheet, currentBlockId, initializeExercisesReorder]);
 
+  // Measurement Template handler
+  const handleUpdateMeasurementTemplate = useCallback(
+    (templateId: MeasurementTemplateId) => {
+      if (!currentExerciseInBlockId) return;
+      updateExerciseMeasurementTemplate(currentExerciseInBlockId, templateId);
+      closeSheet();
+      clearCurrentState();
+    },
+    [
+      currentExerciseInBlockId,
+      updateExerciseMeasurementTemplate,
+      closeSheet,
+      clearCurrentState,
+    ]
+  );
+
+  // Get current measurement template for the selected exercise
+  const currentMeasurementTemplate = useMemo(() => {
+    if (!currentExerciseInBlockId) return null;
+    const exerciseSetIds = setsByExercise[currentExerciseInBlockId] || [];
+    const firstSet = exerciseSetIds[0] ? sets[exerciseSetIds[0]] : null;
+    return firstSet?.measurement_template || "weight_reps";
+  }, [currentExerciseInBlockId, setsByExercise, sets]);
+
   // Check if we have more than 1 block to enable reorder blocks
   const canReorderBlocks = blocksBySession.length > 1;
 
@@ -282,6 +310,14 @@ export const ActiveSheetsV2: React.FC<Props> = ({
         visible={activeSheet === "circuitTimerMode"}
         onClose={closeSheet}
         blockId={currentBlockId || ""}
+      />
+
+      {/* Measurement Template Selector */}
+      <MeasurementTemplateSelectorV2
+        visible={activeSheet === "measurementTemplate"}
+        onClose={closeSheet}
+        onSelect={handleUpdateMeasurementTemplate}
+        currentTemplate={currentMeasurementTemplate}
       />
     </>
   );

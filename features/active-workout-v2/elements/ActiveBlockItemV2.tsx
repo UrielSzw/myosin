@@ -24,6 +24,7 @@ type Props = {
   onOpenRestTime: () => void;
   onOpenRPESelector: () => void;
   onOpenTempoMetronome: () => void;
+  onOpenMeasurementTemplate: () => void;
 };
 
 export const ActiveBlockItemV2: React.FC<Props> = ({
@@ -35,6 +36,7 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
   onOpenRestTime,
   onOpenRPESelector,
   onOpenTempoMetronome,
+  onOpenMeasurementTemplate,
 }) => {
   const {
     blocks,
@@ -176,6 +178,7 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
                       onOpenSetType={onOpenSetType}
                       onOpenRPESelector={onOpenRPESelector}
                       onOpenTempoMetronome={onOpenTempoMetronome}
+                      onOpenMeasurementTemplate={onOpenMeasurementTemplate}
                     />
                   </ActiveExerciseItemV2>
                 </View>

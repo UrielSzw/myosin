@@ -173,8 +173,8 @@ export const routineFormTranslations = {
     en: "Exercises ({count})",
   },
   addExercise: {
-    es: "+ Agregar Ejercicio",
-    en: "+ Add Exercise",
+    es: "Agregar Ejercicio",
+    en: "Add Exercise",
   },
   listHint: {
     es: "Consejo: Mantén presionado cualquier bloque para reordenar los ejercicios",

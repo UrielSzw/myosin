@@ -284,6 +284,10 @@ El módulo de workout activo permite ejecutar una rutina en tiempo real.
 - 📝 **Valores Planificados vs Ejecutados**: Compara lo planeado con lo realizado
 - 🏆 **Detección de PRs**: Detecta automáticamente nuevos records
 - 📊 **Previous Sets**: Muestra los valores de la última sesión
+- 🔀 **Reordenar Bloques/Ejercicios**: Drag & drop durante el workout
+- 📏 **Cambiar Measurement Template**: Modificar tipo de medición por ejercicio
+- ⏲️ **Timer para Ejercicios de Tiempo**: Timer visual para sets basados en tiempo
+- 🔄 **Circuit Timer Mode**: Modo especial para ejecutar circuitos con timer automático
 
 #### Quick Workout
 
@@ -294,16 +298,121 @@ Permite iniciar un entrenamiento sin rutina previa:
 3. Al finalizar, puede convertirla en rutina normal o descartarla
 4. Las rutinas con `is_quick_workout = true` no aparecen en la lista de rutinas
 
+#### Reordenamiento Durante Workout
+
+El usuario puede reorganizar la estructura del workout en tiempo real:
+
+| Acción               | Descripción                                     | Restricciones |
+| -------------------- | ----------------------------------------------- | ------------- |
+| Reordenar Bloques    | Cambiar orden de bloques via drag & drop        | Ninguna       |
+| Reordenar Ejercicios | Cambiar orden de ejercicios dentro de un bloque | Ninguna       |
+
+Los cambios de orden se detectan como modificaciones y al finalizar el workout se sugiere actualizar la rutina original.
+
+#### Cambio de Measurement Template
+
+Durante el workout activo, se puede cambiar el tipo de medición de un ejercicio:
+
+| Condición            | Comportamiento                      |
+| -------------------- | ----------------------------------- |
+| Sin sets completados | ✅ Permite cambiar template         |
+| Con sets completados | ❌ Bloqueado (datos ya registrados) |
+
+**Al cambiar template:**
+
+1. Se actualiza `measurement_template` en todos los sets del ejercicio
+2. Se limpian `actual_primary_value` y `actual_secondary_value`
+3. Se marca `was_modified_during_workout = true`
+4. Al finalizar, se sugiere actualizar la rutina original
+
+**Previous Sets (PREV):**
+
+- Si el template anterior es compatible, muestra los valores formateados
+- Si es incompatible, muestra "--" (no hay datos comparables)
+
+#### Timer para Sets de Tiempo (SingleSetTimerSheet)
+
+Para ejercicios con measurement template basado en tiempo (`time_only`, `weight_time`), se ofrece un timer visual interactivo:
+
+**Características:**
+
+- 🎯 **Círculo de progreso animado**: Visualización clara del tiempo transcurrido
+- ▶️ **Control de Play/Pause**: Iniciar, pausar y reanudar el timer
+- 🔄 **Reset**: Reiniciar el timer desde cero
+- ✅ **Completar parcial**: Terminar antes con el tiempo actual registrado
+- ✅ **Completar target**: Marcar como completado con la duración objetivo
+- 🔔 **Haptic feedback**: Vibración en los últimos 3 segundos
+- 🔊 **Audio de completado**: Sonido al finalizar el timer
+
+**Estados del Timer:**
+
+| Estado     | Descripción                    |
+| ---------- | ------------------------------ |
+| `idle`     | Timer listo para iniciar       |
+| `running`  | Timer corriendo                |
+| `paused`   | Timer pausado                  |
+| `complete` | Timer completado (auto-cierre) |
+
+**Acciones disponibles:**
+
+| Acción           | Descripción                    | Resultado                         |
+| ---------------- | ------------------------------ | --------------------------------- |
+| Start            | Inicia el timer                | Comienza cuenta regresiva         |
+| Pause            | Pausa el timer                 | Preserva tiempo transcurrido      |
+| Resume           | Reanuda timer pausado          | Continúa desde donde quedó        |
+| Reset            | Reinicia el timer              | Vuelve a duración objetivo        |
+| Complete Partial | Completa con tiempo actual     | Registra tiempo real transcurrido |
+| Complete Target  | Completa con duración objetivo | Registra duración planificada     |
+
+#### Circuit Timer Mode (CircuitTimerModeV2)
+
+Modo especial de ejecución para bloques de tipo `circuit`. Proporciona una experiencia guiada con timer automático que alterna entre ejercicios y descansos.
+
+**Características:**
+
+- 📋 **Vista previa del circuito**: Muestra todos los ejercicios, rondas y tiempos estimados antes de iniciar
+- ⏱️ **Countdown inicial**: 5 segundos de preparación antes de comenzar
+- 🔄 **Transiciones automáticas**: Pasa automáticamente entre ejercicio → descanso → siguiente ejercicio
+- 🎨 **Colores por estado**: Diferentes colores para ejercicio (azul), descanso (verde), descanso entre rondas (ámbar)
+- 📊 **Progreso visual**: Círculo animado con progreso y tiempo restante
+- ⏭️ **Skip**: Saltar ejercicio o descanso actual
+- ⏸️ **Pause/Resume**: Pausar y reanudar en cualquier momento
+- 🏆 **Celebración de completado**: Animación al finalizar el circuito
+
+**Estados del Circuit Timer:**
+
+| Estado      | Color  | Descripción                          |
+| ----------- | ------ | ------------------------------------ |
+| `idle`      | -      | Vista previa, listo para iniciar     |
+| `countdown` | Indigo | Cuenta regresiva de preparación (5s) |
+| `exercise`  | Azul   | Ejecutando ejercicio actual          |
+| `rest`      | Verde  | Descanso entre ejercicios            |
+| `roundRest` | Ámbar  | Descanso entre rondas                |
+| `paused`    | -      | Timer pausado                        |
+| `complete`  | Verde  | Circuito completado                  |
+
+**Flujo de ejecución:**
+
+```
+Countdown (5s) → Ejercicio 1 → Rest → Ejercicio 2 → Rest → ... → Round Rest → Ejercicio 1 (Round 2) → ... → Complete
+```
+
+**Auto-complete de sets:**
+
+- Cuando el timer de un ejercicio termina, el set se marca automáticamente como completado
+- Se registra la duración objetivo como `actual_primary_value`
+
 #### Estados del Set en Workout
 
-| Campo                      | Tipo      | Descripción                        |
-| -------------------------- | --------- | ---------------------------------- |
-| `planned_primary_value`    | `number`  | Valor planeado (ej: peso)          |
-| `planned_secondary_value`  | `number`  | Valor planeado (ej: reps)          |
-| `actual_primary_value`     | `number`  | Valor ejecutado                    |
-| `actual_secondary_value`   | `number`  | Valor ejecutado                    |
-| `completed`                | `boolean` | Si el set fue completado           |
-| `was_added_during_workout` | `boolean` | Si fue agregado durante el workout |
+| Campo                         | Tipo      | Descripción                                  |
+| ----------------------------- | --------- | -------------------------------------------- |
+| `planned_primary_value`       | `number`  | Valor planeado (ej: peso)                    |
+| `planned_secondary_value`     | `number`  | Valor planeado (ej: reps)                    |
+| `actual_primary_value`        | `number`  | Valor ejecutado                              |
+| `actual_secondary_value`      | `number`  | Valor ejecutado                              |
+| `completed`                   | `boolean` | Si el set fue completado                     |
+| `was_added_during_workout`    | `boolean` | Si fue agregado durante el workout           |
+| `was_modified_during_workout` | `boolean` | Si fue modificado (template, set type, etc.) |
 
 ---
 
@@ -628,6 +737,9 @@ El sync engine implementa:
 - `ROUTINE_UPDATE` - Actualizar rutina
 - `ROUTINE_DELETE` - Eliminar rutina (soft delete)
 - `ROUTINE_CLEAR_TRAINING_DAYS` - Limpiar días de entrenamiento
+- `ROUTINE_CREATE_QUICK_WORKOUT` - Crear rutina temporal para Quick Workout
+- `ROUTINE_CONVERT_FROM_QUICK` - Convertir Quick Workout a rutina normal
+- `ROUTINE_UPDATE_FOLDER` - Mover rutina a otra carpeta
 
 #### Carpetas
 
@@ -638,7 +750,10 @@ El sync engine implementa:
 
 #### Workouts
 
+- `WORKOUT_START` - Iniciar sesión de workout
 - `WORKOUT_COMPLETE` - Guardar sesión completada
+- `WORKOUT_UPDATE` - Actualizar sesión existente
+- `FINISH_WORKOUT` - Finalizar workout (RPC completo)
 
 #### PRs
 
@@ -649,6 +764,41 @@ El sync engine implementa:
 
 - `USER_PREFERENCES_CREATE` - Crear preferencias
 - `USER_PREFERENCES_UPDATE` - Actualizar preferencias
+
+#### Tracker - Entries
+
+- `TRACKER_ENTRY_CREATE` - Crear entrada de métrica
+- `TRACKER_ENTRY_UPDATE` - Actualizar entrada
+- `TRACKER_ENTRY_DELETE` - Eliminar entrada
+- `TRACKER_ENTRY_FROM_QUICK_ACTION` - Crear desde acción rápida
+- `TRACKER_ENTRY_WITH_AGGREGATE` - Crear con agregado atómico
+- `TRACKER_REPLACE_ENTRY_WITH_AGGREGATE` - Reemplazar con agregado
+- `TRACKER_DELETE_ENTRY_WITH_AGGREGATE` - Eliminar con agregado
+
+#### Tracker - Metrics
+
+- `TRACKER_METRIC_CREATE` - Crear métrica personalizada
+- `TRACKER_METRIC_UPDATE` - Actualizar métrica
+- `TRACKER_METRIC_DELETE` - Eliminar métrica (soft delete)
+- `TRACKER_METRIC_RESTORE` - Restaurar métrica eliminada
+- `TRACKER_METRIC_REORDER` - Reordenar métricas
+- `TRACKER_METRIC_FROM_TEMPLATE` - Crear desde template
+
+#### Tracker - Quick Actions
+
+- `TRACKER_QUICK_ACTION_CREATE` - Crear acción rápida
+- `TRACKER_QUICK_ACTION_DELETE` - Eliminar acción rápida
+
+#### Macros
+
+- `MACRO_TARGET_UPSERT` - Crear/actualizar objetivo de macros
+- `MACRO_TARGET_UPDATE` - Actualizar objetivo
+- `MACRO_ENTRY_CREATE` - Crear entrada de macro
+- `MACRO_ENTRY_UPDATE` - Actualizar entrada
+- `MACRO_ENTRY_DELETE` - Eliminar entrada
+- `MACRO_QUICK_ACTIONS_INIT` - Inicializar acciones rápidas de macros
+- `MACRO_QUICK_ACTION_CREATE` - Crear acción rápida de macro
+- `MACRO_QUICK_ACTION_DELETE` - Eliminar acción rápida de macro
 
 ### Estados del Sync
 

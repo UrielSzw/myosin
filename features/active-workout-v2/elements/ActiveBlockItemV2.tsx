@@ -2,9 +2,12 @@ import {
   useActiveMainActions,
   useActiveWorkout,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import { useReorderBlocksActive } from "@/features/active-workout-v2/shared";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useHaptic } from "@/shared/services/haptic-service";
 import { BlurView } from "expo-blur";
+import { router } from "expo-router";
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import Animated, { FadeInDown } from "react-native-reanimated";
@@ -33,11 +36,18 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
   onOpenRPESelector,
   onOpenTempoMetronome,
 }) => {
-  const { blocks, exercisesByBlock, exercises, setsByExercise } =
-    useActiveWorkout();
+  const {
+    blocks,
+    exercisesByBlock,
+    exercises,
+    setsByExercise,
+    blocksBySession,
+  } = useActiveWorkout();
   const { getBlockColors } = useBlockStyles();
   const { setCurrentState } = useActiveMainActions();
   const { isDarkMode } = useColorScheme();
+  const { initializeReorder } = useReorderBlocksActive();
+  const haptic = useHaptic();
 
   const block = blocks[blockId];
   const blockColors = getBlockColors(block.type);
@@ -54,6 +64,16 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
 
     return setCounts.every((count) => count === setCounts[0]);
   }, [block, exercisesInBlockIds, setsByExercise]);
+
+  // Only enable longPress reorder if there's more than 1 block
+  const canReorderBlocks = blocksBySession.length > 1;
+
+  const handleLongPress = () => {
+    if (!canReorderBlocks) return;
+    haptic.drag();
+    initializeReorder();
+    router.push("/workout/reorder-blocks");
+  };
 
   const handleBlockPress = () => {
     if (block.type === "individual") {
@@ -84,6 +104,8 @@ export const ActiveBlockItemV2: React.FC<Props> = ({
     >
       <Pressable
         onPress={handleBlockPress}
+        onLongPress={canReorderBlocks ? handleLongPress : undefined}
+        delayLongPress={500}
         style={({ pressed }) => [{ opacity: pressed ? 0.98 : 1 }]}
       >
         <View style={styles.cardWrapper}>

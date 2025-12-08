@@ -1,4 +1,3 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { BlockInsert } from "@/shared/db/schema";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
@@ -7,6 +6,8 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { reorderTranslations } from "@/shared/translations/reorder";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
+import { ReorderExerciseData } from "@/shared/types/reorder";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Check, GripVertical, Layers, X } from "lucide-react-native";
@@ -30,18 +31,29 @@ type Props = {
   blocks: (BlockInsert & { tempId: string })[];
   onReorder: (reorderedBlocks: (BlockInsert & { tempId: string })[]) => void;
   onCancel: () => void;
+  /** Optional: exercise data for displaying names. If not provided, uses reorder store */
+  exercisesByBlock?: Record<string, string[]>;
+  /** Optional: exercises lookup. If not provided, uses reorder store */
+  exercisesInBlock?: Record<string, ReorderExerciseData>;
 };
 
 export const ReorderBlocksV2Feature: React.FC<Props> = ({
   blocks,
   onReorder,
   onCancel,
+  exercisesByBlock: exercisesByBlockProp,
+  exercisesInBlock: exercisesInBlockProp,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const insets = useSafeAreaInsets();
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
   const t = reorderTranslations;
+
+  // Use props if provided, otherwise fallback to store
+  const storeState = useReorderBlocksState();
+  const exercisesByBlock = exercisesByBlockProp ?? storeState.exercisesByBlock;
+  const exercisesInBlock = exercisesInBlockProp ?? storeState.exercisesInBlock;
 
   const [reorderedBlocks, setReorderedBlocks] = useState(blocks);
 
@@ -82,6 +94,8 @@ export const ReorderBlocksV2Feature: React.FC<Props> = ({
           drag={drag}
           isActive={isActive}
           index={getIndex() ?? 0}
+          exercisesByBlock={exercisesByBlock}
+          exercisesInBlock={exercisesInBlock}
         />
       </ScaleDecorator>
     );
@@ -198,6 +212,8 @@ type BlockItemProps = {
   drag: () => void;
   isActive: boolean;
   index: number;
+  exercisesByBlock: Record<string, string[]>;
+  exercisesInBlock: Record<string, ReorderExerciseData>;
 };
 
 const ReorderBlockItemV2: React.FC<BlockItemProps> = ({
@@ -205,14 +221,14 @@ const ReorderBlockItemV2: React.FC<BlockItemProps> = ({
   drag,
   isActive,
   index,
+  exercisesByBlock,
+  exercisesInBlock,
 }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const lang = toSupportedLanguage(prefs?.language);
   const t = sharedUiTranslations;
   const { getBlockTypeLabel, getBlockColors } = useBlockStyles();
-  const { exercisesByBlock = {}, exercisesInBlock = {} } =
-    useReorderBlocksState();
   const haptic = useHaptic();
 
   const blockColors = getBlockColors(blockData.type);

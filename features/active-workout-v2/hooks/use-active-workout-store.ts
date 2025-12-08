@@ -244,6 +244,15 @@ type Store = {
     skipRestTimer: () => void;
     adjustRestTimer: (newSeconds: number) => void;
   };
+
+  sharedActions: {
+    setNewOrderBlocks: (newOrder: Record<string, ActiveWorkoutBlock>) => void;
+    setNewOrderBlocksIds: (newOrderIds: string[]) => void;
+    setNewOrderExercises: (
+      newOrder: Record<string, ActiveWorkoutExercise>
+    ) => void;
+    setNewOrderExercisesIds: (blockId: string, newOrderIds: string[]) => void;
+  };
 };
 
 const useActiveWorkoutStore = create<Store>()(
@@ -1926,6 +1935,51 @@ const useActiveWorkoutStore = create<Store>()(
         });
       },
     },
+
+    sharedActions: {
+      setNewOrderBlocks: (newOrder) => {
+        set((state) => {
+          if (!state.activeWorkout) return;
+
+          // Mark all reordered blocks as modified
+          Object.values(newOrder).forEach((block) => {
+            block.was_modified_during_workout = true;
+          });
+
+          state.activeWorkout.blocks = newOrder;
+        });
+      },
+      setNewOrderBlocksIds: (newOrderIds) => {
+        set((state) => {
+          if (!state.activeWorkout) return;
+
+          state.activeWorkout.blocksBySession = newOrderIds;
+        });
+      },
+      setNewOrderExercises: (newOrder) => {
+        set((state) => {
+          if (!state.activeWorkout) return;
+
+          state.activeWorkout.exercises = newOrder;
+        });
+      },
+      setNewOrderExercisesIds: (blockId, newOrderIds) => {
+        set((state) => {
+          if (!state.activeWorkout) return;
+
+          // Mark the block as modified when exercises are reordered
+          if (state.activeWorkout.blocks[blockId]) {
+            state.activeWorkout.blocks[blockId].was_modified_during_workout =
+              true;
+          }
+
+          state.activeWorkout.exercisesByBlock = {
+            ...state.activeWorkout.exercisesByBlock,
+            [blockId]: newOrderIds,
+          };
+        });
+      },
+    },
   }))
 );
 
@@ -1955,3 +2009,6 @@ export const useActiveRestTimerActions = () =>
 
 export const useActiveWorkoutStats = () =>
   useActiveWorkoutStore((state) => state.stats);
+
+export const useActiveSharedActions = () =>
+  useActiveWorkoutStore((state) => state.sharedActions);

@@ -6,6 +6,10 @@ import {
   useActiveWorkout,
   useActiveWorkoutState,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
+import {
+  useReorderBlocksActive,
+  useReorderExercisesActive,
+} from "@/features/active-workout-v2/shared";
 import { ISetType, RPEValue } from "@/shared/types/workout";
 import {
   BlockOptionsSheetV2,
@@ -14,6 +18,7 @@ import {
   RPESelectorV2,
   SetTypeSheetV2,
 } from "@/shared/ui/sheets-v2";
+import { router } from "expo-router";
 import React, { useCallback, useMemo } from "react";
 import { CircuitTimerModeV2 } from "../elements/CircuitTimerModeV2";
 import { TempoMetronomeV2 } from "../elements/TempoMetronomeV2";
@@ -43,13 +48,25 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     currentRpeValue,
     currentBlockId,
   } = useActiveWorkoutState();
-  const { blocks, exercises, sets, exercisesByBlock, setsByExercise } =
-    useActiveWorkout();
+  const {
+    blocks,
+    exercises,
+    sets,
+    exercisesByBlock,
+    setsByExercise,
+    blocksBySession,
+  } = useActiveWorkout();
   const { setExerciseModalMode, clearCurrentState } = useActiveMainActions();
   const { deleteSet, updateSetType, updateRpe } = useActiveSetActions();
   const { updateRestTime, deleteBlock, convertBlockToIndividual } =
     useActiveBlockActions();
   const { deleteExercise } = useActiveExerciseActions();
+
+  // Reorder hooks
+  const { initializeReorder: initializeBlocksReorder } =
+    useReorderBlocksActive();
+  const { initializeReorder: initializeExercisesReorder } =
+    useReorderExercisesActive();
 
   // Set Type handlers
   const handleUpdateSetType = useCallback(
@@ -172,6 +189,30 @@ export const ActiveSheetsV2: React.FC<Props> = ({
     }, 100);
   }, [closeSheet, openCircuitTimerModeSheet]);
 
+  // Reorder handlers
+  const handleReorderBlocks = useCallback(() => {
+    closeSheet();
+    initializeBlocksReorder();
+    router.push("/workout/reorder-blocks");
+  }, [closeSheet, initializeBlocksReorder]);
+
+  const handleReorderExercises = useCallback(() => {
+    if (!currentBlockId) return;
+    closeSheet();
+    initializeExercisesReorder(currentBlockId);
+    router.push("/workout/reorder-exercises");
+  }, [closeSheet, currentBlockId, initializeExercisesReorder]);
+
+  // Check if we have more than 1 block to enable reorder blocks
+  const canReorderBlocks = blocksBySession.length > 1;
+
+  // Check if current block has more than 1 exercise to enable reorder exercises
+  const canReorderExercises = useMemo(() => {
+    if (!currentBlockId) return false;
+    const exerciseIds = exercisesByBlock[currentBlockId] || [];
+    return exerciseIds.length > 1;
+  }, [currentBlockId, exercisesByBlock]);
+
   return (
     <>
       {/* Set Type Sheet */}
@@ -204,6 +245,10 @@ export const ActiveSheetsV2: React.FC<Props> = ({
         hasBalancedSets={hasBalancedSets}
         onReplace={handleShowReplaceModal}
         onStartTimerMode={handleStartTimerMode}
+        onReorderBlocks={canReorderBlocks ? handleReorderBlocks : undefined}
+        onReorderExercises={
+          canReorderExercises ? handleReorderExercises : undefined
+        }
       />
 
       {/* Exercise Options Sheet */}

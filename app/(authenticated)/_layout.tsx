@@ -96,6 +96,22 @@ export default function AuthenticatedLayout() {
           }}
         />
         <Stack.Screen
+          name="workout/reorder-blocks"
+          options={{
+            presentation: "fullScreenModal",
+            title: t.reorderBlocks[lang],
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="workout/reorder-exercises"
+          options={{
+            presentation: "fullScreenModal",
+            title: t.reorderBlockExercises[lang],
+            gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
           name="workout/summary"
           options={{
             presentation: "transparentModal",

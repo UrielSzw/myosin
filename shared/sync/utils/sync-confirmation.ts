@@ -5,7 +5,7 @@
  * Después de un sync exitoso, marca is_synced=true en la entidad correspondiente.
  */
 
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { db } from "../../db/client";
 import {
   macro_daily_aggregates,
@@ -540,28 +540,28 @@ export const getUnsyncedCounts = async (
 
   // Folders
   const foldersResult = await db
-    .select({ count: db.$count(folders.id) })
+    .select({ count: count() })
     .from(folders)
     .where(eq(folders.is_synced, false));
   counts.folders = foldersResult[0]?.count ?? 0;
 
   // Routines
   const routinesResult = await db
-    .select({ count: db.$count(routines.id) })
+    .select({ count: count() })
     .from(routines)
     .where(eq(routines.is_synced, false));
   counts.routines = routinesResult[0]?.count ?? 0;
 
   // Tracker metrics
   const metricsResult = await db
-    .select({ count: db.$count(tracker_metrics.id) })
+    .select({ count: count() })
     .from(tracker_metrics)
     .where(eq(tracker_metrics.is_synced, false));
   counts.tracker_metrics = metricsResult[0]?.count ?? 0;
 
   // Tracker entries
   const entriesResult = await db
-    .select({ count: db.$count(tracker_entries.id) })
+    .select({ count: count() })
     .from(tracker_entries)
     .where(eq(tracker_entries.is_synced, false));
   counts.tracker_entries = entriesResult[0]?.count ?? 0;

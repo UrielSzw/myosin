@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, lte } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, lte } from "drizzle-orm";
 import { db } from "../../db/client";
 import { syncEngineState, syncQueue } from "../../db/schema/sync-queue";
 import type {
@@ -193,11 +193,11 @@ export class SyncQueueRepository {
    */
   async getQueueSize(): Promise<number> {
     const [result] = await db
-      .select({ count: db.$count(syncQueue.id) })
+      .select({ count: count() })
       .from(syncQueue)
       .where(eq(syncQueue.status, "pending"));
 
-    return result.count;
+    return result?.count ?? 0;
   }
 
   /**
@@ -206,11 +206,11 @@ export class SyncQueueRepository {
    */
   async getActiveQueueSize(): Promise<number> {
     const [result] = await db
-      .select({ count: db.$count(syncQueue.id) })
+      .select({ count: count() })
       .from(syncQueue)
       .where(inArray(syncQueue.status, ["pending", "processing"]));
 
-    return result.count;
+    return result?.count ?? 0;
   }
 
   /**
@@ -225,7 +225,7 @@ export class SyncQueueRepository {
     const results = await db
       .select({
         status: syncQueue.status,
-        count: db.$count(syncQueue.id),
+        count: count(),
       })
       .from(syncQueue)
       .groupBy(syncQueue.status);

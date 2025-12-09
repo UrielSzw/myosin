@@ -4,7 +4,7 @@ import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prListTranslations as t } from "@/shared/translations/pr-list";
 import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
-import { fromKg } from "@/shared/utils/weight-conversion";
+import { formatPRDisplay } from "@/shared/utils/pr-formatters";
 import { BlurView } from "expo-blur";
 import { ChevronRight, Sparkles, Trophy } from "lucide-react-native";
 import React from "react";
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const getMedalInfo = (
-  estimated1rm: number,
+  prScore: number,
   allPRs?: PRListItem[]
 ): { Icon: React.FC<any>; color: string; rank?: number } => {
   // Default trophy icon
@@ -30,13 +30,21 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const achievedDate = new Date(pr.achieved_at);
   const isRecent = pr.is_recent;
 
-  // Format weights in user's preferred unit
-  const bestWeightFormatted = fromKg(pr.best_weight, weightUnit, 1);
-  const estimated1RMFormatted = fromKg(pr.estimated_1rm, weightUnit, 1);
+  // Format PR display based on measurement template
+  const { mainDisplay, scoreDisplay, scoreName } = formatPRDisplay(
+    pr.measurement_template,
+    pr.best_primary_value,
+    pr.best_secondary_value,
+    pr.pr_score,
+    weightUnit,
+    distanceUnit,
+    lang
+  );
 
   const formatDate = (date: Date) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -46,7 +54,7 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
     return date.toLocaleDateString(getLocale(lang), options);
   };
 
-  const { Icon, color } = getMedalInfo(pr.estimated_1rm);
+  const { Icon, color } = getMedalInfo(pr.pr_score);
 
   return (
     <Animated.View entering={FadeInDown.duration(300).delay(200 + index * 40)}>
@@ -126,21 +134,14 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
               )}
             </View>
 
-            {/* Weight x Reps */}
+            {/* Main PR Value Display */}
             <View style={styles.weightRow}>
               <Typography
                 variant="h5"
                 weight="bold"
                 style={{ color: colors.text }}
               >
-                {bestWeightFormatted}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="textMuted"
-                style={{ marginLeft: 4 }}
-              >
-                {weightUnit} × {pr.best_reps}
+                {mainDisplay}
               </Typography>
             </View>
 
@@ -170,7 +171,7 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
             </View>
           </View>
 
-          {/* Right: 1RM + Chevron */}
+          {/* Right: Score + Chevron */}
           <View style={styles.rightSection}>
             <View
               style={[
@@ -182,14 +183,14 @@ export const PRCardV2: React.FC<Props> = ({ pr, index, onPress, lang }) => {
                 variant="caption"
                 style={{ color: colors.primary[500], fontSize: 10 }}
               >
-                1RM
+                {scoreName}
               </Typography>
               <Typography
                 variant="h6"
                 weight="bold"
                 style={{ color: colors.primary[500] }}
               >
-                {estimated1RMFormatted}
+                {scoreDisplay}
               </Typography>
             </View>
             <ChevronRight

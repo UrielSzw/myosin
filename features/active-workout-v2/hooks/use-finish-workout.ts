@@ -11,7 +11,6 @@ import { useHaptic } from "@/shared/services/haptic-service";
 import TimerService from "@/shared/services/timer-service";
 import { activeWorkoutTranslations } from "@/shared/translations/active-workout";
 import { toSupportedLanguage } from "@/shared/types/language";
-import { fromKg } from "@/shared/utils/weight-conversion";
 import { useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -87,11 +86,10 @@ export const useFinishWorkout = () => {
           );
           return {
             exerciseName: exercise?.exercise?.name ?? "Exercise",
-            weight:
-              weightUnit === "kg"
-                ? pr.weight
-                : fromKg(pr.weight, weightUnit, 1),
-            reps: pr.reps,
+            measurementTemplate: pr.measurement_template,
+            primaryValue: pr.primary_value,
+            secondaryValue: pr.secondary_value,
+            prScore: pr.pr_score,
           };
         }
       );

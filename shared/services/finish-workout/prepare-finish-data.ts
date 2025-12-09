@@ -76,9 +76,10 @@ type ActiveWorkoutState = {
     {
       tempSetId: string;
       exercise_id: string;
-      weight: number;
-      reps: number;
-      estimated_1rm: number;
+      measurement_template: import("@/shared/types/measurement").MeasurementTemplateId;
+      primary_value: number;
+      secondary_value: number | null;
+      pr_score: number;
       created_at: string;
     }
   >;
@@ -428,9 +429,10 @@ function preparePRsData(
     id: generateUUID(),
     user_id: userId,
     exercise_id: pr.exercise_id,
-    best_weight: pr.weight,
-    best_reps: pr.reps,
-    estimated_1rm: pr.estimated_1rm,
+    measurement_template: pr.measurement_template,
+    best_primary_value: pr.primary_value,
+    best_secondary_value: pr.secondary_value,
+    pr_score: pr.pr_score,
     achieved_at: pr.created_at,
     source: "auto" as const,
   }));
@@ -439,9 +441,10 @@ function preparePRsData(
     id: generateUUID(),
     user_id: userId,
     exercise_id: pr.exercise_id,
-    weight: pr.weight,
-    reps: pr.reps,
-    estimated_1rm: pr.estimated_1rm,
+    measurement_template: pr.measurement_template,
+    primary_value: pr.primary_value,
+    secondary_value: pr.secondary_value,
+    pr_score: pr.pr_score,
     workout_session_id: sessionId,
     workout_set_id: "", // We don't have the workout set ID mapping here
     source: "auto" as const,

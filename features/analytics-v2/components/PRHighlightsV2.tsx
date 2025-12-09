@@ -2,8 +2,11 @@ import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 
 import { AnalyticsPRData } from "@/features/analytics-v2/types/dashboard";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { analyticsTranslations as t } from "@/shared/translations/analytics";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
+import { formatPRDisplay } from "@/shared/utils/pr-formatters";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 import { Award, ChevronRight, Medal, Trophy } from "lucide-react-native";
@@ -31,6 +34,9 @@ const getMedalIcon = (index: number) => {
 
 export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
   const { colors, isDarkMode } = useColorScheme();
+  const prefs = useUserPreferences();
+  const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const displayPRs = prs.slice(0, 3);
 
@@ -149,21 +155,7 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
                   </Typography>
                 </View>
 
-                {/* PR value */}
-                <View style={styles.prValue}>
-                  <Typography
-                    variant="h5"
-                    weight="bold"
-                    style={{ color: colors.text }}
-                  >
-                    {pr.best_weight}
-                  </Typography>
-                  <Typography variant="caption" color="textMuted">
-                    kg × {pr.best_reps}
-                  </Typography>
-                </View>
-
-                {/* 1RM estimate */}
+                {/* Score estimate */}
                 <View
                   style={[
                     styles.estimateBadge,
@@ -175,13 +167,17 @@ export const PRHighlightsV2: React.FC<Props> = ({ prs, lang }) => {
                     weight="bold"
                     style={{ color: colors.primary[500] }}
                   >
-                    ~{Math.round(pr.estimated_1rm)}
-                  </Typography>
-                  <Typography
-                    variant="caption"
-                    style={{ color: colors.primary[500], fontSize: 9 }}
-                  >
-                    1RM
+                    {
+                      formatPRDisplay(
+                        pr.measurement_template as MeasurementTemplateId,
+                        pr.best_primary_value,
+                        pr.best_secondary_value,
+                        pr.pr_score,
+                        weightUnit,
+                        distanceUnit,
+                        lang
+                      ).scoreDisplay
+                    }
                   </Typography>
                 </View>
               </Pressable>

@@ -1,41 +1,48 @@
 import { useActiveWorkout } from "@/features/active-workout-v2/hooks/use-active-workout-store";
-import { computeEpley1RM } from "@/shared/db/utils/pr";
-import { supportsPRCalculation } from "@/shared/types/measurement";
+import { computePRScore, isPRBetter } from "@/shared/db/utils/pr";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { useMemo } from "react";
 
 export interface PRValidationResult {
   isPersonalBest: boolean; // Mejor que el PR histórico del ejercicio
   isSessionBest: boolean; // Mejor que otros PRs en esta sesión
   isPR: boolean; // Es PR (personal best O session best cuando no hay histórico)
-  estimatedOneRM: number; // 1RM calculado
+  prScore: number; // PR score (template-specific)
   improvementOver: "historical" | "session" | "none"; // Sobre qué mejora
 }
 
 export interface SessionPRData {
   tempSetId: string;
   exercise_id: string;
-  weight: number;
-  reps: number;
-  estimated_1rm: number;
+  primary_value: number;
+  secondary_value: number | null;
+  pr_score: number;
   created_at: string;
 }
 
 /**
  * Hook centralizado para toda la lógica de Personal Records
  * Maneja validación, comparación y gestión de PRs de sesión
- * Calcula PRs para templates weight_reps y weight_reps_range
+ * Soporta TODOS los measurement templates
  */
-export const usePRLogic = (exerciseId: string, tempSetId: string) => {
+export const usePRLogic = (
+  exerciseId: string,
+  tempSetId: string,
+  measurementTemplate?: MeasurementTemplateId
+) => {
   const { exercises, sessionBestPRs, sets } = useActiveWorkout();
 
-  // Obtener datos del ejercicio actual y set actual
+  // Obtener datos del ejercicio actual
   const exercise = useMemo(() => {
     return Object.values(exercises).find((ex) => ex.exercise_id === exerciseId);
   }, [exercises, exerciseId]);
 
-  const currentSet = useMemo(() => {
-    return Object.values(sets).find((s) => s.tempId === tempSetId);
-  }, [sets, tempSetId]);
+  // Get template from param or from set in store
+  const template = useMemo(() => {
+    if (measurementTemplate) return measurementTemplate;
+    const set = sets[tempSetId];
+    return set?.measurement_template;
+  }, [measurementTemplate, sets, tempSetId]);
 
   // PR histórico del ejercicio (cargado al inicializar workout)
   const historicalPR = exercise?.pr;
@@ -44,47 +51,33 @@ export const usePRLogic = (exerciseId: string, tempSetId: string) => {
   const sessionBestPR = sessionBestPRs?.[exerciseId] || null;
 
   /**
-   * Valida si un peso/reps constituye un PR
-   * Calcula PRs para weight_reps y weight_reps_range templates
+   * Valida si los valores constituyen un PR para CUALQUIER template
+   * @param primaryValue - Valor principal (peso, distancia, tiempo según template)
+   * @param secondaryValue - Valor secundario (reps, tiempo, distancia según template)
    */
   const validatePR = (
-    weight: number | null,
-    reps: number | null
+    primaryValue: number | null,
+    secondaryValue: number | null
   ): PRValidationResult => {
-    // Guard clause: Solo calcular PRs para templates que soporten peso+reps
-    if (
-      !currentSet?.measurement_template ||
-      !supportsPRCalculation(currentSet.measurement_template)
-    ) {
+    // Guard clause: necesitamos template y valor primario válido
+    if (!template || primaryValue == null || primaryValue <= 0) {
       return {
         isPersonalBest: false,
         isSessionBest: false,
         isPR: false,
-        estimatedOneRM: 0,
+        prScore: 0,
         improvementOver: "none",
       };
     }
 
-    // Validar inputs
-    if (!weight || !reps || weight <= 0 || reps <= 0) {
-      return {
-        isPersonalBest: false,
-        isSessionBest: false,
-        isPR: false,
-        estimatedOneRM: 0,
-        improvementOver: "none",
-      };
-    }
-
-    const estimatedOneRM = computeEpley1RM(weight, reps);
+    // Calcular PR score usando la fórmula específica del template
+    const prScore = computePRScore(template, primaryValue, secondaryValue);
 
     // Comparar con PR histórico
-    const isPersonalBest =
-      !historicalPR || estimatedOneRM > historicalPR.estimated_1rm;
+    const isPersonalBest = isPRBetter(prScore, historicalPR?.pr_score);
 
     // Comparar con mejor de la sesión
-    const isSessionBest =
-      !sessionBestPR || estimatedOneRM > sessionBestPR.estimated_1rm;
+    const isSessionBest = isPRBetter(prScore, sessionBestPR?.pr_score);
 
     // Es PR si es personal best O si no hay histórico y es session best
     const isPR = isPersonalBest || (!historicalPR && isSessionBest);
@@ -101,7 +94,7 @@ export const usePRLogic = (exerciseId: string, tempSetId: string) => {
       isPersonalBest,
       isSessionBest,
       isPR,
-      estimatedOneRM,
+      prScore,
       improvementOver,
     };
   };
@@ -129,7 +122,7 @@ export const usePRLogic = (exerciseId: string, tempSetId: string) => {
     if (sessionBestPR) {
       return {
         hasAnyPR: true,
-        best1RM: sessionBestPR.estimated_1rm,
+        best1RM: sessionBestPR.pr_score,
         source: "session" as const,
       };
     }
@@ -137,7 +130,7 @@ export const usePRLogic = (exerciseId: string, tempSetId: string) => {
     // Fallback a PR histórico
     return {
       hasAnyPR: true,
-      best1RM: historicalPR!.estimated_1rm,
+      best1RM: historicalPR!.pr_score,
       source: "historical" as const,
     };
   }, [historicalPR, sessionBestPR]);

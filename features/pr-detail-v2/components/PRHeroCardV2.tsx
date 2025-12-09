@@ -1,9 +1,10 @@
 import { CurrentPR } from "@/features/pr-detail-v2/hooks/use-pr-detail";
-import type { SupportedLanguage } from "@/shared/types/language";import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
-import { fromKg } from "@/shared/utils/weight-conversion";
+import { formatPRDisplay } from "@/shared/utils/pr-formatters";
 import { BlurView } from "expo-blur";
 import { Calendar, Sparkles, Trophy } from "lucide-react-native";
 import React from "react";
@@ -15,7 +16,10 @@ type Props = {
   lang: SupportedLanguage;
 };
 
-const formatRelativeDate = (dateString: string, lang: SupportedLanguage): string => {
+const formatRelativeDate = (
+  dateString: string,
+  lang: SupportedLanguage
+): string => {
   const date = new Date(dateString);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
@@ -49,9 +53,19 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
-  const bestWeightFormatted = fromKg(currentPR.best_weight, weightUnit, 1);
-  const estimated1RMFormatted = fromKg(currentPR.estimated_1rm, weightUnit, 1);
+  // Format PR display based on measurement template
+  const { primaryDisplay, secondaryDisplay, scoreDisplay, scoreName } =
+    formatPRDisplay(
+      currentPR.measurement_template,
+      currentPR.best_primary_value,
+      currentPR.best_secondary_value,
+      currentPR.pr_score,
+      weightUnit,
+      distanceUnit,
+      lang
+    );
 
   // Check if PR is recent (within 7 days)
   const isRecent =
@@ -131,7 +145,7 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
             )}
           </Animated.View>
 
-          {/* Main Weight x Reps */}
+          {/* Main PR Value Display */}
           <Animated.View entering={FadeInDown.duration(400).delay(300)}>
             <View style={styles.mainValue}>
               <Typography
@@ -139,19 +153,21 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
                 weight="bold"
                 style={[styles.weightText, { color: colors.text }]}
               >
-                {bestWeightFormatted}
-              </Typography>
-              <Typography
-                variant="h4"
-                weight="medium"
-                style={{ color: colors.textMuted }}
-              >
-                {weightUnit} × {currentPR.best_reps}
+                {primaryDisplay}
               </Typography>
             </View>
+            {secondaryDisplay && (
+              <Typography
+                variant="h3"
+                weight="medium"
+                style={[styles.secondaryText, { color: colors.textMuted }]}
+              >
+                {secondaryDisplay}
+              </Typography>
+            )}
           </Animated.View>
 
-          {/* 1RM Badge */}
+          {/* Score Badge */}
           <Animated.View
             entering={FadeInDown.duration(400).delay(350)}
             style={[
@@ -164,14 +180,14 @@ export const PRHeroCardV2: React.FC<Props> = ({ currentPR, lang }) => {
               weight="medium"
               style={{ color: colors.primary[500] }}
             >
-              {t.estimated1RM[lang]}:
+              {scoreName}:
             </Typography>
             <Typography
               variant="body1"
               weight="bold"
               style={{ color: colors.primary[500], marginLeft: 6 }}
             >
-              {estimated1RMFormatted} {weightUnit}
+              {scoreDisplay}
             </Typography>
           </Animated.View>
 
@@ -272,11 +288,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "baseline",
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 4,
   },
   weightText: {
     fontSize: 56,
     lineHeight: 62,
+  },
+  secondaryText: {
+    fontSize: 24,
+    textAlign: "center",
+    marginBottom: 16,
   },
   rmBadge: {
     flexDirection: "row",

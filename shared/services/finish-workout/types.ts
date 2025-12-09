@@ -9,6 +9,7 @@ import type {
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 
 // ============================================
 // ROUTINE UPDATE TYPES
@@ -33,16 +34,17 @@ export type WorkoutSessionData = {
 };
 
 // ============================================
-// PR TYPES
+// PR TYPES (Generic for all measurement templates)
 // ============================================
 
 export type PRCurrentData = {
   id: string;
   user_id: string;
   exercise_id: string;
-  best_weight: number;
-  best_reps: number;
-  estimated_1rm: number;
+  measurement_template: MeasurementTemplateId;
+  best_primary_value: number;
+  best_secondary_value: number | null;
+  pr_score: number;
   achieved_at: string;
   source: "auto" | "manual";
 };
@@ -51,9 +53,10 @@ export type PRHistoryData = {
   id: string;
   user_id: string;
   exercise_id: string;
-  weight: number;
-  reps: number;
-  estimated_1rm: number;
+  measurement_template: MeasurementTemplateId;
+  primary_value: number;
+  secondary_value: number | null;
+  pr_score: number;
   workout_session_id: string;
   workout_set_id: string;
   source: "auto" | "manual" | "import";

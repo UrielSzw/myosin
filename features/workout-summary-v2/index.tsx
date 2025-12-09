@@ -1,7 +1,8 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
+import { toSupportedLanguage } from "@/shared/types/language";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
@@ -47,7 +48,13 @@ export const WorkoutSummaryV2: React.FC = () => {
   const totalVolume = parseInt(params.totalVolume ?? "0", 10);
 
   // Parse PRs and improvements
-  let prs: { exerciseName: string; weight: number; reps: number }[] = [];
+  let prs: {
+    exerciseName: string;
+    measurementTemplate: MeasurementTemplateId;
+    primaryValue: number;
+    secondaryValue: number | null;
+    prScore: number;
+  }[] = [];
   let improvementsCount = 0;
 
   try {

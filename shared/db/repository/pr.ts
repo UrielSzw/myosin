@@ -2,6 +2,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import { db } from "../client";
 import type {
   BasePRCurrent,
+  BasePRHistory,
   PRCurrentInsert,
   PRHistoryInsert,
 } from "../schema/pr";
@@ -68,9 +69,10 @@ export const prRepository = {
       const [updated] = await db
         .update(pr_current)
         .set({
-          best_weight: data.best_weight,
-          best_reps: data.best_reps,
-          estimated_1rm: data.estimated_1rm,
+          measurement_template: data.measurement_template,
+          best_primary_value: data.best_primary_value,
+          best_secondary_value: data.best_secondary_value,
+          pr_score: data.pr_score,
           achieved_at: data.achieved_at,
           source: data.source,
           updated_at: new Date()?.toISOString(),
@@ -90,16 +92,20 @@ export const prRepository = {
     return inserted as BasePRCurrent;
   },
 
-  insertPRHistory: async (data: PRHistoryInsert) => {
+  insertPRHistory: async (data: PRHistoryInsert): Promise<BasePRHistory> => {
     const id = generateUUID();
     const [inserted] = await db
       .insert(pr_history)
       .values({ id, ...data })
       .returning();
-    return inserted;
+    return inserted as BasePRHistory;
   },
 
-  getPRHistory: async (userId: string, exerciseId: string, limit = 100) => {
+  getPRHistory: async (
+    userId: string,
+    exerciseId: string,
+    limit = 100
+  ): Promise<BasePRHistory[]> => {
     const rows = await db
       .select()
       .from(pr_history)
@@ -112,7 +118,7 @@ export const prRepository = {
       .orderBy(desc(pr_history.created_at))
       .limit(limit);
 
-    return rows;
+    return rows as BasePRHistory[];
   },
 
   getTopPRs: async (userId: string, limit = 10) => {
@@ -122,9 +128,10 @@ export const prRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -136,7 +143,7 @@ export const prRepository = {
       .from(pr_current)
       .innerJoin(exercises, eq(pr_current.exercise_id, exercises.id))
       .where(eq(pr_current.user_id, userId))
-      .orderBy(desc(pr_current.estimated_1rm))
+      .orderBy(desc(pr_current.pr_score))
       .limit(limit);
 
     return rows;
@@ -149,9 +156,10 @@ export const prRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -163,7 +171,7 @@ export const prRepository = {
       .from(pr_current)
       .innerJoin(exercises, eq(pr_current.exercise_id, exercises.id))
       .where(eq(pr_current.user_id, userId))
-      .orderBy(desc(pr_current.estimated_1rm));
+      .orderBy(desc(pr_current.achieved_at)); // Order by most recent
 
     return rows;
   },
@@ -175,9 +183,10 @@ export const prRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -189,7 +198,7 @@ export const prRepository = {
       .from(pr_current)
       .innerJoin(exercises, eq(pr_current.exercise_id, exercises.id))
       .where(eq(pr_current.user_id, userId))
-      .orderBy(desc(pr_current.estimated_1rm));
+      .orderBy(desc(pr_current.achieved_at));
 
     // Filter by name in JavaScript since SQLite LIKE case sensitivity can vary
     return rows.filter((row) =>
@@ -208,9 +217,10 @@ export const prRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -227,7 +237,7 @@ export const prRepository = {
           inArray(exercises.main_muscle_group, muscleGroups as any)
         )
       )
-      .orderBy(desc(pr_current.estimated_1rm));
+      .orderBy(desc(pr_current.achieved_at));
 
     return rows;
   },
@@ -243,9 +253,10 @@ export const prRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -277,7 +288,7 @@ export const prRepository = {
 
     return {
       currentPR,
-      history,
+      history: history as BasePRHistory[],
       exerciseInfo: currentPR
         ? {
             name: currentPR.exercise_name,

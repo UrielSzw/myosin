@@ -131,9 +131,10 @@ const localRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -144,7 +145,7 @@ const localRepository = {
       .from(pr_current)
       .innerJoin(exercises, eq(pr_current.exercise_id, exercises.id))
       .where(eq(pr_current.user_id, userId))
-      .orderBy(desc(pr_current.estimated_1rm))
+      .orderBy(desc(pr_current.pr_score))
       .limit(limit);
 
     return rows as PRWithExerciseInfo[];
@@ -158,9 +159,10 @@ const localRepository = {
         id: pr_current.id,
         user_id: pr_current.user_id,
         exercise_id: pr_current.exercise_id,
-        best_weight: pr_current.best_weight,
-        best_reps: pr_current.best_reps,
-        estimated_1rm: pr_current.estimated_1rm,
+        measurement_template: pr_current.measurement_template,
+        best_primary_value: pr_current.best_primary_value,
+        best_secondary_value: pr_current.best_secondary_value,
+        pr_score: pr_current.pr_score,
         achieved_at: pr_current.achieved_at,
         source: pr_current.source,
         created_at: pr_current.created_at,
@@ -171,7 +173,7 @@ const localRepository = {
       .from(pr_current)
       .innerJoin(exercises, eq(pr_current.exercise_id, exercises.id))
       .where(eq(pr_current.user_id, userId))
-      .orderBy(desc(pr_current.estimated_1rm));
+      .orderBy(desc(pr_current.pr_score));
 
     return rows as PRWithExerciseInfo[];
   },
@@ -191,9 +193,10 @@ const localRepository = {
       const [updated] = await db
         .update(pr_current)
         .set({
-          best_weight: data.best_weight,
-          best_reps: data.best_reps,
-          estimated_1rm: data.estimated_1rm,
+          measurement_template: data.measurement_template,
+          best_primary_value: data.best_primary_value,
+          best_secondary_value: data.best_secondary_value,
+          pr_score: data.pr_score,
           achieved_at: data.achieved_at,
           source: data.source,
           updated_at: new Date().toISOString(),

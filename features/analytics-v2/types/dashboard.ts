@@ -6,9 +6,10 @@ export type AnalyticsPRData = {
   exercise_id: string;
   exercise_name: string;
   exercise_muscle: string;
-  best_weight: number;
-  best_reps: number;
-  estimated_1rm: number;
+  measurement_template: string;
+  best_primary_value: number;
+  best_secondary_value: number | null;
+  pr_score: number;
   achieved_at: string;
   source: "auto" | "manual";
 };

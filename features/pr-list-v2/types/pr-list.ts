@@ -1,3 +1,4 @@
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { IExerciseMuscle } from "@/shared/types/workout";
 
 export type PRListItem = {
@@ -6,13 +7,18 @@ export type PRListItem = {
   exercise_id: string;
   exercise_name: string;
   exercise_muscle: IExerciseMuscle;
-  best_weight: number;
-  best_reps: number;
-  estimated_1rm: number;
+
+  // Template-aware fields (support all measurement templates)
+  measurement_template: MeasurementTemplateId;
+  best_primary_value: number;
+  best_secondary_value: number | null;
+  pr_score: number;
+
   achieved_at: string;
   source: "auto" | "manual";
   created_at: string;
-  updated_at: string;
+  updated_at: string | null;
+
   // Datos adicionales calculados
   is_recent?: boolean; // PRs de última semana
   exercise_muscle_category?: string; // chest, back, etc.

@@ -4,6 +4,7 @@ import {
   DEFAULT_LANGUAGE,
   type SupportedLanguage,
 } from "@/shared/types/language";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { IExerciseMuscle } from "@/shared/types/workout";
 import { useQuery } from "@tanstack/react-query";
 
@@ -12,9 +13,10 @@ export type CurrentPR = {
   id: string;
   user_id: string;
   exercise_id: string;
-  best_weight: number;
-  best_reps: number;
-  estimated_1rm: number;
+  measurement_template: MeasurementTemplateId;
+  best_primary_value: number;
+  best_secondary_value: number | null;
+  pr_score: number;
   achieved_at: string;
   source: "auto" | "manual";
   created_at: string | null;
@@ -27,9 +29,10 @@ export type PRHistoryItem = {
   id: string;
   user_id: string;
   exercise_id: string;
-  weight: number;
-  reps: number;
-  estimated_1rm: number;
+  measurement_template: MeasurementTemplateId;
+  primary_value: number;
+  secondary_value: number | null;
+  pr_score: number;
   workout_session_id: string | null;
   workout_set_id: string | null;
   source: "auto" | "manual" | "import";
@@ -94,7 +97,8 @@ export const usePRDetail = (
           repositoryData.history[repositoryData.history.length - 1]; // Más antiguo
         const currentPR = repositoryData.currentPR;
 
-        const weightProgress = currentPR.best_weight - firstPR.weight;
+        // Use pr_score for progress calculation (works for all templates)
+        const scoreProgress = currentPR.pr_score - firstPR.pr_score;
 
         // Calcular tiempo transcurrido
         const firstDate = new Date(firstPR.created_at || new Date());
@@ -111,11 +115,10 @@ export const usePRDetail = (
               }`
             : `${diffDays} ${t.days[lang]}`;
 
-        const averageIncrease =
-          diffMonths > 0 ? weightProgress / diffMonths : 0;
+        const averageIncrease = diffMonths > 0 ? scoreProgress / diffMonths : 0;
 
         progressStats = {
-          totalProgress: weightProgress,
+          totalProgress: scoreProgress,
           timeSpan,
           averageIncrease,
           bestStreak: repositoryData.history.length, // Simplificado por ahora

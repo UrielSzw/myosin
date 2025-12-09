@@ -27,9 +27,10 @@ export class SupabasePRRepository extends BaseSupabaseRepository {
         const { data: updated, error: updateError } = await this.supabase
           .from("pr_current")
           .update({
-            best_weight: data.best_weight,
-            best_reps: data.best_reps,
-            estimated_1rm: data.estimated_1rm,
+            measurement_template: data.measurement_template,
+            best_primary_value: data.best_primary_value,
+            best_secondary_value: data.best_secondary_value,
+            pr_score: data.pr_score,
             achieved_at: data.achieved_at,
             source: data.source,
             updated_at: new Date().toISOString(),

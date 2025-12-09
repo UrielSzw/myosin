@@ -1,3 +1,4 @@
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { InferSelectModel } from "drizzle-orm";
 import {
   index,
@@ -11,6 +12,17 @@ import { generateUUID } from "../utils/uuid";
 import { exercises } from "./routine";
 import { workout_sessions, workout_sets } from "./workout-session";
 
+/**
+ * PR Current - Stores the current best PR for each exercise
+ *
+ * Generic fields support ALL measurement templates:
+ * - weight_reps: primary=weight, secondary=reps, score=1RM
+ * - time_only: primary=duration, secondary=null, score=duration
+ * - weight_time: primary=weight, secondary=duration, score=weight*duration
+ * - distance_only: primary=distance, secondary=null, score=distance
+ * - distance_time: primary=distance, secondary=time, score=distance
+ * - weight_distance: primary=weight, secondary=distance, score=weight*distance
+ */
 export const pr_current = sqliteTable(
   "pr_current",
   {
@@ -22,9 +34,19 @@ export const pr_current = sqliteTable(
       .notNull()
       .references(() => exercises.id),
 
-    best_weight: real("best_weight").notNull(),
-    best_reps: integer("best_reps").notNull(),
-    estimated_1rm: real("estimated_1rm").notNull(),
+    // Template defines how to interpret the values
+    measurement_template: text("measurement_template")
+      .$type<MeasurementTemplateId>()
+      .notNull()
+      .default("weight_reps"),
+
+    // Generic values (interpretation depends on template)
+    best_primary_value: real("best_primary_value").notNull(),
+    best_secondary_value: real("best_secondary_value"), // Nullable for single-metric templates
+
+    // Calculated score for comparison/ranking
+    pr_score: real("pr_score").notNull(),
+
     achieved_at: text("achieved_at").notNull(),
 
     source: text("source").$type<"auto" | "manual">().default("auto").notNull(),
@@ -39,6 +61,9 @@ export const pr_current = sqliteTable(
   (t) => [index("idx_pr_current_user_exercise").on(t.user_id, t.exercise_id)]
 );
 
+/**
+ * PR History - Stores all PRs achieved over time for charting/analytics
+ */
 export const pr_history = sqliteTable(
   "pr_history",
   {
@@ -50,9 +75,18 @@ export const pr_history = sqliteTable(
       .notNull()
       .references(() => exercises.id),
 
-    weight: real("weight").notNull(),
-    reps: integer("reps").notNull(),
-    estimated_1rm: real("estimated_1rm").notNull(),
+    // Template defines how to interpret the values
+    measurement_template: text("measurement_template")
+      .$type<MeasurementTemplateId>()
+      .notNull()
+      .default("weight_reps"),
+
+    // Generic values
+    primary_value: real("primary_value").notNull(),
+    secondary_value: real("secondary_value"), // Nullable for single-metric templates
+
+    // Calculated score
+    pr_score: real("pr_score").notNull(),
 
     workout_session_id: text("workout_session_id").references(
       () => workout_sessions.id

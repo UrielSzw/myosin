@@ -1,7 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
-import type { SupportedLanguage } from "@/shared/types/language";import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { workoutSummaryTranslations as t } from "@/shared/translations/workout-summary";
+import type { SupportedLanguage } from "@/shared/types/language";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
+import { formatPRDisplay } from "@/shared/utils/pr-formatters";
+import type { WeightUnit } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { Medal, Sparkles, Trophy } from "lucide-react-native";
@@ -22,8 +26,10 @@ import Animated, {
 
 type PR = {
   exerciseName: string;
-  weight: number;
-  reps: number;
+  measurementTemplate: MeasurementTemplateId;
+  primaryValue: number;
+  secondaryValue: number | null;
+  prScore: number;
 };
 
 type Props = {
@@ -37,12 +43,24 @@ type Props = {
 const PRCardAnimated: React.FC<{
   pr: PR;
   index: number;
-  weightUnit: string;
+  weightUnit: WeightUnit;
+  distanceUnit: "metric" | "imperial";
   lang: SupportedLanguage;
   baseDelay: number;
-}> = ({ pr, index, weightUnit, lang, baseDelay }) => {
+}> = ({ pr, index, weightUnit, distanceUnit, lang, baseDelay }) => {
   const { colors, isDarkMode } = useColorScheme();
   const trophyRotate = useSharedValue(0);
+
+  // Format PR display using the utility
+  const { mainDisplay } = formatPRDisplay(
+    pr.measurementTemplate,
+    pr.primaryValue,
+    pr.secondaryValue,
+    pr.prScore,
+    weightUnit,
+    distanceUnit,
+    lang
+  );
   const shimmerPosition = useSharedValue(-1);
   const trophyScale = useSharedValue(0);
 
@@ -189,7 +207,7 @@ const PRCardAnimated: React.FC<{
             color="textMuted"
             style={{ marginTop: 2 }}
           >
-            {pr.weight} {weightUnit} × {pr.reps} reps
+            {mainDisplay}
           </Typography>
         </View>
       </View>
@@ -206,6 +224,7 @@ export const PRShowcaseV2: React.FC<Props> = ({
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   if (!prs || prs.length === 0) return null;
 
@@ -257,6 +276,7 @@ export const PRShowcaseV2: React.FC<Props> = ({
             pr={pr}
             index={index}
             weightUnit={weightUnit}
+            distanceUnit={distanceUnit}
             lang={lang}
             baseDelay={baseDelay + 100}
           />

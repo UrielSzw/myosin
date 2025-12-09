@@ -72,16 +72,22 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const haptic = useHaptic();
 
     const nextSetIndicator = useNextSetIndicator(blockId);
-    const { validatePR } = usePRLogic(exerciseInBlock.exercise_id, setId);
 
     const blockColors = getBlockColors(blockType);
     const set = sets[setId];
 
-    // Get measurement template early (needed for timer callback)
+    // Get measurement template early (needed for timer callback and PR validation)
     const template = getMeasurementTemplate(
       set?.measurement_template || "weight_reps",
       weightUnit,
       distanceUnit
+    );
+
+    // PR logic with template passed explicitly
+    const { validatePR } = usePRLogic(
+      exerciseInBlock.exercise_id,
+      setId,
+      set?.measurement_template
     );
 
     // Detect time fields for timer functionality (needed for timer callback)
@@ -185,19 +191,14 @@ export const ActiveSetRowV2 = React.memo<Props>(
         0
       );
 
-      // PR validation for weight_reps templates
-      const supportsPRTemplate =
-        set?.measurement_template === "weight_reps" ||
-        set?.measurement_template === "weight_reps_range";
-      const prValidation = supportsPRTemplate
-        ? validatePR(effectivePrimary, effectiveSecondary)
-        : { isPR: false, estimatedOneRM: 0 };
+      // PR validation for ALL measurement templates
+      const prValidation = validatePR(effectivePrimary, effectiveSecondary);
 
       completeSet(exerciseInBlock.tempId, setId, blockId, {
         primaryValue: effectivePrimary,
         secondaryValue: effectiveSecondary,
         actualRpe: set?.actual_rpe || set?.planned_rpe || 0,
-        estimated1RM: prValidation.estimatedOneRM,
+        estimated1RM: prValidation.prScore,
         isPR: prValidation.isPR,
       });
 
@@ -272,16 +273,23 @@ export const ActiveSetRowV2 = React.memo<Props>(
               prevSet?.actual_secondary_value ??
               0;
 
+        // PR validation for ALL measurement templates
+        const prValidation = validatePR(effectivePrimary, effectiveSecondary);
+
         // Complete the set
         completeSet(exerciseInBlock.tempId, setId, blockId, {
           primaryValue: effectivePrimary,
           secondaryValue: effectiveSecondary,
           actualRpe: set?.actual_rpe || set?.planned_rpe || 0,
-          estimated1RM: 0,
-          isPR: false,
+          estimated1RM: prValidation.prScore,
+          isPR: prValidation.isPR,
         });
 
-        haptic.success();
+        if (prValidation.isPR) {
+          haptic.success();
+        } else {
+          haptic.medium();
+        }
         setTimerVisible(false);
       },
       [
@@ -295,6 +303,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
         updateSetValue,
         completeSet,
         haptic,
+        validatePR,
       ]
     );
 

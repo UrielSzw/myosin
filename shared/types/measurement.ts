@@ -211,8 +211,13 @@ export const isDualMetricTemplate = (
   return !isSingleMetricTemplate(templateId);
 };
 
+/**
+ * Check if a template supports PR calculation
+ * ALL templates now support PRs with template-specific scores!
+ */
 export const supportsPRCalculation = (
   templateId: MeasurementTemplateId
 ): boolean => {
-  return templateId === "weight_reps" || templateId === "weight_reps_range";
+  // All measurement templates now support PR tracking
+  return true;
 };

@@ -3,8 +3,9 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { getLocale, type SupportedLanguage } from "@/shared/types/language";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
-import { fromKg } from "@/shared/utils/weight-conversion";
+import { formatPRDisplay } from "@/shared/utils/pr-formatters";
 import { BlurView } from "expo-blur";
 import { Award, Medal, Star, Trophy } from "lucide-react-native";
 import React from "react";
@@ -42,6 +43,7 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
 
   const sortedHistory = [...history].sort(
     (a, b) =>
@@ -54,7 +56,7 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
       ...item,
       rank:
         [...history]
-          .sort((a, b) => b.estimated_1rm - a.estimated_1rm)
+          .sort((a, b) => b.pr_score - a.pr_score)
           .findIndex((h) => h.id === item.id) + 1,
     }))
     .slice(0, 10);
@@ -155,11 +157,17 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
                         weight="bold"
                         style={{ color: isTop3 ? color : colors.text }}
                       >
-                        {fromKg(item.weight, weightUnit, 1)} {weightUnit}
-                      </Typography>
-                      <Typography variant="caption" color="textMuted">
-                        {" "}
-                        x {item.reps} reps
+                        {
+                          formatPRDisplay(
+                            item.measurement_template as MeasurementTemplateId,
+                            item.primary_value,
+                            item.secondary_value,
+                            item.pr_score,
+                            weightUnit,
+                            distanceUnit,
+                            lang
+                          ).mainDisplay
+                        }
                       </Typography>
                     </View>
                     <Typography variant="caption" color="textMuted">
@@ -186,7 +194,17 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
                           fontSize: 10,
                         }}
                       >
-                        1RM
+                        {
+                          formatPRDisplay(
+                            item.measurement_template as MeasurementTemplateId,
+                            item.primary_value,
+                            item.secondary_value,
+                            item.pr_score,
+                            weightUnit,
+                            distanceUnit,
+                            lang
+                          ).scoreName
+                        }
                       </Typography>
                     </View>
                     <Typography
@@ -194,7 +212,17 @@ export const PRHistoryV2: React.FC<Props> = ({ history, lang }) => {
                       weight="bold"
                       style={{ color: isTop3 ? color : colors.primary[500] }}
                     >
-                      {fromKg(item.estimated_1rm, weightUnit, 0)}
+                      {
+                        formatPRDisplay(
+                          item.measurement_template as MeasurementTemplateId,
+                          item.primary_value,
+                          item.secondary_value,
+                          item.pr_score,
+                          weightUnit,
+                          distanceUnit,
+                          lang
+                        ).scoreDisplay
+                      }
                     </Typography>
                   </View>
                 </View>

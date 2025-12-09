@@ -1,14 +1,16 @@
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { IExerciseMuscle } from "@/shared/types/workout";
 
 // Tipo para un PR individual en el historial
 export type PRHistoryItem = {
   id: string;
-  weight: number;
-  reps: number;
-  estimated_1rm: number;
-  achieved_at: string;
-  source: "auto" | "manual";
-  workout_session_id?: string;
+  measurement_template: MeasurementTemplateId;
+  primary_value: number;
+  secondary_value: number | null;
+  pr_score: number;
+  created_at: string | null;
+  source: "auto" | "manual" | "import";
+  workout_session_id?: string | null;
   notes?: string;
 };
 
@@ -22,7 +24,8 @@ export type ExerciseInfo = {
 
 // Tipo para stats de progreso
 export type ProgressStats = {
-  totalProgress: number; // Diferencia en kg desde primer al último PR
+  totalProgress: number; // Diferencia en score desde primer al último PR
+  progressUnit: string; // "kg", "s", "m", etc. based on template
   timeSpan: string; // "8 meses", "1 año", etc.
   averageIncrease: number; // Promedio de incremento por mes
   bestStreak: number; // Mejor racha de PRs consecutivos
@@ -31,6 +34,7 @@ export type ProgressStats = {
 // Tipo principal para el detalle de PR
 export type PRDetailData = {
   exerciseInfo: ExerciseInfo;
+  measurementTemplate: MeasurementTemplateId;
   currentPR: PRHistoryItem;
   history: PRHistoryItem[];
   progressStats: ProgressStats;

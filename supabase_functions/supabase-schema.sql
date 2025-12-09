@@ -267,7 +267,7 @@ CREATE TABLE tracker_daily_aggregates (
 );
 
 -- ============================================================================
--- PR SCHEMA
+-- PR SCHEMA (Generic fields for all measurement templates)
 -- ============================================================================
 
 -- PR current table
@@ -275,9 +275,10 @@ CREATE TABLE pr_current (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     exercise_id UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-    best_weight DECIMAL(10,2) NOT NULL,
-    best_reps INTEGER NOT NULL,
-    estimated_1rm DECIMAL(10,2) NOT NULL,
+    measurement_template TEXT NOT NULL DEFAULT 'weight_reps',
+    best_primary_value DECIMAL(10,2) NOT NULL,
+    best_secondary_value DECIMAL(10,2),
+    pr_score DECIMAL(10,2) NOT NULL,
     achieved_at TIMESTAMPTZ NOT NULL,
     source TEXT DEFAULT 'auto' NOT NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -289,9 +290,10 @@ CREATE TABLE pr_history (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL DEFAULT uuid_generate_v4(),
     exercise_id UUID NOT NULL REFERENCES exercises(id) ON DELETE CASCADE,
-    weight DECIMAL(10,2) NOT NULL,
-    reps INTEGER NOT NULL,
-    estimated_1rm DECIMAL(10,2) NOT NULL,
+    measurement_template TEXT NOT NULL DEFAULT 'weight_reps',
+    primary_value DECIMAL(10,2) NOT NULL,
+    secondary_value DECIMAL(10,2),
+    pr_score DECIMAL(10,2) NOT NULL,
     workout_session_id UUID REFERENCES workout_sessions(id) ON DELETE SET NULL,
     workout_set_id UUID REFERENCES workout_sets(id) ON DELETE SET NULL,
     source TEXT DEFAULT 'auto' NOT NULL,

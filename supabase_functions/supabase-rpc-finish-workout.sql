@@ -221,7 +221,7 @@ BEGIN
   END LOOP;
 
   -- ==========================================
-  -- STEP 3: UPSERT PRS
+  -- STEP 3: UPSERT PRS (Generic fields for all measurement templates)
   -- ==========================================
   
   -- 3a. Upsert current PRs
@@ -236,9 +236,13 @@ BEGIN
     IF v_existing_pr_id IS NOT NULL THEN
       -- Update existing
       UPDATE pr_current SET
-        best_weight = (v_pr_item->>'best_weight')::numeric,
-        best_reps = (v_pr_item->>'best_reps')::integer,
-        estimated_1rm = (v_pr_item->>'estimated_1rm')::numeric,
+        measurement_template = v_pr_item->>'measurement_template',
+        best_primary_value = (v_pr_item->>'best_primary_value')::numeric,
+        best_secondary_value = CASE 
+          WHEN v_pr_item->>'best_secondary_value' IS NOT NULL 
+          THEN (v_pr_item->>'best_secondary_value')::numeric 
+          ELSE NULL END,
+        pr_score = (v_pr_item->>'pr_score')::numeric,
         achieved_at = (v_pr_item->>'achieved_at')::timestamptz,
         source = v_pr_item->>'source',
         updated_at = NOW()
@@ -246,15 +250,20 @@ BEGIN
     ELSE
       -- Insert new
       INSERT INTO pr_current (
-        id, user_id, exercise_id, best_weight, best_reps,
-        estimated_1rm, achieved_at, source
+        id, user_id, exercise_id, measurement_template,
+        best_primary_value, best_secondary_value, pr_score,
+        achieved_at, source
       ) VALUES (
         (v_pr_item->>'id')::uuid,
         (v_pr_item->>'user_id')::uuid,
         (v_pr_item->>'exercise_id')::uuid,
-        (v_pr_item->>'best_weight')::numeric,
-        (v_pr_item->>'best_reps')::integer,
-        (v_pr_item->>'estimated_1rm')::numeric,
+        v_pr_item->>'measurement_template',
+        (v_pr_item->>'best_primary_value')::numeric,
+        CASE 
+          WHEN v_pr_item->>'best_secondary_value' IS NOT NULL 
+          THEN (v_pr_item->>'best_secondary_value')::numeric 
+          ELSE NULL END,
+        (v_pr_item->>'pr_score')::numeric,
         (v_pr_item->>'achieved_at')::timestamptz,
         v_pr_item->>'source'
       );
@@ -265,15 +274,20 @@ BEGIN
   FOR v_pr_item IN SELECT * FROM jsonb_array_elements(p_prs->'history')
   LOOP
     INSERT INTO pr_history (
-      id, user_id, exercise_id, weight, reps, estimated_1rm,
+      id, user_id, exercise_id, measurement_template,
+      primary_value, secondary_value, pr_score,
       workout_session_id, workout_set_id, source
     ) VALUES (
       (v_pr_item->>'id')::uuid,
       (v_pr_item->>'user_id')::uuid,
       (v_pr_item->>'exercise_id')::uuid,
-      (v_pr_item->>'weight')::numeric,
-      (v_pr_item->>'reps')::integer,
-      (v_pr_item->>'estimated_1rm')::numeric,
+      v_pr_item->>'measurement_template',
+      (v_pr_item->>'primary_value')::numeric,
+      CASE 
+        WHEN v_pr_item->>'secondary_value' IS NOT NULL 
+        THEN (v_pr_item->>'secondary_value')::numeric 
+        ELSE NULL END,
+      (v_pr_item->>'pr_score')::numeric,
       CASE WHEN v_pr_item->>'workout_session_id' IS NOT NULL AND v_pr_item->>'workout_session_id' != ''
         THEN (v_pr_item->>'workout_session_id')::uuid ELSE NULL END,
       CASE WHEN v_pr_item->>'workout_set_id' IS NOT NULL AND v_pr_item->>'workout_set_id' != ''

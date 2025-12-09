@@ -27,9 +27,10 @@ export const analyticsService = {
         exercise_id: pr.exercise_id,
         exercise_name: pr.exercise_name,
         exercise_muscle: pr.exercise_muscle,
-        best_weight: pr.best_weight,
-        best_reps: pr.best_reps,
-        estimated_1rm: pr.estimated_1rm,
+        measurement_template: pr.measurement_template,
+        best_primary_value: pr.best_primary_value,
+        best_secondary_value: pr.best_secondary_value,
+        pr_score: pr.pr_score,
         achieved_at: pr.achieved_at,
         source: pr.source,
       }));

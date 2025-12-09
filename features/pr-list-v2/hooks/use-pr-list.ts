@@ -24,9 +24,10 @@ export const usePRList = (userId?: string) => {
         exercise_id: pr.exercise_id,
         exercise_name: pr.exercise_name,
         exercise_muscle: pr.exercise_muscle,
-        best_weight: pr.best_weight,
-        best_reps: pr.best_reps,
-        estimated_1rm: pr.estimated_1rm,
+        measurement_template: pr.measurement_template,
+        best_primary_value: pr.best_primary_value,
+        best_secondary_value: pr.best_secondary_value,
+        pr_score: pr.pr_score,
         achieved_at: pr.achieved_at,
         source: pr.source,
         created_at: pr.created_at || new Date().toISOString(),
@@ -51,13 +52,10 @@ export const usePRList = (userId?: string) => {
     totalPRs: query.data?.length || 0,
     recentPRs: query.data?.filter((pr) => pr.is_recent).length || 0,
     avgEstimated1RM: query.data?.length
-      ? query.data.reduce((sum, pr) => sum + pr.estimated_1rm, 0) /
-        query.data.length
+      ? query.data.reduce((sum, pr) => sum + pr.pr_score, 0) / query.data.length
       : 0,
     strongestLift: query.data?.length
-      ? query.data.reduce((max, pr) =>
-          pr.estimated_1rm > max.estimated_1rm ? pr : max
-        )
+      ? query.data.reduce((max, pr) => (pr.pr_score > max.pr_score ? pr : max))
       : null,
   };
 
@@ -92,9 +90,10 @@ export const usePRSearch = (
         exercise_id: pr.exercise_id,
         exercise_name: pr.exercise_name,
         exercise_muscle: pr.exercise_muscle,
-        best_weight: pr.best_weight,
-        best_reps: pr.best_reps,
-        estimated_1rm: pr.estimated_1rm,
+        measurement_template: pr.measurement_template,
+        best_primary_value: pr.best_primary_value,
+        best_secondary_value: pr.best_secondary_value,
+        pr_score: pr.pr_score,
         achieved_at: pr.achieved_at,
         source: pr.source,
         created_at: pr.created_at || new Date().toISOString(),
@@ -139,9 +138,10 @@ export const usePRByMuscleGroups = (
         exercise_id: pr.exercise_id,
         exercise_name: pr.exercise_name,
         exercise_muscle: pr.exercise_muscle,
-        best_weight: pr.best_weight,
-        best_reps: pr.best_reps,
-        estimated_1rm: pr.estimated_1rm,
+        measurement_template: pr.measurement_template,
+        best_primary_value: pr.best_primary_value,
+        best_secondary_value: pr.best_secondary_value,
+        pr_score: pr.pr_score,
         achieved_at: pr.achieved_at,
         source: pr.source,
         created_at: pr.created_at || new Date().toISOString(),

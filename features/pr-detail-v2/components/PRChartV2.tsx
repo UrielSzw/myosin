@@ -1,9 +1,11 @@
 import type { PRHistoryItem } from "@/features/pr-detail-v2/hooks/use-pr-detail";
+import { PR_SCORE_CONFIG } from "@/shared/db/utils/pr";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
 import { getLocale, type SupportedLanguage } from "@/shared/types/language";
+import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
 import { BlurView } from "expo-blur";
@@ -18,10 +20,30 @@ type Props = {
   lang: SupportedLanguage;
 };
 
+// Score name translations for chart legend
+const SCORE_LEGEND_NAMES: Record<string, Record<SupportedLanguage, string>> = {
+  estimated_1rm: { es: "1RM", en: "1RM" },
+  longest_hold: { es: "Duración", en: "Duration" },
+  tut_volume: { es: "Volumen", en: "Volume" },
+  longest_distance: { es: "Distancia", en: "Distance" },
+  total_work: { es: "Trabajo", en: "Work" },
+};
+
 export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
   const { colors, isDarkMode } = useColorScheme();
   const prefs = useUserPreferences();
   const weightUnit = prefs?.weight_unit ?? "kg";
+  const distanceUnit = prefs?.distance_unit ?? "metric";
+
+  // Get measurement template from first history item
+  const measurementTemplate: MeasurementTemplateId =
+    history[0]?.measurement_template ?? "weight_reps";
+  const scoreConfig = PR_SCORE_CONFIG[measurementTemplate];
+
+  // Determine if we should convert the score (only for weight-based scores)
+  const isWeightBasedScore =
+    measurementTemplate === "weight_reps" ||
+    measurementTemplate === "weight_reps_range";
 
   const chartData = useMemo(() => {
     if (history.length === 0) return [];
@@ -32,21 +54,26 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
         new Date(b.created_at || "").getTime()
     );
 
-    return sorted.map((item, index) => ({
-      value: fromKg(item.estimated_1rm, weightUnit, 0),
-      label:
-        index === 0 || index === sorted.length - 1
-          ? new Date(item.created_at || "").toLocaleDateString(
-              getLocale(lang),
-              { month: "short", day: "numeric" }
-            )
-          : "",
-      dataPointText:
-        index === sorted.length - 1
-          ? `${fromKg(item.estimated_1rm, weightUnit, 0)}`
-          : undefined,
-    }));
-  }, [history, weightUnit, lang]);
+    return sorted.map((item, index) => {
+      // Convert score to user's unit if it's weight-based
+      const displayValue = isWeightBasedScore
+        ? fromKg(item.pr_score, weightUnit, 0)
+        : Math.round(item.pr_score);
+
+      return {
+        value: displayValue,
+        label:
+          index === 0 || index === sorted.length - 1
+            ? new Date(item.created_at || "").toLocaleDateString(
+                getLocale(lang),
+                { month: "short", day: "numeric" }
+              )
+            : "",
+        dataPointText:
+          index === sorted.length - 1 ? `${displayValue}` : undefined,
+      };
+    });
+  }, [history, weightUnit, isWeightBasedScore, lang]);
 
   const minValue = useMemo(() => {
     if (chartData.length === 0) return 0;
@@ -193,7 +220,9 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
               ]}
             />
             <Typography variant="caption" color="textMuted">
-              1RM ({weightUnit})
+              {SCORE_LEGEND_NAMES[scoreConfig.scoreName]?.[lang] ??
+                scoreConfig.scoreName}{" "}
+              ({isWeightBasedScore ? weightUnit : scoreConfig.scoreUnit})
             </Typography>
           </View>
         </View>

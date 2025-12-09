@@ -10,7 +10,7 @@ import {
   WorkoutSessionInsert,
   WorkoutSetInsert,
 } from "@/shared/db/schema/workout-session";
-import { computeEpley1RM } from "@/shared/db/utils/pr";
+import { computePRScore, isPRBetter } from "@/shared/db/utils/pr";
 import { useUserPreferencesStore } from "@/shared/hooks/use-user-preferences-store";
 import {
   getMeasurementTemplate,
@@ -88,14 +88,16 @@ type Store = {
     // Previous sets history por ejercicio
     exercisePreviousSets: Record<string, PreviousSetData[]>; // exercise_id → last sets
     // Session-best PRs: solo UN PR por ejercicio máximo (el mejor de la sesión)
+    // Now supports ALL measurement templates
     sessionBestPRs: Record<
       string,
       {
         tempSetId: string;
         exercise_id: string;
-        weight: number;
-        reps: number;
-        estimated_1rm: number;
+        measurement_template: MeasurementTemplateId;
+        primary_value: number;
+        secondary_value: number | null;
+        pr_score: number;
         created_at: string;
       }
     >; // exercise_id → best PR data
@@ -163,9 +165,10 @@ type Store = {
       exerciseId: string,
       prData: {
         tempSetId: string;
-        weight: number;
-        reps: number;
-        estimated_1rm: number;
+        measurement_template: MeasurementTemplateId;
+        primary_value: number;
+        secondary_value: number | null;
+        pr_score: number;
       }
     ) => void;
     removeSessionPR: (exerciseId: string) => void;
@@ -745,9 +748,10 @@ const useActiveWorkoutStore = create<Store>()(
           state.activeWorkout.sessionBestPRs[exerciseId] = {
             tempSetId: prData.tempSetId,
             exercise_id: exerciseId,
-            weight: prData.weight,
-            reps: prData.reps,
-            estimated_1rm: prData.estimated_1rm,
+            measurement_template: prData.measurement_template,
+            primary_value: prData.primary_value,
+            secondary_value: prData.secondary_value,
+            pr_score: prData.pr_score,
             created_at: new Date().toISOString(),
           };
         });
@@ -1501,13 +1505,8 @@ const useActiveWorkoutStore = create<Store>()(
 
           if (!set || set.completed || !exerciseInBlock) return;
 
-          const {
-            primaryValue,
-            secondaryValue,
-            actualRpe,
-            estimated1RM,
-            isPR,
-          } = completionData;
+          const { primaryValue, secondaryValue, actualRpe, isPR } =
+            completionData;
 
           set.completed = true;
           set.completed_at = new Date().toISOString();
@@ -1516,23 +1515,25 @@ const useActiveWorkoutStore = create<Store>()(
           set.actual_rpe = actualRpe;
           set.was_pr = isPR || false;
 
-          // Handle PR detection and session-best tracking (weight_reps and weight_reps_range templates)
-          if (
-            isPR &&
-            (set.measurement_template === "weight_reps" ||
-              set.measurement_template === "weight_reps_range") &&
-            primaryValue &&
-            secondaryValue &&
-            estimated1RM
-          ) {
+          // Handle PR detection and session-best tracking for ALL measurement templates
+          if (isPR && primaryValue != null) {
             const exerciseId = set.exercise_id;
+            const template = set.measurement_template;
+
+            // Calculate PR score for this template
+            const prScore = computePRScore(
+              template,
+              primaryValue,
+              secondaryValue
+            );
+
             const currentSessionBest =
               state.activeWorkout.sessionBestPRs[exerciseId];
 
             // Only keep the best PR per exercise in the session
             if (
               !currentSessionBest ||
-              estimated1RM > currentSessionBest.estimated_1rm
+              isPRBetter(prScore, currentSessionBest.pr_score)
             ) {
               // Clear was_pr from previous best set if it exists
               if (currentSessionBest) {
@@ -1547,9 +1548,10 @@ const useActiveWorkoutStore = create<Store>()(
               state.activeWorkout.sessionBestPRs[exerciseId] = {
                 tempSetId: set.tempId,
                 exercise_id: exerciseId,
-                weight: primaryValue, // weight is primary_value
-                reps: secondaryValue, // reps is secondary_value
-                estimated_1rm: estimated1RM,
+                measurement_template: template,
+                primary_value: primaryValue,
+                secondary_value: secondaryValue ?? null,
+                pr_score: prScore,
                 created_at: new Date().toISOString(),
               };
             } else {
@@ -1651,6 +1653,7 @@ const useActiveWorkoutStore = create<Store>()(
           // If this set was the session-best PR, handle accordingly
           if (set.was_pr) {
             const exerciseId = set.exercise_id;
+            const template = set.measurement_template;
             const currentSessionBest =
               state.activeWorkout.sessionBestPRs[exerciseId];
 
@@ -1669,29 +1672,29 @@ const useActiveWorkoutStore = create<Store>()(
                   s.exercise_id === exerciseId &&
                   s.completed &&
                   s.tempId !== setId &&
-                  (s.measurement_template === "weight_reps" ||
-                    s.measurement_template === "weight_reps_range") &&
-                  s.actual_primary_value &&
-                  s.actual_secondary_value
+                  s.actual_primary_value != null
               );
 
               if (completedSetsForExercise.length > 0) {
-                // Find the set with the highest estimated 1RM
+                // Find the set with the highest PR score for this template
                 const newBestSet = completedSetsForExercise.reduce((max, s) => {
-                  const currentEst = computeEpley1RM(
+                  const currentScore = computePRScore(
+                    template,
                     s.actual_primary_value!,
-                    s.actual_secondary_value!
+                    s.actual_secondary_value
                   );
-                  const maxEst = computeEpley1RM(
+                  const maxScore = computePRScore(
+                    template,
                     max.actual_primary_value!,
-                    max.actual_secondary_value!
+                    max.actual_secondary_value
                   );
-                  return currentEst > maxEst ? s : max;
+                  return currentScore > maxScore ? s : max;
                 });
 
-                const newBestEst = computeEpley1RM(
+                const newBestScore = computePRScore(
+                  template,
                   newBestSet.actual_primary_value!,
-                  newBestSet.actual_secondary_value!
+                  newBestSet.actual_secondary_value
                 );
 
                 // Check if this new best is still a PR compared to historical PR
@@ -1702,7 +1705,7 @@ const useActiveWorkoutStore = create<Store>()(
                 // Always set as session best if it's the best in session
                 // Mark as PR if: 1) no historical PR, or 2) beats historical PR
                 const isHistoricalPR = exerciseInBlock?.pr
-                  ? newBestEst > exerciseInBlock.pr.estimated_1rm
+                  ? isPRBetter(newBestScore, exerciseInBlock.pr.pr_score)
                   : true; // If no historical PR, any session best is a "PR"
 
                 if (isHistoricalPR) {
@@ -1710,9 +1713,10 @@ const useActiveWorkoutStore = create<Store>()(
                   state.activeWorkout.sessionBestPRs[exerciseId] = {
                     tempSetId: newBestSet.tempId,
                     exercise_id: exerciseId,
-                    weight: newBestSet.actual_primary_value!,
-                    reps: newBestSet.actual_secondary_value!,
-                    estimated_1rm: newBestEst,
+                    measurement_template: template,
+                    primary_value: newBestSet.actual_primary_value!,
+                    secondary_value: newBestSet.actual_secondary_value ?? null,
+                    pr_score: newBestScore,
                     created_at:
                       newBestSet.completed_at || new Date().toISOString(),
                   };

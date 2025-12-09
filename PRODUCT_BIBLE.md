@@ -418,43 +418,74 @@ Countdown (5s) → Ejercicio 1 → Rest → Ejercicio 2 → Rest → ... → Rou
 
 ### Personal Records (PRs)
 
-El sistema de PRs rastrea automáticamente los mejores rendimientos.
+El sistema de PRs rastrea automáticamente los mejores rendimientos para **todos los measurement templates**.
 
-#### Cálculo de 1RM (Fórmula Epley)
+#### Sistema de PR Score
 
-```
-1RM = peso × (1 + reps/30)
-```
+Cada measurement template tiene su propia fórmula de cálculo de PR Score:
+
+| Template            | Score Name  | Fórmula                        | Ejemplo                |
+| ------------------- | ----------- | ------------------------------ | ---------------------- |
+| `weight_reps`       | Est. 1RM    | `peso × (1 + reps/30)` (Epley) | 100kg × 8 reps = 126.7 |
+| `weight_reps_range` | Est. 1RM    | `peso × (1 + reps/30)` (Epley) | Igual que weight_reps  |
+| `time_only`         | Duración    | `segundos`                     | 120 seg plancha        |
+| `weight_time`       | Volumen TUT | `peso × segundos`              | 20kg × 60s = 1200      |
+| `distance_only`     | Distancia   | `metros`                       | 5000m corriendo        |
+| `distance_time`     | Trabajo     | `metros × 60 / segundos`       | 1000m en 240s = 250    |
+| `weight_distance`   | Trabajo     | `peso × metros`                | 40kg × 50m = 2000      |
 
 #### Tablas de PRs
 
-**`pr_current`** - PR actual por ejercicio
-| Campo | Descripción |
-|-------|-------------|
-| `exercise_id` | Ejercicio |
-| `best_weight` | Mejor peso levantado |
-| `best_reps` | Repeticiones con ese peso |
-| `estimated_1rm` | 1RM calculado |
-| `achieved_at` | Fecha del PR |
-| `source` | `auto` (detectado) \| `manual` (ingresado) |
+**`pr_current`** - PR actual por ejercicio (genérico para todos los templates)
+
+| Campo                  | Tipo               | Descripción                                      |
+| ---------------------- | ------------------ | ------------------------------------------------ |
+| `exercise_id`          | UUID               | Ejercicio                                        |
+| `measurement_template` | string             | Template de medición usado                       |
+| `best_primary_value`   | number             | Mejor valor primario (peso, tiempo, distancia)   |
+| `best_secondary_value` | number?            | Mejor valor secundario (reps, tiempo, distancia) |
+| `pr_score`             | number             | Score calculado según template                   |
+| `achieved_at`          | timestamp          | Fecha del PR                                     |
+| `source`               | `auto` \| `manual` | Origen del PR                                    |
 
 **`pr_history`** - Historial de PRs
-| Campo | Descripción |
-|-------|-------------|
-| `exercise_id` | Ejercicio |
-| `weight` | Peso del PR |
-| `reps` | Repeticiones |
-| `estimated_1rm` | 1RM en ese momento |
-| `workout_session_id` | Sesión donde se logró |
-| `workout_set_id` | Set específico |
+
+| Campo                  | Tipo    | Descripción                    |
+| ---------------------- | ------- | ------------------------------ |
+| `exercise_id`          | UUID    | Ejercicio                      |
+| `measurement_template` | string  | Template de medición           |
+| `primary_value`        | number  | Valor primario del PR          |
+| `secondary_value`      | number? | Valor secundario del PR        |
+| `pr_score`             | number  | Score en ese momento           |
+| `workout_session_id`   | UUID?   | Sesión donde se logró          |
+| `workout_set_id`       | UUID?   | Set específico                 |
+| `source`               | string  | `auto` \| `manual` \| `import` |
+
+#### Detección de PRs
+
+El sistema detecta PRs comparando el `pr_score` calculado:
+
+```typescript
+// Un PR es mejor si su score es mayor
+isPRBetter(newScore, currentScore) => newScore > (currentScore ?? 0)
+```
+
+#### Validación Durante Workout
+
+1. Al completar un set, se calcula el `pr_score` según el template
+2. Se compara con el PR histórico del ejercicio
+3. Si es mejor → Se marca como PR, haptic feedback de éxito 🎉
+4. Si no hay PR histórico → El primer set válido es automáticamente un PR
 
 #### Celebración de PR
 
 Cuando se detecta un nuevo PR durante el workout:
 
-1. Se muestra animación de celebración 🎉
-2. Se guarda en `pr_history`
-3. Si es mejor que el actual, se actualiza `pr_current`
+1. Se muestra indicador visual de PR en el set ✨
+2. Haptic feedback de éxito
+3. Se guarda en `pr_history`
+4. Si es mejor que el actual, se actualiza `pr_current`
+5. En el workout summary se muestra el PR con formato específico del template
 
 ---
 

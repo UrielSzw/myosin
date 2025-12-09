@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { syncStatusTranslations as t } from "@/shared/translations/sync-status";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -20,49 +21,6 @@ type Props = {
   delay?: number;
 };
 
-const translations = {
-  sectionTitle: {
-    es: "Acciones",
-    en: "Actions",
-  },
-  syncNow: {
-    es: "Sincronizar Ahora",
-    en: "Sync Now",
-  },
-  syncNowSubtitle: {
-    es: "Procesar cola de sincronización",
-    en: "Process sync queue",
-  },
-  syncing: {
-    es: "Sincronizando...",
-    en: "Syncing...",
-  },
-  clearQueue: {
-    es: "Limpiar Cola",
-    en: "Clear Queue",
-  },
-  clearQueueSubtitle: {
-    es: "Eliminar items con error",
-    en: "Remove failed items",
-  },
-  clearQueueAlertTitle: {
-    es: "Limpiar Cola",
-    en: "Clear Queue",
-  },
-  clearQueueAlertMessage: {
-    es: "¿Estás seguro? Esto eliminará todos los items pendientes de sincronización. Los datos locales NO se eliminarán.",
-    en: "Are you sure? This will remove all pending sync items. Local data will NOT be deleted.",
-  },
-  cancel: {
-    es: "Cancelar",
-    en: "Cancel",
-  },
-  confirm: {
-    es: "Limpiar",
-    en: "Clear",
-  },
-};
-
 export const SyncActions = ({
   onSyncNow,
   onClearQueue,
@@ -76,18 +34,14 @@ export const SyncActions = ({
   const lang = toSupportedLanguage(prefs?.language);
 
   const handleClearQueue = () => {
-    Alert.alert(
-      translations.clearQueueAlertTitle[lang],
-      translations.clearQueueAlertMessage[lang],
-      [
-        { text: translations.cancel[lang], style: "cancel" },
-        {
-          text: translations.confirm[lang],
-          style: "destructive",
-          onPress: onClearQueue,
-        },
-      ]
-    );
+    Alert.alert(t.clearQueueAlertTitle[lang], t.clearQueueAlertMessage[lang], [
+      { text: t.cancel[lang], style: "cancel" },
+      {
+        text: t.confirm[lang],
+        style: "destructive",
+        onPress: onClearQueue,
+      },
+    ]);
   };
 
   return (
@@ -104,7 +58,7 @@ export const SyncActions = ({
             letterSpacing: 1,
           }}
         >
-          {translations.sectionTitle[lang]}
+          {t.sectionTitleActions[lang]}
         </Typography>
       </Animated.View>
 
@@ -162,16 +116,14 @@ export const SyncActions = ({
                   weight="medium"
                   style={{ color: colors.text }}
                 >
-                  {isSyncing
-                    ? translations.syncing[lang]
-                    : translations.syncNow[lang]}
+                  {isSyncing ? t.syncing[lang] : t.syncNow[lang]}
                 </Typography>
                 <Typography
                   variant="caption"
                   color="textMuted"
                   style={{ marginTop: 2 }}
                 >
-                  {translations.syncNowSubtitle[lang]}
+                  {t.syncNowSubtitle[lang]}
                 </Typography>
               </View>
             </View>
@@ -216,14 +168,14 @@ export const SyncActions = ({
                     weight="medium"
                     style={{ color: colors.error[500] }}
                   >
-                    {translations.clearQueue[lang]} ({queueCount})
+                    {t.clearQueue[lang]} ({queueCount})
                   </Typography>
                   <Typography
                     variant="caption"
                     color="textMuted"
                     style={{ marginTop: 2 }}
                   >
-                    {translations.clearQueueSubtitle[lang]}
+                    {t.clearQueueSubtitle[lang]}
                   </Typography>
                 </View>
               </View>

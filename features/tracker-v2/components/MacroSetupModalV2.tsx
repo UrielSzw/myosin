@@ -4,6 +4,7 @@ import {
 } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { macrosTranslations as t } from "@/shared/translations/macros";
 import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -40,25 +41,6 @@ type MacroSetupModalProps = {
   onClose: () => void;
   lang: SupportedLanguage;
   existingTarget?: MacroTargetWithCalories;
-};
-
-const translations = {
-  title: { es: "Objetivos de Macros", en: "Macro Targets" },
-  subtitle: {
-    es: "Establece tus objetivos diarios",
-    en: "Set your daily targets",
-  },
-  protein: { es: "Proteína (g)", en: "Protein (g)" },
-  carbs: { es: "Carbohidratos (g)", en: "Carbs (g)" },
-  fats: { es: "Grasas (g)", en: "Fats (g)" },
-  calories: { es: "Calorías totales", en: "Total calories" },
-  save: { es: "Guardar", en: "Save" },
-  cancel: { es: "Cancelar", en: "Cancel" },
-  calculated: { es: "calculadas", en: "calculated" },
-  presets: { es: "Presets rápidos", en: "Quick presets" },
-  cutting: { es: "Cutting", en: "Cutting" },
-  maintenance: { es: "Mantenimiento", en: "Maintenance" },
-  bulking: { es: "Volumen", en: "Bulking" },
 };
 
 const MACRO_COLORS = {
@@ -201,7 +183,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
   const macroInputs = [
     {
       key: "protein",
-      label: translations.protein[lang],
+      label: t.proteinG[lang],
       value: protein,
       setValue: setProtein,
       color: MACRO_COLORS.protein,
@@ -210,7 +192,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
     },
     {
       key: "carbs",
-      label: translations.carbs[lang],
+      label: t.carbsG[lang],
       value: carbs,
       setValue: setCarbs,
       color: MACRO_COLORS.carbs,
@@ -219,7 +201,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
     },
     {
       key: "fats",
-      label: translations.fats[lang],
+      label: t.fatsG[lang],
       value: fats,
       setValue: setFats,
       color: MACRO_COLORS.fats,
@@ -229,9 +211,9 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
   ];
 
   const presetOptions = [
-    { key: "cutting", label: translations.cutting[lang] },
-    { key: "maintenance", label: translations.maintenance[lang] },
-    { key: "bulking", label: translations.bulking[lang] },
+    { key: "cutting", label: t.cutting[lang] },
+    { key: "maintenance", label: t.maintenance[lang] },
+    { key: "bulking", label: t.bulking[lang] },
   ];
 
   // Check if current values match a preset
@@ -298,10 +280,10 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                         weight="bold"
                         style={{ color: colors.text }}
                       >
-                        {translations.title[lang]}
+                        {t.setupTitle[lang]}
                       </Typography>
                       <Typography variant="caption" color="textMuted">
-                        {translations.subtitle[lang]}
+                        {t.setupSubtitle[lang]}
                       </Typography>
                     </View>
                   </View>
@@ -328,7 +310,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                     weight="medium"
                     style={{ color: colors.text, marginBottom: 12 }}
                   >
-                    {translations.presets[lang]}
+                    {t.presets[lang]}
                   </Typography>
                   <View style={styles.presetsRow}>
                     {presetOptions.map((preset) => {
@@ -467,7 +449,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                         weight="medium"
                         style={{ color: colors.text }}
                       >
-                        {translations.calories[lang]}
+                        {t.totalCalories[lang]}
                       </Typography>
                     </View>
                     <View style={styles.caloriesRight}>
@@ -481,7 +463,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                         </Typography>
                       </Animated.View>
                       <Typography variant="caption" color="textMuted">
-                        {translations.calculated[lang]}
+                        {t.calculated[lang]}
                       </Typography>
                     </View>
                   </View>
@@ -512,7 +494,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                       weight="semibold"
                       style={{ color: colors.text }}
                     >
-                      {translations.cancel[lang]}
+                      {t.cancel[lang]}
                     </Typography>
                   </Pressable>
 
@@ -545,7 +527,7 @@ export const MacroSetupModalV2: React.FC<MacroSetupModalProps> = ({
                       weight="semibold"
                       style={{ color: "#fff" }}
                     >
-                      {isPending ? "..." : translations.save[lang]}
+                      {isPending ? "..." : t.save[lang]}
                     </Typography>
                   </Pressable>
                 </Animated.View>

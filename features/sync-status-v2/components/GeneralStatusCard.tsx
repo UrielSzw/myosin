@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { syncStatusTranslations as t } from "@/shared/translations/sync-status";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -12,41 +13,6 @@ type Props = {
   isOnline: boolean;
   hasPendingItems: boolean;
   delay?: number;
-};
-
-const translations = {
-  sectionTitle: {
-    es: "Estado General",
-    en: "General Status",
-  },
-  online: {
-    es: "En línea",
-    en: "Online",
-  },
-  offline: {
-    es: "Sin conexión",
-    en: "Offline",
-  },
-  synced: {
-    es: "Sincronizado",
-    en: "Synced",
-  },
-  pendingSync: {
-    es: "Sincronización pendiente",
-    en: "Sync pending",
-  },
-  offlineNote: {
-    es: "Los cambios se sincronizarán cuando vuelvas a estar en línea",
-    en: "Changes will sync when you're back online",
-  },
-  allSyncedNote: {
-    es: "Todos tus datos están sincronizados con la nube",
-    en: "All your data is synced with the cloud",
-  },
-  pendingNote: {
-    es: "Hay cambios locales esperando ser sincronizados",
-    en: "There are local changes waiting to be synced",
-  },
 };
 
 export const GeneralStatusCard = ({
@@ -68,16 +34,16 @@ export const GeneralStatusCard = ({
 
   const StatusIcon = !isOnline ? WifiOff : isSynced ? CheckCircle : Cloud;
   const statusText = !isOnline
-    ? translations.offline[lang]
+    ? t.offline[lang]
     : isSynced
-    ? translations.synced[lang]
-    : translations.pendingSync[lang];
+    ? t.statusSynced[lang]
+    : t.pendingSync[lang];
 
   const noteText = !isOnline
-    ? translations.offlineNote[lang]
+    ? t.offlineNote[lang]
     : isSynced
-    ? translations.allSyncedNote[lang]
-    : translations.pendingNote[lang];
+    ? t.allSyncedNote[lang]
+    : t.pendingNote[lang];
 
   return (
     <View>
@@ -93,7 +59,7 @@ export const GeneralStatusCard = ({
             letterSpacing: 1,
           }}
         >
-          {translations.sectionTitle[lang]}
+          {t.sectionTitleGeneral[lang]}
         </Typography>
       </Animated.View>
 

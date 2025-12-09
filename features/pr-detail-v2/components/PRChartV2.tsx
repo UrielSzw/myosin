@@ -4,7 +4,11 @@ import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { prDetailTranslations as t } from "@/shared/translations/pr-detail";
 import { sharedUiTranslations } from "@/shared/translations/shared-ui";
-import { getLocale, type SupportedLanguage } from "@/shared/types/language";
+import {
+  getLocale,
+  type SupportedLanguage,
+  type Translation,
+} from "@/shared/types/language";
 import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import { Typography } from "@/shared/ui/typography";
 import { fromKg } from "@/shared/utils/weight-conversion";
@@ -20,13 +24,24 @@ type Props = {
   lang: SupportedLanguage;
 };
 
-// Score name translations for chart legend
-const SCORE_LEGEND_NAMES: Record<string, Record<SupportedLanguage, string>> = {
-  estimated_1rm: { es: "1RM", en: "1RM" },
-  longest_hold: { es: "Duración", en: "Duration" },
-  tut_volume: { es: "Volumen", en: "Volume" },
-  longest_distance: { es: "Distancia", en: "Distance" },
-  total_work: { es: "Trabajo", en: "Work" },
+// Score name translations for chart legend - use centralized translations
+const SCORE_LEGEND_KEYS: Record<string, keyof typeof t> = {
+  estimated_1rm: "scoreLegend1RM",
+  longest_hold: "scoreLegendDuration",
+  tut_volume: "scoreLegendVolume",
+  longest_distance: "scoreLegendDistance",
+  total_work: "scoreLegendWork",
+};
+
+const getScoreLegendName = (
+  scoreId: string,
+  lang: SupportedLanguage
+): string => {
+  const key = SCORE_LEGEND_KEYS[scoreId];
+  if (key && key in t) {
+    return (t[key] as Translation)[lang];
+  }
+  return scoreId;
 };
 
 export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
@@ -220,9 +235,8 @@ export const PRChartV2: React.FC<Props> = ({ history, lang }) => {
               ]}
             />
             <Typography variant="caption" color="textMuted">
-              {SCORE_LEGEND_NAMES[scoreConfig.scoreName]?.[lang] ??
-                scoreConfig.scoreName}{" "}
-              ({isWeightBasedScore ? weightUnit : scoreConfig.scoreUnit})
+              {getScoreLegendName(scoreConfig.scoreName, lang)} (
+              {isWeightBasedScore ? weightUnit : scoreConfig.scoreUnit})
             </Typography>
           </View>
         </View>

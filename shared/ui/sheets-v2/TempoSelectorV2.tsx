@@ -33,7 +33,7 @@ import {
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface TempoPhase {
-  name: { es: string; en: string };
+  key: "eccentric" | "pause1" | "concentric" | "pause2";
   description: string;
   color: string;
   icon: "ArrowDown" | "Pause" | "ArrowUp" | "Square";
@@ -55,25 +55,25 @@ type Props = {
 
 const TEMPO_PHASES: TempoPhase[] = [
   {
-    name: { es: "Excéntrica", en: "Eccentric" },
+    key: "eccentric",
     description: "eccentric",
     color: "#22C55E",
     icon: "ArrowDown",
   },
   {
-    name: { es: "Pausa Inferior", en: "Bottom Pause" },
+    key: "pause1",
     description: "pause1",
     color: "#F59E0B",
     icon: "Pause",
   },
   {
-    name: { es: "Concéntrica", en: "Concentric" },
+    key: "concentric",
     description: "concentric",
     color: "#EF4444",
     icon: "ArrowUp",
   },
   {
-    name: { es: "Pausa Superior", en: "Top Pause" },
+    key: "pause2",
     description: "pause2",
     color: "#F59E0B",
     icon: "Square",
@@ -670,7 +670,7 @@ export const TempoSelectorV2 = ({
                             weight="semibold"
                             style={{ color: phase.color }}
                           >
-                            {phase.name[lang]}
+                            {t.phaseNames[phase.key][lang]}
                           </Typography>
                           <Typography variant="caption" color="textMuted">
                             {

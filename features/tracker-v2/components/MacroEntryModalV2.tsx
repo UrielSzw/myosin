@@ -1,6 +1,7 @@
 import { calculateCalories } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { macrosTranslations as t } from "@/shared/translations/macros";
 import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -27,22 +28,6 @@ type MacroEntryModalProps = {
   onClose: () => void;
   selectedDate: string;
   lang: SupportedLanguage;
-};
-
-const translations = {
-  title: { es: "Agregar Macros", en: "Add Macros" },
-  protein: { es: "Proteína (g)", en: "Protein (g)" },
-  carbs: { es: "Carbohidratos (g)", en: "Carbs (g)" },
-  fats: { es: "Grasas (g)", en: "Fats (g)" },
-  calories: { es: "Calorías", en: "Calories" },
-  label: { es: "Nombre (opcional)", en: "Label (optional)" },
-  labelPlaceholder: {
-    es: "Ej: Almuerzo, Snack...",
-    en: "E.g: Lunch, Snack...",
-  },
-  add: { es: "Agregar", en: "Add" },
-  cancel: { es: "Cancelar", en: "Cancel" },
-  calculated: { es: "calculadas", en: "calculated" },
 };
 
 const MACRO_COLORS = {
@@ -109,7 +94,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
   const macroInputs = [
     {
       key: "protein",
-      label: translations.protein[lang],
+      label: t.proteinG[lang],
       value: protein,
       setValue: setProtein,
       color: MACRO_COLORS.protein,
@@ -117,7 +102,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
     },
     {
       key: "carbs",
-      label: translations.carbs[lang],
+      label: t.carbsG[lang],
       value: carbs,
       setValue: setCarbs,
       color: MACRO_COLORS.carbs,
@@ -125,7 +110,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
     },
     {
       key: "fats",
-      label: translations.fats[lang],
+      label: t.fatsG[lang],
       value: fats,
       setValue: setFats,
       color: MACRO_COLORS.fats,
@@ -171,7 +156,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                   weight="bold"
                   style={{ color: colors.text }}
                 >
-                  {translations.title[lang]}
+                  {t.addTitle[lang]}
                 </Typography>
                 <Pressable
                   onPress={handleClose}
@@ -272,7 +257,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                         weight="medium"
                         style={{ color: colors.text }}
                       >
-                        {translations.calories[lang]}
+                        {t.calories[lang]}
                       </Typography>
                     </View>
                     <View style={styles.caloriesRight}>
@@ -284,7 +269,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                         {caloriesPreview}
                       </Typography>
                       <Typography variant="caption" color="textMuted">
-                        {translations.calculated[lang]}
+                        {t.calculated[lang]}
                       </Typography>
                     </View>
                   </View>
@@ -298,12 +283,12 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                       weight="medium"
                       style={{ color: colors.text, marginBottom: 8 }}
                     >
-                      {translations.label[lang]}
+                      {t.label[lang]}
                     </Typography>
                     <TextInput
                       value={label}
                       onChangeText={setLabel}
-                      placeholder={translations.labelPlaceholder[lang]}
+                      placeholder={t.labelPlaceholder[lang]}
                       placeholderTextColor={colors.textMuted}
                       style={[
                         styles.input,
@@ -347,7 +332,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                       weight="semibold"
                       style={{ color: colors.text }}
                     >
-                      {translations.cancel[lang]}
+                      {t.cancel[lang]}
                     </Typography>
                   </Pressable>
 
@@ -378,7 +363,7 @@ export const MacroEntryModalV2: React.FC<MacroEntryModalProps> = ({
                       weight="semibold"
                       style={{ color: "#fff" }}
                     >
-                      {addEntry.isPending ? "..." : translations.add[lang]}
+                      {addEntry.isPending ? "..." : t.add[lang]}
                     </Typography>
                   </Pressable>
                 </Animated.View>

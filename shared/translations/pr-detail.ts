@@ -144,4 +144,49 @@ export const prDetailTranslations = {
     es: "Historial de Records",
     en: "Records History",
   },
+
+  // Score Legend Names (for chart)
+  scoreLegend1RM: {
+    es: "1RM",
+    en: "1RM",
+  },
+  scoreLegendDuration: {
+    es: "Duración",
+    en: "Duration",
+  },
+  scoreLegendVolume: {
+    es: "Volumen",
+    en: "Volume",
+  },
+  scoreLegendDistance: {
+    es: "Distancia",
+    en: "Distance",
+  },
+  scoreLegendWork: {
+    es: "Trabajo",
+    en: "Work",
+  },
+
+  // Score type names (for PR formatters)
+  scoreNames: {
+    estimated_1rm: { es: "Est. 1RM", en: "Est. 1RM" },
+    longest_hold: { es: "Duración", en: "Duration" },
+    tut_volume: { es: "Volumen TUT", en: "TUT Volume" },
+    longest_distance: { es: "Distancia", en: "Distance" },
+    total_work: { es: "Trabajo Total", en: "Total Work" },
+  },
+
+  // PR display formatting
+  reps: {
+    es: "reps",
+    en: "reps",
+  },
+  inPreposition: {
+    es: "en",
+    en: "in",
+  },
+  newPRCelebration: {
+    es: "¡NUEVO PR!",
+    en: "NEW PR!",
+  },
 } as const;

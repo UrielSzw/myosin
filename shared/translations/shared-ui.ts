@@ -13,7 +13,37 @@ export const sharedUiTranslations = {
     en: "Select routines with active days to see the analysis",
   },
 
-  // Exercise Options Sheet
+  // Exercise Options Sheet (V2)
+  exerciseOptionsTitle: {
+    es: "Opciones del Ejercicio",
+    en: "Exercise Options",
+  },
+  replaceExerciseTitle: {
+    es: "Reemplazar Ejercicio",
+    en: "Replace Exercise",
+  },
+  replaceExerciseDesc: {
+    es: "Cambiar por otro ejercicio",
+    en: "Change to another exercise",
+  },
+  createSuperset: {
+    es: "Crear Superserie",
+    en: "Create Superset",
+  },
+  createSupersetDesc: {
+    es: "Combinar con otro ejercicio",
+    en: "Combine with another exercise",
+  },
+  deleteExerciseTitle: {
+    es: "Eliminar Ejercicio",
+    en: "Delete Exercise",
+  },
+  deleteExerciseDesc: {
+    es: "Quitar del superset",
+    en: "Remove from superset",
+  },
+
+  // Exercise Options Sheet (legacy)
   exerciseOptions: {
     es: "Opciones de Ejercicio",
     en: "Exercise Options",
@@ -27,7 +57,69 @@ export const sharedUiTranslations = {
     en: "Delete exercise",
   },
 
-  // Block Options Sheet
+  // Block Options Sheet (V2)
+  blockOptionsTitle: {
+    es: "Opciones del Bloque",
+    en: "Block Options",
+  },
+  addExerciseTitle: {
+    es: "Agregar Ejercicio",
+    en: "Add Exercise",
+  },
+  addExerciseToSupersetDesc: {
+    es: "Añadir otro ejercicio al superset",
+    en: "Add another exercise to superset",
+  },
+  createSupersetTitle: {
+    es: "Crear Superserie",
+    en: "Create Superset",
+  },
+  separateExercisesTitle: {
+    es: "Separar Ejercicios",
+    en: "Separate Exercises",
+  },
+  separateExercisesDesc: {
+    es: "Convertir a bloques individuales",
+    en: "Convert to individual blocks",
+  },
+  reorderExercisesTitle: {
+    es: "Reordenar Ejercicios",
+    en: "Reorder Exercises",
+  },
+  reorderExercisesDesc: {
+    es: "Cambiar orden dentro del bloque",
+    en: "Change order within block",
+  },
+  reorderBlocksTitle: {
+    es: "Reordenar Bloques",
+    en: "Reorder Blocks",
+  },
+  reorderBlocksDesc: {
+    es: "Cambiar orden de la rutina",
+    en: "Change routine order",
+  },
+  deleteBlockTitle: {
+    es: "Eliminar Bloque",
+    en: "Delete Block",
+  },
+  deleteBlockDesc: {
+    es: "Esta acción no se puede deshacer",
+    en: "This action cannot be undone",
+  },
+  startTimerMode: {
+    es: "Iniciar Timer",
+    en: "Start Timer",
+  },
+  startTimerModeDesc: {
+    es: "Timer automático para el circuito",
+    en: "Automatic timer for the circuit",
+  },
+  unbalancedSetsWarning: {
+    es: "Igualar sets por ejercicio",
+    en: "Balance sets per exercise",
+  },
+
+  // Block Options Sheet (legacy)
   blockOptions: {
     es: "Opciones de Bloque",
     en: "Block Options",
@@ -357,6 +449,20 @@ export const sharedUiTranslations = {
   adjustTimeBetweenSets: {
     es: "Ajusta el tiempo entre series",
     en: "Adjust time between sets",
+  },
+
+  // Rest Time Quick Options
+  restQuickOptions: {
+    noRest: { es: "Sin descanso", en: "No rest" },
+    sec30: { es: "30s", en: "30s" },
+    sec45: { es: "45s", en: "45s" },
+    min1: { es: "1 min", en: "1 min" },
+    min1_30: { es: "1:30", en: "1:30" },
+    min2: { es: "2 min", en: "2 min" },
+    min2_30: { es: "2:30", en: "2:30" },
+    min3: { es: "3 min", en: "3 min" },
+    min4: { es: "4 min", en: "4 min" },
+    min5: { es: "5 min", en: "5 min" },
   },
 
   // Set Type Sheet

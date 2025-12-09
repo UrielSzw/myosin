@@ -1,6 +1,7 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations as translations } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -109,19 +110,13 @@ export const ExerciseOptionsSheetV2 = ({
   }, [visible, backdropAnim, slideAnim, optionsAnim]);
 
   const t = {
-    exerciseOptions: { es: "Opciones del Ejercicio", en: "Exercise Options" },
-    replaceExercise: { es: "Reemplazar Ejercicio", en: "Replace Exercise" },
-    replaceDesc: {
-      es: "Cambiar por otro ejercicio",
-      en: "Change to another exercise",
-    },
-    createSuperset: { es: "Crear Superserie", en: "Create Superset" },
-    createSupersetDesc: {
-      es: "Combinar con otro ejercicio",
-      en: "Combine with another exercise",
-    },
-    deleteExercise: { es: "Eliminar Ejercicio", en: "Delete Exercise" },
-    deleteDesc: { es: "Quitar del superset", en: "Remove from superset" },
+    exerciseOptions: translations.exerciseOptionsTitle,
+    replaceExercise: translations.replaceExerciseTitle,
+    replaceDesc: translations.replaceExerciseDesc,
+    createSuperset: translations.createSuperset,
+    createSupersetDesc: translations.createSupersetDesc,
+    deleteExercise: translations.deleteExerciseTitle,
+    deleteDesc: translations.deleteExerciseDesc,
   };
 
   const options: ActionOption[] = [

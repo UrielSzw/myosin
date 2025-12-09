@@ -128,4 +128,12 @@ export const tempoSelectorTranslations = {
     es: "Excéntrica - Pausa - Concéntrica - Pausa",
     en: "Eccentric - Pause - Concentric - Pause",
   },
+
+  // Tempo phase names (for UI display)
+  phaseNames: {
+    eccentric: { es: "Excéntrica", en: "Eccentric" },
+    pause1: { es: "Pausa Inferior", en: "Bottom Pause" },
+    concentric: { es: "Concéntrica", en: "Concentric" },
+    pause2: { es: "Pausa Superior", en: "Top Pause" },
+  },
 } as const;

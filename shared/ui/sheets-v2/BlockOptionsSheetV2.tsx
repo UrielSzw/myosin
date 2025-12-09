@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { sharedUiTranslations as translations } from "@/shared/translations/shared-ui";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -129,53 +130,26 @@ export const BlockOptionsSheetV2 = ({
   }, [visible, backdropAnim, slideAnim, optionsAnim]);
 
   const t = {
-    blockOptions: { es: "Opciones del Bloque", en: "Block Options" },
-    exerciseOptions: { es: "Opciones del Ejercicio", en: "Exercise Options" },
-    addExercise: { es: "Agregar Ejercicio", en: "Add Exercise" },
-    addExerciseDesc: {
-      es: "Añadir otro ejercicio al superset",
-      en: "Add another exercise to superset",
-    },
-    addExerciseSuperset: { es: "Crear Superserie", en: "Create Superset" },
-    addExerciseSupersetDesc: {
-      es: "Combinar con otro ejercicio",
-      en: "Combine with another exercise",
-    },
-    replaceExercise: { es: "Reemplazar Ejercicio", en: "Replace Exercise" },
-    replaceExerciseDesc: {
-      es: "Cambiar por otro ejercicio",
-      en: "Change to another exercise",
-    },
-    separateExercises: { es: "Separar Ejercicios", en: "Separate Exercises" },
-    separateExercisesDesc: {
-      es: "Convertir a bloques individuales",
-      en: "Convert to individual blocks",
-    },
-    reorderExercises: { es: "Reordenar Ejercicios", en: "Reorder Exercises" },
-    reorderExercisesDesc: {
-      es: "Cambiar orden dentro del bloque",
-      en: "Change order within block",
-    },
-    reorderBlocks: { es: "Reordenar Bloques", en: "Reorder Blocks" },
-    reorderBlocksDesc: {
-      es: "Cambiar orden de la rutina",
-      en: "Change routine order",
-    },
-    deleteBlock: { es: "Eliminar Bloque", en: "Delete Block" },
-    deleteExercise: { es: "Eliminar Ejercicio", en: "Delete Exercise" },
-    deleteDesc: {
-      es: "Esta acción no se puede deshacer",
-      en: "This action cannot be undone",
-    },
-    startTimerMode: { es: "Iniciar Timer", en: "Start Timer" },
-    startTimerModeDesc: {
-      es: "Timer automático para el circuito",
-      en: "Automatic timer for the circuit",
-    },
-    unbalancedSetsWarning: {
-      es: "Igualar sets por ejercicio",
-      en: "Balance sets per exercise",
-    },
+    blockOptions: translations.blockOptionsTitle,
+    exerciseOptions: translations.exerciseOptionsTitle,
+    addExercise: translations.addExerciseTitle,
+    addExerciseDesc: translations.addExerciseToSupersetDesc,
+    addExerciseSuperset: translations.createSupersetTitle,
+    addExerciseSupersetDesc: translations.createSupersetDesc,
+    replaceExercise: translations.replaceExerciseTitle,
+    replaceExerciseDesc: translations.replaceExerciseDesc,
+    separateExercises: translations.separateExercisesTitle,
+    separateExercisesDesc: translations.separateExercisesDesc,
+    reorderExercises: translations.reorderExercisesTitle,
+    reorderExercisesDesc: translations.reorderExercisesDesc,
+    reorderBlocks: translations.reorderBlocksTitle,
+    reorderBlocksDesc: translations.reorderBlocksDesc,
+    deleteBlock: translations.deleteBlockTitle,
+    deleteExercise: translations.deleteExerciseTitle,
+    deleteDesc: translations.deleteBlockDesc,
+    startTimerMode: translations.startTimerMode,
+    startTimerModeDesc: translations.startTimerModeDesc,
+    unbalancedSetsWarning: translations.unbalancedSetsWarning,
   };
 
   // Check if timer mode should be shown (circuit with time exercises)

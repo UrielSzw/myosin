@@ -6,6 +6,7 @@
  */
 
 import { PR_SCORE_CONFIG } from "@/shared/db/utils/pr";
+import { prDetailTranslations } from "@/shared/translations/pr-detail";
 import type { SupportedLanguage } from "@/shared/types/language";
 import type { MeasurementTemplateId } from "@/shared/types/measurement";
 import type { DistanceUnit } from "./distance-conversion";
@@ -30,14 +31,11 @@ export interface PRDisplayData {
 }
 
 /**
- * Score name translations per score type
+ * Get score name from translations
  */
-const SCORE_NAMES: Record<string, Record<SupportedLanguage, string>> = {
-  estimated_1rm: { es: "Est. 1RM", en: "Est. 1RM" },
-  longest_hold: { es: "Duración", en: "Duration" },
-  tut_volume: { es: "Volumen TUT", en: "TUT Volume" },
-  longest_distance: { es: "Distancia", en: "Distance" },
-  total_work: { es: "Trabajo Total", en: "Total Work" },
+const getScoreName = (scoreType: string, lang: SupportedLanguage): string => {
+  const scoreNames = prDetailTranslations.scoreNames;
+  return scoreNames[scoreType as keyof typeof scoreNames]?.[lang] ?? scoreType;
 };
 
 /**
@@ -116,7 +114,7 @@ export const formatPRDisplay = (
   lang: SupportedLanguage
 ): PRDisplayData => {
   const config = PR_SCORE_CONFIG[template];
-  const scoreName = SCORE_NAMES[config.scoreName]?.[lang] ?? config.scoreName;
+  const scoreName = getScoreName(config.scoreName, lang);
 
   switch (template) {
     // ═══════════════════════════════════════════════════════════════
@@ -127,7 +125,7 @@ export const formatPRDisplay = (
       const weightDisplay = fromKg(primaryValue, weightUnit, 1);
       const reps = secondaryValue ?? 0;
       const scoreDisplay = fromKg(prScore, weightUnit, 1);
-      const repsLabel = lang === "es" ? "reps" : "reps";
+      const repsLabel = prDetailTranslations.reps[lang];
       return {
         mainDisplay: `${weightDisplay} ${weightUnit} × ${reps} ${repsLabel}`,
         primaryDisplay: `${weightDisplay} ${weightUnit}`,
@@ -187,7 +185,7 @@ export const formatPRDisplay = (
     case "distance_time": {
       const distStr = formatLongDistance(primaryValue, distanceUnit);
       const timeStr = formatDuration((secondaryValue ?? 0) * 60); // min → sec
-      const inWord = lang === "es" ? "en" : "in";
+      const inWord = prDetailTranslations.inPreposition[lang];
       return {
         mainDisplay: `${distStr} ${inWord} ${timeStr}`,
         primaryDisplay: distStr,
@@ -247,7 +245,7 @@ export const getPRCelebrationMessage = (
     lang
   );
 
-  const prLabel = lang === "es" ? "¡NUEVO PR!" : "NEW PR!";
+  const prLabel = prDetailTranslations.newPRCelebration[lang];
 
   // For single-metric templates, don't show redundant score
   if (template === "time_only" || template === "distance_only") {

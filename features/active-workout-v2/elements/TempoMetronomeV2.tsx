@@ -1,8 +1,8 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
 import { tempoMetronomeTranslations } from "@/shared/translations/tempo-metronome";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import {
   ArrowDown,
@@ -43,10 +43,9 @@ type Props = {
 };
 
 interface TempoPhase {
-  name: { es: string; en: string };
+  type: "eccentric" | "pause1" | "concentric" | "pause2";
   duration: number;
   color: string;
-  type: "eccentric" | "pause1" | "concentric" | "pause2";
   icon: "ArrowDown" | "Pause" | "ArrowUp" | "Square";
 }
 
@@ -84,42 +83,39 @@ type Action =
 // ============================================================================
 
 const parseTempoString = (
-  tempoString: string | null | undefined,
-  t: typeof tempoMetronomeTranslations
+  tempoString: string | null | undefined
 ): TempoPhase[] => {
   if (!tempoString) return [];
 
-  const [eccentric, pause1, concentric, pause2] = tempoString
-    .split("-")
-    .map(Number);
+  const parts = tempoString.split("-").map(Number);
+  const eccentric = parts[0] ?? 0;
+  const pause1 = parts[1] ?? 0;
+  const concentric = parts[2] ?? 0;
+  const pause2 = parts[3] ?? 0;
 
   const phases: TempoPhase[] = [
     {
-      name: t.phases.eccentric,
+      type: "eccentric",
       duration: eccentric,
       color: PHASE_COLORS.eccentric,
-      type: "eccentric",
       icon: "ArrowDown",
     },
     {
-      name: t.phases.pause1,
+      type: "pause1",
       duration: pause1,
       color: PHASE_COLORS.pause1,
-      type: "pause1",
       icon: "Pause",
     },
     {
-      name: t.phases.concentric,
+      type: "concentric",
       duration: concentric,
       color: PHASE_COLORS.concentric,
-      type: "concentric",
       icon: "ArrowUp",
     },
     {
-      name: t.phases.pause2,
+      type: "pause2",
       duration: pause2,
       color: PHASE_COLORS.pause2,
-      type: "pause2",
       icon: "Square",
     },
   ];
@@ -273,7 +269,7 @@ export const TempoMetronomeV2: React.FC<Props> = ({
 
   const [state, dispatch] = useReducer(timerReducer, initialState);
 
-  const phases = parseTempoString(tempo, t);
+  const phases = parseTempoString(tempo);
   const currentPhase = phases[state.currentPhaseIndex];
 
   const intervalRef = useRef<number | null>(null);
@@ -342,9 +338,9 @@ export const TempoMetronomeV2: React.FC<Props> = ({
       );
       pulse.start();
       return () => pulse.stop();
-    } else {
-      pulseAnim.setValue(1);
     }
+    pulseAnim.setValue(1);
+    return undefined;
   }, [state.timerState, pulseAnim]);
 
   // ============================================================================
@@ -509,7 +505,7 @@ export const TempoMetronomeV2: React.FC<Props> = ({
     }
 
     if (state.timerState === "running" && currentPhase) {
-      return currentPhase.name[lang];
+      return t.phases[currentPhase.type][lang];
     }
 
     if (state.timerState === "paused") {
@@ -707,43 +703,37 @@ export const TempoMetronomeV2: React.FC<Props> = ({
               >
                 {t.next[lang]}:
               </Typography>
-              <View
-                style={[
-                  styles.nextPhaseChip,
-                  {
-                    backgroundColor: `${
-                      phases[(state.currentPhaseIndex + 1) % phases.length]
-                        ?.color
-                    }20`,
-                  },
-                ]}
-              >
-                <PhaseIcon
-                  icon={
-                    phases[(state.currentPhaseIndex + 1) % phases.length]?.icon
-                  }
-                  size={12}
-                  color={
-                    phases[(state.currentPhaseIndex + 1) % phases.length]?.color
-                  }
-                />
-                <Typography
-                  variant="caption"
-                  weight="semibold"
-                  style={{
-                    color:
-                      phases[(state.currentPhaseIndex + 1) % phases.length]
-                        ?.color,
-                    marginLeft: 4,
-                  }}
-                >
-                  {
-                    phases[(state.currentPhaseIndex + 1) % phases.length]?.name[
-                      lang
-                    ]
-                  }
-                </Typography>
-              </View>
+              {(() => {
+                const nextPhase =
+                  phases[(state.currentPhaseIndex + 1) % phases.length];
+                if (!nextPhase) return null;
+                return (
+                  <View
+                    style={[
+                      styles.nextPhaseChip,
+                      {
+                        backgroundColor: `${nextPhase.color}20`,
+                      },
+                    ]}
+                  >
+                    <PhaseIcon
+                      icon={nextPhase.icon}
+                      size={12}
+                      color={nextPhase.color}
+                    />
+                    <Typography
+                      variant="caption"
+                      weight="semibold"
+                      style={{
+                        color: nextPhase.color,
+                        marginLeft: 4,
+                      }}
+                    >
+                      {t.phases[nextPhase.type][lang]}
+                    </Typography>
+                  </View>
+                );
+              })()}
             </View>
           )}
         </View>
@@ -808,7 +798,7 @@ export const TempoMetronomeV2: React.FC<Props> = ({
                   weight="medium"
                   style={{ color: colors.text, flex: 1 }}
                 >
-                  {phase.name[lang]}
+                  {t.phases[phase.type][lang]}
                 </Typography>
                 <Typography
                   variant="caption"

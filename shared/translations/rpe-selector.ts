@@ -1,44 +1,137 @@
 export const rpeSelectorTranslations = {
-  rpe6: {
-    es: "Podrías hacer 4+ reps más",
-    en: "Could do 4+ more reps",
+  // Main titles
+  title: {
+    es: "Escala de Esfuerzo",
+    en: "Effort Scale",
   },
-  rpe65: {
-    es: "Podrías hacer 3-4 reps más",
-    en: "Could do 3-4 more reps",
+  subtitle: {
+    es: "Selecciona la intensidad percibida",
+    en: "Select perceived intensity",
   },
-  rpe7: {
-    es: "Podrías hacer 2-3 reps más",
-    en: "Could do 2-3 more reps",
+  formSubtitle: {
+    es: "Configura la intensidad objetivo",
+    en: "Configure target intensity",
   },
-  rpe75: {
-    es: "Podrías hacer 1-2 reps más",
-    en: "Could do 1-2 more reps",
+  targetRPE: {
+    es: "RPE Objetivo:",
+    en: "Target RPE:",
   },
-  rpe8: {
-    es: "Podrías hacer 1 rep más",
-    en: "Could do 1 more rep",
+  howDidItFeel: {
+    es: "¿Cómo se sintió?",
+    en: "How did it feel?",
   },
-  rpe85: {
-    es: "Tal vez 1 rep más",
-    en: "Maybe 1 more rep",
+  plannedIntensity: {
+    es: "Intensidad planificada",
+    en: "Planned intensity",
   },
-  rpe9: {
-    es: "No podrías hacer otra rep",
-    en: "Could not do another rep",
+  clear: {
+    es: "Sin RPE",
+    en: "No RPE",
   },
-  rpe95: {
-    es: "La técnica empezó a fallar",
-    en: "Form started to break",
-  },
-  rpe10: {
-    es: "Máximo esfuerzo / Falla",
-    en: "Maximum effort / Failure",
+  confirm: {
+    es: "Confirmar",
+    en: "Confirm",
   },
   selectRPE: {
-    es: "Selecciona el RPE",
+    es: "Seleccionar RPE",
     en: "Select RPE",
   },
+  back: {
+    es: "Volver",
+    en: "Back",
+  },
+
+  // RPE short descriptions
+  rpe6: {
+    es: "Muy fácil",
+    en: "Very easy",
+  },
+  rpe65: {
+    es: "Fácil",
+    en: "Easy",
+  },
+  rpe7: {
+    es: "Moderado",
+    en: "Moderate",
+  },
+  rpe75: {
+    es: "Algo difícil",
+    en: "Somewhat hard",
+  },
+  rpe8: {
+    es: "Difícil",
+    en: "Hard",
+  },
+  rpe85: {
+    es: "Muy difícil",
+    en: "Very hard",
+  },
+  rpe9: {
+    es: "Extremadamente difícil",
+    en: "Extremely hard",
+  },
+  rpe95: {
+    es: "Casi máximo",
+    en: "Almost maximal",
+  },
+  rpe10: {
+    es: "Esfuerzo máximo",
+    en: "Maximum effort",
+  },
+
+  // RPE detailed descriptions
+  rpe6Detail: {
+    es: "Podrías hacer 4+ repeticiones más. Calentamiento o técnica.",
+    en: "Could do 4+ more reps. Warm-up or technique work.",
+  },
+  rpe65Detail: {
+    es: "Podrías hacer 3-4 repeticiones más sin problema.",
+    en: "Could do 3-4 more reps without issue.",
+  },
+  rpe7Detail: {
+    es: "Podrías hacer 3 repeticiones más. Buen trabajo de volumen.",
+    en: "Could do 3 more reps. Good volume work.",
+  },
+  rpe75Detail: {
+    es: "Podrías hacer 2-3 repeticiones más. Empezando a sentirlo.",
+    en: "Could do 2-3 more reps. Starting to feel it.",
+  },
+  rpe8Detail: {
+    es: "Podrías hacer 2 repeticiones más. Trabajo efectivo.",
+    en: "Could do 2 more reps. Effective work.",
+  },
+  rpe85Detail: {
+    es: "Podrías hacer 1-2 repeticiones más. Alta intensidad.",
+    en: "Could do 1-2 more reps. High intensity.",
+  },
+  rpe9Detail: {
+    es: "Podrías hacer 1 repetición más. Muy cerca del fallo.",
+    en: "Could do 1 more rep. Very close to failure.",
+  },
+  rpe95Detail: {
+    es: "Tal vez 1 repetición más con forma imperfecta.",
+    en: "Maybe 1 more rep with imperfect form.",
+  },
+  rpe10Detail: {
+    es: "No podrías hacer ni una repetición más. Fallo muscular.",
+    en: "Couldn't do another rep. Muscular failure.",
+  },
+
+  // Reps in reserve
+  repsInReserve: {
+    es: "rep. en reserva",
+    en: "reps in reserve",
+  },
+  repInReserve: {
+    es: "rep. en reserva",
+    en: "rep in reserve",
+  },
+  noReserve: {
+    es: "Sin reserva",
+    en: "No reserve",
+  },
+
+  // Legacy keys for backwards compatibility
   selectTargetRPE: {
     es: "Seleccionar RPE Objetivo",
     en: "Select Target RPE",
@@ -46,10 +139,6 @@ export const rpeSelectorTranslations = {
   cancel: {
     es: "Cancelar",
     en: "Cancel",
-  },
-  clear: {
-    es: "Limpiar",
-    en: "Clear",
   },
   selectRPEButton: {
     es: "Seleccionar RPE",
@@ -66,17 +155,5 @@ export const rpeSelectorTranslations = {
   configureTargetIntensity: {
     es: "Configura la intensidad objetivo para este ejercicio",
     en: "Configure the target intensity for this exercise",
-  },
-  targetRPE: {
-    es: "RPE Objetivo:",
-    en: "Target RPE:",
-  },
-  howDidItFeel: {
-    es: "¿Cómo se sintió realmente esta serie?",
-    en: "How did this set really feel?",
-  },
-  plannedIntensity: {
-    es: "🎯 Intensidad planificada",
-    en: "🎯 Planned intensity",
   },
 } as const;

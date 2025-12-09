@@ -1,6 +1,7 @@
 import { calculateCalories } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { macrosTranslations as t } from "@/shared/translations/macros";
 import { getLocale, type SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -31,17 +32,6 @@ type MacroHistorySheetProps = {
   onClose: () => void;
   selectedDate: string;
   lang: SupportedLanguage;
-};
-
-const translations = {
-  title: { es: "Historial del día", en: "Today's history" },
-  noEntries: { es: "Sin registros", en: "No entries" },
-  noEntriesDesc: {
-    es: "Aún no has registrado macros hoy",
-    en: "You haven't logged any macros today",
-  },
-  total: { es: "Total", en: "Total" },
-  cal: { es: "cal", en: "cal" },
 };
 
 const MACRO_COLORS = {
@@ -126,7 +116,7 @@ export const MacroHistorySheetV2: React.FC<MacroHistorySheetProps> = ({
                 weight="bold"
                 style={{ color: colors.text }}
               >
-                {translations.title[lang]}
+                {t.historyTitle[lang]}
               </Typography>
             </View>
             <Pressable
@@ -165,10 +155,10 @@ export const MacroHistorySheetV2: React.FC<MacroHistorySheetProps> = ({
                   <Flame size={32} color={colors.textMuted} />
                 </View>
                 <Typography variant="body1" weight="medium" color="textMuted">
-                  {translations.noEntries[lang]}
+                  {t.noEntries[lang]}
                 </Typography>
                 <Typography variant="body2" color="textMuted" align="center">
-                  {translations.noEntriesDesc[lang]}
+                  {t.noEntriesDesc[lang]}
                 </Typography>
               </View>
             ) : (
@@ -313,7 +303,7 @@ export const MacroHistorySheetV2: React.FC<MacroHistorySheetProps> = ({
                           weight="semibold"
                           style={{ color: colors.text }}
                         >
-                          {translations.total[lang]}
+                          {t.total[lang]}
                         </Typography>
                         <View style={styles.totalCalories}>
                           <Typography
@@ -324,7 +314,7 @@ export const MacroHistorySheetV2: React.FC<MacroHistorySheetProps> = ({
                             {Math.round(aggregate.total_calories)}
                           </Typography>
                           <Typography variant="caption" color="textMuted">
-                            {translations.cal[lang]}
+                            {t.cal[lang]}
                           </Typography>
                         </View>
                       </View>

@@ -25,16 +25,12 @@ type Props = {
 };
 
 const MUSCLE_CATEGORIES = [
-  { key: "chest", label: { es: "Pecho", en: "Chest" }, color: "#ef4444" },
-  { key: "back", label: { es: "Espalda", en: "Back" }, color: "#3b82f6" },
-  {
-    key: "shoulders",
-    label: { es: "Hombros", en: "Shoulders" },
-    color: "#8b5cf6",
-  },
-  { key: "arms", label: { es: "Brazos", en: "Arms" }, color: "#f59e0b" },
-  { key: "legs", label: { es: "Piernas", en: "Legs" }, color: "#10b981" },
-  { key: "core", label: { es: "Core", en: "Core" }, color: "#ec4899" },
+  { key: "chest" as const, color: "#ef4444" },
+  { key: "back" as const, color: "#3b82f6" },
+  { key: "shoulders" as const, color: "#8b5cf6" },
+  { key: "arms" as const, color: "#f59e0b" },
+  { key: "legs" as const, color: "#10b981" },
+  { key: "core" as const, color: "#ec4899" },
 ];
 
 export const PRFiltersV2: React.FC<Props> = ({
@@ -154,7 +150,7 @@ export const PRFiltersV2: React.FC<Props> = ({
                     marginLeft: isSelected ? 0 : 6,
                   }}
                 >
-                  {category.label[lang]}
+                  {t[category.key][lang]}
                 </Typography>
               </View>
             </Pressable>

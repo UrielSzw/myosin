@@ -1,6 +1,11 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
-import { toSupportedLanguage } from "@/shared/types/language";
+import { syncStatusTranslations as t } from "@/shared/translations/sync-status";
+import {
+  toSupportedLanguage,
+  type SupportedLanguage,
+  type Translation,
+} from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import {
@@ -23,25 +28,6 @@ type Props = {
   delay?: number;
 };
 
-const translations = {
-  sectionTitle: {
-    es: "Datos Locales",
-    en: "Local Data",
-  },
-  synced: {
-    es: "sincronizados",
-    en: "synced",
-  },
-  unsynced: {
-    es: "sin sincronizar",
-    en: "unsynced",
-  },
-  allSynced: {
-    es: "Todo sincronizado",
-    en: "All synced",
-  },
-};
-
 const TABLE_ICONS: Record<string, { icon: typeof Database; color: string }> = {
   routines: { icon: Dumbbell, color: "#8b5cf6" },
   folders: { icon: FolderOpen, color: "#f59e0b" },
@@ -52,14 +38,28 @@ const TABLE_ICONS: Record<string, { icon: typeof Database; color: string }> = {
   macro_entries: { icon: Utensils, color: "#f97316" },
 };
 
-const TABLE_DISPLAY_NAMES: Record<string, { es: string; en: string }> = {
-  routines: { es: "Rutinas", en: "Routines" },
-  folders: { es: "Carpetas", en: "Folders" },
-  workout_sessions: { es: "Entrenamientos", en: "Workouts" },
-  pr_current: { es: "Records Personales", en: "Personal Records" },
-  tracker_metrics: { es: "Métricas", en: "Metrics" },
-  tracker_entries: { es: "Entradas Tracker", en: "Tracker Entries" },
-  macro_entries: { es: "Entradas Macros", en: "Macro Entries" },
+// Map table names to translation keys
+const TABLE_TRANSLATION_KEYS: Record<string, keyof typeof t> = {
+  routines: "tableRoutines",
+  folders: "tableFolders",
+  workout_sessions: "tableWorkoutSessions",
+  pr_current: "tablePRCurrent",
+  tracker_metrics: "tableTrackerMetrics",
+  tracker_entries: "tableTrackerEntries",
+  macro_entries: "tableMacroEntries",
+};
+
+const getTableDisplayName = (
+  tableName: string,
+  lang: SupportedLanguage,
+  fallback: string
+): string => {
+  const translationKey = TABLE_TRANSLATION_KEYS[tableName];
+  if (translationKey && translationKey in t) {
+    const translation = t[translationKey] as Translation;
+    return translation[lang];
+  }
+  return fallback;
 };
 
 export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
@@ -68,7 +68,7 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
   const lang = toSupportedLanguage(prefs?.language);
 
   // Filter out empty tables
-  const nonEmptyTables = tables.filter((t) => t.total > 0);
+  const nonEmptyTables = tables.filter((tbl) => tbl.total > 0);
 
   return (
     <View>
@@ -84,7 +84,7 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
             letterSpacing: 1,
           }}
         >
-          {translations.sectionTitle[lang]}
+          {t.sectionTitleLocalData[lang]}
         </Typography>
       </Animated.View>
 
@@ -95,8 +95,11 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
             color: "#6366f1",
           };
           const Icon = config.icon;
-          const displayName =
-            TABLE_DISPLAY_NAMES[table.tableName]?.[lang] ?? table.displayName;
+          const displayName = getTableDisplayName(
+            table.tableName,
+            lang,
+            table.displayName
+          );
           const isSynced = table.unsynced === 0;
 
           return (
@@ -173,7 +176,7 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
                             fontSize: 10,
                           }}
                         >
-                          {translations.allSynced[lang]}
+                          {t.allSynced[lang]}
                         </Typography>
                       </View>
                     ) : (
@@ -198,7 +201,7 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
                             fontSize: 10,
                           }}
                         >
-                          {translations.unsynced[lang]}
+                          {t.unsynced[lang]}
                         </Typography>
                       </View>
                     )}
@@ -230,7 +233,7 @@ export const DataSummaryCard = ({ tables, delay = 0 }: Props) => {
                 color="textMuted"
                 style={{ marginTop: 8 }}
               >
-                No hay datos locales
+                {t.noLocalData[lang]}
               </Typography>
             </View>
           </Animated.View>

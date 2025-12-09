@@ -136,6 +136,22 @@ export const exerciseSelectorTranslations = {
     es: "Personalizado",
     en: "Custom",
   },
+  instructions: {
+    es: "Instrucciones",
+    en: "Instructions",
+  },
+  mainMuscle: {
+    es: "Músculo Principal",
+    en: "Main Muscle",
+  },
+  equipment: {
+    es: "Equipamiento",
+    en: "Equipment",
+  },
+  noInstructions: {
+    es: "No hay instrucciones disponibles",
+    en: "No instructions available",
+  },
   noInstructionsAvailable: {
     es: "No hay instrucciones disponibles para este ejercicio",
     en: "No instructions available for this exercise",

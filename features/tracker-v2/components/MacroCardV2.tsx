@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { macrosTranslations as t } from "@/shared/translations/macros";
 import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -28,23 +29,6 @@ import { MacroSetupModalV2 } from "./MacroSetupModalV2";
 type MacroCardProps = {
   selectedDate: string;
   lang: SupportedLanguage;
-};
-
-const translations = {
-  macros: { es: "Macros", en: "Macros" },
-  setupRequired: { es: "Configurar objetivos", en: "Set up targets" },
-  tapToSetup: {
-    es: "Toca para establecer tus objetivos de macros",
-    en: "Tap to set your macro targets",
-  },
-  protein: { es: "Proteína", en: "Protein" },
-  carbs: { es: "Carbs", en: "Carbs" },
-  fats: { es: "Grasas", en: "Fats" },
-  calories: { es: "Calorías", en: "Calories" },
-  cal: { es: "cal", en: "cal" },
-  g: { es: "g", en: "g" },
-  add: { es: "Agregar", en: "Add" },
-  quickAdd: { es: "Rápido", en: "Quick" },
 };
 
 // Macro colors
@@ -148,10 +132,10 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
               weight="semibold"
               style={{ color: colors.text }}
             >
-              {translations.macros[lang]}
+              {t.macros[lang]}
             </Typography>
             <Typography variant="body2" color="textMuted" align="center">
-              {translations.tapToSetup[lang]}
+              {t.tapToSetup[lang]}
             </Typography>
           </View>
         </Pressable>
@@ -213,7 +197,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
                 weight="semibold"
                 style={{ color: colors.text }}
               >
-                {translations.macros[lang]}
+                {t.macros[lang]}
               </Typography>
               <Pressable
                 onPress={() => setShowSetupModal(true)}
@@ -236,7 +220,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
                 {Math.round(currentCalories)}
               </Typography>
               <Typography variant="caption" color="textMuted">
-                / {Math.round(targetCalories)} {translations.cal[lang]}
+                / {Math.round(targetCalories)} {t.cal[lang]}
               </Typography>
             </View>
           </View>
@@ -244,7 +228,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
           {/* Macro bars */}
           <View style={styles.macrosContainer}>
             <MacroProgressBarV2
-              label={translations.protein[lang]}
+              label={t.protein[lang]}
               current={currentProtein}
               target={targetProtein}
               progress={proteinProgress}
@@ -253,7 +237,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
               isDarkMode={isDarkMode}
             />
             <MacroProgressBarV2
-              label={translations.carbs[lang]}
+              label={t.carbs[lang]}
               current={currentCarbs}
               target={targetCarbs}
               progress={carbsProgress}
@@ -262,7 +246,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
               isDarkMode={isDarkMode}
             />
             <MacroProgressBarV2
-              label={translations.fats[lang]}
+              label={t.fats[lang]}
               current={currentFats}
               target={targetFats}
               progress={fatsProgress}
@@ -290,7 +274,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
                 weight="semibold"
                 style={{ color: "#fff" }}
               >
-                {translations.add[lang]}
+                {t.add[lang]}
               </Typography>
             </Pressable>
 
@@ -315,7 +299,7 @@ export const MacroCardV2: React.FC<MacroCardProps> = ({
                 weight="semibold"
                 style={{ color: colors.text }}
               >
-                {translations.quickAdd[lang]}
+                {t.quickAdd[lang]}
               </Typography>
             </Pressable>
 

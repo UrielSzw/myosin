@@ -19,18 +19,29 @@ import {
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
-const QUICK_OPTIONS = [
-  { label: { es: "Sin descanso", en: "No rest" }, value: 0 },
-  { label: { es: "30s", en: "30s" }, value: 30 },
-  { label: { es: "45s", en: "45s" }, value: 45 },
-  { label: { es: "1 min", en: "1 min" }, value: 60 },
-  { label: { es: "1:30", en: "1:30" }, value: 90 },
-  { label: { es: "2 min", en: "2 min" }, value: 120 },
-  { label: { es: "2:30", en: "2:30" }, value: 150 },
-  { label: { es: "3 min", en: "3 min" }, value: 180 },
-  { label: { es: "4 min", en: "4 min" }, value: 240 },
-  { label: { es: "5 min", en: "5 min" }, value: 300 },
-];
+// Quick options with values - labels come from translations
+const QUICK_OPTIONS_VALUES = [
+  0, 30, 45, 60, 90, 120, 150, 180, 240, 300,
+] as const;
+
+// Map value to translation key
+const getQuickOptionLabel = (
+  value: number
+): keyof typeof t.restQuickOptions => {
+  const keyMap: Record<number, keyof typeof t.restQuickOptions> = {
+    0: "noRest",
+    30: "sec30",
+    45: "sec45",
+    60: "min1",
+    90: "min1_30",
+    120: "min2",
+    150: "min2_30",
+    180: "min3",
+    240: "min4",
+    300: "min5",
+  };
+  return keyMap[value] ?? "noRest";
+};
 
 export type RestTimeType =
   | "between-exercises"
@@ -340,13 +351,14 @@ export const RestTimeSheetV2 = ({
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.quickOptionsScroll}
             >
-              {QUICK_OPTIONS.map((option) => {
-                const isSelected = selectedTime === option.value;
+              {QUICK_OPTIONS_VALUES.map((value) => {
+                const isSelected = selectedTime === value;
+                const labelKey = getQuickOptionLabel(value);
 
                 return (
                   <Pressable
-                    key={option.value}
-                    onPress={() => setSelectedTime(option.value)}
+                    key={value}
+                    onPress={() => setSelectedTime(value)}
                     style={({ pressed }) => [
                       styles.quickOption,
                       {
@@ -372,7 +384,7 @@ export const RestTimeSheetV2 = ({
                         color: isSelected ? "#fff" : colors.text,
                       }}
                     >
-                      {option.label[lang]}
+                      {t.restQuickOptions[labelKey][lang]}
                     </Typography>
                   </Pressable>
                 );

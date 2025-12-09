@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { syncStatusTranslations as t } from "@/shared/translations/sync-status";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -20,13 +21,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 type Props = {
   onRefresh: () => void;
   isLoading: boolean;
-};
-
-const translations = {
-  title: {
-    es: "Estado de Sync",
-    en: "Sync Status",
-  },
 };
 
 export const SyncStatusHeader = ({ onRefresh, isLoading }: Props) => {
@@ -84,7 +78,7 @@ export const SyncStatusHeader = ({ onRefresh, isLoading }: Props) => {
         {/* Title */}
         <View style={styles.titleContainer}>
           <Typography variant="h5" weight="bold" style={{ color: colors.text }}>
-            {translations.title[lang]}
+            {t.title[lang]}
           </Typography>
         </View>
 

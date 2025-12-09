@@ -14,6 +14,12 @@
 export type SupportedLanguage = "es" | "en";
 
 /**
+ * Generic translation object type.
+ * All translation entries should follow this structure.
+ */
+export type Translation = Record<SupportedLanguage, string>;
+
+/**
  * Default language for the app.
  */
 export const DEFAULT_LANGUAGE: SupportedLanguage = "en";

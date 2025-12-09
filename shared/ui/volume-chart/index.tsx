@@ -5,9 +5,9 @@
  * Used in analytics and routine form preview.
  */
 
-import type { SupportedLanguage } from "@/shared/types/language";
-
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
+import { analyticsTranslations } from "@/shared/translations/analytics";
+import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Dumbbell } from "lucide-react-native";
@@ -46,25 +46,16 @@ export interface VolumeChartProps {
 // CONSTANTS
 // =============================================================================
 
-type MuscleCategory = {
-  key: string;
-  label: { es: string; en: string };
-  color: string;
+// Map of category key to color - labels come from translations
+const MUSCLE_CATEGORY_COLORS: Record<string, string> = {
+  Pecho: "#ef4444",
+  Espalda: "#3b82f6",
+  Hombros: "#8b5cf6",
+  Brazos: "#f59e0b",
+  Piernas: "#10b981",
+  Core: "#ec4899",
+  Otro: "#6b7280",
 };
-
-const MUSCLE_CATEGORIES: MuscleCategory[] = [
-  { key: "Pecho", label: { es: "Pecho", en: "Chest" }, color: "#ef4444" },
-  { key: "Espalda", label: { es: "Espalda", en: "Back" }, color: "#3b82f6" },
-  {
-    key: "Hombros",
-    label: { es: "Hombros", en: "Shoulders" },
-    color: "#8b5cf6",
-  },
-  { key: "Brazos", label: { es: "Brazos", en: "Arms" }, color: "#f59e0b" },
-  { key: "Piernas", label: { es: "Piernas", en: "Legs" }, color: "#10b981" },
-  { key: "Core", label: { es: "Core", en: "Core" }, color: "#ec4899" },
-  { key: "Otro", label: { es: "Otro", en: "Other" }, color: "#6b7280" },
-];
 
 // Also support English keys from WeeklyVolumeMap
 const CATEGORY_KEY_MAP: Record<string, string> = {
@@ -77,9 +68,18 @@ const CATEGORY_KEY_MAP: Record<string, string> = {
   other: "Otro",
 };
 
-const TRANSLATIONS = {
-  weeklyVolume: { es: "Volumen Semanal", en: "Weekly Volume" },
-  sets: { es: "series", en: "sets" },
+// Map normalized key to translation key
+const CATEGORY_TRANSLATION_KEY_MAP: Record<
+  string,
+  keyof typeof analyticsTranslations.muscleCategories
+> = {
+  Pecho: "chest",
+  Espalda: "back",
+  Hombros: "shoulders",
+  Brazos: "arms",
+  Piernas: "legs",
+  Core: "core",
+  Otro: "other",
 };
 
 // =============================================================================
@@ -101,17 +101,15 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({
     // Normalize category keys and merge with category config
     const normalizedData = volumeData.map((item) => {
       const normalizedKey = CATEGORY_KEY_MAP[item.category] || item.category;
-      const categoryConfig = MUSCLE_CATEGORIES.find(
-        (c) => c.key === normalizedKey
-      );
+      const translationKey = CATEGORY_TRANSLATION_KEY_MAP[normalizedKey];
+      const label = translationKey
+        ? analyticsTranslations.muscleCategories[translationKey]
+        : { es: normalizedKey, en: normalizedKey };
 
       return {
         key: normalizedKey,
-        label: categoryConfig?.label || {
-          es: normalizedKey,
-          en: normalizedKey,
-        },
-        color: categoryConfig?.color || "#6b7280",
+        label,
+        color: MUSCLE_CATEGORY_COLORS[normalizedKey] || "#6b7280",
         sets: Math.round(item.sets),
       };
     });
@@ -134,7 +132,7 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({
     return null;
   }
 
-  const displayTitle = title || TRANSLATIONS.weeklyVolume[lang];
+  const displayTitle = title || analyticsTranslations.weeklyVolume[lang];
 
   return (
     <Animated.View entering={FadeInDown.duration(400).delay(animationDelay)}>
@@ -179,7 +177,7 @@ export const VolumeChart: React.FC<VolumeChartProps> = ({
               weight="semibold"
               style={{ color: colors.primary[500] }}
             >
-              {totalSets} {TRANSLATIONS.sets[lang]}
+              {totalSets} {analyticsTranslations.sets[lang]}
             </Typography>
           </View>
         </View>

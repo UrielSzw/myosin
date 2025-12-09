@@ -1,5 +1,6 @@
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { syncStatusTranslations as t } from "@/shared/translations/sync-status";
 import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -12,33 +13,6 @@ import type { QueueStats } from "../hooks/use-sync-status";
 type Props = {
   stats: QueueStats;
   delay?: number;
-};
-
-const translations = {
-  sectionTitle: {
-    es: "Cola de Sincronización",
-    en: "Sync Queue",
-  },
-  pending: {
-    es: "Pendientes",
-    en: "Pending",
-  },
-  processing: {
-    es: "Procesando",
-    en: "Processing",
-  },
-  failed: {
-    es: "Con error",
-    en: "Failed",
-  },
-  emptyQueue: {
-    es: "La cola está vacía",
-    en: "Queue is empty",
-  },
-  itemsInQueue: {
-    es: "items en cola",
-    en: "items in queue",
-  },
 };
 
 export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
@@ -62,7 +36,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
             letterSpacing: 1,
           }}
         >
-          {translations.sectionTitle[lang]}
+          {t.sectionTitleQueue[lang]}
         </Typography>
       </Animated.View>
 
@@ -104,7 +78,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
                   color="textMuted"
                   style={{ marginTop: 8 }}
                 >
-                  {translations.emptyQueue[lang]}
+                  {t.emptyQueue[lang]}
                 </Typography>
               </View>
             ) : (
@@ -129,7 +103,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
                       {stats.pending}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
-                      {translations.pending[lang]}
+                      {t.pending[lang]}
                     </Typography>
                   </View>
 
@@ -151,7 +125,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
                       {stats.processing}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
-                      {translations.processing[lang]}
+                      {t.processing[lang]}
                     </Typography>
                   </View>
 
@@ -173,7 +147,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
                       {stats.failed}
                     </Typography>
                     <Typography variant="caption" color="textMuted">
-                      {translations.failed[lang]}
+                      {t.failed[lang]}
                     </Typography>
                   </View>
                 </View>
@@ -194,7 +168,7 @@ export const QueueStatusCard = ({ stats, delay = 0 }: Props) => {
                     weight="medium"
                     color="textMuted"
                   >
-                    {stats.total} {translations.itemsInQueue[lang]}
+                    {stats.total} {t.itemsInQueue[lang]}
                   </Typography>
                 </View>
               </>

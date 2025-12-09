@@ -1,4 +1,3 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
@@ -8,6 +7,7 @@ import {
   exerciseMuscleTranslations,
 } from "@/shared/translations/exercise-labels";
 import { exerciseSelectorTranslations } from "@/shared/translations/exercise-selector";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { IExerciseEquipment, IExerciseMuscle } from "@/shared/types/workout";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -77,13 +77,10 @@ export const ExerciseDetailViewV2: React.FC<Props> = ({
   const cardBorder = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
 
   const translations = {
-    instructions: { es: "Instrucciones", en: "Instructions" },
-    muscle: { es: "Músculo Principal", en: "Main Muscle" },
-    equipment: { es: "Equipamiento", en: "Equipment" },
-    noInstructions: {
-      es: "No hay instrucciones disponibles",
-      en: "No instructions available",
-    },
+    instructions: exerciseSelectorTranslations.instructions,
+    muscle: exerciseSelectorTranslations.mainMuscle,
+    equipment: exerciseSelectorTranslations.equipment,
+    noInstructions: exerciseSelectorTranslations.noInstructions,
   };
 
   return (

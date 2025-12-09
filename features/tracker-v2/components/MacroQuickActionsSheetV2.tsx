@@ -4,6 +4,7 @@ import {
 } from "@/shared/db/schema/macros";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useAuth } from "@/shared/providers/auth-provider";
+import { macrosTranslations as t } from "@/shared/translations/macros";
 import type { SupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
@@ -27,19 +28,6 @@ type MacroQuickActionsSheetProps = {
   quickActions: BaseMacroQuickAction[];
   selectedDate: string;
   lang: SupportedLanguage;
-};
-
-const translations = {
-  title: { es: "Agregar rápido", en: "Quick add" },
-  subtitle: { es: "Selecciona una comida", en: "Select a food" },
-  empty: {
-    es: "No hay acciones rápidas configuradas",
-    en: "No quick actions configured",
-  },
-  cal: { es: "cal", en: "cal" },
-  p: { es: "P", en: "P" },
-  c: { es: "C", en: "C" },
-  f: { es: "F", en: "F" },
 };
 
 const MACRO_COLORS = {
@@ -110,17 +98,17 @@ export const MacroQuickActionsSheetV2: React.FC<
               </Typography>
               <View style={styles.macroChips}>
                 <MacroChip
-                  label={translations.p[lang]}
+                  label={t.p[lang]}
                   value={item.protein}
                   color={MACRO_COLORS.protein}
                 />
                 <MacroChip
-                  label={translations.c[lang]}
+                  label={t.c[lang]}
                   value={item.carbs}
                   color={MACRO_COLORS.carbs}
                 />
                 <MacroChip
-                  label={translations.f[lang]}
+                  label={t.f[lang]}
                   value={item.fats}
                   color={MACRO_COLORS.fats}
                 />
@@ -136,7 +124,7 @@ export const MacroQuickActionsSheetV2: React.FC<
                 {calories}
               </Typography>
               <Typography variant="caption" color="textMuted">
-                {translations.cal[lang]}
+                {t.cal[lang]}
               </Typography>
             </View>
           </View>
@@ -189,10 +177,10 @@ export const MacroQuickActionsSheetV2: React.FC<
                   weight="bold"
                   style={{ color: colors.text }}
                 >
-                  {translations.title[lang]}
+                  {t.quickActionsTitle[lang]}
                 </Typography>
                 <Typography variant="caption" color="textMuted">
-                  {translations.subtitle[lang]}
+                  {t.quickActionsSubtitle[lang]}
                 </Typography>
               </View>
             </View>
@@ -224,7 +212,7 @@ export const MacroQuickActionsSheetV2: React.FC<
           ) : (
             <View style={styles.emptyState}>
               <Typography variant="body1" color="textMuted" align="center">
-                {translations.empty[lang]}
+                {t.noQuickActions[lang]}
               </Typography>
             </View>
           )}

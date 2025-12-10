@@ -104,10 +104,21 @@ export type PrepareFinishDataOptions = {
 // RESULT TYPES
 // ============================================
 
+/**
+ * Information about a newly unlocked exercise from progressions
+ */
+export type UnlockedExerciseInfo = {
+  exerciseId: string;
+  unlockedByExerciseId: string;
+  unlockedByPrId?: string;
+};
+
 export type FinishWorkoutResult = {
   success: boolean;
   sessionId: string | null;
   error?: string;
+  /** Exercises that were unlocked as a result of PRs in this workout */
+  unlockedExercises?: UnlockedExerciseInfo[];
 };
 
 // ============================================

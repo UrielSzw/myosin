@@ -14,6 +14,7 @@ import {
   macro_targets,
 } from "../../db/schema/macros";
 import { pr_current, pr_history } from "../../db/schema/pr";
+import { userExerciseUnlocks } from "../../db/schema/progressions";
 import {
   exercise_in_block,
   folders,
@@ -76,7 +77,8 @@ export type SyncableTable =
   | "workout_sets"
   | "user_preferences"
   | "pr_current"
-  | "pr_history";
+  | "pr_history"
+  | "user_exercise_unlocks";
 
 // ============================================
 // TABLE MAP
@@ -106,6 +108,7 @@ const tableSchemaMap = {
   user_preferences,
   pr_current,
   pr_history,
+  user_exercise_unlocks: userExerciseUnlocks,
 } as const;
 
 // ============================================
@@ -519,6 +522,20 @@ const inferAndMarkFromMutation = async (
     case "USER_PREFERENCES_UPDATE":
       // user_preferences usa user_id como identificador único, no id
       // El sync se maneja diferente aquí
+      break;
+
+    // Progression Unlocks
+    case "USER_EXERCISE_UNLOCK_UPSERT":
+      if (payload.id)
+        await markEntitySynced("user_exercise_unlocks", payload.id);
+      break;
+    case "USER_EXERCISE_UNLOCKS_BULK":
+      if (payload.unlocks?.length) {
+        for (const unlock of payload.unlocks) {
+          if (unlock.id)
+            await markEntitySynced("user_exercise_unlocks", unlock.id);
+        }
+      }
       break;
 
     default:

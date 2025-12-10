@@ -235,3 +235,14 @@ export const exerciseEquipmentTranslations = {
     en: "Other",
   },
 } as const;
+
+export const exerciseTypeTranslations = {
+  compound: {
+    es: "Compuesto",
+    en: "Compound",
+  },
+  isolation: {
+    es: "Aislamiento",
+    en: "Isolation",
+  },
+} as const;

@@ -92,6 +92,14 @@ export const profileTranslations = {
     es: "Peso, altura, nivel de experiencia",
     en: "Weight, height, experience level",
   },
+  progressionPaths: {
+    es: "Progresiones",
+    en: "Progressions",
+  },
+  progressionPathsSubtitle: {
+    es: "Árbol de habilidades de calistenia",
+    en: "Calisthenics skill tree",
+  },
 
   // Support Section
   supportSection: {

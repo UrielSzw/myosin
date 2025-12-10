@@ -1390,50 +1390,50 @@ const MUSCLEUP_PREREQUISITES_SEED = {
 
 ### Fase 1: Foundation (Sprint 1-2)
 
-- [ ] **Schema & Migrations**
+- [x] **Schema & Migrations**
 
-  - [ ] Crear tabla `exercise_progressions`
-  - [ ] Crear tabla `progression_paths`
-  - [ ] Crear tabla `progression_path_exercises`
-  - [ ] Crear tabla `user_exercise_unlocks`
-  - [ ] Índices y relaciones
+  - [x] Crear tabla `exercise_progressions`
+  - [x] Crear tabla `progression_paths`
+  - [x] Crear tabla `progression_path_exercises`
+  - [x] Crear tabla `user_exercise_unlocks`
+  - [x] Índices y relaciones
 
-- [ ] **Seed Data**
+- [x] **Seed Data**
 
-  - [ ] Pull-up progression path
-  - [ ] Push-up progression path
-  - [ ] Dip progression path
+  - [x] Pull-up progression path
+  - [x] Push-up progression path
+  - [x] Dip progression path
   - [ ] Squat progression path
   - [ ] L-sit progression path
 
-- [ ] **Repository Layer**
-  - [ ] `progressionRepository.getProgressionsFrom(exerciseId)`
-  - [ ] `progressionRepository.getProgressionsTo(exerciseId)`
-  - [ ] `progressionRepository.getPathBySlug(slug)`
-  - [ ] `unlockRepository.getUserUnlocks(userId)`
-  - [ ] `unlockRepository.upsertUnlock(...)`
+- [x] **Repository Layer**
+  - [x] `progressionRepository.getProgressionsFrom(exerciseId)`
+  - [x] `progressionRepository.getProgressionsTo(exerciseId)`
+  - [x] `progressionRepository.getPathBySlug(slug)`
+  - [x] `unlockRepository.getUserUnlocks(userId)`
+  - [x] `unlockRepository.upsertUnlock(...)`
 
 ### Fase 2: Core Logic (Sprint 3)
 
-- [ ] **Progression Service**
+- [x] **Progression Service**
 
-  - [ ] `checkUnlocksOnNewPR(userId, exerciseId, prData)`
-  - [ ] `getProgressionTree(userId, exerciseId)`
-  - [ ] `getPathToSkill(userId, pathSlug)`
-  - [ ] `manuallyUnlockExercise(userId, exerciseId)`
+  - [x] `checkUnlocksOnNewPR(userId, exerciseId, prData)` → `checkUnlocksForExercise`
+  - [x] `getProgressionTree(userId, exerciseId)` → `getExerciseProgressionStatus`
+  - [x] `getPathToSkill(userId, pathSlug)` → `getPathProgress`
+  - [x] `manuallyUnlockExercise(userId, exerciseId)`
 
 - [ ] **Integración con PR System**
   - [ ] Hook en `completeSet()` para verificar unlocks
   - [ ] Almacenar unlocks en workout session
-  - [ ] Mutations de sync para `user_exercise_unlocks`
+  - [x] Mutations de sync para `user_exercise_unlocks` → `use-progressions-sync.ts`
 
 ### Fase 3: UI Básica (Sprint 4-5)
 
-- [ ] **Exercise Detail - Progression Section**
+- [x] **Exercise Detail - Progression Section**
 
-  - [ ] Componente `ExerciseProgressionInfo`
-  - [ ] Lista de easier/harder/variations
-  - [ ] Barra de progreso hacia unlock
+  - [x] Componente `ExerciseProgressionInfo`
+  - [x] Lista de easier/harder/variations
+  - [x] Barra de progreso hacia unlock
 
 - [ ] **Exercise Selector - Suggestions**
 

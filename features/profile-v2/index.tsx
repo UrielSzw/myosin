@@ -13,6 +13,7 @@ import {
   Settings,
   Shield,
   Sun,
+  TrendingUp,
   User,
 } from "lucide-react-native";
 import React, { useState } from "react";
@@ -63,6 +64,10 @@ export const ProfileFeatureV2 = () => {
 
   const handleNavigateSyncStatus = () => {
     router.push("/profile/sync-status" as never);
+  };
+
+  const handleNavigateProgressionPaths = () => {
+    router.push("/progression-paths" as never);
   };
 
   // Calculate header height for padding
@@ -140,6 +145,15 @@ export const ProfileFeatureV2 = () => {
               subtitle={t.personalDataSubtitle[lang]}
               onPress={handleNavigatePersonalData}
               delay={850}
+            />
+            <SettingItemV2
+              icon={TrendingUp}
+              iconColor="#8b5cf6"
+              iconBgColor="rgba(139, 92, 246, 0.15)"
+              title={t.progressionPaths[lang]}
+              subtitle={t.progressionPathsSubtitle[lang]}
+              onPress={handleNavigateProgressionPaths}
+              delay={875}
             />
           </SettingSectionV2>
 

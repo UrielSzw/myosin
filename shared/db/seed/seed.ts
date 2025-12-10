@@ -1,4 +1,5 @@
 import { syncExercisesWithLanguage } from "../../hooks/use-exercises-sync";
+import { syncProgressionsCatalog } from "../../hooks/use-progressions-sync";
 import { supabase } from "../../services/supabase";
 import { DEFAULT_LANGUAGE, type SupportedLanguage } from "../../types/language";
 import { usersRepository } from "../repository/user";
@@ -43,6 +44,9 @@ export const loadExercisesSeed = async () => {
   try {
     const currentLanguage = await getUserLanguage();
     await syncExercisesWithLanguage(currentLanguage);
+
+    // Sync progressions catalog (exercise progressions, paths, etc.)
+    await syncProgressionsCatalog();
   } catch (error) {
     console.error("❌ Error en seed:", error);
   }

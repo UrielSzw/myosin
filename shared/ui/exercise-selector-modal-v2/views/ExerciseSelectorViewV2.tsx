@@ -16,6 +16,7 @@ import { SearchAndFiltersV2 } from "../components/SearchAndFiltersV2";
 
 type Props = {
   exercises: BaseExercise[];
+  allExercises: BaseExercise[];
   loading: boolean;
   selectedExercises: Record<string, BaseExercise>;
   selectedExercisesLength: number;

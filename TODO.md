@@ -1,5 +1,5 @@
 1. Al eliminar carpeta, preguntar si eliminar o sacar rutinas
-2. Mejorar selector y visualizacion del tempo
-3. Mejorar selector y visualizacion del RPE
-
-PROXIMO: TESTEAR LOGICA DE PRs + FEEDBACK DE UI EN ACTIVE SET ROW
+2. Mejorar Hapatics
+3. Eliminar PR id de user_exercise_unlocks (porque con race conditions puede ser null)
+4. Eliminar exercises images (ya NO se usa)
+5. Revisar deletes y como afecta al sync engine

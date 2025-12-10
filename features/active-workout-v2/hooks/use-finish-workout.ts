@@ -125,6 +125,9 @@ export const useFinishWorkout = () => {
           prs: JSON.stringify(prs),
           improvements: JSON.stringify([]), // For future use
           sessionId,
+          unlockedExercises: result.unlockedExercises
+            ? JSON.stringify(result.unlockedExercises)
+            : undefined,
         },
       } as any);
     } catch (error) {

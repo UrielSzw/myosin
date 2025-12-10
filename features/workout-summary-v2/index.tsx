@@ -14,6 +14,10 @@ import { ImprovementsCardV2 } from "./components/ImprovementsCardV2";
 import { MotivationalCardV2 } from "./components/MotivationalCardV2";
 import { PRShowcaseV2 } from "./components/PRShowcaseV2";
 import { StreakFireV2 } from "./components/StreakFireV2";
+import {
+  UnlockedExercisesCardV2,
+  type UnlockedExercise,
+} from "./components/UnlockedExercisesCardV2";
 import { VictoryBadgeV2 } from "./components/VictoryBadgeV2";
 import { WorkoutStatsCounterV2 } from "./components/WorkoutStatsCounterV2";
 
@@ -37,6 +41,7 @@ export const WorkoutSummaryV2: React.FC = () => {
     improvements: string;
     sessionId: string;
     totalVolume?: string;
+    unlockedExercises?: string;
   }>();
 
   const routineName = params.routineName ?? "Workout";
@@ -56,6 +61,7 @@ export const WorkoutSummaryV2: React.FC = () => {
     prScore: number;
   }[] = [];
   let improvementsCount = 0;
+  let unlockedExercises: UnlockedExercise[] = [];
 
   try {
     if (params.prs) {
@@ -63,6 +69,9 @@ export const WorkoutSummaryV2: React.FC = () => {
     }
     if (params.improvements) {
       improvementsCount = JSON.parse(params.improvements).length;
+    }
+    if (params.unlockedExercises) {
+      unlockedExercises = JSON.parse(params.unlockedExercises);
     }
   } catch {
     // Ignore parse errors
@@ -103,6 +112,7 @@ export const WorkoutSummaryV2: React.FC = () => {
 
   const hasPRs = prs.length > 0;
   const hasImprovements = improvementsCount > 0;
+  const hasUnlocks = unlockedExercises.length > 0;
 
   return (
     <View style={styles.container}>
@@ -151,12 +161,23 @@ export const WorkoutSummaryV2: React.FC = () => {
           />
         )}
 
+        {/* Unlocked Exercises (if any unlocks from progressions) */}
+        {hasUnlocks && (
+          <UnlockedExercisesCardV2
+            unlockedExercises={unlockedExercises}
+            lang={lang}
+            baseDelay={hasPRs ? 1800 : 1400}
+          />
+        )}
+
         {/* Improvements Card (if any improvements) */}
         {hasImprovements && (
           <ImprovementsCardV2
             improvementsCount={improvementsCount}
             lang={lang}
-            baseDelay={hasPRs ? 1800 : 1400}
+            baseDelay={
+              hasPRs && hasUnlocks ? 2200 : hasPRs || hasUnlocks ? 1800 : 1400
+            }
           />
         )}
 
@@ -166,7 +187,7 @@ export const WorkoutSummaryV2: React.FC = () => {
           hasPRs={hasPRs}
           hasImprovements={hasImprovements}
           streak={currentStreak}
-          baseDelay={hasPRs || hasImprovements ? 2100 : 1600}
+          baseDelay={hasPRs || hasImprovements || hasUnlocks ? 2500 : 1600}
         />
 
         {/* Spacer to push button down */}
@@ -176,7 +197,7 @@ export const WorkoutSummaryV2: React.FC = () => {
         <ActionButtonV2
           onPress={handleDone}
           lang={lang}
-          baseDelay={hasPRs || hasImprovements ? 2400 : 1900}
+          baseDelay={hasPRs || hasImprovements || hasUnlocks ? 2800 : 1900}
         />
       </ScrollView>
     </View>

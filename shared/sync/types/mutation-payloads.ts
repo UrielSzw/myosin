@@ -17,6 +17,10 @@ import type {
 } from "../../db/schema/macros";
 import type { PRCurrentInsert, PRHistoryInsert } from "../../db/schema/pr";
 import type {
+  UnlockProgress,
+  UserExerciseUnlockStatus,
+} from "../../db/schema/progressions";
+import type {
   BaseTrackerDailyAggregate,
   BaseTrackerEntry,
   TrackerEntryInsert,
@@ -257,6 +261,28 @@ export interface UserPreferencesUpdatePayload {
   data: Partial<BaseUserPreferences>;
 }
 
+// ==================== USER EXERCISE UNLOCK PAYLOADS ====================
+
+export interface UserExerciseUnlockUpsertPayload {
+  id: string;
+  user_id: string;
+  exercise_id: string;
+  status: UserExerciseUnlockStatus;
+  unlocked_at?: string | null;
+  unlocked_by_exercise_id?: string | null;
+  unlocked_by_pr_id?: string | null;
+  current_progress?: UnlockProgress | null;
+  manually_unlocked?: boolean;
+  manually_unlocked_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface UserExerciseUnlocksBulkPayload {
+  userId: string;
+  unlocks: UserExerciseUnlockUpsertPayload[];
+}
+
 // ==================== DISCRIMINATED UNION ====================
 
 /**
@@ -327,6 +353,10 @@ export type MutationPayloadMap = {
   // User Preferences
   USER_PREFERENCES_CREATE: UserPreferencesCreatePayload;
   USER_PREFERENCES_UPDATE: UserPreferencesUpdatePayload;
+
+  // Progression Unlocks
+  USER_EXERCISE_UNLOCK_UPSERT: UserExerciseUnlockUpsertPayload;
+  USER_EXERCISE_UNLOCKS_BULK: UserExerciseUnlocksBulkPayload;
 };
 
 /**

@@ -2,6 +2,7 @@ import { BaseExercise } from "@/shared/db/schema";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useExerciseFilters } from "@/shared/hooks/use-exercise-filters";
 import { useExercises } from "@/shared/hooks/use-exercises";
+import { ExerciseDetailViewV2 } from "@/shared/ui/exercise-detail-v2";
 import React, { useCallback, useEffect, useState } from "react";
 import { Modal, StatusBar } from "react-native";
 import Animated, {
@@ -12,7 +13,6 @@ import Animated, {
   SlideOutRight,
 } from "react-native-reanimated";
 import { useExerciseSelector } from "./hooks/use-exercise-selector";
-import { ExerciseDetailViewV2 } from "./views/ExerciseDetailViewV2";
 import { ExerciseSelectorViewV2 } from "./views/ExerciseSelectorViewV2";
 
 type Props = {
@@ -144,6 +144,7 @@ export const ExerciseSelectorModalV2: React.FC<Props> = ({
       visible={visible}
       animationType="slide"
       presentationStyle="pageSheet"
+      backdropColor={screenBg}
       onRequestClose={handleCloseModal}
     >
       <StatusBar
@@ -171,6 +172,7 @@ export const ExerciseSelectorModalV2: React.FC<Props> = ({
         >
           <ExerciseSelectorViewV2
             exercises={filtersHook.filteredExercises}
+            allExercises={exercises}
             loading={loading}
             selectedExercises={selectedExercises}
             selectedExercisesLength={selectedExercisesLength}

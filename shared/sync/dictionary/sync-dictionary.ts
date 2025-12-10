@@ -2,6 +2,7 @@ import { syncFinishWorkoutToSupabase } from "../../services/finish-workout/supab
 import { SupabaseFoldersRepository } from "../repositories/supabase-folders-repository";
 import { SupabaseMacrosRepository } from "../repositories/supabase-macros-repository";
 import { SupabasePRRepository } from "../repositories/supabase-pr-repository";
+import { SupabaseProgressionsRepository } from "../repositories/supabase-progressions-repository";
 import { SupabaseRoutinesRepository } from "../repositories/supabase-routines-repository";
 import { SupabaseTrackerRepository } from "../repositories/supabase-tracker-repository";
 import { SupabaseUserRepository } from "../repositories/supabase-user-repository";
@@ -45,6 +46,8 @@ import type {
   TrackerQuickActionCreatePayload,
   TrackerQuickActionDeletePayload,
   TrackerReplaceEntryWithAggregatePayload,
+  UserExerciseUnlocksBulkPayload,
+  UserExerciseUnlockUpsertPayload,
   UserPreferencesCreatePayload,
   UserPreferencesUpdatePayload,
   WorkoutCompletePayload,
@@ -61,6 +64,7 @@ const macrosRepo = new SupabaseMacrosRepository();
 const prRepo = new SupabasePRRepository();
 const workoutRepo = new SupabaseWorkoutRepository();
 const userRepo = new SupabaseUserRepository();
+const progressionsRepo = new SupabaseProgressionsRepository();
 
 /**
  * Type-safe sync function signature.
@@ -190,4 +194,15 @@ export const supabaseSyncDictionary: {
     userRepo.createUserPreferences(payload.userId, payload.data),
   USER_PREFERENCES_UPDATE: (payload: UserPreferencesUpdatePayload) =>
     userRepo.updateUserPreferences(payload.userId, payload.data),
+
+  // Progression Unlocks
+  USER_EXERCISE_UNLOCK_UPSERT: (payload: UserExerciseUnlockUpsertPayload) =>
+    progressionsRepo.upsertUserUnlock(payload),
+  USER_EXERCISE_UNLOCKS_BULK: (payload: UserExerciseUnlocksBulkPayload) =>
+    progressionsRepo.batchUpsertUserUnlocks(
+      payload.unlocks.map((u) => ({
+        ...u,
+        is_synced: true,
+      }))
+    ),
 };

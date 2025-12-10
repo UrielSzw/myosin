@@ -1,5 +1,6 @@
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { ToastPortal } from "@/shared/ui/toast";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import React, { useEffect } from "react";
 import {
@@ -174,6 +175,9 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
         closeSheet={closeSheet}
         openCircuitTimerModeSheet={openCircuitTimerModeSheet}
       />
+
+      {/* PR Toast - placed here to ensure visibility above all content */}
+      <ToastPortal />
     </View>
   );
 };

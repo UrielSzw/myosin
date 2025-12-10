@@ -4,6 +4,7 @@ import { loadExercisesSeed } from "@/shared/db/seed/seed";
 import { useNetwork } from "@/shared/hooks/use-network";
 import { useProtectedRoute } from "@/shared/hooks/use-protected-route";
 import { AuthProvider } from "@/shared/providers/auth-provider";
+import { ToastProvider } from "@/shared/providers/toast-provider";
 import { logger } from "@/shared/services/logger";
 import { ErrorBoundary } from "@/shared/ui/error-boundary";
 import { LoadingScreen } from "@/shared/ui/loading-screen";
@@ -95,12 +96,14 @@ export default function RootLayout() {
     >
       <QueryClientProvider client={queryClient}>
         <GestureHandlerRootView style={{ flex: 1 }}>
-          <BottomSheetModalProvider>
-            <AuthProvider>
-              <AppContent />
-              <StatusBar style="auto" />
-            </AuthProvider>
-          </BottomSheetModalProvider>
+          <ToastProvider>
+            <BottomSheetModalProvider>
+              <AuthProvider>
+                <AppContent />
+                <StatusBar style="auto" />
+              </AuthProvider>
+            </BottomSheetModalProvider>
+          </ToastProvider>
         </GestureHandlerRootView>
       </QueryClientProvider>
     </ErrorBoundary>

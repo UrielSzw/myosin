@@ -12,6 +12,7 @@ import {
 } from "@/shared/db/schema/workout-session";
 import { computePRScore, isPRBetter } from "@/shared/db/utils/pr";
 import { useUserPreferencesStore } from "@/shared/hooks/use-user-preferences-store";
+import { getGlobalToast } from "@/shared/providers/toast-provider";
 import {
   getMeasurementTemplate,
   MeasurementTemplateId,
@@ -1497,6 +1498,13 @@ const useActiveWorkoutStore = create<Store>()(
       },
       completeSet: (exerciseInBlockId, setId, blockId, completionData) => {
         let shouldStartTimer = false;
+        let prToastData: {
+          exerciseName: string;
+          measurementTemplate: MeasurementTemplateId;
+          primaryValue: number;
+          secondaryValue: number | null;
+          prScore: number;
+        } | null = null;
 
         set((state) => {
           const set = state.activeWorkout.sets[setId];
@@ -1553,6 +1561,15 @@ const useActiveWorkoutStore = create<Store>()(
                 secondary_value: secondaryValue ?? null,
                 pr_score: prScore,
                 created_at: new Date().toISOString(),
+              };
+
+              // Capture data for toast (will be shown after set() completes)
+              prToastData = {
+                exerciseName: exerciseInBlock.exercise.name,
+                measurementTemplate: template,
+                primaryValue,
+                secondaryValue: secondaryValue ?? null,
+                prScore,
               };
             } else {
               // This PR is not better than current session best
@@ -1640,6 +1657,12 @@ const useActiveWorkoutStore = create<Store>()(
             }
           }
         });
+
+        // Show PR toast if a new session-best PR was achieved
+        if (prToastData) {
+          const { showPRToast } = getGlobalToast();
+          showPRToast(prToastData);
+        }
 
         return shouldStartTimer;
       },

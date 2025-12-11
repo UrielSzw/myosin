@@ -602,4 +602,80 @@ export const sharedUiTranslations = {
     es: "récords encontrados",
     en: "records found",
   },
+
+  // Bodyweight Display
+  totalWeight: {
+    es: "Total",
+    en: "Total",
+  },
+
+  // Plate Calculator
+  plateCalculator: {
+    es: "Calculador de Discos",
+    en: "Plate Calculator",
+  },
+  totalWeightLabel: {
+    es: "Peso total",
+    en: "Total weight",
+  },
+  eachSide: {
+    es: "Cada lado",
+    en: "Each side",
+  },
+  barType: {
+    es: "Barra",
+    en: "Bar",
+  },
+  availablePlates: {
+    es: "Discos disponibles",
+    en: "Available plates",
+  },
+  applyWeight: {
+    es: "Aplicar peso",
+    en: "Apply weight",
+  },
+  standardBar: {
+    es: "Estándar (20kg)",
+    en: "Standard (20kg)",
+  },
+  olympicBar: {
+    es: "Olímpica (20kg)",
+    en: "Olympic (20kg)",
+  },
+  shortBar: {
+    es: "Corta (10kg)",
+    en: "Short (10kg)",
+  },
+  ezBar: {
+    es: "EZ Curl (7kg)",
+    en: "EZ Curl (7kg)",
+  },
+  womenBar: {
+    es: "Media (15kg)",
+    en: "Medium (15kg)",
+  },
+  noBarWeight: {
+    es: "Sin barra (0kg)",
+    en: "No bar (0kg)",
+  },
+  impossibleWeight: {
+    es: "No se puede lograr este peso con los discos disponibles",
+    en: "Cannot achieve this weight with available plates",
+  },
+  platesLabel: {
+    es: "Discos",
+    en: "Plates",
+  },
+  customBar: {
+    es: "Otra",
+    en: "Other",
+  },
+  customPlate: {
+    es: "Otro",
+    en: "Other",
+  },
+  addCustomPlate: {
+    es: "Agregar disco",
+    en: "Add plate",
+  },
 } as const;

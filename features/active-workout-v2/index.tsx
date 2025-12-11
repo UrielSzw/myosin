@@ -1,5 +1,6 @@
 import { AuroraBackground } from "@/features/workouts-v2/components/AuroraBackground";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
+import { PlateCalculatorSheetV2 } from "@/shared/ui/sheets-v2";
 import { ToastPortal } from "@/shared/ui/toast";
 import { activateKeepAwakeAsync, deactivateKeepAwake } from "expo-keep-awake";
 import React, { useEffect } from "react";
@@ -18,11 +19,16 @@ import {
   ActiveWorkoutHeaderV2,
   AddExerciseButtonV2,
   EmptyWorkoutStateV2,
+  PlateCalculatorFloatingButton,
   RestTimerBannerV2,
 } from "./elements";
 
 // Sheets
-import { useActiveWorkoutSheetsV2 } from "./hooks";
+import {
+  PlateCalculatorProvider,
+  useActiveWorkoutSheetsV2,
+  usePlateCalculator,
+} from "./hooks";
 import { ActiveSheetsV2 } from "./sheets";
 
 // Exercise Modal
@@ -38,7 +44,8 @@ import {
   useActiveWorkoutState,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 
-export const ActiveWorkoutV2Feature: React.FC = () => {
+// Inner component that uses the plate calculator context
+const ActiveWorkoutContent: React.FC = () => {
   const { blocksBySession } = useActiveWorkout();
   const { exerciseModalMode, currentExerciseId } = useActiveWorkoutState();
   const { clearCurrentState, setExerciseModalMode } = useActiveMainActions();
@@ -48,6 +55,18 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
 
   const prefs = useUserPreferences();
   const keepScreenAwake = prefs?.keep_screen_awake ?? true;
+  const weightUnit = prefs?.weight_unit ?? "kg";
+
+  // Plate calculator context
+  const {
+    isButtonVisible,
+    isSheetVisible,
+    currentWeightKg,
+    onApplyWeight,
+    openSheet,
+    closeSheet: closePlateCalcSheet,
+    hideFloatingButton,
+  } = usePlateCalculator();
 
   // Sheet management
   const {
@@ -98,6 +117,19 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
   const handleAddToBlock = (selectedExercises: BaseExercise[]) => {
     addToBlock(selectedExercises);
     clearCurrentState();
+  };
+
+  // Plate calculator handlers
+  const handlePlateCalcApply = (weightKg: number) => {
+    if (onApplyWeight) {
+      onApplyWeight(weightKg);
+    }
+    closePlateCalcSheet();
+  };
+
+  const handleOpenPlateCalculator = () => {
+    // This is triggered by the floating button - opens the sheet
+    openSheet();
   };
 
   return (
@@ -157,6 +189,13 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
         <RestTimerBannerV2 />
       </KeyboardAvoidingView>
 
+      {/* Floating Plate Calculator Button - shows above keyboard when weight input is focused */}
+      <PlateCalculatorFloatingButton
+        visible={isButtonVisible}
+        onPress={handleOpenPlateCalculator}
+        onHide={hideFloatingButton}
+      />
+
       {/* Exercise Selector Modal */}
       <ExerciseSelectorModalV2
         visible={!!exerciseModalMode}
@@ -176,9 +215,27 @@ export const ActiveWorkoutV2Feature: React.FC = () => {
         openCircuitTimerModeSheet={openCircuitTimerModeSheet}
       />
 
+      {/* Plate Calculator Sheet */}
+      <PlateCalculatorSheetV2
+        visible={isSheetVisible}
+        currentWeight={currentWeightKg}
+        weightUnit={weightUnit}
+        onApply={handlePlateCalcApply}
+        onClose={closePlateCalcSheet}
+      />
+
       {/* PR Toast - placed here to ensure visibility above all content */}
       <ToastPortal />
     </View>
+  );
+};
+
+// Main export with provider wrapper
+export const ActiveWorkoutV2Feature: React.FC = () => {
+  return (
+    <PlateCalculatorProvider>
+      <ActiveWorkoutContent />
+    </PlateCalculatorProvider>
   );
 };
 

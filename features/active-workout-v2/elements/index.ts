@@ -10,6 +10,7 @@ export * from "./AddExerciseButtonV2";
 export * from "./CircuitTimerModeV2";
 export * from "./EmptyWorkoutStateV2";
 export * from "./NextSetArrowV2";
+export * from "./PlateCalculatorFloatingButton";
 export * from "./RestTimerBannerV2";
 export * from "./SingleSetTimerSheet";
 export * from "./TempoMetronomeV2";

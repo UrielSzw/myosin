@@ -5,16 +5,23 @@ import {
   useActiveWorkout,
 } from "@/features/active-workout-v2/hooks/use-active-workout-store";
 import { useNextSetIndicator } from "@/features/active-workout-v2/hooks/use-next-set-indicator";
+import { usePlateCalculator } from "@/features/active-workout-v2/hooks/use-plate-calculator-context";
 import { usePRLogic } from "@/features/active-workout-v2/hooks/use-pr-logic";
 import { useBlockStyles } from "@/shared/hooks/use-block-styles";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useHaptic } from "@/shared/services/haptic-service";
+import { sharedUiTranslations as t } from "@/shared/translations/shared-ui";
+import { toSupportedLanguage } from "@/shared/types/language";
 import {
   getMeasurementTemplate,
   MeasurementTemplateId,
 } from "@/shared/types/measurement";
-import { IBlockType, RPEValue } from "@/shared/types/workout";
+import {
+  IBlockType,
+  IExerciseEquipment,
+  RPEValue,
+} from "@/shared/types/workout";
 import { MeasurementInput } from "@/shared/ui/measurement-input";
 import { Typography } from "@/shared/ui/typography";
 import { fromKm, fromMeters } from "@/shared/utils/distance-conversion";
@@ -110,6 +117,23 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const prevSet = exercisePrevSets.find(
       (prevData) => prevData.order_index === set?.order_index
     );
+
+    // Language for translations
+    const lang = toSupportedLanguage(prefs?.language);
+
+    // Equipment detection for plate calculator and bodyweight
+    const primaryEquipment = exerciseInBlock.exercise
+      .primary_equipment as IExerciseEquipment;
+    const isBarbellExercise =
+      primaryEquipment === "barbell" || primaryEquipment === "ez_curl_bar";
+    const isBodyweightExercise = primaryEquipment === "bodyweight";
+    const userBodyweightKg = prefs?.initial_weight_kg ?? null;
+
+    // Check if this is a weight field
+    const primaryFieldIsWeight = template?.fields[0]?.type === "weight";
+
+    // Plate calculator context
+    const { showFloatingButton } = usePlateCalculator();
 
     // Animation values - following SetRowV2 style
     const typeScale = useSharedValue(1);
@@ -316,6 +340,51 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const isCompleted = !!set.completed_at;
 
     const hasSecondaryField = template?.fields && template.fields.length > 1;
+
+    // Plate calculator handler - now uses context
+    const handlePlateCalculatorApply = useCallback(
+      (weightKg: number) => {
+        updateSetValue(setId, "primary", weightKg, exerciseInBlock.tempId);
+      },
+      [setId, exerciseInBlock.tempId, updateSetValue]
+    );
+
+    // Handler for showing floating button when weight input is focused
+    const handleWeightInputFocus = useCallback(() => {
+      if (isBarbellExercise && primaryFieldIsWeight && !isCompleted) {
+        showFloatingButton({
+          currentWeightKg:
+            set.actual_primary_value ?? set.planned_primary_value ?? null,
+          weightUnit,
+          onApply: handlePlateCalculatorApply,
+        });
+      }
+    }, [
+      isBarbellExercise,
+      primaryFieldIsWeight,
+      isCompleted,
+      set.actual_primary_value,
+      set.planned_primary_value,
+      weightUnit,
+      showFloatingButton,
+      handlePlateCalculatorApply,
+    ]);
+
+    // Calculate bodyweight total for display
+    const getBodyweightTotal = (): number | null => {
+      if (!isBodyweightExercise || !userBodyweightKg || !primaryFieldIsWeight)
+        return null;
+
+      const extraWeight =
+        set.actual_primary_value ??
+        set.planned_primary_value ??
+        prevSet?.actual_primary_value ??
+        0;
+
+      return userBodyweightKg + extraWeight;
+    };
+
+    const bodyweightTotal = getBodyweightTotal();
 
     // Get timer duration (always in seconds for the timer)
     const getTimerDuration = (): number => {
@@ -588,7 +657,20 @@ export const ActiveSetRowV2 = React.memo<Props>(
                   weightUnit={weightUnit}
                   distanceUnit={distanceUnit}
                   disabled={isCompleted}
+                  onFocus={handleWeightInputFocus}
                 />
+                {/* Bodyweight Total Display */}
+                {bodyweightTotal !== null && (
+                  <Typography
+                    variant="caption"
+                    color="textMuted"
+                    style={styles.bodyweightTotal}
+                  >
+                    {t.totalWeight[lang]}:{" "}
+                    {fromKg(bodyweightTotal, weightUnit, 1)}
+                    {weightUnit}
+                  </Typography>
+                )}
               </View>
 
               {/* Secondary Input */}
@@ -647,7 +729,20 @@ export const ActiveSetRowV2 = React.memo<Props>(
                 weightUnit={weightUnit}
                 distanceUnit={distanceUnit}
                 disabled={isCompleted}
+                onFocus={handleWeightInputFocus}
               />
+              {/* Bodyweight Total Display */}
+              {bodyweightTotal !== null && (
+                <Typography
+                  variant="caption"
+                  color="textMuted"
+                  style={styles.bodyweightTotal}
+                >
+                  {t.totalWeight[lang]}:{" "}
+                  {fromKg(bodyweightTotal, weightUnit, 1)}
+                  {weightUnit}
+                </Typography>
+              )}
             </View>
           )}
 
@@ -876,5 +971,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 6,
     alignSelf: "flex-start",
+  },
+  bodyweightTotal: {
+    fontSize: 10,
+    textAlign: "center",
+    marginTop: 2,
   },
 });

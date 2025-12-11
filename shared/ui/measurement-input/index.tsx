@@ -53,6 +53,10 @@ type MeasurementInputProps = {
    * Disable input (e.g., when set is completed)
    */
   disabled?: boolean;
+  /**
+   * Callback when input receives focus
+   */
+  onFocus?: () => void;
 };
 
 export const MeasurementInput: React.FC<MeasurementInputProps> = ({
@@ -68,6 +72,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
   weightUnit = "kg",
   distanceUnit = "metric",
   disabled = false,
+  onFocus,
 }) => {
   const { colors } = useColorScheme();
 
@@ -420,6 +425,7 @@ export const MeasurementInput: React.FC<MeasurementInputProps> = ({
         selectTextOnFocus={true}
         style={inputStyles}
         editable={!disabled}
+        onFocus={onFocus}
         accessible={true}
         accessibilityLabel={
           accessibilityLabel || `${field.label} para set ${setNumber}`

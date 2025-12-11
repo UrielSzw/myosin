@@ -12,3 +12,5 @@ export { MeasurementTemplateSelectorV2 } from "./MeasurementTemplateSelectorV2";
 export { TempoSelectorV2 } from "./TempoSelectorV2";
 
 export { RPESelectorV2 } from "./RPESelectorV2";
+
+export { PlateCalculatorSheetV2 } from "./PlateCalculatorSheetV2";

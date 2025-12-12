@@ -145,7 +145,7 @@ La app incluye ejercicios predefinidos organizados por grupos musculares.
 
 - `full_body` - Cuerpo completo
 
-#### Equipamiento (`IExerciseEquipment`) - 18 valores
+#### Equipamiento (`IExerciseEquipment`) - 20 valores
 
 **Pesos Libres**
 
@@ -176,7 +176,8 @@ La app incluye ejercicios predefinidos organizados por grupos musculares.
 - `suspension_trainer` - TRX
 - `medicine_ball` - Balón medicinal
 - `landmine` - Landmine
-- `decline_bench` - Banco declinado
+- `rings` - Anillas de gimnasia
+- `parallettes` - Paralelas bajas
 
 #### Tipo de Ejercicio (`IExerciseType`)
 

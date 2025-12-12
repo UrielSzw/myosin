@@ -1,47 +1,53 @@
 import { db } from "@/shared/db/client";
 import {
   exerciseProgressionsRepository,
+  progressionPathExercisesRepository,
+  progressionPathsRepository,
   userExerciseUnlocksRepository,
 } from "@/shared/db/repository/progressions";
 import { exercises, type BaseExercise } from "@/shared/db/schema";
-import type {
-  ExerciseProgression,
-  UnlockProgress,
-} from "@/shared/db/schema/progressions";
+import type { UnlockProgress } from "@/shared/db/schema/progressions";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { inArray } from "drizzle-orm";
 import { useCallback, useEffect, useState } from "react";
 import type { PathExercise, ProgressionPath } from "../types";
 
 // ============================================================================
-// Category Mapping
+// Path Name Translations (from name_key)
 // ============================================================================
 
-// Map muscle groups to broader movement categories
-const muscleGroupToCategory: Record<string, string> = {
-  // Pull movements
-  upper_back: "pull",
-  lats: "pull",
-  biceps: "pull",
-  forearms: "pull",
-  shoulders_rear: "pull",
-  // Push movements
-  chest: "push",
-  triceps: "push",
-  shoulders_front: "push",
-  shoulders_side: "push",
-  // Core
-  abs: "core",
-  obliques: "core",
-  lower_back: "core",
-  // Lower body
-  glutes: "lower_body",
-  quads: "lower_body",
-  hamstrings: "lower_body",
-  calves: "lower_body",
-  hip_flexors: "lower_body",
-  // Full body
-  full_body: "full_body",
+const PATH_NAMES: Record<string, { en: string; es: string }> = {
+  "paths.pull_up.name": {
+    en: "Pull-up Progression",
+    es: "Progresión de Dominadas",
+  },
+  "paths.row.name": { en: "Row to Front Lever", es: "Remo a Front Lever" },
+  "paths.dip.name": { en: "Dip Progression", es: "Progresión de Fondos" },
+  "paths.push_up.name": {
+    en: "Push-up Progression",
+    es: "Progresión de Flexiones",
+  },
+  "paths.squat.name": {
+    en: "Squat Progression",
+    es: "Progresión de Sentadillas",
+  },
+  "paths.hinge.name": {
+    en: "Nordic Curl Progression",
+    es: "Progresión de Nordic Curl",
+  },
+  "paths.muscle_up.name": {
+    en: "Muscle-up Progression",
+    es: "Progresión de Muscle-up",
+  },
+  "paths.hspu.name": { en: "HSPU Progression", es: "Progresión de HSPU" },
+  "paths.l_sit.name": { en: "L-sit Progression", es: "Progresión de L-sit" },
+  "paths.front_lever.name": { en: "Front Lever", es: "Front Lever" },
+  "paths.planche.name": {
+    en: "Planche Progression",
+    es: "Progresión de Planche",
+  },
+  "paths.back_lever.name": { en: "Back Lever", es: "Back Lever" },
+  "paths.dragon_flag.name": { en: "Dragon Flag", es: "Dragon Flag" },
 };
 
 // ============================================================================
@@ -71,16 +77,22 @@ export function useProgressionPaths(): UseProgressionPathsReturn {
     setError(null);
 
     try {
-      // 1. Get all progressions from DB
-      const allProgressions: ExerciseProgression[] =
-        await exerciseProgressionsRepository.findAll();
+      // 1. Get all progression paths from DB (the 13 skill trees)
+      const allPaths = await progressionPathsRepository.findAll();
 
-      // 2. Get all user unlocks
+      // 2. Get all path exercises (links between paths and exercises)
+      const allPathExercises =
+        await progressionPathExercisesRepository.findAll();
+
+      // 3. Get all exercise progressions (for unlock criteria)
+      const allProgressions = await exerciseProgressionsRepository.findAll();
+
+      // 4. Get all user unlocks
       const allUnlocks = await userExerciseUnlocksRepository.getAllForUser(
         user.id
       );
 
-      // 3. Build a map of exercise IDs to their unlock status
+      // 5. Build unlock status map
       const unlockMap = new Map(
         allUnlocks.map((u) => [
           u.exercise_id,
@@ -95,14 +107,14 @@ export function useProgressionPaths(): UseProgressionPathsReturn {
         ])
       );
 
-      // 4. Get unique exercise IDs from progressions
+      // 6. Get all unique exercise IDs needed
       const exerciseIds = new Set<string>();
-      allProgressions.forEach((p) => {
-        exerciseIds.add(p.from_exercise_id);
-        exerciseIds.add(p.to_exercise_id);
+      allPathExercises.forEach((pe) => exerciseIds.add(pe.exercise_id));
+      allPaths.forEach((p) => {
+        if (p.ultimate_exercise_id) exerciseIds.add(p.ultimate_exercise_id);
       });
 
-      // 5. Fetch exercise details
+      // 7. Fetch all exercise details in one query
       let exerciseMap = new Map<string, BaseExercise>();
       if (exerciseIds.size > 0) {
         const exercisesList = await db
@@ -112,216 +124,137 @@ export function useProgressionPaths(): UseProgressionPathsReturn {
         exerciseMap = new Map(exercisesList.map((e) => [e.id, e]));
       }
 
-      // 6. Group progressions by "path" (using the ultimate skill as identifier)
-      // We'll identify paths by finding exercises that have no further progressions (ultimate skills)
-      const fromExercises = new Set(
-        allProgressions.map((p) => p.from_exercise_id)
-      );
-      const toExercises = new Set(allProgressions.map((p) => p.to_exercise_id));
-
-      // Ultimate skills: exercises that are "to" but never "from"
-      const ultimateSkillIds = Array.from(toExercises).filter(
-        (id) => !fromExercises.has(id)
+      // 8. Build progression map for unlock criteria lookup
+      // Key: "fromId->toId", Value: progression data
+      const progressionMap = new Map(
+        allProgressions.map((p) => [
+          `${p.from_exercise_id}->${p.to_exercise_id}`,
+          p,
+        ])
       );
 
-      // 7. For each ultimate skill, trace back to build the full path
+      // 9. Build each path
       const pathsResult: ProgressionPath[] = [];
 
-      for (const ultimateId of ultimateSkillIds) {
-        const ultimateExercise = exerciseMap.get(ultimateId);
-        if (!ultimateExercise) continue;
+      for (const path of allPaths) {
+        // Get exercises for this path, ordered by level
+        const pathExerciseLinks = allPathExercises
+          .filter((pe) => pe.path_id === path.id)
+          .sort((a, b) => a.level - b.level);
 
-        // Trace back through progressions
+        if (pathExerciseLinks.length === 0) continue;
+
+        // Build PathExercise array
         const pathExercises: PathExercise[] = [];
-        const visited = new Set<string>();
-        const queue = [ultimateId];
 
-        // BFS backwards to find all exercises in this path
-        while (queue.length > 0) {
-          const currentId = queue.shift()!;
-          if (visited.has(currentId)) continue;
-          visited.add(currentId);
-
-          const exercise = exerciseMap.get(currentId);
+        for (let i = 0; i < pathExerciseLinks.length; i++) {
+          const link = pathExerciseLinks[i]!;
+          const exercise = exerciseMap.get(link.exercise_id);
           if (!exercise) continue;
 
-          const unlockInfo = unlockMap.get(currentId);
+          const unlockInfo = unlockMap.get(link.exercise_id);
+          const nextLink = pathExerciseLinks[i + 1];
+
+          // Find unlock criteria for the next exercise
+          let unlockCriteriaForNext = undefined;
+          let nextExerciseName = undefined;
+
+          if (nextLink) {
+            const nextExercise = exerciseMap.get(nextLink.exercise_id);
+            if (nextExercise) {
+              nextExerciseName = nextExercise.name;
+              // Look for progression from current to next
+              const progression = progressionMap.get(
+                `${link.exercise_id}->${nextLink.exercise_id}`
+              );
+              if (progression?.unlock_criteria) {
+                unlockCriteriaForNext = progression.unlock_criteria;
+              }
+            }
+          }
+
+          // Determine status - first exercise in path is always unlocked if no status
+          let status = unlockInfo?.status || "locked";
+          if (i === 0 && status === "locked") {
+            status = "unlocked";
+          }
 
           pathExercises.push({
-            exerciseId: currentId,
+            exerciseId: link.exercise_id,
             exerciseName: exercise.name,
-            order: 0, // Will be set later
-            status: unlockInfo?.status || "locked",
+            order: i,
+            status,
             progress: unlockInfo?.progress,
-            // Include full exercise data to avoid loading delay when viewing details
+            unlockCriteriaForNext,
+            nextExerciseName,
             exerciseData: exercise,
           });
-
-          // Find progressions leading to this exercise
-          const incomingProgressions = allProgressions.filter(
-            (p) => p.to_exercise_id === currentId
-          );
-          for (const prog of incomingProgressions) {
-            if (!visited.has(prog.from_exercise_id)) {
-              queue.push(prog.from_exercise_id);
-            }
-          }
         }
 
-        // Sort by progression order (earliest first)
-        // Proper topological sort using Kahn's algorithm
-        const orderedExercises: PathExercise[] = [];
-        const remaining = new Set(pathExercises.map((e) => e.exerciseId));
-
-        // Build in-degree map (how many prerequisites each exercise has within this path)
-        const inDegree = new Map<string, number>();
-        for (const ex of pathExercises) {
-          const prereqCount = allProgressions.filter(
-            (p) =>
-              p.to_exercise_id === ex.exerciseId &&
-              remaining.has(p.from_exercise_id) &&
-              p.relationship_type === "progression"
-          ).length;
-          inDegree.set(ex.exerciseId, prereqCount);
-        }
-
-        // Process exercises with no prerequisites first
-        let safetyCounter = pathExercises.length + 10;
-        while (remaining.size > 0 && safetyCounter > 0) {
-          safetyCounter--;
-
-          // Find all exercises with in-degree 0 (no pending prerequisites)
-          const ready: PathExercise[] = [];
-          for (const exercise of pathExercises) {
-            if (!remaining.has(exercise.exerciseId)) continue;
-            if ((inDegree.get(exercise.exerciseId) || 0) === 0) {
-              ready.push(exercise);
-            }
-          }
-
-          if (ready.length === 0) {
-            // Cycle or orphaned nodes - add remaining in any order
-            for (const ex of pathExercises) {
-              if (remaining.has(ex.exerciseId)) {
-                ex.order = orderedExercises.length;
-                orderedExercises.push(ex);
-                remaining.delete(ex.exerciseId);
-              }
-            }
-            break;
-          }
-
-          // Add all ready exercises (sorted by name for consistency)
-          ready.sort((a, b) => a.exerciseName.localeCompare(b.exerciseName));
-          for (const exercise of ready) {
-            exercise.order = orderedExercises.length;
-            orderedExercises.push(exercise);
-            remaining.delete(exercise.exerciseId);
-
-            // Decrease in-degree of exercises that depend on this one
-            for (const prog of allProgressions) {
-              if (
-                prog.from_exercise_id === exercise.exerciseId &&
-                prog.relationship_type === "progression" &&
-                remaining.has(prog.to_exercise_id)
-              ) {
-                const current = inDegree.get(prog.to_exercise_id) || 0;
-                inDegree.set(prog.to_exercise_id, Math.max(0, current - 1));
-              }
-            }
-          }
-        }
-
-        // Mark the first exercise(s) as unlocked if they have no status
-        // (entry points to the path should be available by default)
-        for (const exercise of orderedExercises) {
-          // Check if this exercise has any prerequisites in the path
-          const hasPrerequisite = allProgressions.some(
-            (p) =>
-              p.to_exercise_id === exercise.exerciseId &&
-              p.relationship_type === "progression" &&
-              orderedExercises.some((e) => e.exerciseId === p.from_exercise_id)
-          );
-
-          // If no prerequisites and currently locked, mark as unlocked
-          if (!hasPrerequisite && exercise.status === "locked") {
-            exercise.status = "unlocked";
-          } else {
-            // Stop at first exercise with prerequisites
-            break;
-          }
-        }
-
-        // Enrich each exercise with unlock criteria for the next level
-        for (let i = 0; i < orderedExercises.length; i++) {
-          const exercise = orderedExercises[i];
-          const nextExerciseInPath = orderedExercises[i + 1];
-
-          if (exercise && nextExerciseInPath) {
-            // Find the progression from this exercise to the next
-            const progressionToNext = allProgressions.find(
-              (p) =>
-                p.from_exercise_id === exercise.exerciseId &&
-                p.to_exercise_id === nextExerciseInPath.exerciseId &&
-                p.relationship_type === "progression"
-            );
-
-            if (progressionToNext?.unlock_criteria) {
-              exercise.unlockCriteriaForNext =
-                progressionToNext.unlock_criteria;
-              exercise.nextExerciseName = nextExerciseInPath.exerciseName;
-            }
-          }
-        }
-
-        // Calculate current level (only count MASTERED exercises as completed)
-        // "unlocked" means available to practice, not completed
-        const completedCount = orderedExercises.filter(
+        // Calculate stats
+        const completedCount = pathExercises.filter(
           (e) => e.status === "mastered"
         ).length;
 
-        // Find current and next exercises
         const currentExercise =
-          orderedExercises.find((e) => e.status === "unlocking") ||
-          orderedExercises.find((e) => e.status === "unlocked");
+          pathExercises.find((e) => e.status === "unlocking") ||
+          pathExercises.find((e) => e.status === "unlocked");
 
-        const nextExercise = orderedExercises.find(
-          (e) =>
-            e.status === "locked" &&
-            orderedExercises.some(
-              (prev) =>
-                (prev.status === "unlocked" || prev.status === "mastered") &&
-                allProgressions.some(
-                  (p) =>
-                    p.from_exercise_id === prev.exerciseId &&
-                    p.to_exercise_id === e.exerciseId
-                )
+        // Find next locked exercise after current
+        const currentIndex = currentExercise
+          ? pathExercises.findIndex(
+              (e) => e.exerciseId === currentExercise.exerciseId
             )
-        );
+          : -1;
+        const nextExercise =
+          currentIndex >= 0 ? pathExercises[currentIndex + 1] || null : null;
 
-        // Determine category from exercise muscle group using the mapping
-        const muscleGroup = ultimateExercise.main_muscle_group || "";
-        const category = muscleGroupToCategory[muscleGroup] || "skills";
+        // Get ultimate exercise
+        const ultimateExercise = path.ultimate_exercise_id
+          ? exerciseMap.get(path.ultimate_exercise_id)
+          : pathExercises[pathExercises.length - 1]?.exerciseData;
+
+        // Get translated path name
+        const pathName =
+          PATH_NAMES[path.name_key]?.en || path.slug.replace(/_/g, " ");
 
         pathsResult.push({
-          pathId: ultimateId,
-          pathName: `${ultimateExercise.name} Path`,
-          category,
+          pathId: path.id,
+          pathName,
+          category: path.category,
           subcategory: undefined,
-          ultimateSkill: ultimateExercise.name,
-          ultimateSkillId: ultimateId,
-          exercises: orderedExercises,
+          ultimateSkill: ultimateExercise?.name || pathName,
+          ultimateSkillId:
+            path.ultimate_exercise_id ||
+            pathExercises[pathExercises.length - 1]?.exerciseId ||
+            "",
+          exercises: pathExercises,
           currentLevel: completedCount,
-          maxLevel: orderedExercises.length,
+          maxLevel: pathExercises.length,
           currentExercise: currentExercise || null,
           nextExercise: nextExercise || null,
         });
       }
 
       // Sort paths by category and then by name
+      const categoryOrder = [
+        "vertical_pull",
+        "horizontal_pull",
+        "vertical_push",
+        "horizontal_push",
+        "squat",
+        "hinge",
+        "core",
+        "skill",
+      ];
+
       pathsResult.sort((a, b) => {
-        if (a.category !== b.category) {
-          return a.category.localeCompare(b.category);
+        const aIndex = categoryOrder.indexOf(a.category);
+        const bIndex = categoryOrder.indexOf(b.category);
+        if (aIndex !== bIndex) {
+          return (
+            (aIndex === -1 ? 999 : aIndex) - (bIndex === -1 ? 999 : bIndex)
+          );
         }
         return a.pathName.localeCompare(b.pathName);
       });

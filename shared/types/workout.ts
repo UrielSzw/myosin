@@ -50,7 +50,9 @@ export type IExerciseEquipment =
   | "landmine"
   | "suspension_trainer"
   | "medicine_ball"
-  | "cardio_machine";
+  | "cardio_machine"
+  | "rings"
+  | "parallettes";
 
 export type IExerciseSource = "system" | "user";
 

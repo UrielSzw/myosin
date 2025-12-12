@@ -6,7 +6,7 @@ Este documento refleja la estructura final de exercises, muscles y equipment ya 
 
 ---
 
-## EQUIPMENT (18 valores)
+## EQUIPMENT (20 valores)
 
 ```
 bodyweight          - Peso corporal
@@ -27,6 +27,8 @@ landmine            - Landmine
 suspension_trainer  - TRX/Entrenador de suspensión
 medicine_ball       - Balón medicinal
 cardio_machine      - Máquina de cardio (bici, cinta, etc.)
+rings               - Anillas de gimnasia
+parallettes         - Paralelas bajas
 ```
 
 ---

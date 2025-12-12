@@ -153,7 +153,13 @@ export const EQUIPMENT_GROUPS = {
     "smith_machine",
     "cardio_machine",
   ] as IExerciseEquipment[],
-  bodyweight: ["bodyweight", "pull_up_bar", "dip_bars"] as IExerciseEquipment[],
+  bodyweight: [
+    "bodyweight",
+    "pull_up_bar",
+    "dip_bars",
+    "rings",
+    "parallettes",
+  ] as IExerciseEquipment[],
   accessories: [
     "resistance_band",
     "suspension_trainer",

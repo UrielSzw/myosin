@@ -146,6 +146,14 @@ export const exerciseEquipmentTranslations = {
     es: "Máquina cardio",
     en: "Cardio machine",
   },
+  rings: {
+    es: "Anillas",
+    en: "Rings",
+  },
+  parallettes: {
+    es: "Paralelas bajas",
+    en: "Parallettes",
+  },
 } as const;
 
 export const exerciseTypeTranslations = {

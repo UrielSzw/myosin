@@ -21,10 +21,10 @@ Necesito que me ayudes a crear una lista COMPLETA y ORGANIZADA de ejercicios de 
 - **Lower Body**: glutes, quads, hamstrings, calves, hip_flexors
 - **Full Body**: full_body
 
-## EQUIPAMIENTO (18 valores):
+## EQUIPAMIENTO (20 valores):
 - **Free Weights**: barbell, dumbbell, kettlebell, ez_bar, plate, trap_bar
 - **Machines**: cable, machine, smith_machine, cardio_machine
-- **Bodyweight**: bodyweight, pull_up_bar, dip_bars
+- **Bodyweight**: bodyweight, pull_up_bar, dip_bars, rings, parallettes
 - **Accessories**: bench, resistance_band, suspension_trainer, medicine_ball, landmine
 
 ## EXERCISE_TYPE:
@@ -96,7 +96,7 @@ Basándote en la lista que creamos anteriormente, necesito que generes la estruc
   secondary_muscle_groups: IExerciseMuscle[], // Músculos secundarios
 
   // Equipment
-  primary_equipment: IExerciseEquipment,      // Equipment principal (1 de 18)
+  primary_equipment: IExerciseEquipment,      // Equipment principal (1 de 20)
   equipment: IExerciseEquipment[],            // Todo equipment necesario
 
   // Tipo
@@ -125,9 +125,9 @@ Basándote en la lista que creamos anteriormente, necesito que generes la estruc
 
 chest, upper_back, lats, shoulders_front, shoulders_side, shoulders_rear, biceps, triceps, forearms, abs, obliques, lower_back, glutes, quads, hamstrings, calves, hip_flexors, full_body
 
-### IExerciseEquipment (18 valores - USA EXACTAMENTE ESTOS):
+### IExerciseEquipment (20 valores - USA EXACTAMENTE ESTOS):
 
-bodyweight, barbell, dumbbell, kettlebell, ez_bar, plate, cable, machine, smith_machine, bench, pull_up_bar, dip_bars, resistance_band, trap_bar, landmine, suspension_trainer, medicine_ball, cardio_machine
+bodyweight, barbell, dumbbell, kettlebell, ez_bar, plate, cable, machine, smith_machine, bench, pull_up_bar, dip_bars, resistance_band, trap_bar, landmine, suspension_trainer, medicine_ball, cardio_machine, rings, parallettes
 
 ### IMovementPattern (8 valores - USA EXACTAMENTE ESTOS):
 

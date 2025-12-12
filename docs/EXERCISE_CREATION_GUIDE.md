@@ -73,28 +73,30 @@ INSERT INTO exercise_translations (
 | `hip_flexors`     | Flexores de cadera                  |
 | `full_body`       | Cuerpo completo                     |
 
-### Equipamiento (`primary_equipment`, `equipment`) - 18 valores
+### Equipamiento (`primary_equipment`, `equipment`) - 20 valores
 
-| Valor                | Descripción        |
-| -------------------- | ------------------ |
-| `bodyweight`         | Peso corporal      |
-| `barbell`            | Barra olímpica     |
-| `dumbbell`           | Mancuerna          |
-| `kettlebell`         | Kettlebell         |
-| `ez_bar`             | Barra EZ           |
-| `plate`              | Disco              |
-| `cable`              | Cable/Polea        |
-| `machine`            | Máquina (genérico) |
-| `smith_machine`      | Máquina Smith      |
-| `bench`              | Banco              |
-| `pull_up_bar`        | Barra de dominadas |
-| `dip_bars`           | Barras de fondos   |
-| `resistance_band`    | Banda elástica     |
-| `trap_bar`           | Barra trampa       |
-| `landmine`           | Landmine           |
-| `suspension_trainer` | TRX                |
-| `medicine_ball`      | Balón medicinal    |
-| `cardio_machine`     | Máquina cardio     |
+| Valor                | Descripción         |
+| -------------------- | ------------------- |
+| `bodyweight`         | Peso corporal       |
+| `barbell`            | Barra olímpica      |
+| `dumbbell`           | Mancuerna           |
+| `kettlebell`         | Kettlebell          |
+| `ez_bar`             | Barra EZ            |
+| `plate`              | Disco               |
+| `cable`              | Cable/Polea         |
+| `machine`            | Máquina (genérico)  |
+| `smith_machine`      | Máquina Smith       |
+| `bench`              | Banco               |
+| `pull_up_bar`        | Barra de dominadas  |
+| `dip_bars`           | Barras de fondos    |
+| `resistance_band`    | Banda elástica      |
+| `trap_bar`           | Barra trampa        |
+| `landmine`           | Landmine            |
+| `suspension_trainer` | TRX/Suspensión      |
+| `medicine_ball`      | Balón medicinal     |
+| `cardio_machine`     | Máquina cardio      |
+| `rings`              | Anillas de gimnasia |
+| `parallettes`        | Paralelas bajas     |
 
 ### Patrón de Movimiento (`movement_pattern`) - 8 valores
 

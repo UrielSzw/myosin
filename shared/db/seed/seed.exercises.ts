@@ -11,10 +11,10 @@ import { ExerciseInsert } from "../schema";
  * biceps, triceps, forearms, abs, obliques, lower_back, glutes, quads,
  * hamstrings, calves, hip_flexors, full_body
  *
- * Equipment (18):
+ * Equipment (20):
  * bodyweight, barbell, dumbbell, kettlebell, ez_bar, plate, cable, machine,
  * smith_machine, bench, pull_up_bar, dip_bars, resistance_band, trap_bar,
- * landmine, suspension_trainer, medicine_ball, cardio_machine
+ * landmine, suspension_trainer, medicine_ball, cardio_machine, rings, parallettes
  *
  * Nuevos campos:
  * - difficulty: 1-5

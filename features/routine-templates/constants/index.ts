@@ -195,6 +195,8 @@ export const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
   suspension_trainer: "TRX",
   medicine_ball: "Balón medicinal",
   cardio_machine: "Máquina cardio",
+  rings: "Anillas",
+  parallettes: "Paralelas bajas",
 
   // Gym types (for templates)
   gym: "Gimnasio",

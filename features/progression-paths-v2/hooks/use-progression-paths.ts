@@ -20,28 +20,28 @@ import type { PathExercise, ProgressionPath } from "../types";
 // Map muscle groups to broader movement categories
 const muscleGroupToCategory: Record<string, string> = {
   // Pull movements
-  back: "pull",
-  biceps: "pull",
+  upper_back: "pull",
   lats: "pull",
-  rear_delts: "pull",
+  biceps: "pull",
+  forearms: "pull",
+  shoulders_rear: "pull",
   // Push movements
   chest: "push",
-  chest_upper: "push",
-  chest_lower: "push",
   triceps: "push",
-  front_delts: "push",
-  shoulders: "push",
+  shoulders_front: "push",
+  shoulders_side: "push",
   // Core
-  rectus_abdominis: "core",
+  abs: "core",
   obliques: "core",
-  transverse_abdominis: "core",
   lower_back: "core",
   // Lower body
+  glutes: "lower_body",
   quads: "lower_body",
   hamstrings: "lower_body",
-  glutes: "lower_body",
   calves: "lower_body",
   hip_flexors: "lower_body",
+  // Full body
+  full_body: "full_body",
 };
 
 // ============================================================================

@@ -125,7 +125,7 @@ export const ActiveSetRowV2 = React.memo<Props>(
     const primaryEquipment = exerciseInBlock.exercise
       .primary_equipment as IExerciseEquipment;
     const isBarbellExercise =
-      primaryEquipment === "barbell" || primaryEquipment === "ez_curl_bar";
+      primaryEquipment === "barbell" || primaryEquipment === "ez_bar";
     const isBodyweightExercise = primaryEquipment === "bodyweight";
     const userBodyweightKg = prefs?.initial_weight_kg ?? null;
 

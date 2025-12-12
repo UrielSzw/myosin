@@ -38,6 +38,7 @@ import m0033 from './0033_bitter_switch.sql';
 import m0034 from './0034_outstanding_lizard.sql';
 import m0035 from './0035_material_lady_vermin.sql';
 import m0036 from './0036_rich_bastion.sql';
+import m0037 from './0037_slimy_joshua_kane.sql';
 
   export default {
     journal,
@@ -78,7 +79,8 @@ m0032,
 m0033,
 m0034,
 m0035,
-m0036
+m0036,
+m0037
     }
   }
   

@@ -129,29 +129,37 @@ export const getTemplatesByDifficulty = (difficulty: string) => {
  * Diccionario para traducir músculos objetivo al español
  */
 export const TARGET_MUSCLES_TRANSLATIONS: Record<string, string> = {
-  // Upper body
+  // Upper body - Push
   chest: "Pecho",
+  shoulders_front: "Hombro frontal",
+  shoulders_side: "Hombro lateral",
+  shoulders_rear: "Hombro posterior",
   shoulders: "Hombros",
   triceps: "Tríceps",
-  biceps: "Bíceps",
-  back: "Espalda",
-  lats: "Dorsales",
-  traps: "Trapecios",
-  forearms: "Antebrazos",
 
-  // Lower body
-  quads: "Cuádriceps",
-  hamstrings: "Isquiotibiales",
-  glutes: "Glúteos",
-  calves: "Pantorrillas",
-  legs: "Piernas",
+  // Upper body - Pull
+  upper_back: "Espalda alta",
+  lats: "Dorsales",
+  back: "Espalda",
+  biceps: "Bíceps",
+  forearms: "Antebrazos",
 
   // Core
   abs: "Abdominales",
-  core: "Core",
   obliques: "Oblicuos",
+  lower_back: "Zona lumbar",
+  core: "Core",
+
+  // Lower body
+  glutes: "Glúteos",
+  quads: "Cuádriceps",
+  hamstrings: "Isquiotibiales",
+  calves: "Gemelos",
+  hip_flexors: "Flexores de cadera",
+  legs: "Piernas",
 
   // Full body
+  full_body: "Cuerpo completo",
   "full-body": "Cuerpo completo",
   compound: "Compuestos",
 };
@@ -161,29 +169,43 @@ export const TARGET_MUSCLES_TRANSLATIONS: Record<string, string> = {
  */
 export const EQUIPMENT_TRANSLATIONS: Record<string, string> = {
   // Free weights
+  bodyweight: "Peso corporal",
   barbell: "Barra",
-  dumbbell: "Mancuernas",
-  kettlebell: "Kettlebells",
+  dumbbell: "Mancuerna",
+  kettlebell: "Kettlebell",
+  ez_bar: "Barra EZ",
+  plate: "Disco",
 
-  // Machines
+  // Machines & Cable
+  cable: "Cable",
   machine: "Máquina",
-  cable: "Polea",
+  smith_machine: "Máquina Smith",
   smith: "Smith",
 
-  // Bodyweight
-  bodyweight: "Peso corporal",
-  "body-weight": "Peso corporal",
-
-  // Equipment
+  // Benches & Bars
   bench: "Banco",
-  rack: "Rack",
   pull_up_bar: "Barra de dominadas",
   "pull-up-bar": "Barra de dominadas",
+  dip_bars: "Barras de fondos",
 
-  // Gym types
+  // Other equipment
+  resistance_band: "Banda elástica",
+  trap_bar: "Barra trampa",
+  landmine: "Landmine",
+  suspension_trainer: "TRX",
+  medicine_ball: "Balón medicinal",
+  cardio_machine: "Máquina cardio",
+
+  // Gym types (for templates)
   gym: "Gimnasio",
   home: "Casa",
   minimal: "Mínimo",
+  rack: "Rack",
+  "barbell-dumbbells": "Barra y mancuernas",
+  "full-gym": "Gimnasio completo",
+  "machines-only": "Solo máquinas",
+  "home-gym": "Gimnasio en casa",
+  dumbbells: "Mancuernas",
 
   // Cardio
   treadmill: "Caminadora",

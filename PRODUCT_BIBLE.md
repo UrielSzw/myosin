@@ -108,98 +108,75 @@ El onboarding recolecta información personal para personalizar la experiencia:
 
 ### Ejercicios
 
-La app incluye **~196 ejercicios predefinidos** organizados por grupos musculares.
+La app incluye ejercicios predefinidos organizados por grupos musculares.
 
-#### Grupos Musculares (`IExerciseMuscle`)
+#### Grupos Musculares (`IExerciseMuscle`) - 18 valores
 
 **Upper Body - Push**
 
-- `chest_upper` - Pecho superior
-- `chest_middle` - Pecho medio
-- `chest_lower` - Pecho inferior
-- `front_delts` - Deltoides frontales
-- `side_delts` - Deltoides laterales
-- `rear_delts` - Deltoides posteriores
+- `chest` - Pecho
+- `shoulders_front` - Hombro frontal
+- `shoulders_side` - Hombro lateral
+- `shoulders_rear` - Hombro posterior
 - `triceps` - Tríceps
 
 **Upper Body - Pull**
 
+- `upper_back` - Espalda alta (trapecios, romboides)
 - `lats` - Dorsales
-- `rhomboids` - Romboides
-- `mid_traps` - Trapecios medios
-- `lower_traps` - Trapecios inferiores
-- `upper_traps` - Trapecios superiores
 - `biceps` - Bíceps
 - `forearms` - Antebrazos
 
 **Core**
 
-- `rectus_abdominis` - Recto abdominal
+- `abs` - Abdominales
 - `obliques` - Oblicuos
-- `transverse_abdominis` - Transverso abdominal
-- `erector_spinae` - Erectores espinales
-- `lower_back` - Espalda baja
+- `lower_back` - Zona lumbar
 
 **Lower Body**
 
+- `glutes` - Glúteos
 - `quads` - Cuádriceps
 - `hamstrings` - Isquiotibiales
-- `glutes` - Glúteos
-- `calves` - Pantorrillas
+- `calves` - Gemelos
 - `hip_flexors` - Flexores de cadera
-- `hip_adductors` - Aductores
-- `hip_abductors` - Abductores
 
 **Otros**
 
-- `serratus_anterior` - Serrato anterior
-- `rotator_cuff` - Manguito rotador
 - `full_body` - Cuerpo completo
 
-#### Equipamiento (`IExerciseEquipment`)
+#### Equipamiento (`IExerciseEquipment`) - 18 valores
 
 **Pesos Libres**
 
 - `barbell` - Barra olímpica
-- `ez_curl_bar` - Barra Z
-- `dumbbell` - Mancuernas
-- `kettlebell` - Pesa rusa
-- `weight_plate` - Disco de peso
+- `dumbbell` - Mancuerna
+- `kettlebell` - Kettlebell
+- `ez_bar` - Barra EZ
+- `plate` - Disco
+- `trap_bar` - Barra trampa
 
 **Máquinas**
 
-- `cable_machine` - Polea/cables
-- `smith_machine` - Multipower
-- `leg_press` - Prensa de piernas
-- `lat_pulldown` - Polea alta
-- `chest_press_machine` - Máquina de press de pecho
-- `leg_curl_machine` - Máquina de curl de piernas
-- `leg_extension_machine` - Máquina de extensión
-- `seated_row_machine` - Máquina de remo sentado
-- `shoulder_press_machine` - Máquina de press de hombros
+- `cable` - Cable/Polea
+- `machine` - Máquina (genérico)
+- `smith_machine` - Máquina Smith
+- `cardio_machine` - Máquina de cardio
 
 **Peso Corporal**
 
 - `bodyweight` - Peso corporal
 - `pull_up_bar` - Barra de dominadas
-- `dip_station` - Estación de fondos
-- `parallel_bars` - Barras paralelas
+- `dip_bars` - Barras de fondos
 
 **Accesorios**
 
+- `bench` - Banco
 - `resistance_band` - Banda elástica
-- `suspension_trainer` - TRX/suspensión
+- `suspension_trainer` - TRX
 - `medicine_ball` - Balón medicinal
-- `stability_ball` - Pelota de estabilidad
-- `foam_roller` - Rodillo de espuma
-- `ab_wheel` - Rueda abdominal
-
-**Bancos**
-
-- `flat_bench` - Banco plano
-- `incline_bench` - Banco inclinado
+- `landmine` - Landmine
 - `decline_bench` - Banco declinado
-- `preacher_bench` - Banco Scott
 
 #### Tipo de Ejercicio (`IExerciseType`)
 
@@ -207,6 +184,19 @@ La app incluye **~196 ejercicios predefinidos** organizados por grupos musculare
 | ----------- | ------------------------------------------------------------------ |
 | `compound`  | Ejercicios multiarticulares (Press banca, Sentadilla, Peso muerto) |
 | `isolation` | Ejercicios de aislamiento (Curl bíceps, Extensión de tríceps)      |
+
+#### Patrón de Movimiento (`IMovementPattern`)
+
+| Patrón      | Descripción                        |
+| ----------- | ---------------------------------- |
+| `push`      | Empuje (press, flexiones)          |
+| `pull`      | Tirón (dominadas, remos)           |
+| `squat`     | Sentadilla (squat, prensa)         |
+| `hinge`     | Bisagra de cadera (peso muerto)    |
+| `lunge`     | Zancada (lunges, step-ups)         |
+| `carry`     | Acarreo (farmer walks)             |
+| `rotation`  | Rotación (russian twist, woodchop) |
+| `isometric` | Isométrico (plancha, hold)         |
 
 #### Origen del Ejercicio (`IExerciseSource`)
 

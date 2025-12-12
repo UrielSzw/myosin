@@ -8,10 +8,12 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { MeasurementTemplateId } from "../../types/measurement";
 import {
+  IDifficulty,
   IExerciseEquipment,
   IExerciseMuscle,
   IExerciseSource,
   IExerciseType,
+  IMovementPattern,
   ISetType,
 } from "../../types/workout";
 import { timestamps } from "../utils/schema-utils";
@@ -57,9 +59,20 @@ export const exercises = sqliteTable(
       .notNull()
       .default("weight_reps"),
 
-    // Media fields - OPTIONAL to avoid breaking existing exercises
+    // Media fields
     primary_media_url: text("primary_media_url"),
     primary_media_type: text("primary_media_type").$type<"gif" | "image">(),
+
+    // New fields
+    difficulty: integer("difficulty").$type<IDifficulty>().default(3),
+    unilateral: integer("unilateral", { mode: "boolean" }).default(false),
+    movement_pattern: text("movement_pattern").$type<IMovementPattern>(),
+    adds_bodyweight: integer("adds_bodyweight", { mode: "boolean" }).default(
+      false
+    ),
+    common_mistakes: text("common_mistakes", { mode: "json" }).$type<
+      string[]
+    >(),
 
     ...timestamps,
   },

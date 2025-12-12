@@ -47,46 +47,35 @@ export const DEFAULT_PR_LIST_FILTERS: PRListFilters = {
 // Mapeo de muscle groups a categorías principales para filtros
 export const MUSCLE_CATEGORY_MAP: Record<IExerciseMuscle, string> = {
   // Chest
-  chest_upper: "chest",
-  chest_middle: "chest",
-  chest_lower: "chest",
+  chest: "chest",
 
   // Back
+  upper_back: "back",
   lats: "back",
-  rhomboids: "back",
-  mid_traps: "back",
-  lower_traps: "back",
-  upper_traps: "back",
 
   // Shoulders
-  front_delts: "shoulders",
-  side_delts: "shoulders",
-  rear_delts: "shoulders",
+  shoulders_front: "shoulders",
+  shoulders_side: "shoulders",
+  shoulders_rear: "shoulders",
 
   // Arms
-  triceps: "arms",
   biceps: "arms",
+  triceps: "arms",
   forearms: "arms",
 
   // Legs
+  glutes: "legs",
   quads: "legs",
   hamstrings: "legs",
-  glutes: "legs",
   calves: "legs",
   hip_flexors: "legs",
-  hip_adductors: "legs",
-  hip_abductors: "legs",
 
   // Core
-  rectus_abdominis: "core",
+  abs: "core",
   obliques: "core",
-  transverse_abdominis: "core",
-  erector_spinae: "core",
   lower_back: "core",
 
   // Other
-  serratus_anterior: "other",
-  rotator_cuff: "other",
   full_body: "other",
 };
 

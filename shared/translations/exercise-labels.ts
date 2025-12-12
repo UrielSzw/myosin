@@ -1,79 +1,55 @@
 export const exerciseMuscleTranslations = {
-  chest_upper: {
-    es: "Pecho superior",
-    en: "Upper chest",
+  chest: {
+    es: "Pecho",
+    en: "Chest",
   },
-  chest_middle: {
-    es: "Pecho medio",
-    en: "Middle chest",
-  },
-  chest_lower: {
-    es: "Pecho inferior",
-    en: "Lower chest",
-  },
-  front_delts: {
-    es: "Deltoides frontales",
-    en: "Front delts",
-  },
-  side_delts: {
-    es: "Deltoides laterales",
-    en: "Side delts",
-  },
-  rear_delts: {
-    es: "Deltoides posteriores",
-    en: "Rear delts",
-  },
-  triceps: {
-    es: "Tríceps",
-    en: "Triceps",
+  upper_back: {
+    es: "Espalda alta",
+    en: "Upper back",
   },
   lats: {
     es: "Dorsales",
     en: "Lats",
   },
-  rhomboids: {
-    es: "Romboides",
-    en: "Rhomboids",
+  shoulders_front: {
+    es: "Hombro frontal",
+    en: "Front shoulders",
   },
-  mid_traps: {
-    es: "Trapecio medio",
-    en: "Mid traps",
+  shoulders_side: {
+    es: "Hombro lateral",
+    en: "Side shoulders",
   },
-  lower_traps: {
-    es: "Trapecio inferior",
-    en: "Lower traps",
-  },
-  upper_traps: {
-    es: "Trapecio superior",
-    en: "Upper traps",
+  shoulders_rear: {
+    es: "Hombro posterior",
+    en: "Rear shoulders",
   },
   biceps: {
     es: "Bíceps",
     en: "Biceps",
   },
+  triceps: {
+    es: "Tríceps",
+    en: "Triceps",
+  },
   forearms: {
     es: "Antebrazos",
     en: "Forearms",
   },
-  rectus_abdominis: {
-    es: "Recto abdominal",
-    en: "Rectus abdominis",
+  abs: {
+    es: "Abdominales",
+    en: "Abs",
   },
   obliques: {
     es: "Oblicuos",
     en: "Obliques",
   },
-  transverse_abdominis: {
-    es: "Transverso abdominal",
-    en: "Transverse abdominis",
-  },
-  erector_spinae: {
-    es: "Erectores espinales",
-    en: "Erector spinae",
-  },
   lower_back: {
     es: "Zona lumbar",
     en: "Lower back",
+  },
+  glutes: {
+    es: "Glúteos",
+    en: "Glutes",
   },
   quads: {
     es: "Cuádriceps",
@@ -83,10 +59,6 @@ export const exerciseMuscleTranslations = {
     es: "Isquiotibiales",
     en: "Hamstrings",
   },
-  glutes: {
-    es: "Glúteos",
-    en: "Glutes",
-  },
   calves: {
     es: "Gemelos",
     en: "Calves",
@@ -95,22 +67,6 @@ export const exerciseMuscleTranslations = {
     es: "Flexores de cadera",
     en: "Hip flexors",
   },
-  hip_adductors: {
-    es: "Aductores de cadera",
-    en: "Hip adductors",
-  },
-  hip_abductors: {
-    es: "Abductores de cadera",
-    en: "Hip abductors",
-  },
-  serratus_anterior: {
-    es: "Serrato anterior",
-    en: "Serratus anterior",
-  },
-  rotator_cuff: {
-    es: "Manguito rotador",
-    en: "Rotator cuff",
-  },
   full_body: {
     es: "Cuerpo completo",
     en: "Full body",
@@ -118,13 +74,13 @@ export const exerciseMuscleTranslations = {
 } as const;
 
 export const exerciseEquipmentTranslations = {
+  bodyweight: {
+    es: "Peso corporal",
+    en: "Bodyweight",
+  },
   barbell: {
     es: "Barra",
     en: "Barbell",
-  },
-  ez_curl_bar: {
-    es: "Barra EZ",
-    en: "EZ curl bar",
   },
   dumbbell: {
     es: "Mancuerna",
@@ -134,105 +90,61 @@ export const exerciseEquipmentTranslations = {
     es: "Kettlebell",
     en: "Kettlebell",
   },
-  weight_plate: {
-    es: "Disco de peso",
-    en: "Weight plate",
+  ez_bar: {
+    es: "Barra EZ",
+    en: "EZ bar",
   },
-  cable_machine: {
-    es: "Máquina de cable",
-    en: "Cable machine",
+  plate: {
+    es: "Disco",
+    en: "Plate",
+  },
+  cable: {
+    es: "Cable",
+    en: "Cable",
+  },
+  machine: {
+    es: "Máquina",
+    en: "Machine",
   },
   smith_machine: {
     es: "Máquina Smith",
     en: "Smith machine",
   },
-  leg_press: {
-    es: "Prensa de piernas",
-    en: "Leg press",
-  },
-  lat_pulldown: {
-    es: "Jalón de dorsales",
-    en: "Lat pulldown",
-  },
-  chest_press_machine: {
-    es: "Máquina de press de pecho",
-    en: "Chest press machine",
-  },
-  leg_curl_machine: {
-    es: "Máquina de curl de piernas",
-    en: "Leg curl machine",
-  },
-  leg_extension_machine: {
-    es: "Máquina de extensión de piernas",
-    en: "Leg extension machine",
-  },
-  seated_row_machine: {
-    es: "Máquina de remo sentado",
-    en: "Seated row machine",
-  },
-  shoulder_press_machine: {
-    es: "Máquina de press de hombros",
-    en: "Shoulder press machine",
-  },
-  bodyweight: {
-    es: "Peso corporal",
-    en: "Bodyweight",
+  bench: {
+    es: "Banco",
+    en: "Bench",
   },
   pull_up_bar: {
     es: "Barra de dominadas",
     en: "Pull-up bar",
   },
-  dip_station: {
-    es: "Estación de fondos",
-    en: "Dip station",
-  },
-  parallel_bars: {
-    es: "Barras paralelas",
-    en: "Parallel bars",
+  dip_bars: {
+    es: "Barras de fondos",
+    en: "Dip bars",
   },
   resistance_band: {
-    es: "Bandas de resistencia",
+    es: "Banda elástica",
     en: "Resistance band",
   },
+  trap_bar: {
+    es: "Barra trampa",
+    en: "Trap bar",
+  },
+  landmine: {
+    es: "Landmine",
+    en: "Landmine",
+  },
   suspension_trainer: {
-    es: "Entrenador de suspensión",
+    es: "TRX",
     en: "Suspension trainer",
   },
   medicine_ball: {
     es: "Balón medicinal",
     en: "Medicine ball",
   },
-  stability_ball: {
-    es: "Balón de estabilidad",
-    en: "Stability ball",
-  },
-  foam_roller: {
-    es: "Rodillo de espuma",
-    en: "Foam roller",
-  },
-  ab_wheel: {
-    es: "Rueda de abdominales",
-    en: "Ab wheel",
-  },
-  flat_bench: {
-    es: "Banco plano",
-    en: "Flat bench",
-  },
-  incline_bench: {
-    es: "Banco inclinado",
-    en: "Incline bench",
-  },
-  decline_bench: {
-    es: "Banco declinado",
-    en: "Decline bench",
-  },
-  preacher_bench: {
-    es: "Banco predicador",
-    en: "Preacher bench",
-  },
-  other: {
-    es: "Otro",
-    en: "Other",
+  cardio_machine: {
+    es: "Máquina cardio",
+    en: "Cardio machine",
   },
 } as const;
 

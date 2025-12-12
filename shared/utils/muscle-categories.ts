@@ -13,24 +13,17 @@ export type WeekDay =
 // Categorías principales de músculos para análisis de volumen
 export const MUSCLE_CATEGORIES = {
   chest: {
-    muscles: ["chest_upper", "chest_middle", "chest_lower"] as const,
+    muscles: ["chest"] as const,
     display: "Pecho",
     icon: "💪",
   },
   back: {
-    muscles: [
-      "lats",
-      "rhomboids",
-      "mid_traps",
-      "lower_traps",
-      "upper_traps",
-      "erector_spinae",
-    ] as const,
+    muscles: ["upper_back", "lats", "lower_back"] as const,
     display: "Espalda",
     icon: "🔙",
   },
   shoulders: {
-    muscles: ["front_delts", "side_delts", "rear_delts"] as const,
+    muscles: ["shoulders_front", "shoulders_side", "shoulders_rear"] as const,
     display: "Hombros",
     icon: "🏋️",
   },
@@ -40,25 +33,23 @@ export const MUSCLE_CATEGORIES = {
     icon: "💪",
   },
   legs: {
-    muscles: ["quads", "hamstrings", "glutes", "calves"] as const,
+    muscles: [
+      "quads",
+      "hamstrings",
+      "glutes",
+      "calves",
+      "hip_flexors",
+    ] as const,
     display: "Piernas",
     icon: "🦵",
   },
   core: {
-    muscles: ["rectus_abdominis", "obliques", "transverse_abdominis"] as const,
+    muscles: ["abs", "obliques"] as const,
     display: "Core",
     icon: "🎯",
   },
   other: {
-    muscles: [
-      "lower_back",
-      "hip_flexors",
-      "hip_adductors",
-      "hip_abductors",
-      "serratus_anterior",
-      "rotator_cuff",
-      "full_body",
-    ] as const,
+    muscles: ["full_body"] as const,
     display: "Otros",
     icon: "⚡",
   },

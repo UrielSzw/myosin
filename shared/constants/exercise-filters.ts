@@ -58,14 +58,12 @@ export const MAIN_CATEGORY_ICONS: Record<string, string> = {
 // Mapeo de músculos a categorías principales
 export const MUSCLE_TO_CATEGORY: Record<IExerciseMuscle, MainCategory> = {
   // Pecho
-  chest_upper: "chest",
-  chest_middle: "chest",
-  chest_lower: "chest",
+  chest: "chest",
 
   // Hombros
-  front_delts: "shoulders",
-  side_delts: "shoulders",
-  rear_delts: "shoulders",
+  shoulders_front: "shoulders",
+  shoulders_side: "shoulders",
+  shoulders_rear: "shoulders",
 
   // Brazos
   biceps: "biceps",
@@ -73,11 +71,9 @@ export const MUSCLE_TO_CATEGORY: Record<IExerciseMuscle, MainCategory> = {
   forearms: "others",
 
   // Espalda
+  upper_back: "back",
   lats: "back",
-  rhomboids: "back",
-  mid_traps: "others",
-  lower_traps: "others",
-  upper_traps: "others",
+  lower_back: "others",
 
   // Piernas
   quads: "quads",
@@ -85,19 +81,12 @@ export const MUSCLE_TO_CATEGORY: Record<IExerciseMuscle, MainCategory> = {
   glutes: "glutes",
   calves: "calves",
   hip_flexors: "others",
-  hip_adductors: "others",
-  hip_abductors: "others",
 
   // Core/Abs
-  rectus_abdominis: "abs",
+  abs: "abs",
   obliques: "abs",
-  transverse_abdominis: "abs",
-  erector_spinae: "others",
-  lower_back: "others",
 
-  // Specialized
-  serratus_anterior: "others",
-  rotator_cuff: "others",
+  // Full body
   full_body: "others",
 };
 
@@ -152,41 +141,25 @@ export const QUICK_FILTERS: QuickFilter[] = [
 export const EQUIPMENT_GROUPS = {
   free_weights: [
     "barbell",
-    "ez_curl_bar",
+    "ez_bar",
     "dumbbell",
     "kettlebell",
-    "weight_plate",
+    "plate",
+    "trap_bar",
   ] as IExerciseEquipment[],
   machines: [
-    "cable_machine",
+    "cable",
+    "machine",
     "smith_machine",
-    "leg_press",
-    "lat_pulldown",
-    "chest_press_machine",
-    "leg_curl_machine",
-    "leg_extension_machine",
-    "seated_row_machine",
-    "shoulder_press_machine",
+    "cardio_machine",
   ] as IExerciseEquipment[],
-  bodyweight: [
-    "bodyweight",
-    "pull_up_bar",
-    "dip_station",
-    "parallel_bars",
-  ] as IExerciseEquipment[],
+  bodyweight: ["bodyweight", "pull_up_bar", "dip_bars"] as IExerciseEquipment[],
   accessories: [
     "resistance_band",
     "suspension_trainer",
     "medicine_ball",
-    "stability_ball",
-    "foam_roller",
-    "ab_wheel",
-  ] as IExerciseEquipment[],
-  benches: [
-    "flat_bench",
-    "incline_bench",
-    "decline_bench",
-    "preacher_bench",
+    "landmine",
+    "bench",
   ] as IExerciseEquipment[],
 };
 

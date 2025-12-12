@@ -14,41 +14,44 @@
 
 Necesito que me ayudes a crear una lista COMPLETA y ORGANIZADA de ejercicios de gimnasio para una app de fitness profesional.
 
-## GRUPOS MUSCULARES DISPONIBLES:
-- **Upper Body Push**: chest_upper, chest_middle, chest_lower, front_delts, side_delts, triceps
-- **Upper Body Pull**: lats, rhomboids, mid_traps, lower_traps, upper_traps, rear_delts, biceps, forearms
-- **Core**: rectus_abdominis, obliques, transverse_abdominis, erector_spinae, lower_back
-- **Lower Body**: quads, hamstrings, glutes, calves, hip_flexors, hip_adductors, hip_abductors
-- **Specialized**: serratus_anterior, rotator_cuff, full_body
+## GRUPOS MUSCULARES (18 valores):
+- **Upper Body Push**: chest, shoulders_front, shoulders_side, shoulders_rear, triceps
+- **Upper Body Pull**: upper_back, lats, biceps, forearms
+- **Core**: abs, obliques, lower_back
+- **Lower Body**: glutes, quads, hamstrings, calves, hip_flexors
+- **Full Body**: full_body
 
-## EQUIPAMIENTO DISPONIBLE:
-**Free Weights**: barbell, ez_curl_bar, dumbbell, kettlebell, weight_plate
-**Machines**: cable_machine, smith_machine, leg_press, lat_pulldown, chest_press_machine, leg_curl_machine, leg_extension_machine, seated_row_machine, shoulder_press_machine
-**Bodyweight**: bodyweight, pull_up_bar, dip_station, parallel_bars
-**Accessories**: resistance_band, suspension_trainer, medicine_ball, stability_ball, ab_wheel
-**Benches**: flat_bench, incline_bench, decline_bench, preacher_bench
+## EQUIPAMIENTO (18 valores):
+- **Free Weights**: barbell, dumbbell, kettlebell, ez_bar, plate, trap_bar
+- **Machines**: cable, machine, smith_machine, cardio_machine
+- **Bodyweight**: bodyweight, pull_up_bar, dip_bars
+- **Accessories**: bench, resistance_band, suspension_trainer, medicine_ball, landmine
 
 ## EXERCISE_TYPE:
 - **compound**: Ejercicios multi-articulares (squat, deadlift, bench press)
 - **isolation**: Ejercicios de una articulación (bicep curl, leg extension)
 
+## MOVEMENT_PATTERN:
+- **push**: Empuje (press, flexiones)
+- **pull**: Tirón (dominadas, remos)
+- **squat**: Sentadilla
+- **hinge**: Bisagra de cadera (peso muerto, hip thrust)
+- **lunge**: Zancadas
+- **carry**: Acarreo (farmer walks)
+- **rotation**: Rotación (russian twist)
+- **isometric**: Isométrico (plancha)
+
 ## INSTRUCCIONES:
 
 1. **Crea una lista de 15-20 ejercicios POR CADA grupo muscular**
-2. **Incluye ejercicios de TODOS los niveles**: principiante, intermedio, avanzado
+2. **Incluye ejercicios de TODOS los niveles**: principiante (1-2), intermedio (3), avanzado (4-5)
 3. **Mezcla equipment**: bodyweight, free weights, machines, cables
 4. **Incluye variaciones importantes**: incline/decline, different grips, unilateral, etc.
 5. **Prioriza ejercicios REALES y POPULARES** usados en gimnasios
 
 ## FORMATO DE RESPUESTA:
 
-### CHEST_UPPER (15-20 ejercicios)
-1. Incline Barbell Press
-2. Incline Dumbbell Press
-3. Incline Dumbbell Flyes
-4. [continúa...]
-
-### CHEST_MIDDLE (15-20 ejercicios)
+### CHEST (15-20 ejercicios)
 1. Barbell Bench Press
 2. Dumbbell Bench Press
 3. Push-ups
@@ -87,37 +90,58 @@ Basándote en la lista que creamos anteriormente, necesito que generes la estruc
   name: string,                  // Nombre del ejercicio
   source: "system",              // SIEMPRE "system"
   created_by_user_id: null,      // SIEMPRE null
-  main_muscle_group: IExerciseMuscle,        // Músculo principal
+
+  // Músculos
+  main_muscle_group: IExerciseMuscle,         // Músculo principal (1 de 18)
   secondary_muscle_groups: IExerciseMuscle[], // Músculos secundarios
-  primary_equipment: IExerciseEquipment,     // Equipment principal
-  equipment: IExerciseEquipment[],           // Todo equipment necesario
-  exercise_type: "compound" | "isolation",   // Tipo de ejercicio
-  instructions: string[],        // 3-7 pasos SÚPER claros
-  similar_exercises: string[],   // IDs de ejercicios similares (déjalo vacío por ahora)
-  images: string[],              // SIEMPRE array vacío []
-  default_measurement_template: "time_only" | "distance_only" | "weight_reps" | "weight_reps_range" | "distance_time" | "weight_distance" | "weight_time"  // Template de medición
+
+  // Equipment
+  primary_equipment: IExerciseEquipment,      // Equipment principal (1 de 18)
+  equipment: IExerciseEquipment[],            // Todo equipment necesario
+
+  // Tipo
+  exercise_type: "compound" | "isolation",
+
+  // NUEVOS CAMPOS
+  difficulty: 1 | 2 | 3 | 4 | 5,             // 1=principiante, 5=avanzado
+  unilateral: boolean,                        // true si trabaja un lado a la vez
+  movement_pattern: "push" | "pull" | "squat" | "hinge" | "lunge" | "carry" | "rotation" | "isometric",
+  adds_bodyweight: boolean,                   // true si suma peso corporal (dominadas con lastre, dips)
+  common_mistakes: string[],                  // Errores comunes (opcional, puede ser [])
+
+  // Instrucciones
+  instructions: string[],                     // 3-7 pasos SÚPER claros
+  similar_exercises: string[],                // IDs de ejercicios similares (puede ser [])
+  images: string[],                           // SIEMPRE array vacío []
+
+  // Template de medición
+  default_measurement_template: "weight_reps" | "weight_reps_range" | "time_only" | "weight_time" | "distance_only" | "distance_time" | "weight_distance"
 }
 ````
 
 ## TYPES DISPONIBLES:
 
-### IExerciseMuscle (USA EXACTAMENTE ESTOS VALORES - core no existe):
+### IExerciseMuscle (18 valores - USA EXACTAMENTE ESTOS):
 
-chest_upper, chest_middle, chest_lower, front_delts, side_delts, rear_delts, triceps, lats, rhomboids, mid_traps, lower_traps, upper_traps, biceps, forearms, rectus_abdominis, obliques, transverse_abdominis, erector_spinae, lower_back, quads, hamstrings, glutes, calves, hip_flexors, hip_adductors, hip_abductors, serratus_anterior, rotator_cuff, full_body
+chest, upper_back, lats, shoulders_front, shoulders_side, shoulders_rear, biceps, triceps, forearms, abs, obliques, lower_back, glutes, quads, hamstrings, calves, hip_flexors, full_body
 
-### IExerciseEquipment (USA EXACTAMENTE ESTOS VALORES):
+### IExerciseEquipment (18 valores - USA EXACTAMENTE ESTOS):
 
-barbell, ez_curl_bar, dumbbell, kettlebell, weight_plate, cable_machine, smith_machine, leg_press, lat_pulldown, chest_press_machine, leg_curl_machine, leg_extension_machine, seated_row_machine, shoulder_press_machine, bodyweight, pull_up_bar, dip_station, parallel_bars, resistance_band, suspension_trainer, medicine_ball, stability_ball, foam_roller, ab_wheel, flat_bench, incline_bench, decline_bench, preacher_bench
+bodyweight, barbell, dumbbell, kettlebell, ez_bar, plate, cable, machine, smith_machine, bench, pull_up_bar, dip_bars, resistance_band, trap_bar, landmine, suspension_trainer, medicine_ball, cardio_machine
+
+### IMovementPattern (8 valores - USA EXACTAMENTE ESTOS):
+
+push, pull, squat, hinge, lunge, carry, rotation, isometric
 
 ### default_measurement_template (USA EXACTAMENTE ESTOS VALORES):
 
-- **"time_only"**: Para ejercicios isométricos como plancha, wall sit (solo tiempo)
-- **"distance_only"**: Para ejercicios de distancia sin tiempo
 - **"weight_reps"**: Para ejercicios con peso y repeticiones (bench press, squats, etc.)
 - **"weight_reps_range"**: Para peso fijo con rango de repeticiones (ej: 8-12 reps)
+- **"time_only"**: Para ejercicios isométricos como plancha, wall sit (solo tiempo)
+- **"weight_time"**: Para ejercicios isométricos con peso (peso + tiempo)
+- **"distance_only"**: Para ejercicios de distancia sin tiempo
 - **"distance_time"**: Para cardio - correr, remar, ciclismo (distancia + tiempo)
 - **"weight_distance"**: Para farmer's walk, sled push/pull (peso + distancia)
-- **"weight_time"**: Para ejercicios isométricos con peso (peso + tiempo)
 
 ## EJEMPLO COMPLETO:
 
@@ -127,11 +151,20 @@ barbell, ez_curl_bar, dumbbell, kettlebell, weight_plate, cable_machine, smith_m
   name: "Barbell Bench Press",
   source: "system",
   created_by_user_id: null,
-  main_muscle_group: "chest_middle",
-  secondary_muscle_groups: ["triceps", "front_delts"],
+  main_muscle_group: "chest",
+  secondary_muscle_groups: ["triceps", "shoulders_front"],
   primary_equipment: "barbell",
-  equipment: ["barbell", "flat_bench"],
+  equipment: ["barbell", "bench"],
   exercise_type: "compound",
+  difficulty: 2,
+  unilateral: false,
+  movement_pattern: "push",
+  adds_bodyweight: false,
+  common_mistakes: [
+    "Rebotar la barra en el pecho",
+    "Levantar los glúteos del banco",
+    "No retraer las escápulas"
+  ],
   instructions: [
     "Acuéstate boca arriba en el banco plano con los pies firmemente apoyados en el suelo",
     "Agarra la barra con las manos separadas un poco más que el ancho de los hombros, con agarre pronado",

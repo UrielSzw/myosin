@@ -41,7 +41,7 @@ export type RoutineVolumeData = {
 
 // Tipo para datos de sesión (músculos específicos)
 export type SessionMuscleData = {
-  group: string; // e.g. "chest_middle", "lats", "quads"
+  group: string; // e.g. "chest", "lats", "quads"
   sets: number;
   percentage: number;
 };

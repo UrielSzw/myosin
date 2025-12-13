@@ -46,6 +46,15 @@ export class SupabaseExercisesRepository extends BaseSupabaseRepository {
           similar_exercises: ex.similar_exercises,
           default_measurement_template:
             ex.default_measurement_template ?? "weight_reps",
+          // Media fields
+          primary_media_url: ex.primary_media_url,
+          primary_media_type: ex.primary_media_type,
+          // New fields
+          difficulty: ex.difficulty,
+          unilateral: ex.unilateral,
+          movement_pattern: ex.movement_pattern,
+          adds_bodyweight: ex.adds_bodyweight,
+          common_mistakes: ex.common_mistakes ?? [],
         })) as ExerciseInsert[];
     } catch (error) {
       return await this.handleError(

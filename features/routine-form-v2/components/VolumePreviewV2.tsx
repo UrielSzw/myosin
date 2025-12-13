@@ -221,10 +221,12 @@ export const VolumePreviewV2: React.FC<Props> = ({
               )}
             </View>
 
-            {/* Chevron */}
-            <Animated.View style={chevronStyle}>
-              <ChevronRight size={20} color={colors.textMuted} />
-            </Animated.View>
+            {/* Chevron - only show when there's volume to expand */}
+            {hasVolume && (
+              <Animated.View style={chevronStyle}>
+                <ChevronRight size={20} color={colors.textMuted} />
+              </Animated.View>
+            )}
           </View>
         </View>
       </Pressable>

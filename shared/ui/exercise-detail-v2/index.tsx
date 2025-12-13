@@ -18,6 +18,7 @@ import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { Image } from "expo-image";
 import {
+  AlertTriangle,
   ChevronLeft,
   ChevronRight,
   Dumbbell,
@@ -84,6 +85,10 @@ const translations = {
   noInstructions: {
     es: "No hay instrucciones disponibles para este ejercicio.",
     en: "No instructions available for this exercise.",
+  },
+  commonMistakes: {
+    es: "Errores Comunes",
+    en: "Common Mistakes",
   },
   noMedia: {
     es: "Sin imagen",
@@ -991,6 +996,82 @@ export const ExerciseDetailViewV2: React.FC<Props> = ({
             </View>
           </Animated.View>
         )}
+
+        {/* Common Mistakes Section */}
+        {exercise.common_mistakes && exercise.common_mistakes.length > 0 && (
+          <Animated.View
+            entering={FadeInDown.duration(400).delay(300)}
+            style={styles.instructionsSection}
+          >
+            {/* Section Header */}
+            <View style={styles.sectionHeader}>
+              <View
+                style={[
+                  styles.sectionHeaderIcon,
+                  {
+                    backgroundColor: `${colors.warning[500]}15`,
+                  },
+                ]}
+              >
+                <AlertTriangle size={16} color={colors.warning[500]} />
+              </View>
+              <Typography
+                variant="body2"
+                weight="semibold"
+                style={{ color: colors.warning[500] }}
+              >
+                {t.commonMistakes[lang]}
+              </Typography>
+            </View>
+
+            {/* Mistakes List */}
+            <View
+              style={[
+                styles.instructionsCard,
+                {
+                  backgroundColor: `${colors.warning[500]}08`,
+                  borderColor: `${colors.warning[500]}20`,
+                },
+              ]}
+            >
+              {exercise.common_mistakes.map((mistake, index) => (
+                <Animated.View
+                  key={index}
+                  entering={FadeInDown.duration(300).delay(350 + index * 40)}
+                  style={[
+                    styles.stepRow,
+                    index < exercise.common_mistakes!.length - 1 && {
+                      borderBottomWidth: 1,
+                      borderBottomColor: `${colors.warning[500]}15`,
+                    },
+                  ]}
+                >
+                  <View
+                    style={[
+                      styles.mistakeBullet,
+                      {
+                        backgroundColor: `${colors.warning[500]}25`,
+                      },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.mistakeBulletInner,
+                        { backgroundColor: colors.warning[500] },
+                      ]}
+                    />
+                  </View>
+                  <Typography
+                    variant="body2"
+                    style={[styles.stepText, { color: colors.text }]}
+                  >
+                    {mistake}
+                  </Typography>
+                </Animated.View>
+              ))}
+            </View>
+          </Animated.View>
+        )}
       </Animated.ScrollView>
     </View>
   );
@@ -1295,6 +1376,19 @@ const styles = StyleSheet.create({
   stepText: {
     flex: 1,
     lineHeight: 22,
+  },
+  mistakeBullet: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 2,
+  },
+  mistakeBulletInner: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   emptyInstructions: {
     padding: 32,

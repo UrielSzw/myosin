@@ -145,6 +145,12 @@ export const syncExercisesWithLanguage = async (
           default_measurement_template: ex.default_measurement_template,
           primary_media_type: ex.primary_media_type,
           primary_media_url: ex.primary_media_url,
+          // New fields
+          difficulty: ex.difficulty,
+          unilateral: ex.unilateral,
+          movement_pattern: ex.movement_pattern,
+          adds_bodyweight: ex.adds_bodyweight,
+          common_mistakes: ex.common_mistakes,
         })
         .onConflictDoUpdate({
           target: exercises.id,
@@ -163,6 +169,12 @@ export const syncExercisesWithLanguage = async (
             default_measurement_template: ex.default_measurement_template,
             primary_media_type: ex.primary_media_type,
             primary_media_url: ex.primary_media_url,
+            // New fields
+            difficulty: ex.difficulty,
+            unilateral: ex.unilateral,
+            movement_pattern: ex.movement_pattern,
+            adds_bodyweight: ex.adds_bodyweight,
+            common_mistakes: ex.common_mistakes,
           },
         });
     }

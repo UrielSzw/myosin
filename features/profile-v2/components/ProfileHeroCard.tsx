@@ -1,9 +1,9 @@
-import { toSupportedLanguage } from "@/shared/types/language";
 import { useColorScheme } from "@/shared/hooks/use-color-scheme";
 import { useUserPreferences } from "@/shared/hooks/use-user-preferences-store";
 import { useUserProfile } from "@/shared/hooks/use-user-profile";
 import { useAuth } from "@/shared/providers/auth-provider";
 import { profileTranslations as t } from "@/shared/translations/profile";
+import { toSupportedLanguage } from "@/shared/types/language";
 import { Typography } from "@/shared/ui/typography";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
@@ -29,7 +29,7 @@ export const ProfileHeroCard = () => {
     if (!user?.created_at) return "2025";
     const date = new Date(user.created_at);
     const monthNames = t.monthNames[lang];
-    return `${monthNames[date.getMonth()].slice(0, 3)} ${date.getFullYear()}`;
+    return `${monthNames[date.getMonth()]?.slice(0, 3)} ${date.getFullYear()}`;
   };
 
   const handleEditProfile = () => {
@@ -92,8 +92,11 @@ export const ProfileHeroCard = () => {
                 <Typography
                   style={{
                     fontSize: 48,
+                    lineHeight: 56,
                     color: "#fff",
                     fontWeight: "700",
+                    textAlignVertical: "center",
+                    includeFontPadding: false,
                   }}
                 >
                   {initial}

@@ -108,7 +108,15 @@ El onboarding recolecta información personal para personalizar la experiencia:
 
 ### Ejercicios
 
-La app incluye ejercicios predefinidos organizados por grupos musculares.
+La app incluye ejercicios predefinidos organizados por grupos musculares. Incluye tanto ejercicios de gimnasio tradicional como una extensa librería de **ejercicios de calistenia** con sistema de progresiones.
+
+#### Tipos de Ejercicios por Origen
+
+| Categoría      | Descripción                                   | Cantidad Aprox |
+| -------------- | --------------------------------------------- | -------------- |
+| **Gimnasio**   | Ejercicios tradicionales con pesas y máquinas | ~200+          |
+| **Calistenia** | Ejercicios de peso corporal con progresiones  | ~75            |
+| **Usuario**    | Ejercicios creados por el usuario             | Ilimitados     |
 
 #### Grupos Musculares (`IExerciseMuscle`) - 18 valores
 
@@ -205,6 +213,193 @@ La app incluye ejercicios predefinidos organizados por grupos musculares.
 | -------- | --------------------------------- |
 | `system` | Ejercicios predefinidos de la app |
 | `user`   | Ejercicios creados por el usuario |
+
+#### Campos Adicionales del Ejercicio
+
+| Campo                          | Tipo                  | Descripción                                  |
+| ------------------------------ | --------------------- | -------------------------------------------- |
+| `difficulty`                   | 1-5                   | Nivel de dificultad (1=fácil, 5=muy difícil) |
+| `unilateral`                   | boolean               | Si es unilateral (un lado a la vez)          |
+| `adds_bodyweight`              | boolean               | Si suma peso corporal (fondos, dominadas)    |
+| `default_measurement_template` | MeasurementTemplateId | Template de medición por defecto             |
+| `common_mistakes`              | string[]              | Errores comunes (translation keys)           |
+| `primary_media_url`            | string                | URL del GIF/imagen principal                 |
+| `primary_media_type`           | `gif` \| `image`      | Tipo de media                                |
+
+---
+
+### Sistema de Progresiones (Calistenia)
+
+El sistema de progresiones permite trackear el avance del usuario a través de "skill trees" de ejercicios de calistenia.
+
+#### Arquitectura de Tablas
+
+```
+┌─────────────────────┐
+│  progression_paths  │  ← 13 skill trees definidos
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────────────┐
+│ progression_path_exercises  │  ← Ejercicios asignados a cada path con level
+└──────────┬──────────────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      exercises      │  ← Ejercicios de calistenia
+└─────────────────────┘
+
+┌────────────────────────┐
+│  exercise_progressions │  ← Relaciones entre ejercicios (unlock criteria)
+└────────────────────────┘
+
+┌────────────────────────┐
+│  user_exercise_unlocks │  ← Progreso del usuario por ejercicio
+└────────────────────────┘
+```
+
+#### Categorías de Progression Path (`ProgressionPathCategory`)
+
+| Categoría         | Descripción                 | Ejemplo de Path           |
+| ----------------- | --------------------------- | ------------------------- |
+| `vertical_pull`   | Tirón vertical              | Pull-up → One Arm Pull-up |
+| `horizontal_pull` | Tirón horizontal            | Row → Front Lever         |
+| `vertical_push`   | Empuje vertical             | Dip → HSPU                |
+| `horizontal_push` | Empuje horizontal           | Push-up → Planche         |
+| `squat`           | Patrón de sentadilla        | Squat → Pistol Squat      |
+| `hinge`           | Patrón de bisagra de cadera | Romanian DL → Nordic Curl |
+| `core`            | Core y estabilidad          | L-sit → Dragon Flag       |
+| `skill`           | Skills avanzados            | Handstand, Muscle-up      |
+
+#### Progression Paths Disponibles (13 paths)
+
+| Slug          | Nombre                  | Categoría         | Ultimate Skill    |
+| ------------- | ----------------------- | ----------------- | ----------------- |
+| `pull_up`     | Pull-up Progression     | `vertical_pull`   | One Arm Pull-up   |
+| `row`         | Row to Front Lever      | `horizontal_pull` | Front Lever       |
+| `dip`         | Dip Progression         | `vertical_push`   | Weighted Dip      |
+| `push_up`     | Push-up Progression     | `horizontal_push` | One Arm Push-up   |
+| `squat`       | Squat Progression       | `squat`           | Pistol Squat      |
+| `hinge`       | Nordic Curl Progression | `hinge`           | Nordic Curl       |
+| `muscle_up`   | Muscle-up Progression   | `skill`           | Muscle-up         |
+| `hspu`        | HSPU Progression        | `vertical_push`   | Handstand Push-up |
+| `l_sit`       | L-sit Progression       | `core`            | V-sit             |
+| `front_lever` | Front Lever             | `horizontal_pull` | Front Lever       |
+| `planche`     | Planche Progression     | `horizontal_push` | Planche           |
+| `back_lever`  | Back Lever              | `horizontal_pull` | Back Lever        |
+| `dragon_flag` | Dragon Flag             | `core`            | Dragon Flag       |
+
+#### Tabla: `progression_paths`
+
+| Campo                  | Tipo                    | Descripción                         |
+| ---------------------- | ----------------------- | ----------------------------------- |
+| `id`                   | UUID                    | ID único del path                   |
+| `slug`                 | string                  | Identificador único (ej: "pull_up") |
+| `name_key`             | string                  | Translation key para el nombre      |
+| `description_key`      | string                  | Translation key para descripción    |
+| `category`             | ProgressionPathCategory | Categoría del path                  |
+| `ultimate_exercise_id` | UUID                    | Ejercicio final del path            |
+| `icon`                 | string                  | Nombre del ícono Lucide             |
+| `color`                | string                  | Color hexadecimal                   |
+
+#### Tabla: `progression_path_exercises`
+
+| Campo          | Tipo    | Descripción                              |
+| -------------- | ------- | ---------------------------------------- |
+| `id`           | UUID    | ID único                                 |
+| `path_id`      | UUID    | FK a progression_paths                   |
+| `exercise_id`  | UUID    | FK a exercises                           |
+| `level`        | integer | Nivel en el path (1=más fácil, 8+=skill) |
+| `is_main_path` | boolean | true=línea principal, false=variación    |
+
+#### Tabla: `exercise_progressions`
+
+| Campo               | Tipo                        | Descripción                      |
+| ------------------- | --------------------------- | -------------------------------- |
+| `id`                | UUID                        | ID único                         |
+| `from_exercise_id`  | UUID                        | Ejercicio origen (prerrequisito) |
+| `to_exercise_id`    | UUID                        | Ejercicio destino                |
+| `relationship_type` | ProgressionRelationshipType | Tipo de relación                 |
+| `unlock_criteria`   | UnlockCriteria (JSON)       | Criterio para desbloquear        |
+| `difficulty_delta`  | integer                     | Cambio de dificultad (+1, -1)    |
+| `notes`             | string                      | Tips/técnica (translation key)   |
+| `source`            | `system` \| `community`     | Origen de la data                |
+
+#### Tipos de Relación (`ProgressionRelationshipType`)
+
+| Tipo           | Descripción                                |
+| -------------- | ------------------------------------------ |
+| `progression`  | from es más fácil que to (avance natural)  |
+| `prerequisite` | from es REQUERIDO para desbloquear to      |
+| `variation`    | Alternativas del mismo nivel de dificultad |
+| `regression`   | from es más difícil que to (paso atrás)    |
+
+#### Criterios de Unlock (`UnlockCriteriaType`)
+
+| Tipo          | Descripción                   | Ejemplo                  |
+| ------------- | ----------------------------- | ------------------------ |
+| `reps`        | X repeticiones                | 8 reps de Pull-up        |
+| `time`        | X segundos                    | 30 seg de L-sit          |
+| `weight`      | X peso mínimo                 | 20kg en Weighted Pull-up |
+| `weight_reps` | X peso por Y reps             | 10kg x 5 reps            |
+| `sets_reps`   | X sets de Y reps              | 3 sets de 8 reps         |
+| `manual`      | El usuario decide manualmente | -                        |
+
+#### Estructura de UnlockCriteria (JSON)
+
+```typescript
+interface UnlockCriteria {
+  type: ProgressionUnlockCriteriaType;
+  primary_value: number; // 8 reps, 30 segundos, 10kg
+  secondary_value?: number; // Para weight_reps: el segundo valor (reps)
+  sets?: number; // Para sets_reps: "3 sets of 8"
+  description_key: string; // Key for translation
+}
+```
+
+#### Tabla: `user_exercise_unlocks`
+
+| Campo                     | Tipo                     | Descripción                    |
+| ------------------------- | ------------------------ | ------------------------------ |
+| `id`                      | UUID                     | ID único                       |
+| `user_id`                 | UUID                     | Usuario                        |
+| `exercise_id`             | UUID                     | Ejercicio                      |
+| `status`                  | UserExerciseUnlockStatus | Estado actual                  |
+| `unlocked_at`             | timestamp                | Cuándo se desbloqueó           |
+| `unlocked_by_exercise_id` | UUID                     | Qué ejercicio triggereó unlock |
+| `unlocked_by_pr_id`       | UUID                     | Qué PR triggereó unlock        |
+| `current_progress`        | UnlockProgress (JSON)    | Progreso actual hacia unlock   |
+| `manually_unlocked`       | boolean                  | Si fue unlock manual           |
+
+#### Estados de Unlock (`UserExerciseUnlockStatus`)
+
+| Estado      | Descripción                                   |
+| ----------- | --------------------------------------------- |
+| `locked`    | No puede hacerlo aún                          |
+| `unlocking` | En progreso (>50% del criterio cumplido)      |
+| `unlocked`  | Cumplió criterio de unlock, puede practicarlo |
+| `mastered`  | Cumplió criterio de mastery                   |
+
+#### Estructura de UnlockProgress (JSON)
+
+```typescript
+interface UnlockProgress {
+  current_value: number; // Valor actual logrado
+  target_value: number; // Valor objetivo
+  percentage: number; // Porcentaje de progreso (0-100)
+}
+```
+
+#### Sincronización de Progressions
+
+Las tablas de progressions se sincronizan desde Supabase al abrir la app:
+
+| Tabla                        | Dirección     | Descripción                      |
+| ---------------------------- | ------------- | -------------------------------- |
+| `progression_paths`          | Cloud → Local | Read-only, definidos en Supabase |
+| `progression_path_exercises` | Cloud → Local | Read-only, definidos en Supabase |
+| `exercise_progressions`      | Cloud → Local | Read-only, definidos en Supabase |
+| `user_exercise_unlocks`      | Bidireccional | Progreso del usuario             |
 
 ---
 
